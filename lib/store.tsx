@@ -11,320 +11,194 @@ import type {
   AppNotification,
   Statement,
 } from "@/types";
-import {
-  DEMO_MEMBER,
-  seedWorks,
-  seedSingles,
-  seedAlbums,
-  seedUploads,
-  seedRoyalty,
-  seedNotifications,
-  seedStatements,
-} from "@/data/mock";
-import { uid } from "@/lib/format";
 
-const STORAGE_KEY = "zamcops_portal_v1";
+type Result<T = void> = { ok: boolean; error?: string; item?: T };
 
-interface PersistShape {
-  members: Member[];
-  currentMemberId: string | null;
+interface MemberState {
+  member: Member | null;
   works: WorkDeclaration[];
   singles: SongSubmission[];
   albums: AlbumSubmission[];
   uploads: UploadFile[];
   notifications: AppNotification[];
   statements: Statement[];
-  royalty: Record<string, RoyaltySummary>;
+  royalty: RoyaltySummary | null;
 }
 
-function seedState(): PersistShape {
-  const m = DEMO_MEMBER;
-  return {
-    members: [m],
-    currentMemberId: null, // require explicit login even in demo
-    works: seedWorks(m.id),
-    singles: seedSingles(m.id),
-    albums: seedAlbums(m.id),
-    uploads: seedUploads(m.id),
-    notifications: seedNotifications(m.id),
-    statements: seedStatements(m.id),
-    royalty: { [m.id]: seedRoyalty(m.id) },
-  };
-}
+const empty: MemberState = {
+  member: null,
+  works: [],
+  singles: [],
+  albums: [],
+  uploads: [],
+  notifications: [],
+  statements: [],
+  royalty: null,
+};
 
-function load(): PersistShape {
-  if (typeof window === "undefined") return seedState();
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return seedState();
-    return JSON.parse(raw) as PersistShape;
-  } catch {
-    return seedState();
-  }
-}
-
-interface AppContextValue extends PersistShape {
+interface AppContextValue extends MemberState {
   ready: boolean;
   currentMember: Member | null;
-  // auth
-  login: (identifier: string, password: string) => boolean;
-  register: (data: Partial<Member> & { password: string }) => Member;
-  logout: () => void;
-  // profile
-  updateProfile: (patch: Partial<Member>) => void;
-  // submissions
-  addWork: (w: Omit<WorkDeclaration, "id" | "ownerId" | "submittedAt" | "status">) => WorkDeclaration;
-  addSingle: (s: Omit<SongSubmission, "id" | "ownerId" | "submittedAt" | "status">) => SongSubmission;
-  addAlbum: (a: Omit<AlbumSubmission, "id" | "ownerId" | "submittedAt" | "status">) => AlbumSubmission;
-  // notifications
-  markNotificationRead: (id: string) => void;
-  markAllRead: () => void;
-  // admin review actions
-  setReviewStatus: (
-    kind: "work" | "single" | "album",
-    id: string,
-    status: WorkDeclaration["status"]
-  ) => void;
-  resetDemo: () => void;
+  refresh: () => Promise<void>;
+  login: (identifier: string, password: string) => Promise<Result>;
+  register: (data: Partial<Member> & { password: string }) => Promise<Result>;
+  logout: () => Promise<void>;
+  updateProfile: (patch: Partial<Member>) => Promise<Result>;
+  changePassword: (current: string, next: string) => Promise<Result>;
+  addWork: (w: Record<string, unknown>) => Promise<Result<WorkDeclaration>>;
+  addSingle: (s: Record<string, unknown>) => Promise<Result<SongSubmission>>;
+  addAlbum: (a: Record<string, unknown>) => Promise<Result<AlbumSubmission>>;
+  markNotificationRead: (id: string) => Promise<void>;
+  markAllRead: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
 
+async function postJSON(url: string, body?: unknown, method = "POST") {
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  return { res, data };
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<PersistShape>(seedState);
+  const [state, setState] = useState<MemberState>(empty);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    setState(load());
-    setReady(true);
+  const refresh = useCallback(async () => {
+    const res = await fetch("/api/member/bootstrap");
+    if (!res.ok) {
+      setState(empty);
+      return;
+    }
+    const data = await res.json();
+    setState({
+      member: data.member,
+      works: data.works,
+      singles: data.singles,
+      albums: data.albums,
+      uploads: data.uploads,
+      notifications: data.notifications,
+      statements: data.statements,
+      royalty: data.royalty,
+    });
   }, []);
 
+  // Bootstrap session on mount.
   useEffect(() => {
-    if (!ready) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      /* ignore quota errors */
-    }
-  }, [state, ready]);
-
-  const currentMember =
-    state.members.find((m) => m.id === state.currentMemberId) ?? null;
-
-  const login = useCallback(
-    (identifier: string, password: string) => {
-      let ok = false;
-      setState((s) => {
-        const m = s.members.find(
-          (x) =>
-            (x.email.toLowerCase() === identifier.toLowerCase() ||
-              x.phone.replace(/\s/g, "") === identifier.replace(/\s/g, "")) &&
-            x.password === password
-        );
-        if (m) {
-          ok = true;
-          return { ...s, currentMemberId: m.id };
+    (async () => {
+      try {
+        const me = await fetch("/api/auth/me").then((r) => r.json());
+        if (me.authenticated && me.role === "member") {
+          await refresh();
         }
-        return s;
-      });
-      return ok;
+      } catch {
+        /* ignore */
+      } finally {
+        setReady(true);
+      }
+    })();
+  }, [refresh]);
+
+  const login = useCallback<AppContextValue["login"]>(
+    async (identifier, password) => {
+      const { res, data } = await postJSON("/api/auth/login", { identifier, password });
+      if (!res.ok) return { ok: false, error: data.error || "Sign in failed." };
+      await refresh();
+      return { ok: true };
     },
-    []
+    [refresh]
   );
 
-  const register = useCallback((data: Partial<Member> & { password: string }) => {
-    const member: Member = {
-      id: uid("mem"),
-      memberNumber: `ZAM-2026-${Math.floor(10000 + Math.random() * 89999)}`,
-      fullName: data.fullName ?? "",
-      stageName: data.stageName ?? "",
-      nrcOrPassport: data.nrcOrPassport ?? "",
-      phone: data.phone ?? "",
-      email: data.email ?? "",
-      role: data.role ?? "Artist",
-      membershipStatus: "Pending",
-      joinedAt: new Date().toISOString(),
-      password: data.password,
-    };
-    setState((s) => ({
-      ...s,
-      members: [...s.members, member],
-      currentMemberId: member.id,
-      royalty: {
-        ...s.royalty,
-        [member.id]: {
-          ownerId: member.id,
-          currency: "ZMW",
-          totalEstimated: 0,
-          pending: 0,
-          paid: 0,
-          usageLogs: [],
-          topSongs: [],
-        },
-      },
-      statements: [
-        {
-          id: uid("stm"),
-          ownerId: member.id,
-          type: "Membership Receipt",
-          title: "2026 Membership Application",
-          reference: `MR-2026-${member.memberNumber.split("-").pop()}`,
-          amount: 350,
-          issuedAt: new Date().toISOString(),
-        },
-        ...s.statements,
-      ],
-      notifications: [
-        {
-          id: uid("ntf"),
-          ownerId: member.id,
-          title: "Welcome to ZAMCOPS",
-          body: "Your membership application has been received. Complete your profile to speed up verification.",
-          type: "info",
-          createdAt: new Date().toISOString(),
-          read: false,
-        },
-        ...s.notifications,
-      ],
-    }));
-    return member;
+  const register = useCallback<AppContextValue["register"]>(
+    async (payload) => {
+      const { res, data } = await postJSON("/api/auth/register", payload);
+      if (!res.ok) return { ok: false, error: data.error || "Registration failed." };
+      await refresh();
+      return { ok: true };
+    },
+    [refresh]
+  );
+
+  const logout = useCallback(async () => {
+    await postJSON("/api/auth/logout");
+    setState(empty);
   }, []);
 
-  const logout = useCallback(() => {
-    setState((s) => ({ ...s, currentMemberId: null }));
+  const updateProfile = useCallback<AppContextValue["updateProfile"]>(async (patch) => {
+    const { res, data } = await postJSON("/api/member/profile", patch, "PATCH");
+    if (!res.ok) return { ok: false, error: data.error || "Could not save profile." };
+    setState((s) => ({ ...s, member: data.member }));
+    return { ok: true };
   }, []);
 
-  const updateProfile = useCallback((patch: Partial<Member>) => {
-    setState((s) => ({
-      ...s,
-      members: s.members.map((m) =>
-        m.id === s.currentMemberId ? { ...m, ...patch } : m
-      ),
-    }));
+  const changePassword = useCallback<AppContextValue["changePassword"]>(async (current, next) => {
+    const { res, data } = await postJSON("/api/member/password", { current, next }, "PATCH");
+    if (!res.ok) return { ok: false, error: data.error || "Could not update password." };
+    return { ok: true };
   }, []);
 
-  const pushReceipt = (s: PersistShape, ownerId: string, title: string, ref: string): Statement => ({
-    id: uid("stm"),
-    ownerId,
-    type: "Submission Receipt",
-    title,
-    reference: ref,
-    issuedAt: new Date().toISOString(),
-  });
+  const addWork = useCallback<AppContextValue["addWork"]>(
+    async (w) => {
+      const { res, data } = await postJSON("/api/member/works", w);
+      if (!res.ok) return { ok: false, error: data.error || "Could not submit declaration." };
+      await refresh();
+      return { ok: true, item: data.work };
+    },
+    [refresh]
+  );
 
-  const addWork = useCallback<AppContextValue["addWork"]>((w) => {
-    const id = uid("wrk");
-    let created!: WorkDeclaration;
-    setState((s) => {
-      const ownerId = s.currentMemberId!;
-      created = { ...w, id, ownerId, status: "Pending", submittedAt: new Date().toISOString() };
-      return {
-        ...s,
-        works: [created, ...s.works],
-        statements: [pushReceipt(s, ownerId, `Work Declaration — ${w.title}`, `SR-W-${id.slice(-5)}`), ...s.statements],
-        notifications: [
-          {
-            id: uid("ntf"),
-            ownerId,
-            title: "Work declaration pending review",
-            body: `Your declaration for “${w.title}” has been received and is queued for review.`,
-            type: "info",
-            createdAt: new Date().toISOString(),
-            read: false,
-          },
-          ...s.notifications,
-        ],
-      };
-    });
-    return created;
-  }, []);
+  const addSingle = useCallback<AppContextValue["addSingle"]>(
+    async (s) => {
+      const { res, data } = await postJSON("/api/member/singles", s);
+      if (!res.ok) return { ok: false, error: data.error || "Could not submit single." };
+      await refresh();
+      return { ok: true, item: data.single };
+    },
+    [refresh]
+  );
 
-  const addSingle = useCallback<AppContextValue["addSingle"]>((song) => {
-    const id = uid("sng");
-    let created!: SongSubmission;
-    setState((s) => {
-      const ownerId = s.currentMemberId!;
-      created = { ...song, id, ownerId, status: "Pending", submittedAt: new Date().toISOString() };
-      const newUploads: UploadFile[] = [];
-      if (song.audioFile) newUploads.push({ id: uid("upl"), ownerId, fileName: song.audioFile, fileType: "Audio", linkedTo: song.title, uploadedAt: new Date().toISOString(), status: "Processing" });
-      if (song.coverArt) newUploads.push({ id: uid("upl"), ownerId, fileName: song.coverArt, fileType: "Cover Art", linkedTo: song.title, uploadedAt: new Date().toISOString(), status: "Pending" });
-      return {
-        ...s,
-        singles: [created, ...s.singles],
-        uploads: [...newUploads, ...s.uploads],
-        statements: [pushReceipt(s, ownerId, `Single — ${song.title}`, `SR-S-${id.slice(-5)}`), ...s.statements],
-        notifications: [
-          { id: uid("ntf"), ownerId, title: "Single submission received", body: `“${song.title}” is now pending review.`, type: "info", createdAt: new Date().toISOString(), read: false },
-          ...s.notifications,
-        ],
-      };
-    });
-    return created;
-  }, []);
+  const addAlbum = useCallback<AppContextValue["addAlbum"]>(
+    async (a) => {
+      const { res, data } = await postJSON("/api/member/albums", a);
+      if (!res.ok) return { ok: false, error: data.error || "Could not submit album." };
+      await refresh();
+      return { ok: true, item: data.album };
+    },
+    [refresh]
+  );
 
-  const addAlbum = useCallback<AppContextValue["addAlbum"]>((album) => {
-    const id = uid("alb");
-    let created!: AlbumSubmission;
-    setState((s) => {
-      const ownerId = s.currentMemberId!;
-      created = { ...album, id, ownerId, status: "Pending", submittedAt: new Date().toISOString() };
-      return {
-        ...s,
-        albums: [created, ...s.albums],
-        statements: [pushReceipt(s, ownerId, `Album — ${album.title}`, `SR-A-${id.slice(-5)}`), ...s.statements],
-        notifications: [
-          { id: uid("ntf"), ownerId, title: "Album submission received", body: `“${album.title}” (${album.tracks.length} tracks) is now pending review.`, type: "info", createdAt: new Date().toISOString(), read: false },
-          ...s.notifications,
-        ],
-      };
-    });
-    return created;
-  }, []);
-
-  const markNotificationRead = useCallback((id: string) => {
+  const markNotificationRead = useCallback(async (id: string) => {
     setState((s) => ({
       ...s,
       notifications: s.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
     }));
+    await postJSON("/api/member/notifications", { id }, "PATCH");
   }, []);
 
-  const markAllRead = useCallback(() => {
-    setState((s) => ({
-      ...s,
-      notifications: s.notifications.map((n) =>
-        n.ownerId === s.currentMemberId ? { ...n, read: true } : n
-      ),
-    }));
-  }, []);
-
-  const setReviewStatus = useCallback<AppContextValue["setReviewStatus"]>((kind, id, status) => {
-    setState((s) => {
-      if (kind === "work") return { ...s, works: s.works.map((w) => (w.id === id ? { ...w, status } : w)) };
-      if (kind === "single") return { ...s, singles: s.singles.map((x) => (x.id === id ? { ...x, status } : x)) };
-      return { ...s, albums: s.albums.map((x) => (x.id === id ? { ...x, status } : x)) };
-    });
-  }, []);
-
-  const resetDemo = useCallback(() => {
-    const fresh = seedState();
-    setState(fresh);
+  const markAllRead = useCallback(async () => {
+    setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) }));
+    await postJSON("/api/member/notifications", { all: true }, "PATCH");
   }, []);
 
   const value: AppContextValue = {
     ...state,
     ready,
-    currentMember,
+    currentMember: state.member,
+    refresh,
     login,
     register,
     logout,
     updateProfile,
+    changePassword,
     addWork,
     addSingle,
     addAlbum,
     markNotificationRead,
     markAllRead,
-    setReviewStatus,
-    resetDemo,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -336,17 +210,16 @@ export function useApp(): AppContextValue {
   return ctx;
 }
 
-// Convenience selectors scoped to the current member.
+// Member-scoped collections (already filtered server-side).
 export function useMemberData() {
   const app = useApp();
-  const id = app.currentMemberId;
   return {
-    works: app.works.filter((w) => w.ownerId === id),
-    singles: app.singles.filter((s) => s.ownerId === id),
-    albums: app.albums.filter((a) => a.ownerId === id),
-    uploads: app.uploads.filter((u) => u.ownerId === id),
-    notifications: app.notifications.filter((n) => n.ownerId === id),
-    statements: app.statements.filter((s) => s.ownerId === id),
-    royalty: (id && app.royalty[id]) || null,
+    works: app.works,
+    singles: app.singles,
+    albums: app.albums,
+    uploads: app.uploads,
+    notifications: app.notifications,
+    statements: app.statements,
+    royalty: app.royalty,
   };
 }

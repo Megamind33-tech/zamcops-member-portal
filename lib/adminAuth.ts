@@ -2,31 +2,41 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-// Lightweight, demo-only admin session kept separate from member auth.
-const KEY = "zamcops_admin_authed";
-const ADMIN_EMAIL = "admin@zamcops.org.zm";
-const ADMIN_PASSWORD = "admin123";
-
+// Real admin session backed by the API (httpOnly cookie). `authed` is null
+// while the session is being checked, then true/false.
 export function useAdminAuth() {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    setAuthed(typeof window !== "undefined" && window.localStorage.getItem(KEY) === "1");
+  const check = useCallback(async () => {
+    try {
+      const me = await fetch("/api/auth/me").then((r) => r.json());
+      setAuthed(me.authenticated && me.role === "admin");
+    } catch {
+      setAuthed(false);
+    }
   }, []);
 
-  const login = useCallback((email: string, password: string) => {
-    if (email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      window.localStorage.setItem(KEY, "1");
+  useEffect(() => {
+    check();
+  }, [check]);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (res.ok) {
       setAuthed(true);
       return true;
     }
     return false;
   }, []);
 
-  const logout = useCallback(() => {
-    window.localStorage.removeItem(KEY);
+  const logout = useCallback(async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     setAuthed(false);
   }, []);
 
-  return { authed, login, logout, ADMIN_EMAIL };
+  return { authed, login, logout, recheck: check };
 }

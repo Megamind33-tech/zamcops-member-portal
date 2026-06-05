@@ -37,8 +37,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const active = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
 
-  const doLogout = () => {
-    logout();
+  const doLogout = async () => {
+    await logout();
     router.replace("/admin/login");
   };
 

@@ -7,22 +7,28 @@ singles and albums, track royalties and manage their membership — all from an
 Android-style app experience in the browser.
 
 It also includes a separate, wider **staff / admin dashboard** for reviewing
-applications, works, submissions, files and royalties.
+member applications, works, submissions, files and royalties.
+
+The app has two clearly-separated areas:
+
+- **Member portal** — `app/(portal)/` (artists **and** publishers, by role)
+- **Admin dashboard** — `app/admin/`
 
 ## Tech stack
 
 - **Next.js 15** (App Router) + **React 19** + **TypeScript**
 - **Tailwind CSS** with a ZAMCOPS institutional theme (deep blue + gold)
-- **lucide-react** icons
-- Client-side **mock data** persisted to `localStorage` (no backend required)
+- **Prisma + SQLite** database (real persistence)
+- **Auth:** hashed passwords (bcrypt) + signed JWT in an httpOnly cookie (jose)
+- **API:** Next.js Route Handlers under `app/api/`
 - PWA: web manifest, icon and a minimal service worker
 
 ## Run locally
 
 ```bash
-npm install
-npm run dev
-# open http://localhost:3000
+npm install          # also runs `prisma generate`
+npm run db:push      # create the SQLite database from the schema
+npm run dev          # http://localhost:3000
 ```
 
 Build for production:
@@ -31,16 +37,25 @@ Build for production:
 npm run build && npm start
 ```
 
-## Demo accounts
+### Environment
 
-- **Member app:** `demo@zamcops.org.zm` / `demo1234` (or register a new account)
-- **Admin dashboard** (`/admin`): `admin@zamcops.org.zm` / `admin123`
+Copy `.env.example` to `.env` and adjust as needed:
+
+- `DATABASE_URL` — defaults to a local SQLite file (`file:./dev.db`).
+- `AUTH_SECRET` — secret used to sign session tokens.
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` — the staff account, created
+  automatically on first admin sign-in.
+
+## Accounts
+
+- **Member portal:** register a new account at `/register`, then sign in at `/login`.
+- **Admin dashboard** (`/admin`): sign in with the `ADMIN_*` credentials from `.env`.
 
 ## Structure
 
 ```
 app/
-  (mobile)/            # phone-width artist app + auth (route group)
+  (portal)/            # member portal (artists & publishers) — phone-width
     page.tsx           # splash
     onboarding/ login/ register/ forgot-password/
     (member)/          # authenticated screens with bottom nav
@@ -49,15 +64,23 @@ app/
       uploads/ royalties/ statements/ notifications/ support/ settings/
   admin/               # wider staff dashboard
     login/ members/ works/ songs/ albums/ files/ royalties/ reports/
+  api/                 # route handlers (auth, member, admin)
 components/            # UI primitives, mobile chrome, admin shell
-data/                  # mock seed data
-lib/                   # store (context), formatting, auth helpers
+data/                  # reference lists (provinces, genres, languages)
+lib/                   # db client, auth, server helpers, client store
+prisma/                # schema (SQLite)
 types/                 # domain models
 public/                # manifest, icon, service worker
 ```
 
+## Deploying to a hosted database
+
+SQLite is used for a self-contained local setup. For a hosted deploy, change the
+`datasource` provider in `prisma/schema.prisma` to `postgresql` (or `mysql`),
+point `DATABASE_URL` at your database, and run `npx prisma migrate deploy`.
+
 ## Notes
 
-- Data is mock/local only. File pickers record file names but do not upload.
-- Royalty figures are realistic placeholders for prototype purposes.
-- Use **Settings → Reset demo data** in the app to restore seeded content.
+- File pickers record the chosen file name only; binary upload/storage is not
+  yet implemented.
+- Royalty figures shown are illustrative until usage ingestion is connected.

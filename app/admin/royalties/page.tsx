@@ -4,12 +4,12 @@ import React from "react";
 import { Wallet, Clock, CheckCircle2, Radio } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { AdminStat, Panel, Th, Td } from "@/components/admin/widgets";
-import { useApp } from "@/lib/store";
+import { useAdminData } from "@/lib/adminClient";
 import { formatKwacha } from "@/lib/format";
 
 export default function AdminRoyaltiesPage() {
-  const { royalty, members } = useApp();
-  const summaries = Object.values(royalty);
+  const { royalty, members } = useAdminData();
+  const summaries = royalty;
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
 
   const totalEstimated = summaries.reduce((s, r) => s + r.totalEstimated, 0);

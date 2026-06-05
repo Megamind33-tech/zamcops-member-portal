@@ -5,11 +5,11 @@ import Link from "next/link";
 import { Users, FileText, Music2, Disc3, FolderOpen, Clock, ChevronRight } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { AdminStat, Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
-import { useApp } from "@/lib/store";
+import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
 
 export default function AdminDashboard() {
-  const { members, works, singles, albums, uploads } = useApp();
+  const { members, works, singles, albums, uploads } = useAdminData();
 
   const pendingWorks = works.filter((w) => w.status === "Pending").length;
   const pendingSongs = singles.filter((s) => s.status === "Pending" || s.status === "Under Review").length;

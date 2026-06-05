@@ -3,14 +3,14 @@
 import React, { useState } from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
-import { useApp } from "@/lib/store";
+import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
 import type { UploadStatus } from "@/types";
 
 const filters: ("All" | UploadStatus)[] = ["All", "Pending", "Processing", "Approved", "Rejected"];
 
 export default function AdminFilesPage() {
-  const { uploads, members } = useApp();
+  const { uploads, members } = useAdminData();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
   const shown = uploads.filter((u) => filter === "All" || u.status === filter);

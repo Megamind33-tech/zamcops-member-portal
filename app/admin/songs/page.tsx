@@ -3,11 +3,11 @@
 import React from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
-import { useApp } from "@/lib/store";
+import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
 
 export default function AdminSongsPage() {
-  const { singles, setReviewStatus } = useApp();
+  const { singles, setReviewStatus } = useAdminData();
 
   return (
     <div>

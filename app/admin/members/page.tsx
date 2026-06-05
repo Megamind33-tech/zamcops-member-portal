@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
-import { useApp } from "@/lib/store";
+import { useAdminData } from "@/lib/adminClient";
 import { formatDate, initials } from "@/lib/format";
 
 export default function AdminMembersPage() {
-  const { members } = useApp();
+  const { members } = useAdminData();
   const [q, setQ] = useState("");
   const shown = members.filter(
     (m) =>

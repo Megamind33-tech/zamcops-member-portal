@@ -1,0 +1,54 @@
+import { prisma } from "@/lib/db";
+import { requireMember } from "@/lib/auth";
+import { json, bad } from "@/lib/server";
+import { albumDTO } from "@/lib/serialize";
+import type { Track, OwnershipSplit } from "@/types";
+
+export const runtime = "nodejs";
+
+const splitsTotal = (s: OwnershipSplit[]) =>
+  s.reduce((sum, x) => sum + (Number(x.percentage) || 0), 0);
+
+export async function POST(req: Request) {
+  const session = await requireMember();
+  if (!session) return bad("Not authenticated.", 401);
+
+  const b = await req.json().catch(() => null);
+  if (!b) return bad("Invalid request body.");
+  if (!b.title?.trim()) return bad("Album title is required.");
+  const tracks: Track[] = Array.isArray(b.tracks) ? b.tracks : [];
+  if (tracks.length === 0) return bad("Add at least one track.");
+  if (tracks.some((t) => !t.title?.trim())) return bad("Every track needs a title.");
+  if (tracks.some((t) => splitsTotal(t.ownershipSplits || []) !== 100))
+    return bad("Each track's ownership splits must total 100%.");
+
+  const album = await prisma.albumSubmission.create({
+    data: {
+      ownerId: session.sub,
+      title: b.title,
+      artistName: b.artistName ?? "",
+      releaseDate: b.releaseDate ?? "",
+      coverArt: b.coverArt ?? "",
+      tracks: JSON.stringify(tracks),
+    },
+  });
+
+  await prisma.statement.create({
+    data: {
+      ownerId: session.sub,
+      type: "Submission Receipt",
+      title: `Album — ${album.title}`,
+      reference: `SR-A-${album.id.slice(-5).toUpperCase()}`,
+    },
+  });
+  await prisma.notification.create({
+    data: {
+      ownerId: session.sub,
+      title: "Album submission received",
+      body: `“${album.title}” (${tracks.length} tracks) is now pending review.`,
+      type: "info",
+    },
+  });
+
+  return json({ album: albumDTO(album) }, 201);
+}

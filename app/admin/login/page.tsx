@@ -14,11 +14,15 @@ export default function AdminLoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (login(email, password)) router.replace("/admin");
+    setBusy(true);
+    const ok = await login(email, password);
+    setBusy(false);
+    if (ok) router.replace("/admin");
     else setError("Invalid staff credentials.");
   };
 
@@ -42,14 +46,10 @@ export default function AdminLoginScreen() {
             <TextInput type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
           </Field>
           {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{error}</p>}
-          <Button type="submit" block size="lg">
-            <LogIn size={18} /> Sign in
+          <Button type="submit" block size="lg" disabled={busy}>
+            <LogIn size={18} /> {busy ? "Signing in…" : "Sign in"}
           </Button>
         </form>
-
-        <p className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-[11px] text-slate-500">
-          Demo: admin@zamcops.org.zm / admin123
-        </p>
       </div>
     </div>
   );

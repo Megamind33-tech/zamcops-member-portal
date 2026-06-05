@@ -4,11 +4,11 @@ import React from "react";
 import { Download, PieChart, BarChart3 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel } from "@/components/admin/widgets";
-import { useApp } from "@/lib/store";
+import { useAdminData } from "@/lib/adminClient";
 import { formatKwacha } from "@/lib/format";
 
 export default function AdminReportsPage() {
-  const { works, singles, albums, members, royalty } = useApp();
+  const { works, singles, albums, members, royalty } = useAdminData();
 
   const reviewBreakdown = (items: { status: string }[]) => {
     const b = { Approved: 0, Pending: 0, Rejected: 0, "Under Review": 0 } as Record<string, number>;
@@ -19,7 +19,7 @@ export default function AdminReportsPage() {
   const works$ = reviewBreakdown(works);
   const songs$ = reviewBreakdown(singles);
   const albums$ = reviewBreakdown(albums);
-  const totalEstimated = Object.values(royalty).reduce((s, r) => s + r.totalEstimated, 0);
+  const totalEstimated = royalty.reduce((s, r) => s + r.totalEstimated, 0);
 
   const reports = [
     { title: "Membership Register", desc: `${members.length} members`, ref: "RPT-MEM-2026" },
