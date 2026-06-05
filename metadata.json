@@ -1,0 +1,6 @@
+{
+  "name": "ZAMCOPS Portal",
+  "description": "Zambian Music Copyright Protection Society Portal for Artists, Labels, Admins, and Finance",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
