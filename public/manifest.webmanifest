@@ -1,0 +1,20 @@
+{
+  "name": "ZAMCOPS Member Portal",
+  "short_name": "ZAMCOPS",
+  "description": "Register works, submit songs and albums, and track royalties with the Zambian Music Copyright Protection Society.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1f4f7e",
+  "theme_color": "#1f4f7e",
+  "categories": ["music", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
