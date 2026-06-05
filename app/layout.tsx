@@ -1,6 +1,9 @@
 import React from "react";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { AppProvider } from "@/lib/store";
+import { PWARegister } from "@/components/PWARegister";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,20 +17,38 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata = {
-  title: "ZAMCOPS Onboarding & Admin Audit Portal",
-  description: "Zambian Music Copyright Protection Society digital portal with dual wizard and compliance audit registry",
+export const metadata: Metadata = {
+  title: "ZAMCOPS Member Portal",
+  description:
+    "ZAMCOPS Artist Membership Portal — register works, submit songs and albums, track royalties and manage your membership with the Zambian Music Copyright Protection Society.",
+  manifest: "/manifest.webmanifest",
+  applicationName: "ZAMCOPS",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ZAMCOPS",
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export const viewport: Viewport = {
+  themeColor: "#1f4f7e",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} h-full`}>
-      <body className="h-full bg-zinc-950 text-zinc-100 font-sans antialiased">
-        {children}
+      <body className="h-full font-sans antialiased">
+        <AppProvider>{children}</AppProvider>
+        <PWARegister />
       </body>
     </html>
   );

@@ -1,0 +1,60 @@
+import { prisma } from "@/lib/db";
+import { requireMember } from "@/lib/auth";
+import { json, bad } from "@/lib/server";
+import { workDTO } from "@/lib/serialize";
+import type { OwnershipSplit } from "@/types";
+
+export const runtime = "nodejs";
+
+const splitsTotal = (s: OwnershipSplit[]) =>
+  s.reduce((sum, x) => sum + (Number(x.percentage) || 0), 0);
+
+export async function POST(req: Request) {
+  const session = await requireMember();
+  if (!session) return bad("Not authenticated.", 401);
+
+  const b = await req.json().catch(() => null);
+  if (!b) return bad("Invalid request body.");
+  if (!b.title?.trim()) return bad("A work title is required.");
+  const splits: OwnershipSplit[] = Array.isArray(b.ownershipSplits) ? b.ownershipSplits : [];
+  if (splitsTotal(splits) !== 100) return bad("Ownership splits must total exactly 100%.");
+
+  const work = await prisma.workDeclaration.create({
+    data: {
+      ownerId: session.sub,
+      title: b.title,
+      alternativeTitle: b.alternativeTitle ?? "",
+      workType: b.workType ?? "Song",
+      language: b.language ?? "",
+      genre: b.genre ?? "",
+      duration: b.duration ?? "",
+      composers: JSON.stringify(b.composers ?? []),
+      authors: JSON.stringify(b.authors ?? []),
+      producers: JSON.stringify(b.producers ?? []),
+      publisher: b.publisher ?? "",
+      ownershipSplits: JSON.stringify(splits),
+      isrc: b.isrc ?? "",
+      iswc: b.iswc ?? "",
+      dateCreated: b.dateCreated ?? "",
+    },
+  });
+
+  await prisma.statement.create({
+    data: {
+      ownerId: session.sub,
+      type: "Submission Receipt",
+      title: `Work Declaration — ${work.title}`,
+      reference: `SR-W-${work.id.slice(-5).toUpperCase()}`,
+    },
+  });
+  await prisma.notification.create({
+    data: {
+      ownerId: session.sub,
+      title: "Work declaration pending review",
+      body: `Your declaration for “${work.title}” has been received and is queued for review.`,
+      type: "info",
+    },
+  });
+
+  return json({ work: workDTO(work) }, 201);
+}

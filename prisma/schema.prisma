@@ -1,0 +1,174 @@
+// ZAMCOPS Member Portal — database schema
+// Prototype uses SQLite for a self-contained, runnable backend. To deploy on a
+// hosted database, change `provider` to "postgresql" and set DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Staff accounts for the admin dashboard (separate from members).
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+// Members of the society — artists, composers, producers, publishers, labels.
+model Member {
+  id           String   @id @default(cuid())
+  memberNumber String   @unique
+  email        String   @unique
+  phone        String
+  passwordHash String
+
+  fullName     String
+  stageName    String   @default("")
+  nrcOrPassport String  @default("")
+  dateOfBirth  String   @default("")
+  gender       String   @default("")
+  role         String   @default("Artist")
+
+  province     String   @default("")
+  district     String   @default("")
+  address      String   @default("")
+
+  bankName         String @default("")
+  bankAccount      String @default("")
+  mobileMoneyNumber String @default("")
+
+  nextOfKinName  String @default("")
+  nextOfKinPhone String @default("")
+
+  nrcDocument  String @default("")
+  profilePhoto String @default("")
+
+  membershipStatus String   @default("Pending")
+  joinedAt         DateTime @default(now())
+
+  works         WorkDeclaration[]
+  singles       SongSubmission[]
+  albums        AlbumSubmission[]
+  uploads       UploadFile[]
+  notifications Notification[]
+  statements    Statement[]
+  royalty       RoyaltySummary?
+}
+
+model WorkDeclaration {
+  id               String   @id @default(cuid())
+  owner            Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId          String
+  title            String
+  alternativeTitle String   @default("")
+  workType         String
+  language         String
+  genre            String
+  duration         String   @default("")
+  composers        String   @default("[]") // JSON string[]
+  authors          String   @default("[]")
+  producers        String   @default("[]")
+  publisher        String   @default("")
+  ownershipSplits  String   @default("[]") // JSON OwnershipSplit[]
+  isrc             String   @default("")
+  iswc             String   @default("")
+  dateCreated      String   @default("")
+  status           String   @default("Pending")
+  submittedAt      DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model SongSubmission {
+  id              String   @id @default(cuid())
+  owner           Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId         String
+  title           String
+  artistName      String
+  featuredArtists String   @default("")
+  producer        String   @default("")
+  genre           String
+  releaseDate     String   @default("")
+  audioFile       String   @default("")
+  coverArt        String   @default("")
+  lyricsFile      String   @default("")
+  ownershipSplits String   @default("[]")
+  status          String   @default("Pending")
+  submittedAt     DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model AlbumSubmission {
+  id          String   @id @default(cuid())
+  owner       Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+  title       String
+  artistName  String
+  releaseDate String   @default("")
+  coverArt    String   @default("")
+  tracks      String   @default("[]") // JSON Track[]
+  status      String   @default("Pending")
+  submittedAt DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model UploadFile {
+  id              String   @id @default(cuid())
+  owner           Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId         String
+  fileName        String
+  fileType        String
+  linkedTo        String   @default("")
+  status          String   @default("Pending")
+  rejectionReason String   @default("")
+  uploadedAt      DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  owner     Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+  title     String
+  body      String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model Statement {
+  id        String   @id @default(cuid())
+  owner     Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+  type      String
+  title     String
+  reference String
+  amount    Float?
+  issuedAt  DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+// One royalty summary per member, with usage logs and top songs stored as JSON.
+model RoyaltySummary {
+  id             String @id @default(cuid())
+  owner          Member @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId        String @unique
+  currency       String @default("ZMW")
+  totalEstimated Float  @default(0)
+  pending        Float  @default(0)
+  paid           Float  @default(0)
+  usageLogs      String @default("[]") // JSON RoyaltyUsageLog[]
+  topSongs       String @default("[]") // JSON top songs
+}
