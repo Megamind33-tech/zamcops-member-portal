@@ -19,7 +19,7 @@ export function BottomNav() {
 
   return (
     <nav className="sticky bottom-0 z-30 mt-auto px-3 pb-3">
-      <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-night-850/85 shadow-nav backdrop-blur-2xl">
+      <div className="relative rounded-[1.75rem] border border-white/10 bg-night-850/85 shadow-nav backdrop-blur-2xl">
         <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-accent-400/70 to-transparent" />
         {/* Faint equalizer silhouette — the "music OS" texture, barely-there. */}
         <div className="pointer-events-none absolute inset-x-10 bottom-2 flex items-end justify-between opacity-[0.05]">
