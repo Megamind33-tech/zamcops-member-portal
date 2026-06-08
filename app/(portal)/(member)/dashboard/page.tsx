@@ -18,7 +18,7 @@ import { useApp, useMemberData } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { SectionTitle } from "@/components/ui/Misc";
-import { CoverArt } from "@/components/media/CoverArt";
+import { CoverArt, coverGlow } from "@/components/media/CoverArt";
 import { formatKwacha, timeAgo, cn } from "@/lib/format";
 
 export default function DashboardScreen() {
@@ -26,6 +26,13 @@ export default function DashboardScreen() {
   const { works, singles, albums, notifications, royalty } = useMemberData();
   const member = currentMember!;
   const completion = profileCompletion(member);
+
+  const catalog = [
+    ...singles.map((s) => ({ id: s.id, title: s.title, sub: s.genre || "Single", status: s.status, kind: "Single", date: s.submittedAt })),
+    ...albums.map((a) => ({ id: a.id, title: a.title, sub: `${a.tracks.length} tracks`, status: a.status, kind: "Album", date: a.submittedAt })),
+  ]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 8);
 
   const pending =
     works.filter((w) => w.status === "Pending").length +
@@ -159,6 +166,49 @@ export default function DashboardScreen() {
       </section>
 
       <div className="mt-5 space-y-5">
+        {catalog.length > 0 && (
+          <section className="animate-fade-up" style={{ animationDelay: "70ms" }}>
+            <SectionTitle
+              title="Your catalog"
+              action={
+                <Link href="/works" className="text-xs font-semibold text-brand-300">
+                  See all
+                </Link>
+              }
+            />
+            <div className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4 pb-1">
+              {catalog.map((item, index) => (
+                <Link
+                  key={item.id}
+                  href="/works"
+                  className="group relative w-[150px] shrink-0 animate-fade-up"
+                  style={{ animationDelay: `${90 + index * 40}ms` }}
+                >
+                  <div className="relative">
+                    <span
+                      className="pointer-events-none absolute -inset-7 rounded-full opacity-70 blur-2xl transition group-hover:opacity-100"
+                      style={{ background: coverGlow(item.title, 0.4) }}
+                    />
+                    <CoverArt
+                      seed={item.title}
+                      size={150}
+                      rounded="rounded-[1.4rem]"
+                      className="relative shadow-[0_28px_60px_-22px_rgba(0,0,0,0.75)] ring-1 ring-white/10 transition duration-300 group-hover:-translate-y-1 group-hover:ring-white/25"
+                    />
+                    <span className="absolute right-2 top-2">
+                      <StatusBadge status={item.status} className="bg-night-950/70 backdrop-blur-md" />
+                    </span>
+                  </div>
+                  <p className="mt-2.5 truncate text-[13px] font-bold leading-tight text-white">{item.title}</p>
+                  <p className="truncate text-[11px] text-night-400">
+                    {item.kind} · {item.sub}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="animate-fade-up" style={{ animationDelay: "100ms" }}>
           <SectionTitle title="Quick actions" />
           <div className="grid grid-cols-2 gap-3">
@@ -192,25 +242,57 @@ export default function DashboardScreen() {
           </div>
         </section>
 
-        <section className="card overflow-hidden animate-fade-up" style={{ animationDelay: "160ms" }}>
-          <div className="border-b border-white/[0.07] bg-white/[0.02] px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <Wallet size={16} className="text-accent-400" />
-                Royalty summary
-              </div>
-              <ChevronRight size={16} className="text-night-400" />
+        <section
+          className="grain relative isolate overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-night-800/70 p-5 shadow-card backdrop-blur-xl animate-fade-up"
+          style={{ animationDelay: "160ms" }}
+        >
+          <span className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-accent-500/14 blur-[80px]" />
+
+          <div className="relative flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.28em] text-accent-400">
+                <Wallet size={12} />
+                This quarter's earnings
+              </p>
+              <p className="mt-2 font-display text-[2.4rem] font-bold leading-none tracking-tight text-white">
+                {formatKwacha(royalty?.totalEstimated ?? 0)}
+              </p>
+              <p className="mt-1.5 text-xs text-night-400">Estimated across all detected airplay and streams</p>
             </div>
-            <p className="mt-1 text-[11px] text-night-400">
-              A quick look at what is estimated, pending, and paid.
-            </p>
+            <Link
+              href="/royalties"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/[0.06] text-night-300 ring-1 ring-white/10 transition hover:bg-white/[0.1] hover:text-white"
+              aria-label="Open royalties"
+            >
+              <ChevronRight size={16} />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-3 divide-x divide-white/[0.06] px-2 py-4 text-center">
-            <RoyaltyStat label="Estimated" value={royalty?.totalEstimated ?? 0} />
-            <RoyaltyStat label="Pending" value={royalty?.pending ?? 0} />
-            <RoyaltyStat label="Paid" value={royalty?.paid ?? 0} />
-          </div>
+          {(() => {
+            const paid = royalty?.paid ?? 0;
+            const pending = royalty?.pending ?? 0;
+            const total = Math.max(paid + pending, 1);
+            return (
+              <div className="relative mt-5">
+                <div className="flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                  <span className="h-full bg-gradient-to-r from-accent-500 to-accent-300" style={{ width: `${(paid / total) * 100}%` }} />
+                  <span className="h-full bg-gradient-to-r from-gold-500/70 to-gold-400/70" style={{ width: `${(pending / total) * 100}%` }} />
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-accent-400" />
+                    <span className="text-xs text-night-300">Paid</span>
+                    <span className="font-display text-sm font-bold text-white">{formatKwacha(paid)}</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-gold-400" />
+                    <span className="text-xs text-night-300">Pending</span>
+                    <span className="font-display text-sm font-bold text-white">{formatKwacha(pending)}</span>
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
         </section>
 
         <section className="animate-fade-up" style={{ animationDelay: "220ms" }}>
@@ -304,15 +386,6 @@ function MiniChip({ label, value }: { label: string; value: string }) {
     <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2 text-left backdrop-blur">
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">{label}</p>
       <p className="mt-1 truncate text-xs font-semibold text-white">{value}</p>
-    </div>
-  );
-}
-
-function RoyaltyStat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="px-1">
-      <p className="text-[10px] uppercase tracking-[0.22em] text-night-400">{label}</p>
-      <p className="mt-1 font-display text-sm font-semibold text-white">{formatKwacha(value)}</p>
     </div>
   );
 }

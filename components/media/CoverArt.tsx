@@ -25,6 +25,20 @@ function hash(seed: string): number {
   return h >>> 0;
 }
 
+// Pulls the same palette the artwork is painted from, so surrounding chrome
+// can bleed the cover's colour the way a "now playing" screen recolours itself.
+export function coverPalette(seed: string): [string, string, string] {
+  return PALETTES[hash(seed || "zamcops") % PALETTES.length];
+}
+
+export function coverGlow(seed: string, alpha = 0.32): string {
+  const [a] = coverPalette(seed);
+  const r = parseInt(a.slice(1, 3), 16);
+  const g = parseInt(a.slice(3, 5), 16);
+  const b = parseInt(a.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 export function CoverArt({
   seed,
   size = 56,
