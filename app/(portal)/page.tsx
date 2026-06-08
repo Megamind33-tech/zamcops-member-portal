@@ -28,39 +28,30 @@ export default function SplashScreen() {
   }, [tick, ready, currentMember, router]);
 
   return (
-    <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-night-950 text-white">
+    <div className="relative flex flex-1 flex-col overflow-hidden bg-black text-white">
       <PhotoBackdrop photo="splash-stage" scrim="strong" position="center" />
-      <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-brand-600/40 blur-[90px]" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-iris-500/35 blur-[90px]" />
 
-      <div className="z-10 flex flex-col items-center gap-7 animate-scale-in">
-        <span className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-[30px] brand-gradient text-5xl font-black text-white shadow-fab ring-1 ring-white/20">
-          <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.45),transparent_45%)]" />
-          <span className="relative">Z</span>
-        </span>
-        <div className="text-center">
-          <h1 className="font-display text-[2.4rem] font-bold tracking-tight">ZAMCOPS</h1>
-          <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.32em] text-brand-300">
+      <div className="relative z-10 flex flex-1 flex-col justify-end px-7 pb-16">
+        <div className="animate-fade-up">
+          <div className="flex items-end gap-1.5">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <span
+                key={i}
+                className="w-2 origin-bottom rounded-full bg-accent-500 animate-equalize"
+                style={{ height: 28, animationDelay: `${i * 0.12}s`, animationDuration: `${0.9 + (i % 3) * 0.25}s` }}
+              />
+            ))}
+          </div>
+          <h1 className="mt-5 font-display text-[3rem] font-bold leading-[0.95] tracking-[-0.03em]">
+            ZAMCOPS
+          </h1>
+          <p className="mt-2 text-[12px] font-bold uppercase tracking-[0.26em] text-white/70">
             Member Portal
           </p>
+          <p className="mt-5 max-w-[18rem] text-[13px] leading-relaxed text-white/55">
+            Zambian Music Copyright Protection Society
+          </p>
         </div>
-
-        {/* Equalizer — a little motion to signal "music". */}
-        <div className="flex h-8 items-end gap-1.5">
-          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-            <span
-              key={i}
-              className="w-1.5 origin-bottom rounded-full bg-gradient-to-t from-brand-500 to-iris-400 animate-equalize"
-              style={{ height: "100%", animationDelay: `${i * 0.12}s`, animationDuration: `${0.9 + (i % 3) * 0.25}s` }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="absolute bottom-12 z-10 flex flex-col items-center gap-3">
-        <p className="max-w-[18rem] text-center text-[11px] text-night-300">
-          Zambian Music Copyright Protection Society
-        </p>
       </div>
     </div>
   );

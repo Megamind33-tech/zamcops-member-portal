@@ -42,6 +42,15 @@ module.exports = {
           400: "#ff6fae",
           500: "#f63d8b",
         },
+        // Signature ACTION accent — a single vivid mint/green. Primary CTAs are
+        // a confident solid of this (no gradient), the way a music OS would do it.
+        accent: {
+          300: "#5cf0b3",
+          400: "#2fe79a",
+          500: "#19e08a",
+          600: "#10b870",
+          700: "#0c8f57",
+        },
         // Dark neutral surface scale — the canvas the whole app sits on.
         night: {
           50: "#f5f6fb",

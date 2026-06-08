@@ -61,7 +61,7 @@ export default function AdminReportsPage() {
               </div>
               <button
                 onClick={() => download(r.title, r.ref, r.desc)}
-                className="inline-flex items-center gap-1.5 rounded-lg brand-gradient px-3 py-2 text-xs font-semibold text-white shadow-fab hover:brightness-110"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-accent-500 px-3 py-2 text-xs font-semibold text-night-950 shadow-fab hover:bg-accent-400"
               >
                 <Download size={14} /> Download
               </button>

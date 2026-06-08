@@ -264,7 +264,7 @@ export default function DashboardScreen() {
           </div>
           <Link
             href={nextStep.href}
-            className="relative mt-4 inline-flex items-center gap-2 rounded-full brand-gradient px-4 py-2.5 text-sm font-semibold text-white shadow-fab transition hover:brightness-110"
+            className="relative mt-4 inline-flex items-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 shadow-[0_14px_30px_-12px_rgba(25,224,138,0.6)] transition hover:bg-accent-400"
           >
             {nextStep.cta}
             <ChevronRight size={16} />

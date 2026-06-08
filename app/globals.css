@@ -15,11 +15,10 @@ body {
   color: #f5f6fb;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
-  background-color: #070814;
+  background-color: #05050c;
   background-image:
-    radial-gradient(60% 50% at 8% -4%, rgba(84, 96, 248, 0.28), transparent 60%),
-    radial-gradient(55% 45% at 100% 0%, rgba(139, 92, 246, 0.24), transparent 58%),
-    radial-gradient(50% 40% at 50% 108%, rgba(245, 166, 35, 0.1), transparent 60%);
+    radial-gradient(55% 45% at 6% -4%, rgba(84, 96, 248, 0.18), transparent 60%),
+    radial-gradient(50% 40% at 100% 2%, rgba(25, 224, 138, 0.1), transparent 58%);
 }
 
 /* Subtle grid / grain so the dark surface never feels flat. */
@@ -91,7 +90,7 @@ body::after {
 
   .field-input {
     @apply w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition
-           placeholder:text-night-400 focus:border-brand-400/70 focus:bg-white/[0.06] focus:ring-4 focus:ring-brand-500/20;
+           placeholder:text-night-400 focus:border-accent-400/70 focus:bg-white/[0.06] focus:ring-4 focus:ring-accent-500/20;
   }
 
   /* Default surface: a frosted dark glass panel with a hairline edge. */
@@ -108,8 +107,22 @@ body::after {
     @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[11px] font-semibold backdrop-blur-sm;
   }
 
-  /* The signature vibrant gradient used on hero blocks and primary CTAs. */
+  /* The signature vibrant gradient used on the brand mark and hero accents. */
   .brand-gradient {
     background-image: linear-gradient(135deg, #5460f8 0%, #7338e0 48%, #8b5cf6 100%);
+  }
+
+  /* Frosted-glass input cluster for the lock-screen auth composition. */
+  .glass-group {
+    @apply overflow-hidden rounded-[1.4rem] border border-white/[0.12] bg-white/[0.06] backdrop-blur-xl;
+  }
+
+  .glass-group > * + * {
+    @apply border-t border-white/10;
+  }
+
+  .glass-field {
+    @apply flex w-full items-center gap-3 bg-transparent px-4 py-4 text-[15px] text-white outline-none
+           placeholder:text-white/45;
   }
 }

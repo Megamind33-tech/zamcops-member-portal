@@ -79,7 +79,7 @@ export function FilePicker({
         <span className={cn("truncate", value ? "font-medium text-white" : "text-night-400")}>
           {value || "Tap to choose a file"}
         </span>
-        <span className="shrink-0 rounded-xl brand-gradient px-3 py-1.5 text-xs font-semibold text-white">
+        <span className="shrink-0 rounded-xl bg-accent-500 px-3 py-1.5 text-xs font-semibold text-night-950 hover:bg-accent-400">
           Browse
         </span>
         <input

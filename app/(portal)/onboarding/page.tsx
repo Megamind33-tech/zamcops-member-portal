@@ -2,33 +2,33 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileMusic, Activity, BarChart3, BadgeCheck, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
+import { AuthScreen, AuthHeading } from "@/components/auth/AuthScreen";
 
 const slides = [
   {
-    icon: FileMusic,
     photo: "synth" as const,
-    title: "Register your works",
+    kicker: "01 — Register",
+    title: "Your music,\nprotected",
     body: "Declare your songs, compositions, beats and lyrics so your copyright ownership is recorded and protected.",
   },
   {
-    icon: Activity,
     photo: "dj-console" as const,
-    title: "Track your submissions",
-    body: "Follow every single, album and work declaration from submission through to review and approval.",
+    kicker: "02 — Track",
+    title: "Follow every\nsubmission",
+    body: "Track every single, album and work declaration from submission through to review and approval.",
   },
   {
-    icon: BarChart3,
     photo: "piano" as const,
-    title: "View royalty activity",
-    body: "See estimated, pending and paid royalties from radio and broadcast usage of your music across Zambia.",
+    kicker: "03 — Earn",
+    title: "See your\nroyalties",
+    body: "Estimated, pending and paid royalties from radio and broadcast usage of your music across Zambia.",
   },
   {
-    icon: BadgeCheck,
     photo: "hands" as const,
-    title: "Manage your membership",
+    kicker: "04 — Belong",
+    title: "Manage your\nmembership",
     body: "Keep your profile, KYC and payout details up to date and access receipts and statements anytime.",
   },
 ];
@@ -37,7 +37,6 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const [i, setI] = useState(0);
   const slide = slides[i];
-  const Icon = slide.icon;
   const last = i === slides.length - 1;
 
   const finish = () => {
@@ -46,61 +45,54 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4">
-      <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-brand-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 bottom-4 h-64 w-64 rounded-full bg-iris-500/15 blur-3xl" />
-
-      <div className="card relative z-10 flex flex-1 flex-col px-5 py-6">
-        <div className="flex items-center justify-between">
-          <span className="font-display text-sm font-bold tracking-[0.14em] text-white">ZAMCOPS</span>
-          <button onClick={finish} className="text-xs font-semibold text-night-400 transition hover:text-white">
-            Skip
-          </button>
-        </div>
-
-        <div key={i} className="flex flex-1 flex-col items-center justify-center text-center animate-fade-up">
-          <div className="relative mb-8 aspect-square w-44 overflow-hidden rounded-[2rem] ring-1 ring-white/10 shadow-glow">
-            <PhotoBackdrop photo={slide.photo} scrim="soft" />
-            <span className="absolute bottom-3 right-3 z-10 grid h-12 w-12 place-items-center rounded-2xl bg-night-900/70 text-brand-200 ring-1 ring-white/15 backdrop-blur">
-              <Icon size={24} strokeWidth={1.9} />
-            </span>
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">Get started</p>
-          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-white">
-            {slide.title}
-          </h2>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-night-300">{slide.body}</p>
-        </div>
-
-        <div className="mb-6 flex justify-center gap-2">
-          {slides.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setI(idx)}
-              aria-label={`Go to slide ${idx + 1}`}
-              className={
-                "h-2 rounded-full transition-all " +
-                (idx === i ? "w-6 bg-gold-400" : "w-2 bg-white/15")
-              }
-            />
+    <AuthScreen
+      photo={slide.photo}
+      topRight={
+        <button onClick={finish} className="text-[13px] font-semibold text-white/70 transition hover:text-white">
+          Skip
+        </button>
+      }
+    >
+      <div key={i} className="animate-fade-up">
+        <AuthHeading
+          kicker={slide.kicker}
+          title={slide.title.split("\n").map((line, idx) => (
+            <React.Fragment key={idx}>
+              {line}
+              {idx === 0 && <br />}
+            </React.Fragment>
           ))}
-        </div>
+          sub={slide.body}
+        />
+      </div>
 
+      <div className="mt-7 flex items-center gap-2">
+        {slides.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setI(idx)}
+            aria-label={`Go to slide ${idx + 1}`}
+            className={"h-1.5 rounded-full transition-all " + (idx === i ? "w-8 bg-accent-500" : "w-2 bg-white/25")}
+          />
+        ))}
+      </div>
+
+      <div className="mt-6 space-y-3">
         {last ? (
-          <div className="space-y-3">
-            <Button block size="lg" onClick={finish}>
+          <>
+            <Button block size="lg" onClick={finish} className="h-[58px] rounded-[18px] text-[16px]">
               Get started <ArrowRight size={18} />
             </Button>
             <ButtonLink href="/login" variant="ghost" block size="md">
               I already have an account
             </ButtonLink>
-          </div>
+          </>
         ) : (
-          <Button block size="lg" onClick={() => setI((v) => v + 1)}>
+          <Button block size="lg" onClick={() => setI((v) => v + 1)} className="h-[58px] rounded-[18px] text-[16px]">
             Next <ArrowRight size={18} />
           </Button>
         )}
       </div>
-    </div>
+    </AuthScreen>
   );
 }
