@@ -32,6 +32,7 @@ export async function POST(req: Request) {
       authors: JSON.stringify(b.authors ?? []),
       producers: JSON.stringify(b.producers ?? []),
       publisher: b.publisher ?? "",
+      publisherIpi: b.publisherIpi ?? "",
       ownershipSplits: JSON.stringify(splits),
       isrc: b.isrc ?? "",
       iswc: b.iswc ?? "",

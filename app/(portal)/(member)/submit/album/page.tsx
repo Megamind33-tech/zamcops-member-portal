@@ -21,6 +21,7 @@ function newTrack(owner: string): Track {
     genre: "Afro-Pop",
     contributors: [],
     ownershipSplits: [{ id: uid("split"), party: owner, role: "Performer", percentage: 100 }],
+    isrc: "",
     audioFile: "",
   };
 }
@@ -168,6 +169,9 @@ export default function AlbumSubmissionScreen() {
                           </Select>
                         </Field>
                       </div>
+                      <Field label="ISRC" hint="Recording identifier, if known">
+                        <TextInput placeholder="ZM-A01-26-…" value={t.isrc ?? ""} onChange={(e) => updateTrack(t.id, { isrc: e.target.value })} />
+                      </Field>
                       <FilePicker
                         label="Audio file"
                         accept="audio/*"

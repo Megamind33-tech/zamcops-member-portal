@@ -138,6 +138,7 @@ export interface Track {
   genre: string;
   contributors: Contributor[];
   ownershipSplits: OwnershipSplit[];
+  isrc?: string;
   audioFile?: string;
 }
 
