@@ -7,6 +7,7 @@ import { UserPlus, CheckCircle2 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { Field, TextInput, Select } from "@/components/ui/Field";
+import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
 import { useApp } from "@/lib/store";
 import type { MemberRole } from "@/types";
 
@@ -69,6 +70,7 @@ export default function RegisterScreen() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4">
+      <PhotoBackdrop photo="synth" scrim="strong" />
       <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-brand-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-24 bottom-4 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
 

@@ -1,23 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileAudio, FileImage, FileText, FileBox, AlertCircle, UploadCloud } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { TopBar } from "@/components/mobile/TopBar";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/Misc";
 import { ButtonLink } from "@/components/ui/Button";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { useMemberData } from "@/lib/store";
 import { formatDate } from "@/lib/format";
-import type { UploadFile, UploadStatus } from "@/types";
+import type { UploadStatus } from "@/types";
 
 const filters: ("All" | UploadStatus)[] = ["All", "Pending", "Processing", "Approved", "Rejected"];
-
-const typeIcon: Record<UploadFile["fileType"], React.ComponentType<{ size?: number }>> = {
-  Audio: FileAudio,
-  "Cover Art": FileImage,
-  Lyrics: FileText,
-  Document: FileBox,
-};
 
 export default function UploadsScreen() {
   const { uploads } = useMemberData();
@@ -46,7 +41,7 @@ export default function UploadsScreen() {
 
         {shown.length === 0 ? (
           <EmptyState
-            icon={<UploadCloud size={22} />}
+            art={<Illustration name="upload" />}
             title="No uploads yet"
             message="Files you attach to singles and albums appear here with their processing status."
             action={
@@ -58,14 +53,11 @@ export default function UploadsScreen() {
         ) : (
           <div className="space-y-3">
             {shown.map((u) => {
-              const Icon = typeIcon[u.fileType];
               return (
                 <div key={u.id} className="card px-4 py-3.5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-start gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
-                        <Icon size={18} />
-                      </span>
+                      <CoverArt seed={u.fileName} size={44} rounded="rounded-xl" />
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-white">{u.fileName}</p>
                         <p className="truncate text-xs text-night-400">

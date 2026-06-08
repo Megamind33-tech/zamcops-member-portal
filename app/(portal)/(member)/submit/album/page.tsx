@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Send, Plus, Trash2, ChevronDown, ListMusic } from "lucide-react";
 import { TopBar } from "@/components/mobile/TopBar";
+import { CoverArt } from "@/components/media/CoverArt";
 import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { SplitEditor, splitsValid } from "@/components/SplitEditor";
@@ -83,7 +84,10 @@ export default function AlbumSubmissionScreen() {
       <TopBar title="Submit an Album" back="/submit" />
       <form onSubmit={submit} className="space-y-5 px-4 py-4">
         <section className="card px-4 py-4">
-          <h3 className="mb-3 text-sm font-bold text-white">Album details</h3>
+          <div className="mb-3 flex items-center gap-3">
+            <CoverArt seed={title || "New album"} size={44} rounded="rounded-xl" />
+            <h3 className="text-sm font-bold text-white">Album details</h3>
+          </div>
           <div className="space-y-3">
             <Field label="Album title" required>
               <TextInput placeholder="e.g. Kalulu Tales" value={title} onChange={(e) => setTitle(e.target.value)} />

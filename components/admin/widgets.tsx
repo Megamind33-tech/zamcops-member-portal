@@ -59,8 +59,20 @@ export function Th({ children, className }: { children?: React.ReactNode; classN
   );
 }
 
-export function Td({ children, className }: { children?: React.ReactNode; className?: string }) {
-  return <td className={cn("px-4 py-3 align-middle text-sm text-night-200", className)}>{children}</td>;
+export function Td({
+  children,
+  className,
+  colSpan,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+  colSpan?: number;
+}) {
+  return (
+    <td colSpan={colSpan} className={cn("px-4 py-3 align-middle text-sm text-night-200", className)}>
+      {children}
+    </td>
+  );
 }
 
 export { StatusBadge };

@@ -6,6 +6,7 @@ import { MailCheck, ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Field, TextInput } from "@/components/ui/Field";
+import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
 
 export default function ForgotPasswordScreen() {
   const [sent, setSent] = useState(false);
@@ -13,6 +14,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4">
+      <PhotoBackdrop photo="piano" scrim="strong" />
       <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-brand-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-24 bottom-4 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
 

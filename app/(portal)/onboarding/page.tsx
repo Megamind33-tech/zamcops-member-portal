@@ -4,25 +4,30 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileMusic, Activity, BarChart3, BadgeCheck, ArrowRight } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
 
 const slides = [
   {
     icon: FileMusic,
+    photo: "synth" as const,
     title: "Register your works",
     body: "Declare your songs, compositions, beats and lyrics so your copyright ownership is recorded and protected.",
   },
   {
     icon: Activity,
+    photo: "dj-console" as const,
     title: "Track your submissions",
     body: "Follow every single, album and work declaration from submission through to review and approval.",
   },
   {
     icon: BarChart3,
+    photo: "piano" as const,
     title: "View royalty activity",
     body: "See estimated, pending and paid royalties from radio and broadcast usage of your music across Zambia.",
   },
   {
     icon: BadgeCheck,
+    photo: "hands" as const,
     title: "Manage your membership",
     body: "Keep your profile, KYC and payout details up to date and access receipts and statements anytime.",
   },
@@ -54,9 +59,11 @@ export default function OnboardingScreen() {
         </div>
 
         <div key={i} className="flex flex-1 flex-col items-center justify-center text-center animate-fade-up">
-          <div className="relative mb-8 grid h-28 w-28 place-items-center overflow-hidden rounded-[2rem] bg-white/[0.04] text-brand-300 ring-1 ring-white/10">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(84,96,248,0.35),transparent_60%)]" />
-            <Icon size={48} strokeWidth={1.7} className="relative" />
+          <div className="relative mb-8 aspect-square w-44 overflow-hidden rounded-[2rem] ring-1 ring-white/10 shadow-glow">
+            <PhotoBackdrop photo={slide.photo} scrim="soft" />
+            <span className="absolute bottom-3 right-3 z-10 grid h-12 w-12 place-items-center rounded-2xl bg-night-900/70 text-brand-200 ring-1 ring-white/15 backdrop-blur">
+              <Icon size={24} strokeWidth={1.9} />
+            </span>
           </div>
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">Get started</p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-white">

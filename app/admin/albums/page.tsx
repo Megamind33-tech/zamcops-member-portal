@@ -4,6 +4,8 @@ import React from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
 export default function AdminAlbumsPage() {
@@ -30,10 +32,15 @@ export default function AdminAlbumsPage() {
               {albums.map((a) => (
                 <tr key={a.id} className="align-top hover:bg-white/[0.03]">
                   <Td className="font-semibold text-white">
-                    {a.title}
-                    <span className="mt-1 block text-xs font-normal text-night-400">
-                      {a.tracks.map((t) => t.title).join(" · ")}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <CoverArt seed={a.title} size={40} rounded="rounded-lg" />
+                      <div className="min-w-0">
+                        {a.title}
+                        <span className="mt-1 block text-xs font-normal text-night-400">
+                          {a.tracks.map((t) => t.title).join(" · ")}
+                        </span>
+                      </div>
+                    </div>
                   </Td>
                   <Td>{a.artistName}</Td>
                   <Td>{a.tracks.length}</Td>
@@ -53,7 +60,12 @@ export default function AdminAlbumsPage() {
               ))}
               {albums.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">No album submissions yet.</Td>
+                  <Td className="py-8 text-center text-night-400">
+                    <div className="flex flex-col items-center gap-3">
+                      <Illustration name="vinyl" />
+                      <span>No album submissions yet.</span>
+                    </div>
+                  </Td>
                 </tr>
               )}
             </tbody>

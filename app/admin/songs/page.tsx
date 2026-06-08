@@ -4,6 +4,8 @@ import React from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
 export default function AdminSongsPage() {
@@ -29,7 +31,12 @@ export default function AdminSongsPage() {
             <tbody className="divide-y divide-white/[0.06]">
               {singles.map((s) => (
                 <tr key={s.id} className="hover:bg-white/[0.03]">
-                  <Td className="font-semibold text-white">{s.title}</Td>
+                  <Td className="font-semibold text-white">
+                    <div className="flex items-center gap-3">
+                      <CoverArt seed={s.title} size={40} rounded="rounded-lg" />
+                      <span>{s.title}</span>
+                    </div>
+                  </Td>
                   <Td>
                     {s.artistName}
                     {s.featuredArtists ? (
@@ -57,7 +64,12 @@ export default function AdminSongsPage() {
               ))}
               {singles.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">No song submissions yet.</Td>
+                  <Td className="py-8 text-center text-night-400">
+                    <div className="flex flex-col items-center gap-3">
+                      <Illustration name="waveform" />
+                      <span>No song submissions yet.</span>
+                    </div>
+                  </Td>
                 </tr>
               )}
             </tbody>

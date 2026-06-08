@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Radio, TrendingUp, Wallet } from "lucide-react";
+import { Download, Radio, TrendingUp } from "lucide-react";
 import { TopBar } from "@/components/mobile/TopBar";
 import { EmptyState } from "@/components/ui/Misc";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { useMemberData } from "@/lib/store";
 import { formatKwacha } from "@/lib/format";
 
@@ -19,7 +21,7 @@ export default function RoyaltiesScreen() {
         <TopBar title="Royalties" back="/dashboard" />
         <div className="px-4 py-6">
           <EmptyState
-            icon={<Wallet size={22} />}
+            art={<Illustration name="royalty" />}
             title="No royalty activity yet"
             message="Once your registered works are detected on radio and broadcast, royalty usage will appear here."
           />
@@ -84,6 +86,7 @@ export default function RoyaltiesScreen() {
                 <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gold-400/12 text-xs font-bold text-gold-300 ring-1 ring-gold-400/20">
                   {i + 1}
                 </span>
+                <CoverArt seed={s.title} size={40} rounded="rounded-lg" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-white">{s.title}</p>
                   <p className="text-xs text-night-400">{s.plays.toLocaleString()} plays detected</p>

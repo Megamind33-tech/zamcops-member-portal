@@ -6,6 +6,8 @@ import { Users, FileText, Music2, Disc3, FolderOpen, Clock, ChevronRight } from 
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { AdminStat, Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
 export default function AdminDashboard() {
@@ -61,13 +63,28 @@ export default function AdminDashboard() {
                       {r.kind}
                     </span>
                   </Td>
-                  <Td className="font-semibold text-white">{r.title}</Td>
+                  <Td className="font-semibold text-white">
+                    <div className="flex items-center gap-3">
+                      <CoverArt seed={r.title} size={36} rounded="rounded-lg" />
+                      <span>{r.title}</span>
+                    </div>
+                  </Td>
                   <Td className="text-night-300">{formatDate(r.at)}</Td>
                   <Td>
                     <StatusBadge status={r.status} />
                   </Td>
                 </tr>
               ))}
+              {recent.length === 0 && (
+                <tr>
+                  <Td colSpan={4} className="py-8 text-center text-night-400">
+                    <div className="flex flex-col items-center gap-3">
+                      <Illustration name="inbox" size={100} />
+                      <span>No recent submissions yet.</span>
+                    </div>
+                  </Td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

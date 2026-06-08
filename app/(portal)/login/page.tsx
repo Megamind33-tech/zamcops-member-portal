@@ -7,6 +7,7 @@ import { AtSign, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { Field, TextInput } from "@/components/ui/Field";
+import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
 import { useApp } from "@/lib/store";
 
 export default function LoginScreen() {
@@ -29,24 +30,27 @@ export default function LoginScreen() {
   };
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4">
-      <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-brand-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 bottom-4 h-64 w-64 rounded-full bg-iris-500/15 blur-3xl" />
-
-      <div className="card relative z-10 flex flex-1 flex-col px-5 py-6">
-        <Logo size={46} />
-
-        <div className="mt-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">Member access</p>
-          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-white">
-            Welcome back
-          </h1>
-          <p className="mt-2 text-sm leading-relaxed text-night-300">
-            Sign in to manage your ZAMCOPS membership.
-          </p>
+    <div className="relative flex flex-1 flex-col overflow-hidden">
+      {/* Cinematic photo header */}
+      <div className="relative h-60 shrink-0 overflow-hidden">
+        <PhotoBackdrop photo="auth-mic" scrim="medium" position="center 35%" />
+        <div className="relative z-10 flex h-full flex-col justify-between p-5">
+          <Logo size={42} />
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">Member access</p>
+            <h1 className="mt-1 font-display text-[2.1rem] font-bold leading-none tracking-tight text-white">
+              Welcome back
+            </h1>
+          </div>
         </div>
+      </div>
 
-        <form onSubmit={submit} className="mt-8 space-y-4">
+      <div className="relative z-10 -mt-6 flex flex-1 flex-col rounded-t-[2rem] border-t border-white/10 bg-night-900/80 px-5 pb-6 pt-6 backdrop-blur-xl">
+        <p className="text-sm leading-relaxed text-night-300">
+          Sign in to manage your ZAMCOPS membership.
+        </p>
+
+        <form onSubmit={submit} className="mt-6 space-y-4">
           <Field label="Phone or email" required>
             <div className="relative">
               <AtSign

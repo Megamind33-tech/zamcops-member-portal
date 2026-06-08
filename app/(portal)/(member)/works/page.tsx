@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { FilePlus2, Library, Music4, Clock } from "lucide-react";
+import { FilePlus2, Clock } from "lucide-react";
 import { TopBar } from "@/components/mobile/TopBar";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/Misc";
 import { ButtonLink } from "@/components/ui/Button";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { useMemberData } from "@/lib/store";
 import { formatDate } from "@/lib/format";
 import type { ReviewStatus } from "@/types";
@@ -52,7 +54,7 @@ export default function WorksScreen() {
 
         {shown.length === 0 ? (
           <EmptyState
-            icon={<Library size={22} />}
+            art={<Illustration name="works" />}
             title="No work declarations"
             message="Declare a musical work to record its copyright ownership and splits."
             action={
@@ -67,9 +69,7 @@ export default function WorksScreen() {
               <div key={w.id} className="card px-4 py-3.5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
-                      <Music4 size={18} />
-                    </span>
+                    <CoverArt seed={w.title} size={44} rounded="rounded-xl" />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-white">{w.title}</p>
                       <p className="truncate text-xs text-night-300">

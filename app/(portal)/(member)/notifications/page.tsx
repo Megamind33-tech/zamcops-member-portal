@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { Bell, CheckCheck, Info, CheckCircle2, AlertTriangle, FileText } from "lucide-react";
+import { CheckCheck, Info, CheckCircle2, AlertTriangle, FileText } from "lucide-react";
 import { TopBar } from "@/components/mobile/TopBar";
 import { EmptyState } from "@/components/ui/Misc";
+import { Illustration } from "@/components/media/Illustration";
 import { useApp, useMemberData } from "@/lib/store";
 import { timeAgo, cn } from "@/lib/format";
 import type { AppNotification } from "@/types";
@@ -42,7 +43,7 @@ export default function NotificationsScreen() {
 
       <div className="px-4 py-4">
         {notifications.length === 0 ? (
-          <EmptyState icon={<Bell size={22} />} title="You're all caught up" message="New updates about your submissions and royalties will show here." />
+          <EmptyState art={<Illustration name="inbox" />} title="You're all caught up" message="New updates about your submissions and royalties will show here." />
         ) : (
           <div className="space-y-3">
             {notifications.map((n) => {

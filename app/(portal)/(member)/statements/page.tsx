@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Download, ReceiptText, FileText, Wallet } from "lucide-react";
 import { TopBar } from "@/components/mobile/TopBar";
 import { EmptyState } from "@/components/ui/Misc";
+import { Illustration } from "@/components/media/Illustration";
 import { useApp, useMemberData } from "@/lib/store";
 import { formatDate, formatKwacha } from "@/lib/format";
 import type { Statement, StatementType } from "@/types";
@@ -72,7 +73,7 @@ export default function StatementsScreen() {
 
         {shown.length === 0 ? (
           <EmptyState
-            icon={<ReceiptText size={22} />}
+            art={<Illustration name="vinyl" />}
             title="No documents yet"
             message="Receipts and statements are generated as you register, submit and earn royalties."
           />

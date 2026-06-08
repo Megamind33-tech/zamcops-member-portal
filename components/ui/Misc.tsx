@@ -39,11 +39,13 @@ export function SectionTitle({
 
 export function EmptyState({
   icon,
+  art,
   title,
   message,
   action,
 }: {
   icon?: React.ReactNode;
+  art?: React.ReactNode;
   title: string;
   message: string;
   action?: React.ReactNode;
@@ -51,10 +53,14 @@ export function EmptyState({
   return (
     <div className="card relative flex flex-col items-center overflow-hidden px-6 py-10 text-center">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(84,96,248,0.14),transparent_55%)]" />
-      {icon && (
-        <div className="relative mb-4 grid h-14 w-14 place-items-center rounded-[1.25rem] bg-white/[0.05] text-brand-300 ring-1 ring-white/10">
-          {icon}
-        </div>
+      {art ? (
+        <div className="relative mb-3 drop-shadow-[0_12px_30px_rgba(84,96,248,0.25)]">{art}</div>
+      ) : (
+        icon && (
+          <div className="relative mb-4 grid h-14 w-14 place-items-center rounded-[1.25rem] bg-white/[0.05] text-brand-300 ring-1 ring-white/10">
+            {icon}
+          </div>
+        )
       )}
       <p className="relative text-sm font-semibold text-white">{title}</p>
       <p className="relative mt-1 max-w-xs text-xs text-night-300">{message}</p>

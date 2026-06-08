@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 import type { UploadStatus } from "@/types";
 
@@ -48,7 +50,12 @@ export default function AdminFilesPage() {
             <tbody className="divide-y divide-white/[0.06]">
               {shown.map((u) => (
                 <tr key={u.id} className="hover:bg-white/[0.03]">
-                  <Td className="font-mono text-xs font-semibold text-white">{u.fileName}</Td>
+                  <Td className="font-mono text-xs font-semibold text-white">
+                    <div className="flex items-center gap-3">
+                      <CoverArt seed={u.fileName} size={40} rounded="rounded-lg" />
+                      <span>{u.fileName}</span>
+                    </div>
+                  </Td>
                   <Td>{u.fileType}</Td>
                   <Td className="text-night-300">{u.linkedTo ?? "—"}</Td>
                   <Td>{nameFor(u.ownerId)}</Td>
@@ -65,7 +72,12 @@ export default function AdminFilesPage() {
               ))}
               {shown.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">No files match this filter.</Td>
+                  <Td className="py-8 text-center text-night-400">
+                    <div className="flex flex-col items-center gap-3">
+                      <Illustration name="upload" />
+                      <span>No files match this filter.</span>
+                    </div>
+                  </Td>
                 </tr>
               )}
             </tbody>

@@ -4,6 +4,8 @@ import React from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
+import { CoverArt } from "@/components/media/CoverArt";
+import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
 export default function AdminWorksPage() {
@@ -31,10 +33,15 @@ export default function AdminWorksPage() {
               {works.map((w) => (
                 <tr key={w.id} className="hover:bg-white/[0.03]">
                   <Td className="font-semibold text-white">
-                    {w.title}
-                    <span className="block text-xs font-normal text-night-400">
-                      {w.genre} · {w.language}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <CoverArt seed={w.title} size={40} rounded="rounded-lg" />
+                      <div className="min-w-0">
+                        {w.title}
+                        <span className="block text-xs font-normal text-night-400">
+                          {w.genre} · {w.language}
+                        </span>
+                      </div>
+                    </div>
                   </Td>
                   <Td>{w.workType}</Td>
                   <Td>{nameFor(w.ownerId)}</Td>
@@ -56,7 +63,12 @@ export default function AdminWorksPage() {
               ))}
               {works.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">No work declarations yet.</Td>
+                  <Td className="py-8 text-center text-night-400">
+                    <div className="flex flex-col items-center gap-3">
+                      <Illustration name="works" />
+                      <span>No work declarations yet.</span>
+                    </div>
+                  </Td>
                 </tr>
               )}
             </tbody>

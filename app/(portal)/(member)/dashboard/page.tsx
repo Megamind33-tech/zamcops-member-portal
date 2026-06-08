@@ -18,6 +18,7 @@ import { useApp, useMemberData } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { SectionTitle } from "@/components/ui/Misc";
+import { CoverArt } from "@/components/media/CoverArt";
 import { formatKwacha, timeAgo } from "@/lib/format";
 
 export default function DashboardScreen() {
@@ -68,6 +69,9 @@ export default function DashboardScreen() {
         className="relative overflow-hidden rounded-[2.2rem] brand-gradient px-5 py-5 text-white shadow-[0_30px_70px_-30px_rgba(84,96,248,0.7)] ring-1 ring-white/10 animate-fade-up"
         style={{ animationDelay: "40ms" }}
       >
+        <div className="pointer-events-none absolute inset-0 opacity-25 mix-blend-soft-light">
+          <img src="/img/hero-concert.webp" alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+        </div>
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,rgba(255,255,255,0.16),transparent_38%,rgba(0,0,0,0.12)_100%)]" />
         <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-gold-400/25 blur-3xl" />
         <div className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-pop-500/20 blur-3xl" />

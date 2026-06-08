@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/lib/store";
+import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -28,9 +29,9 @@ export default function SplashScreen() {
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-night-950 text-white">
+      <PhotoBackdrop photo="splash-stage" scrim="strong" position="center" />
       <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-brand-600/40 blur-[90px]" />
       <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-iris-500/35 blur-[90px]" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold-500/10 blur-[80px]" />
 
       <div className="z-10 flex flex-col items-center gap-7 animate-scale-in">
         <span className="relative grid h-24 w-24 place-items-center overflow-hidden rounded-[30px] brand-gradient text-5xl font-black text-white shadow-fab ring-1 ring-white/20">
