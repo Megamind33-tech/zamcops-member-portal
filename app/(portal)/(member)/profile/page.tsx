@@ -41,7 +41,7 @@ export default function ProfileScreen() {
         <div className="card mb-4 px-4 py-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-white">KYC completion</span>
-            <span className="text-sm font-bold text-gold-400">{completion}%</span>
+            <span className="text-sm font-bold text-accent-400">{completion}%</span>
           </div>
           <ProgressBar value={completion} className="mt-3" />
         </div>

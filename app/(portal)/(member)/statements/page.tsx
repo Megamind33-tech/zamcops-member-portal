@@ -63,7 +63,7 @@ export default function StatementsScreen() {
               onClick={() => setTab(t)}
               className={
                 "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (tab === t ? "brand-gradient text-white shadow-fab ring-1 ring-white/10" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
+                (tab === t ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
               }
             >
               {t === "All" ? "All" : t.replace(" Receipt", "").replace(" Statement", "")}

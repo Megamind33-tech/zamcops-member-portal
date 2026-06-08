@@ -28,7 +28,7 @@ export default function WorksScreen() {
         right={
           <Link
             href="/works/new"
-            className="grid h-9 w-9 place-items-center rounded-full brand-gradient text-white shadow-fab ring-1 ring-white/10"
+            className="grid h-9 w-9 place-items-center rounded-full bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(25,224,138,0.6)] ring-1 ring-accent-300/30"
             aria-label="Declare work"
           >
             <FilePlus2 size={17} />
@@ -44,7 +44,7 @@ export default function WorksScreen() {
               onClick={() => setFilter(f)}
               className={
                 "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (filter === f ? "brand-gradient text-white ring-1 ring-white/10" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:bg-white/[0.1]")
+                (filter === f ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:bg-white/[0.1]")
               }
             >
               {f}

@@ -29,8 +29,8 @@ export function SectionTitle({
   return (
     <div className="mb-3 flex items-end justify-between gap-3 px-1">
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-gold-400">Section</p>
-        <h2 className="font-display text-lg font-semibold tracking-tight text-white">{title}</h2>
+        <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-accent-400">Section</p>
+        <h2 className="font-display text-lg font-bold tracking-tight text-white">{title}</h2>
       </div>
       {action}
     </div>

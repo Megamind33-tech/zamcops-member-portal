@@ -27,7 +27,7 @@ export default function AdminFilesPage() {
             onClick={() => setFilter(f)}
             className={
               "rounded-full px-3.5 py-1.5 text-xs font-semibold " +
-              (filter === f ? "brand-gradient text-white shadow-fab" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:text-white")
+              (filter === f ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:text-white")
             }
           >
             {f}

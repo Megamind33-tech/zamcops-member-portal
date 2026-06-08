@@ -55,7 +55,7 @@ export default function SettingsScreen() {
       <div className="space-y-5 px-4 py-4">
         {/* Account card */}
         <section className="card flex items-center gap-3 px-4 py-4">
-          <span className="grid h-12 w-12 place-items-center rounded-full brand-gradient text-sm font-bold text-white ring-1 ring-white/10">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-accent-500 text-sm font-bold text-night-950 ring-1 ring-accent-300/30">
             {initials(member.stageName || member.fullName)}
           </span>
           <div className="min-w-0 flex-1">

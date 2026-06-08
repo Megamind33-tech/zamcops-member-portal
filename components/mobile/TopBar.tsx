@@ -30,7 +30,7 @@ export function TopBar({
       )}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-400/50 to-transparent" />
-      <div className="pointer-events-none absolute -right-8 top-1 h-16 w-16 rounded-full bg-iris-500/15 blur-2xl" />
+      <div className="pointer-events-none absolute -right-8 top-1 h-16 w-16 rounded-full bg-accent-500/12 blur-2xl" />
       <div className="relative flex items-center gap-2">
         {back ? (
           typeof back === "string" ? (
@@ -46,7 +46,7 @@ export function TopBar({
           <span className="w-1" />
         )}
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-gold-400">ZAMCOPS</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-accent-400">ZAMCOPS</p>
           <h1 className="truncate font-display text-[1.15rem] font-semibold tracking-tight text-white">
             {title}
           </h1>

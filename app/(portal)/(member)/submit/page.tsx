@@ -11,18 +11,21 @@ const options = [
     icon: Music2,
     title: "Submit a Single",
     body: "Upload one song with its audio, cover art and ownership splits.",
+    tint: "from-accent-400 to-accent-700",
   },
   {
     href: "/submit/album",
     icon: Disc3,
     title: "Submit an Album",
     body: "Create an album and add multiple tracks, each with its own details.",
+    tint: "from-gold-400 to-pop-500",
   },
   {
     href: "/works/new",
     icon: FilePlus2,
     title: "Declare a Work",
     body: "Register copyright ownership of a song, composition, beat or lyric.",
+    tint: "from-iris-400 to-brand-700",
   },
 ];
 
@@ -47,8 +50,8 @@ export default function SubmitHubScreen() {
               href={o.href}
               className="card flex items-center gap-3 px-4 py-4 transition hover:bg-white/[0.03] active:scale-[0.99]"
             >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl brand-gradient text-white ring-1 ring-white/10">
-                <o.icon size={22} />
+              <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${o.tint} text-white shadow-[0_14px_30px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/10`}>
+                <o.icon size={20} />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-white">{o.title}</p>

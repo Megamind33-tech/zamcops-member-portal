@@ -64,7 +64,7 @@ export default function NotificationsScreen() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate text-sm font-semibold text-white">{n.title}</p>
-                      {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-gold-400" />}
+                      {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-accent-400" />}
                     </div>
                     <p className="mt-0.5 text-xs leading-relaxed text-night-300">{n.body}</p>
                     <p className="mt-1 text-[10px] text-night-400">{timeAgo(n.createdAt)}</p>

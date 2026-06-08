@@ -19,7 +19,7 @@ import { profileCompletion } from "@/lib/member";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { SectionTitle } from "@/components/ui/Misc";
 import { CoverArt } from "@/components/media/CoverArt";
-import { formatKwacha, timeAgo } from "@/lib/format";
+import { formatKwacha, timeAgo, cn } from "@/lib/format";
 
 export default function DashboardScreen() {
   const { currentMember } = useApp();
@@ -35,10 +35,10 @@ export default function DashboardScreen() {
   const latest = notifications.slice(0, 3);
 
   const quickActions = [
-    { href: "/submit/single", label: "Submit song", hint: "Capture a new release", icon: Music2 },
-    { href: "/works/new", label: "Declare work", hint: "Record ownership details", icon: FilePlus2 },
-    { href: "/submit/album", label: "Upload album", hint: "Package tracks together", icon: Disc3 },
-    { href: "/profile", label: "Update profile", hint: "Keep KYC current", icon: UserCog },
+    { href: "/submit/single", label: "Submit song", hint: "Capture a new release", icon: Music2, tint: "from-accent-400 to-accent-700" },
+    { href: "/works/new", label: "Declare work", hint: "Record ownership details", icon: FilePlus2, tint: "from-iris-400 to-brand-700" },
+    { href: "/submit/album", label: "Upload album", hint: "Package tracks together", icon: Disc3, tint: "from-gold-400 to-pop-500" },
+    { href: "/profile", label: "Update profile", hint: "Keep KYC current", icon: UserCog, tint: "from-pop-400 to-iris-700" },
   ];
 
   const nextStep =
@@ -66,20 +66,19 @@ export default function DashboardScreen() {
   return (
     <div className="px-4 pb-6 pt-4">
       <section
-        className="relative overflow-hidden rounded-[2.2rem] brand-gradient px-5 py-5 text-white shadow-[0_30px_70px_-30px_rgba(84,96,248,0.7)] ring-1 ring-white/10 animate-fade-up"
+        className="relative overflow-hidden rounded-[2.2rem] bg-night-900 px-5 py-5 text-white shadow-[0_30px_70px_-30px_rgba(0,0,0,0.8)] ring-1 ring-white/10 animate-fade-up"
         style={{ animationDelay: "40ms" }}
       >
-        <div className="pointer-events-none absolute inset-0 opacity-25 mix-blend-soft-light">
+        <div className="pointer-events-none absolute inset-0">
           <img src="/img/hero-concert.webp" alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
         </div>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,rgba(255,255,255,0.16),transparent_38%,rgba(0,0,0,0.12)_100%)]" />
-        <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-gold-400/25 blur-3xl" />
-        <div className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-pop-500/20 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(160deg,rgba(5,5,12,0.55)_0%,rgba(5,5,12,0.82)_55%,rgba(5,5,12,0.95)_100%)]" />
+        <div className="pointer-events-none absolute -left-16 -top-10 h-48 w-48 rounded-full bg-accent-500/15 blur-3xl" />
 
         <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0 space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white">
-              <Sparkles size={12} className="text-gold-300" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white backdrop-blur">
+              <Sparkles size={12} className="text-accent-400" />
               Member portal
             </div>
 
@@ -101,7 +100,7 @@ export default function DashboardScreen() {
           >
             <Bell size={18} />
             {unread > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold-400 px-1 text-[10px] font-bold text-night-950">
+              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent-400 px-1 text-[10px] font-bold text-night-950">
                 {unread}
               </span>
             )}
@@ -129,7 +128,7 @@ export default function DashboardScreen() {
             {[12, 18, 10, 24, 16, 20].map((height, index) => (
               <span
                 key={index}
-                className="w-1.5 origin-bottom rounded-full bg-gradient-to-t from-gold-400/50 to-gold-300 animate-equalize"
+                className="w-1.5 origin-bottom rounded-full bg-gradient-to-t from-accent-600/60 to-accent-300 animate-equalize"
                 style={{ height: `${height}px`, animationDelay: `${index * 0.12}s`, animationDuration: `${0.9 + (index % 3) * 0.3}s` }}
               />
             ))}
@@ -167,19 +166,26 @@ export default function DashboardScreen() {
               <Link
                 key={action.href}
                 href={action.href}
-                className="group card relative overflow-hidden px-4 py-4 transition duration-200 hover:-translate-y-0.5 hover:border-brand-400/40 hover:shadow-glow active:translate-y-px"
+                className={cn(
+                  "group relative isolate flex aspect-[5/4] flex-col justify-between overflow-hidden rounded-[1.6rem] bg-gradient-to-br p-4 shadow-[0_20px_45px_-20px_rgba(0,0,0,0.65)] ring-1 ring-white/10 transition duration-200 hover:-translate-y-0.5 active:translate-y-px animate-fade-up",
+                  action.tint
+                )}
                 style={{ animationDelay: `${80 + index * 40}ms` }}
               >
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(84,96,248,0.16),transparent_46%)] opacity-0 transition group-hover:opacity-100" />
-                <div className="relative flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="grid h-11 w-11 place-items-center rounded-[1.1rem] bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
-                      <action.icon size={18} />
-                    </div>
-                    <p className="mt-3 text-sm font-semibold text-white">{action.label}</p>
-                    <p className="mt-1 text-[11px] leading-relaxed text-night-400">{action.hint}</p>
-                  </div>
-                  <ArrowUpRight size={16} className="mt-1 text-night-400 transition group-hover:text-brand-300" />
+                <action.icon
+                  size={92}
+                  strokeWidth={1.1}
+                  className="pointer-events-none absolute -bottom-6 -right-6 text-white/[0.16] transition duration-300 group-hover:scale-110 group-hover:text-white/25"
+                />
+                <span className="relative grid h-9 w-9 place-items-center rounded-xl bg-black/20 text-white ring-1 ring-white/15 backdrop-blur">
+                  <action.icon size={16} />
+                </span>
+                <div className="relative">
+                  <p className="text-[15px] font-bold leading-tight tracking-tight text-white">{action.label}</p>
+                  <p className="mt-1 flex items-center gap-1 text-[11px] leading-snug text-white/70">
+                    {action.hint}
+                    <ArrowUpRight size={12} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </p>
                 </div>
               </Link>
             ))}
@@ -190,7 +196,7 @@ export default function DashboardScreen() {
           <div className="border-b border-white/[0.07] bg-white/[0.02] px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <Wallet size={16} className="text-gold-400" />
+                <Wallet size={16} className="text-accent-400" />
                 Royalty summary
               </div>
               <ChevronRight size={16} className="text-night-400" />
@@ -231,7 +237,7 @@ export default function DashboardScreen() {
                 <span
                   className={
                     "mt-1 h-2.5 w-2.5 shrink-0 rounded-full " +
-                    (notification.read ? "bg-night-600" : "bg-gold-400 shadow-[0_0_10px_rgba(255,194,77,0.6)]")
+                    (notification.read ? "bg-night-600" : "bg-accent-400 shadow-[0_0_10px_rgba(47,231,154,0.55)]")
                   }
                 />
                 <div className="min-w-0 flex-1">
@@ -247,10 +253,10 @@ export default function DashboardScreen() {
         </section>
 
         <section className="card relative overflow-hidden p-4 animate-fade-up" style={{ animationDelay: "280ms" }}>
-          <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gold-400/12 blur-3xl" />
+          <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-accent-500/12 blur-3xl" />
           <div className="relative flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-accent-400">
                 Next step
               </p>
               <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-white">

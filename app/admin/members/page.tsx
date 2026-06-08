@@ -48,7 +48,7 @@ export default function AdminMembersPage() {
                 <tr key={m.id} className="hover:bg-white/[0.03]">
                   <Td>
                     <div className="flex items-center gap-3">
-                      <span className="grid h-9 w-9 place-items-center rounded-full brand-gradient text-xs font-bold text-white">
+                      <span className="grid h-9 w-9 place-items-center rounded-full bg-accent-500 text-xs font-bold text-night-950">
                         {initials(m.stageName || m.fullName)}
                       </span>
                       <div>

@@ -41,20 +41,24 @@ export default function RoyaltiesScreen() {
 
       <div className="space-y-5 px-4 py-4">
         {/* Hero total */}
-        <div className="relative overflow-hidden rounded-2xl brand-gradient px-5 py-5 text-white shadow-glow ring-1 ring-white/10">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold-400/20 blur-3xl" />
-          <p className="relative text-xs text-white/80">Total estimated royalties</p>
-          <p className="relative mt-1 text-3xl font-extrabold tracking-tight">
+        <div className="relative overflow-hidden rounded-[1.75rem] bg-night-900 px-5 py-5 text-white shadow-[0_30px_70px_-30px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
+          <div className="pointer-events-none absolute inset-0">
+            <img src="/img/dj-console.webp" alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(165deg,rgba(5,5,12,0.6)_0%,rgba(5,5,12,0.85)_55%,rgba(5,5,12,0.96)_100%)]" />
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent-500/15 blur-3xl" />
+          <p className="relative text-xs font-semibold uppercase tracking-[0.2em] text-white/70">Total estimated royalties</p>
+          <p className="relative mt-1.5 font-display text-3xl font-extrabold tracking-tight text-white">
             {formatKwacha(royalty.totalEstimated, royalty.currency)}
           </p>
           <div className="relative mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-white/12 bg-white/10 px-3 py-2.5 backdrop-blur">
-              <p className="text-[11px] text-white/70">Pending</p>
-              <p className="text-sm font-bold">{formatKwacha(royalty.pending, royalty.currency)}</p>
+            <div className="rounded-xl border border-white/12 bg-black/20 px-3 py-2.5 backdrop-blur">
+              <p className="text-[11px] text-white/60">Pending</p>
+              <p className="text-sm font-bold text-white">{formatKwacha(royalty.pending, royalty.currency)}</p>
             </div>
-            <div className="rounded-xl border border-white/12 bg-white/10 px-3 py-2.5 backdrop-blur">
-              <p className="text-[11px] text-white/70">Paid</p>
-              <p className="text-sm font-bold">{formatKwacha(royalty.paid, royalty.currency)}</p>
+            <div className="rounded-xl border border-white/12 bg-black/20 px-3 py-2.5 backdrop-blur">
+              <p className="text-[11px] text-white/60">Paid</p>
+              <p className="text-sm font-bold text-white">{formatKwacha(royalty.paid, royalty.currency)}</p>
             </div>
           </div>
         </div>
@@ -67,7 +71,7 @@ export default function RoyaltiesScreen() {
               onClick={() => setPeriod(p)}
               className={
                 "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (period === p ? "brand-gradient text-white shadow-fab ring-1 ring-white/10" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
+                (period === p ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
               }
             >
               {p}
@@ -83,7 +87,7 @@ export default function RoyaltiesScreen() {
           <div className="card divide-y divide-white/[0.06]">
             {royalty.topSongs.map((s, i) => (
               <div key={s.title} className="flex items-center gap-3 px-4 py-3">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gold-400/12 text-xs font-bold text-gold-300 ring-1 ring-gold-400/20">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent-500/12 text-xs font-bold text-accent-300 ring-1 ring-accent-400/20">
                   {i + 1}
                 </span>
                 <CoverArt seed={s.title} size={40} rounded="rounded-lg" />
@@ -91,7 +95,7 @@ export default function RoyaltiesScreen() {
                   <p className="truncate text-sm font-semibold text-white">{s.title}</p>
                   <p className="text-xs text-night-400">{s.plays.toLocaleString()} plays detected</p>
                 </div>
-                <span className="text-sm font-bold text-gold-400">
+                <span className="text-sm font-bold text-accent-400">
                   {formatKwacha(s.amount, royalty.currency)}
                 </span>
               </div>
@@ -128,7 +132,7 @@ export default function RoyaltiesScreen() {
 
         <a
           href="/statements"
-          className="flex items-center justify-center gap-2 rounded-xl brand-gradient py-3 text-sm font-semibold text-white shadow-fab ring-1 ring-white/10 transition hover:brightness-110"
+          className="flex items-center justify-center gap-2 rounded-xl bg-accent-500 py-3 text-sm font-semibold text-night-950 shadow-[0_16px_38px_-14px_rgba(25,224,138,0.6)] ring-1 ring-accent-300/30 transition hover:bg-accent-400"
         >
           <Download size={18} /> Download statement
         </a>
