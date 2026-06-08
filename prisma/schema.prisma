@@ -52,13 +52,16 @@ model Member {
   membershipStatus String   @default("Pending")
   joinedAt         DateTime @default(now())
 
-  works         WorkDeclaration[]
-  singles       SongSubmission[]
-  albums        AlbumSubmission[]
-  uploads       UploadFile[]
-  notifications Notification[]
-  statements    Statement[]
-  royalty       RoyaltySummary?
+  works               WorkDeclaration[]
+  singles             SongSubmission[]
+  albums              AlbumSubmission[]
+  uploads             UploadFile[]
+  notifications       Notification[]
+  statements          Statement[]
+  royalty             RoyaltySummary?
+  distributionEntries DistributionEntry[]
+  licensableWorks     LicensableWork[]
+  licenseRequests     LicenseRequest[]
 }
 
 model WorkDeclaration {
@@ -75,7 +78,8 @@ model WorkDeclaration {
   authors          String   @default("[]")
   producers        String   @default("[]")
   publisher        String   @default("")
-  ownershipSplits  String   @default("[]") // JSON OwnershipSplit[]
+  publisherIpi     String   @default("") // Publisher's IPI / CAE number, for cross-society registration
+  ownershipSplits  String   @default("[]") // JSON OwnershipSplit[] — each entry now also carries ipiNumber + rightsType
   isrc             String   @default("")
   iswc             String   @default("")
   dateCreated      String   @default("")
@@ -95,6 +99,7 @@ model SongSubmission {
   producer        String   @default("")
   genre           String
   releaseDate     String   @default("")
+  isrc            String   @default("")
   audioFile       String   @default("")
   coverArt        String   @default("")
   lyricsFile      String   @default("")
@@ -161,6 +166,9 @@ model Statement {
 }
 
 // One royalty summary per member, with usage logs and top songs stored as JSON.
+// Note: these are *detected activity* figures (plays/usage) for internal forecasting —
+// members are not shown monetary promises here. Confirmed earnings only become visible
+// to a member once an admin publishes a Distribution covering the relevant period.
 model RoyaltySummary {
   id             String @id @default(cuid())
   owner          Member @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -171,4 +179,76 @@ model RoyaltySummary {
   paid           Float  @default(0)
   usageLogs      String @default("[]") // JSON RoyaltyUsageLog[]
   topSongs       String @default("[]") // JSON top songs
+}
+
+// A closed, society-wide distribution period. Stays in Draft (admin-only) while
+// amounts are being assembled and reviewed; once Published it becomes visible
+// to the affected members — this is the gate that keeps royalties from being
+// shown "ahead of time".
+model Distribution {
+  id          String    @id @default(cuid())
+  periodLabel String // e.g. "Q1 2026"
+  status      String    @default("Draft") // Draft | Published
+  notes       String    @default("")
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  entries DistributionEntry[]
+}
+
+// A member's confirmed payout within a given distribution period.
+model DistributionEntry {
+  id             String       @id @default(cuid())
+  distribution   Distribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  distributionId String
+  owner          Member       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId        String
+  amount         Float        @default(0)
+  currency       String       @default("ZMW")
+  topSongs       String       @default("[]") // JSON [{ title, plays, amount }] — breakdown for this period
+
+  @@unique([distributionId, ownerId])
+  @@index([ownerId])
+}
+
+// A catalog work the member has opted into ZAMCOPS' direct/sync licensing pool —
+// businesses (film, ads, online media, events) can request to license it, with
+// ZAMCOPS facilitating the deal and earning a facilitation fee alongside the member.
+model LicensableWork {
+  id         String   @id @default(cuid())
+  owner      Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String
+  workTitle  String
+  workRef    String   @default("") // optional id of a linked song/album/work
+  usageTypes String   @default("[]") // JSON string[], e.g. ["Film & TV","Advertising","Online content","Live events"]
+  minFee     Float?
+  notes      String   @default("")
+  status     String   @default("Active") // Active | Paused
+  createdAt  DateTime @default(now())
+
+  requests LicenseRequest[]
+
+  @@index([ownerId])
+}
+
+// An inbound licensing enquiry from a business, brokered by ZAMCOPS.
+model LicenseRequest {
+  id               String         @id @default(cuid())
+  work             LicensableWork @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId           String
+  owner            Member         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId          String
+  requesterName    String
+  requesterCompany String         @default("")
+  requesterEmail   String
+  usageType        String
+  description      String         @default("")
+  proposedFee      Float?
+  facilitationFee  Float?
+  status           String         @default("Submitted") // Submitted | In review | Offer sent | Accepted | Declined
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([ownerId])
+  @@index([workId])
 }

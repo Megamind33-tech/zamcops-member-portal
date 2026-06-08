@@ -11,6 +11,8 @@ import {
   Disc3,
   FolderOpen,
   Wallet,
+  CalendarRange,
+  Handshake,
   BarChart3,
   LogOut,
   Smartphone,
@@ -27,6 +29,8 @@ const nav = [
   { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
   { href: "/admin/files", label: "Uploaded Files", icon: FolderOpen },
   { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
+  { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
+  { href: "/admin/licensing", label: "Licensing Desk", icon: Handshake },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
 ];
 

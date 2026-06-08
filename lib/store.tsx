@@ -10,6 +10,9 @@ import type {
   RoyaltySummary,
   AppNotification,
   Statement,
+  MemberDistribution,
+  LicensableWork,
+  LicenseRequest,
 } from "@/types";
 
 type Result<T = void> = { ok: boolean; error?: string; item?: T };
@@ -23,6 +26,9 @@ interface MemberState {
   notifications: AppNotification[];
   statements: Statement[];
   royalty: RoyaltySummary | null;
+  distributions: MemberDistribution[];
+  licensableWorks: LicensableWork[];
+  licenseRequests: LicenseRequest[];
 }
 
 const empty: MemberState = {
@@ -34,6 +40,9 @@ const empty: MemberState = {
   notifications: [],
   statements: [],
   royalty: null,
+  distributions: [],
+  licensableWorks: [],
+  licenseRequests: [],
 };
 
 interface AppContextValue extends MemberState {
@@ -50,6 +59,8 @@ interface AppContextValue extends MemberState {
   addAlbum: (a: Record<string, unknown>) => Promise<Result<AlbumSubmission>>;
   markNotificationRead: (id: string) => Promise<void>;
   markAllRead: () => Promise<void>;
+  addLicensableWork: (w: Record<string, unknown>) => Promise<Result<LicensableWork>>;
+  withdrawLicensableWork: (id: string) => Promise<Result>;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -84,6 +95,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       notifications: data.notifications,
       statements: data.statements,
       royalty: data.royalty,
+      distributions: data.distributions ?? [],
+      licensableWorks: data.licensableWorks ?? [],
+      licenseRequests: data.licenseRequests ?? [],
     });
   }, []);
 
@@ -184,6 +198,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await postJSON("/api/member/notifications", { all: true }, "PATCH");
   }, []);
 
+  const addLicensableWork = useCallback<AppContextValue["addLicensableWork"]>(
+    async (w) => {
+      const { res, data } = await postJSON("/api/member/licensing", w);
+      if (!res.ok) return { ok: false, error: data.error || "Could not add work to the licensing pool." };
+      await refresh();
+      return { ok: true, item: data.work };
+    },
+    [refresh]
+  );
+
+  const withdrawLicensableWork = useCallback<AppContextValue["withdrawLicensableWork"]>(
+    async (id) => {
+      const { res, data } = await postJSON("/api/member/licensing", { id }, "DELETE");
+      if (!res.ok) return { ok: false, error: data.error || "Could not withdraw work." };
+      await refresh();
+      return { ok: true };
+    },
+    [refresh]
+  );
+
   const value: AppContextValue = {
     ...state,
     ready,
@@ -199,6 +233,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addAlbum,
     markNotificationRead,
     markAllRead,
+    addLicensableWork,
+    withdrawLicensableWork,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -221,5 +257,8 @@ export function useMemberData() {
     notifications: app.notifications,
     statements: app.statements,
     royalty: app.royalty,
+    distributions: app.distributions,
+    licensableWorks: app.licensableWorks,
+    licenseRequests: app.licenseRequests,
   };
 }

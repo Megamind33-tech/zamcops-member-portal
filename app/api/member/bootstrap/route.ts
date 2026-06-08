@@ -10,6 +10,9 @@ import {
   notificationDTO,
   statementDTO,
   royaltyDTO,
+  memberDistributionDTO,
+  licensableWorkDTO,
+  licenseRequestDTO,
 } from "@/lib/serialize";
 
 export const runtime = "nodejs";
@@ -20,17 +23,36 @@ export async function GET() {
   if (!session) return bad("Not authenticated.", 401);
   const id = session.sub;
 
-  const [member, works, singles, albums, uploads, notifications, statements, royalty] =
-    await Promise.all([
-      prisma.member.findUnique({ where: { id } }),
-      prisma.workDeclaration.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
-      prisma.songSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
-      prisma.albumSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
-      prisma.uploadFile.findMany({ where: { ownerId: id }, orderBy: { uploadedAt: "desc" } }),
-      prisma.notification.findMany({ where: { ownerId: id }, orderBy: { createdAt: "desc" } }),
-      prisma.statement.findMany({ where: { ownerId: id }, orderBy: { issuedAt: "desc" } }),
-      prisma.royaltySummary.findUnique({ where: { ownerId: id } }),
-    ]);
+  const [
+    member,
+    works,
+    singles,
+    albums,
+    uploads,
+    notifications,
+    statements,
+    royalty,
+    distributionEntries,
+    licensableWorks,
+    licenseRequests,
+  ] = await Promise.all([
+    prisma.member.findUnique({ where: { id } }),
+    prisma.workDeclaration.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
+    prisma.songSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
+    prisma.albumSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
+    prisma.uploadFile.findMany({ where: { ownerId: id }, orderBy: { uploadedAt: "desc" } }),
+    prisma.notification.findMany({ where: { ownerId: id }, orderBy: { createdAt: "desc" } }),
+    prisma.statement.findMany({ where: { ownerId: id }, orderBy: { issuedAt: "desc" } }),
+    prisma.royaltySummary.findUnique({ where: { ownerId: id } }),
+    // Members only ever see PUBLISHED distributions — this is the visibility gate.
+    prisma.distributionEntry.findMany({
+      where: { ownerId: id, distribution: { status: "Published" } },
+      include: { distribution: true },
+      orderBy: { distribution: { publishedAt: "desc" } },
+    }),
+    prisma.licensableWork.findMany({ where: { ownerId: id }, orderBy: { createdAt: "desc" } }),
+    prisma.licenseRequest.findMany({ where: { ownerId: id }, orderBy: { createdAt: "desc" } }),
+  ]);
 
   if (!member) return bad("Member not found.", 404);
 
@@ -43,5 +65,8 @@ export async function GET() {
     notifications: notifications.map(notificationDTO),
     statements: statements.map(statementDTO),
     royalty: royaltyDTO(royalty, id),
+    distributions: distributionEntries.map((e) => memberDistributionDTO(e.distribution, e)),
+    licensableWorks: licensableWorks.map(licensableWorkDTO),
+    licenseRequests: licenseRequests.map(licenseRequestDTO),
   });
 }

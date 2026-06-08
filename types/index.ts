@@ -36,11 +36,17 @@ export type StatementType =
   | "Submission Receipt"
   | "Royalty Statement";
 
+// Performing rights (broadcast/public performance) and mechanical rights
+// (reproduction/distribution) are collected and reconciled separately by
+// CISAC-affiliated societies — splits often differ between the two, so a
+// rightsholder's share must declare which it covers.
+export type RightsType = "Performing" | "Mechanical" | "Both";
+
 export interface Contributor {
   id: string;
   name: string;
   role: ContributorRole;
-  ipiNumber?: string; // Interested Party Information number (placeholder)
+  ipiNumber?: string; // Interested Party Information number — cross-society rightsholder ID
 }
 
 export interface OwnershipSplit {
@@ -48,6 +54,8 @@ export interface OwnershipSplit {
   party: string; // contributor / rights holder name
   role: ContributorRole;
   percentage: number;
+  ipiNumber?: string; // Interested Party Information number, for reciprocal-society registration
+  rightsType?: RightsType; // which royalty stream this share applies to
 }
 
 export interface Member {
@@ -96,6 +104,7 @@ export interface WorkDeclaration {
   authors: string[];
   producers: string[];
   publisher?: string;
+  publisherIpi?: string; // Publisher's IPI / CAE number, for cross-society registration
   ownershipSplits: OwnershipSplit[];
   isrc?: string;
   iswc?: string;
@@ -113,6 +122,7 @@ export interface SongSubmission {
   producer?: string;
   genre: string;
   releaseDate: string;
+  isrc?: string;
   audioFile?: string;
   coverArt?: string;
   lyricsFile?: string;
@@ -191,6 +201,80 @@ export interface Statement {
   reference: string;
   amount?: number;
   issuedAt: string;
+}
+
+export type DistributionStatus = "Draft" | "Published";
+
+// A society-wide distribution period. Members only ever see Published periods —
+// this is the gate between "detected activity" and "confirmed earnings".
+export interface Distribution {
+  id: string;
+  periodLabel: string; // e.g. "Q1 2026"
+  status: DistributionStatus;
+  notes?: string;
+  publishedAt?: string;
+  createdAt: string;
+}
+
+export interface DistributionEntry {
+  id: string;
+  distributionId: string;
+  ownerId: string;
+  amount: number;
+  currency: string;
+  topSongs: { title: string; plays: number; amount: number }[];
+}
+
+// A distribution period as seen by a member: the period plus their own confirmed payout.
+export interface MemberDistribution extends Distribution {
+  amount: number;
+  currency: string;
+  topSongs: { title: string; plays: number; amount: number }[];
+}
+
+export type LicenseUsageType =
+  | "Film & TV"
+  | "Advertising"
+  | "Online content"
+  | "Live events"
+  | "Other";
+
+export type LicenseRequestStatus =
+  | "Submitted"
+  | "In review"
+  | "Offer sent"
+  | "Accepted"
+  | "Declined";
+
+// A catalog work the member has opted into ZAMCOPS' direct/sync licensing pool.
+export interface LicensableWork {
+  id: string;
+  ownerId: string;
+  workTitle: string;
+  workRef?: string;
+  usageTypes: LicenseUsageType[];
+  minFee?: number;
+  notes?: string;
+  status: "Active" | "Paused";
+  createdAt: string;
+}
+
+// An inbound licensing enquiry from a business, brokered by ZAMCOPS — generates
+// income for the member and a facilitation fee for the institution.
+export interface LicenseRequest {
+  id: string;
+  workId: string;
+  ownerId: string;
+  requesterName: string;
+  requesterCompany?: string;
+  requesterEmail: string;
+  usageType: LicenseUsageType;
+  description?: string;
+  proposedFee?: number;
+  facilitationFee?: number;
+  status: LicenseRequestStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdminReviewItem {

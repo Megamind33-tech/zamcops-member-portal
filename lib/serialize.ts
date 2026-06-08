@@ -10,6 +10,12 @@ import type {
   OwnershipSplit,
   Track,
   RoyaltyUsageLog,
+  Distribution,
+  DistributionEntry,
+  MemberDistribution,
+  LicensableWork,
+  LicenseRequest,
+  LicenseUsageType,
 } from "@/types";
 
 const iso = (d: Date | string): string => (d instanceof Date ? d.toISOString() : d);
@@ -64,6 +70,7 @@ export function workDTO(w: any): WorkDeclaration {
     authors: parse<string[]>(w.authors, []),
     producers: parse<string[]>(w.producers, []),
     publisher: w.publisher,
+    publisherIpi: w.publisherIpi,
     ownershipSplits: parse<OwnershipSplit[]>(w.ownershipSplits, []),
     isrc: w.isrc,
     iswc: w.iswc,
@@ -83,6 +90,7 @@ export function singleDTO(s: any): SongSubmission {
     producer: s.producer,
     genre: s.genre,
     releaseDate: s.releaseDate,
+    isrc: s.isrc,
     audioFile: s.audioFile,
     coverArt: s.coverArt,
     lyricsFile: s.lyricsFile,
@@ -163,5 +171,69 @@ export function royaltyDTO(r: any | null, ownerId: string): RoyaltySummary {
     paid: r.paid,
     usageLogs: parse<RoyaltyUsageLog[]>(r.usageLogs, []),
     topSongs: parse<RoyaltySummary["topSongs"]>(r.topSongs, []),
+  };
+}
+
+export function distributionDTO(d: any): Distribution {
+  return {
+    id: d.id,
+    periodLabel: d.periodLabel,
+    status: d.status,
+    notes: d.notes,
+    publishedAt: d.publishedAt ? iso(d.publishedAt) : undefined,
+    createdAt: iso(d.createdAt),
+  };
+}
+
+// A published distribution joined with one member's entry — what that member sees.
+export function memberDistributionDTO(d: any, entry: any): MemberDistribution {
+  return {
+    ...distributionDTO(d),
+    amount: entry.amount,
+    currency: entry.currency,
+    topSongs: parse<MemberDistribution["topSongs"]>(entry.topSongs, []),
+  };
+}
+
+export function distributionEntryDTO(e: any): DistributionEntry {
+  return {
+    id: e.id,
+    distributionId: e.distributionId,
+    ownerId: e.ownerId,
+    amount: e.amount,
+    currency: e.currency,
+    topSongs: parse<DistributionEntry["topSongs"]>(e.topSongs, []),
+  };
+}
+
+export function licensableWorkDTO(w: any): LicensableWork {
+  return {
+    id: w.id,
+    ownerId: w.ownerId,
+    workTitle: w.workTitle,
+    workRef: w.workRef || undefined,
+    usageTypes: parse<LicenseUsageType[]>(w.usageTypes, []),
+    minFee: w.minFee ?? undefined,
+    notes: w.notes || undefined,
+    status: w.status,
+    createdAt: iso(w.createdAt),
+  };
+}
+
+export function licenseRequestDTO(r: any): LicenseRequest {
+  return {
+    id: r.id,
+    workId: r.workId,
+    ownerId: r.ownerId,
+    requesterName: r.requesterName,
+    requesterCompany: r.requesterCompany || undefined,
+    requesterEmail: r.requesterEmail,
+    usageType: r.usageType,
+    description: r.description || undefined,
+    proposedFee: r.proposedFee ?? undefined,
+    facilitationFee: r.facilitationFee ?? undefined,
+    status: r.status,
+    createdAt: iso(r.createdAt),
+    updatedAt: iso(r.updatedAt),
   };
 }

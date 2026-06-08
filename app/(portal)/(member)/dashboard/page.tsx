@@ -11,6 +11,7 @@ import {
   Wallet,
   ChevronRight,
   Clock,
+  CheckCircle2,
   ArrowUpRight,
 } from "lucide-react";
 import { useApp, useMemberData } from "@/lib/store";
@@ -18,13 +19,16 @@ import { profileCompletion } from "@/lib/member";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { SectionTitle } from "@/components/ui/Misc";
 import { CoverArt, coverGlow } from "@/components/media/CoverArt";
-import { formatKwacha, timeAgo, cn } from "@/lib/format";
+import { formatKwacha, formatDate, timeAgo, cn } from "@/lib/format";
 
 export default function DashboardScreen() {
   const { currentMember } = useApp();
-  const { works, singles, albums, notifications, royalty } = useMemberData();
+  const { works, singles, albums, notifications, distributions } = useMemberData();
   const member = currentMember!;
   const completion = profileCompletion(member);
+  // Members only ever see CONFIRMED payouts — distributions[0] is the most recently published period.
+  const lastDistribution = distributions[0] ?? null;
+  const lifetimeDistributed = distributions.reduce((s, d) => s + d.amount, 0);
   const hour = new Date().getHours();
   const greeting = hour < 5 ? "Still up" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Late session";
 
@@ -140,21 +144,28 @@ export default function DashboardScreen() {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-white/70">
-                Royalty snapshot
+                Last distribution
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
-                {formatKwacha(royalty?.totalEstimated ?? 0)}
+                {lastDistribution ? formatKwacha(lastDistribution.amount, lastDistribution.currency) : "Awaiting first payout"}
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
-              Live
-            </span>
+            {lastDistribution ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200">
+                <CheckCircle2 size={12} />
+                {lastDistribution.periodLabel}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-night-300">
+                <Clock size={12} />
+                Pending
+              </span>
+            )}
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <MiniChip label="Estimated" value={formatKwacha(royalty?.totalEstimated ?? 0)} />
-            <MiniChip label="Pending" value={formatKwacha(royalty?.pending ?? 0)} />
-            <MiniChip label="Paid" value={formatKwacha(royalty?.paid ?? 0)} />
+            <MiniChip label="This period" value={lastDistribution ? formatKwacha(lastDistribution.amount, lastDistribution.currency) : "—"} />
+            <MiniChip label="Lifetime" value={formatKwacha(lifetimeDistributed)} />
+            <MiniChip label="Periods" value={String(distributions.length)} />
           </div>
         </div>
       </section>
@@ -246,12 +257,16 @@ export default function DashboardScreen() {
             <div className="min-w-0">
               <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.28em] text-accent-400">
                 <Wallet size={12} />
-                This quarter's earnings
+                Last distribution
               </p>
               <p className="mt-2 font-display text-[2.4rem] font-bold leading-none tracking-tight text-white">
-                {formatKwacha(royalty?.totalEstimated ?? 0)}
+                {lastDistribution ? formatKwacha(lastDistribution.amount, lastDistribution.currency) : formatKwacha(0)}
               </p>
-              <p className="mt-1.5 text-xs text-night-400">Estimated across all detected airplay and streams</p>
+              <p className="mt-1.5 text-xs text-night-400">
+                {lastDistribution
+                  ? `Confirmed payout for ${lastDistribution.periodLabel} · published ${formatDate(lastDistribution.publishedAt ?? lastDistribution.createdAt)}`
+                  : "Your confirmed payout appears here once ZAMCOPS publishes its next distribution"}
+              </p>
             </div>
             <Link
               href="/royalties"
@@ -262,31 +277,29 @@ export default function DashboardScreen() {
             </Link>
           </div>
 
-          {(() => {
-            const paid = royalty?.paid ?? 0;
-            const pending = royalty?.pending ?? 0;
-            const total = Math.max(paid + pending, 1);
-            return (
-              <div className="relative mt-5">
-                <div className="flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                  <span className="h-full bg-gradient-to-r from-accent-500 to-accent-300" style={{ width: `${(paid / total) * 100}%` }} />
-                  <span className="h-full bg-gradient-to-r from-gold-500/70 to-gold-400/70" style={{ width: `${(pending / total) * 100}%` }} />
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-accent-400" />
-                    <span className="text-xs text-night-300">Paid</span>
-                    <span className="font-display text-sm font-bold text-white">{formatKwacha(paid)}</span>
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-gold-400" />
-                    <span className="text-xs text-night-300">Pending</span>
-                    <span className="font-display text-sm font-bold text-white">{formatKwacha(pending)}</span>
-                  </span>
-                </div>
+          {lastDistribution ? (
+            <div className="relative mt-5">
+              <div className="flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                <span className="h-full w-full bg-gradient-to-r from-accent-500 to-accent-300" />
               </div>
-            );
-          })()}
+              <div className="mt-3 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-accent-400" />
+                  <span className="text-xs text-night-300">{lastDistribution.periodLabel}</span>
+                  <span className="font-display text-sm font-bold text-white">{formatKwacha(lastDistribution.amount, lastDistribution.currency)}</span>
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-gold-400" />
+                  <span className="text-xs text-night-300">Lifetime</span>
+                  <span className="font-display text-sm font-bold text-white">{formatKwacha(lifetimeDistributed)}</span>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="relative mt-5 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs leading-relaxed text-night-400">
+              ZAMCOPS confirms royalties at the end of each distribution period — your payout will land here, and we&apos;ll notify you, the moment it&apos;s published.
+            </p>
+          )}
         </section>
 
         <section className="animate-fade-up" style={{ animationDelay: "220ms" }}>
