@@ -27,7 +27,7 @@ const dot: Record<string, string> = {
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   return (
-    <span className={cn("pill", map[status] ?? "bg-slate-100 text-slate-600", className)}>
+    <span className={cn("pill shadow-sm", map[status] ?? "bg-slate-100 text-slate-600", className)}>
       <span className={cn("h-1.5 w-1.5 rounded-full", dot[status] ?? "bg-slate-400")} />
       {status}
     </span>

@@ -80,7 +80,7 @@ export default function RoyaltiesScreen() {
           <div className="card divide-y divide-slate-100">
             {royalty.topSongs.map((s, i) => (
               <div key={s.title} className="flex items-center gap-3 px-4 py-3">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gold-500/15 text-xs font-bold text-gold-600">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gold-500/10 text-xs font-bold text-gold-600">
                   {i + 1}
                 </span>
                 <div className="min-w-0 flex-1">

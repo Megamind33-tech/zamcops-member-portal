@@ -6,11 +6,13 @@ type Variant = "primary" | "secondary" | "ghost" | "gold" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-sm",
-  gold: "bg-gold-500 text-brand-900 hover:bg-gold-600 hover:text-white shadow-sm",
-  secondary: "bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-100",
-  ghost: "bg-transparent text-brand-700 hover:bg-brand-50",
-  danger: "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100",
+  primary:
+    "bg-gradient-to-r from-brand-600 via-brand-700 to-brand-800 text-white shadow-fab hover:from-brand-500 hover:via-brand-600 hover:to-brand-700",
+  gold:
+    "bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-brand-900 shadow-glow hover:from-gold-300 hover:via-gold-400 hover:to-gold-500 hover:text-brand-950",
+  secondary: "bg-white/90 text-brand-700 border border-brand-100 shadow-sm hover:bg-white",
+  ghost: "bg-transparent text-brand-700 hover:bg-brand-50/80",
+  danger: "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 shadow-sm",
 };
 
 const sizes: Record<Size, string> = {
@@ -20,7 +22,7 @@ const sizes: Record<Size, string> = {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition disabled:opacity-50 disabled:pointer-events-none select-none";
+  "inline-flex items-center justify-center gap-2 rounded-2xl font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 select-none active:translate-y-px";
 
 interface CommonProps {
   variant?: Variant;
