@@ -12,6 +12,7 @@ import type {
   DistributionEntry,
   LicensableWork,
   LicenseRequest,
+  LicenseRequestStatus,
 } from "@/types";
 
 // A distribution period as seen by admin staff — includes every member's entry,
@@ -112,6 +113,16 @@ export function useAdminData() {
     [load]
   );
 
+  // Moves an inbound licensing enquiry through the desk's pipeline, optionally
+  // attaching the negotiated fee figures.
+  const setLicenseRequestStatus = useCallback(
+    async (id: string, status: LicenseRequestStatus, fees?: { proposedFee?: number; facilitationFee?: number }) => {
+      await postJSON("/api/admin/licensing", { id, status, ...fees }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
   return {
     ...data,
     loading,
@@ -119,6 +130,7 @@ export function useAdminData() {
     createDistribution,
     setDistributionStatus,
     saveDistributionEntry,
+    setLicenseRequestStatus,
     reload: load,
   };
 }

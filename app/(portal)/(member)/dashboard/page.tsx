@@ -13,6 +13,7 @@ import {
   Clock,
   CheckCircle2,
   ArrowUpRight,
+  Handshake,
 } from "lucide-react";
 import { useApp, useMemberData } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
@@ -23,7 +24,7 @@ import { formatKwacha, formatDate, timeAgo, cn } from "@/lib/format";
 
 export default function DashboardScreen() {
   const { currentMember } = useApp();
-  const { works, singles, albums, notifications, distributions } = useMemberData();
+  const { works, singles, albums, notifications, distributions, licensableWorks } = useMemberData();
   const member = currentMember!;
   const completion = profileCompletion(member);
   // Members only ever see CONFIRMED payouts — distributions[0] is the most recently published period.
@@ -246,6 +247,26 @@ export default function DashboardScreen() {
             ))}
           </div>
         </section>
+
+        <Link
+          href="/licensing"
+          className="group card relative flex animate-fade-up items-center gap-4 overflow-hidden p-4"
+          style={{ animationDelay: "140ms" }}
+        >
+          <span className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-emerald-500/12 blur-3xl transition group-hover:bg-emerald-500/20" />
+          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-700 text-white ring-1 ring-white/15">
+            <Handshake size={20} />
+          </span>
+          <div className="relative min-w-0 flex-1">
+            <p className="text-sm font-bold text-white">Licensing &amp; sync pool</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-night-400">
+              {licensableWorks.length > 0
+                ? `${licensableWorks.length} work${licensableWorks.length === 1 ? "" : "s"} open to brand, film & ad enquiries — ZAMCOPS brokers every deal.`
+                : "Open your catalog to brand, film and ad licensing — ZAMCOPS brokers the deal and finds you new income."}
+            </p>
+          </div>
+          <ChevronRight size={16} className="relative shrink-0 text-night-400 transition group-hover:translate-x-0.5 group-hover:text-white" />
+        </Link>
 
         <section
           className="grain relative isolate overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-night-800/70 p-5 shadow-card backdrop-blur-xl animate-fade-up"

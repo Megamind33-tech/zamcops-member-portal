@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ShieldCheck,
   CheckCircle2,
+  Handshake,
 } from "lucide-react";
 import { TopBar } from "@/components/mobile/TopBar";
 import { Field, TextInput } from "@/components/ui/Field";
@@ -123,6 +124,7 @@ export default function SettingsScreen() {
         <section>
           <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-night-300">More</h3>
           <div className="card divide-y divide-white/[0.06]">
+            <Row href="/licensing" icon={<Handshake size={17} />} label="Licensing & sync" sub="Open works to brand & sync deals" />
             <Row href="/statements" icon={<FileText size={17} />} label="Statements & receipts" />
             <Row href="/support" icon={<LifeBuoy size={17} />} label="Help & support" />
             <div className="flex items-center gap-3 px-4 py-3.5">
