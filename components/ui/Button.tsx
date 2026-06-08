@@ -7,12 +7,14 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-gradient-to-r from-brand-600 via-brand-700 to-brand-800 text-white shadow-fab hover:from-brand-500 hover:via-brand-600 hover:to-brand-700",
+    "brand-gradient text-white shadow-fab hover:brightness-110 ring-1 ring-white/10",
   gold:
-    "bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-brand-900 shadow-glow hover:from-gold-300 hover:via-gold-400 hover:to-gold-500 hover:text-brand-950",
-  secondary: "bg-white/90 text-brand-700 border border-brand-100 shadow-sm hover:bg-white",
-  ghost: "bg-transparent text-brand-700 hover:bg-brand-50/80",
-  danger: "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 shadow-sm",
+    "bg-gradient-to-r from-gold-400 to-gold-500 text-night-950 shadow-gold hover:from-gold-300 hover:to-gold-400 ring-1 ring-gold-300/30",
+  secondary:
+    "bg-white/[0.06] text-white border border-white/12 hover:bg-white/[0.1] backdrop-blur",
+  ghost: "bg-transparent text-night-200 hover:bg-white/[0.06] hover:text-white",
+  danger:
+    "bg-red-500/12 text-red-300 hover:bg-red-500/20 border border-red-500/25",
 };
 
 const sizes: Record<Size, string> = {

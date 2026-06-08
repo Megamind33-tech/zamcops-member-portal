@@ -15,7 +15,7 @@ export default function AdminSongsPage() {
       <Panel title="Singles">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px]">
-            <thead className="bg-slate-50">
+            <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Title</Th>
                 <Th>Artist</Th>
@@ -26,23 +26,23 @@ export default function AdminSongsPage() {
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {singles.map((s) => (
-                <tr key={s.id} className="hover:bg-slate-50">
-                  <Td className="font-semibold text-slate-900">{s.title}</Td>
+                <tr key={s.id} className="hover:bg-white/[0.03]">
+                  <Td className="font-semibold text-white">{s.title}</Td>
                   <Td>
                     {s.artistName}
                     {s.featuredArtists ? (
-                      <span className="block text-xs text-slate-400">ft. {s.featuredArtists}</span>
+                      <span className="block text-xs text-night-400">ft. {s.featuredArtists}</span>
                     ) : null}
                   </Td>
                   <Td>{s.genre}</Td>
-                  <Td className="text-xs text-slate-500">
+                  <Td className="text-xs text-night-300">
                     {[s.audioFile && "Audio", s.coverArt && "Cover", s.lyricsFile && "Lyrics"]
                       .filter(Boolean)
                       .join(", ") || "—"}
                   </Td>
-                  <Td className="text-slate-500">{formatDate(s.submittedAt)}</Td>
+                  <Td className="text-night-300">{formatDate(s.submittedAt)}</Td>
                   <Td>
                     <StatusBadge status={s.status} />
                   </Td>
@@ -57,7 +57,7 @@ export default function AdminSongsPage() {
               ))}
               {singles.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-slate-400">No song submissions yet.</Td>
+                  <Td className="py-8 text-center text-night-400">No song submissions yet.</Td>
                 </tr>
               )}
             </tbody>

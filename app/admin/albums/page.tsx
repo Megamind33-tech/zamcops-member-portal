@@ -15,7 +15,7 @@ export default function AdminAlbumsPage() {
       <Panel title="Albums">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px]">
-            <thead className="bg-slate-50">
+            <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Album</Th>
                 <Th>Artist</Th>
@@ -26,19 +26,19 @@ export default function AdminAlbumsPage() {
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {albums.map((a) => (
-                <tr key={a.id} className="align-top hover:bg-slate-50">
-                  <Td className="font-semibold text-slate-900">
+                <tr key={a.id} className="align-top hover:bg-white/[0.03]">
+                  <Td className="font-semibold text-white">
                     {a.title}
-                    <span className="mt-1 block text-xs font-normal text-slate-400">
+                    <span className="mt-1 block text-xs font-normal text-night-400">
                       {a.tracks.map((t) => t.title).join(" · ")}
                     </span>
                   </Td>
                   <Td>{a.artistName}</Td>
                   <Td>{a.tracks.length}</Td>
-                  <Td className="text-slate-500">{a.releaseDate ? formatDate(a.releaseDate) : "—"}</Td>
-                  <Td className="text-slate-500">{formatDate(a.submittedAt)}</Td>
+                  <Td className="text-night-300">{a.releaseDate ? formatDate(a.releaseDate) : "—"}</Td>
+                  <Td className="text-night-300">{formatDate(a.submittedAt)}</Td>
                   <Td>
                     <StatusBadge status={a.status} />
                   </Td>
@@ -53,7 +53,7 @@ export default function AdminAlbumsPage() {
               ))}
               {albums.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-slate-400">No album submissions yet.</Td>
+                  <Td className="py-8 text-center text-night-400">No album submissions yet.</Td>
                 </tr>
               )}
             </tbody>

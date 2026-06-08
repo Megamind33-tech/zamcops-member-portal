@@ -31,8 +31,8 @@ export default function SubmitHubScreen() {
     <div>
       <TopBar title="Submit & Declare" back="/dashboard" />
       <div className="px-4 py-5">
-        <div className="mb-4 flex items-start gap-2 rounded-2xl bg-brand-50/70 px-4 py-3 text-xs text-brand-800">
-          <Info size={16} className="mt-0.5 shrink-0 text-brand-500" />
+        <div className="mb-4 flex items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-xs text-night-300">
+          <Info size={16} className="mt-0.5 shrink-0 text-brand-300" />
           <p>
             <span className="font-semibold">Submitting</span> a single or album registers a release.
             <span className="font-semibold"> Declaring a work</span> records the underlying copyright
@@ -45,16 +45,16 @@ export default function SubmitHubScreen() {
             <Link
               key={o.href}
               href={o.href}
-              className="card flex items-center gap-3 px-4 py-4 transition active:scale-[0.99]"
+              className="card flex items-center gap-3 px-4 py-4 transition hover:bg-white/[0.03] active:scale-[0.99]"
             >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-600 text-white">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl brand-gradient text-white ring-1 ring-white/10">
                 <o.icon size={22} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-brand-900">{o.title}</p>
-                <p className="text-xs text-slate-500">{o.body}</p>
+                <p className="text-sm font-bold text-white">{o.title}</p>
+                <p className="text-xs text-night-300">{o.body}</p>
               </div>
-              <ChevronRight size={18} className="shrink-0 text-slate-300" />
+              <ChevronRight size={18} className="shrink-0 text-night-400" />
             </Link>
           ))}
         </div>

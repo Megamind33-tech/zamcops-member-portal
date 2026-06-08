@@ -40,8 +40,8 @@ export default function ProfileScreen() {
       <div className="px-4 py-4">
         <div className="card mb-4 px-4 py-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-brand-900">KYC completion</span>
-            <span className="text-sm font-bold text-gold-600">{completion}%</span>
+            <span className="text-sm font-semibold text-white">KYC completion</span>
+            <span className="text-sm font-bold text-gold-400">{completion}%</span>
           </div>
           <ProgressBar value={completion} className="mt-3" />
         </div>
@@ -147,7 +147,7 @@ export default function ProfileScreen() {
 
       {saved && (
         <div className="fixed inset-x-0 bottom-24 z-40 mx-auto flex max-w-app justify-center px-4">
-          <span className="flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-lg">
+          <span className="flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-glow">
             <CheckCircle2 size={16} /> Profile saved
           </span>
         </div>
@@ -168,8 +168,8 @@ function Section({
   return (
     <section className="card px-4 py-4">
       <div className="mb-3 flex items-center gap-2">
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-50 text-brand-600">{icon}</span>
-        <h3 className="text-sm font-bold text-brand-900">{title}</h3>
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">{icon}</span>
+        <h3 className="text-sm font-bold text-white">{title}</h3>
       </div>
       <div className="space-y-3">{children}</div>
     </section>

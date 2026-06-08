@@ -33,7 +33,7 @@ export default function AdminMembersPage() {
       <Panel title="Members">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px]">
-            <thead className="bg-slate-50">
+            <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Member</Th>
                 <Th>Member no.</Th>
@@ -43,27 +43,27 @@ export default function AdminMembersPage() {
                 <Th>Status</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {shown.map((m) => (
-                <tr key={m.id} className="hover:bg-slate-50">
+                <tr key={m.id} className="hover:bg-white/[0.03]">
                   <Td>
                     <div className="flex items-center gap-3">
-                      <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-xs font-bold text-white">
+                      <span className="grid h-9 w-9 place-items-center rounded-full brand-gradient text-xs font-bold text-white">
                         {initials(m.stageName || m.fullName)}
                       </span>
                       <div>
-                        <p className="font-semibold text-slate-900">{m.fullName}</p>
-                        <p className="text-xs text-slate-500">{m.stageName}</p>
+                        <p className="font-semibold text-white">{m.fullName}</p>
+                        <p className="text-xs text-night-300">{m.stageName}</p>
                       </div>
                     </div>
                   </Td>
                   <Td className="font-mono text-xs">{m.memberNumber}</Td>
                   <Td>{m.role}</Td>
                   <Td>
-                    <p className="text-xs text-slate-600">{m.email}</p>
-                    <p className="text-xs text-slate-400">{m.phone}</p>
+                    <p className="text-xs text-night-300">{m.email}</p>
+                    <p className="text-xs text-night-400">{m.phone}</p>
                   </Td>
-                  <Td className="text-slate-500">{formatDate(m.joinedAt)}</Td>
+                  <Td className="text-night-300">{formatDate(m.joinedAt)}</Td>
                   <Td>
                     <StatusBadge status={m.membershipStatus} />
                   </Td>
@@ -71,7 +71,7 @@ export default function AdminMembersPage() {
               ))}
               {shown.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-slate-400">No members match your search.</Td>
+                  <Td className="py-8 text-center text-night-400">No members match your search.</Td>
                 </tr>
               )}
             </tbody>

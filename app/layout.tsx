@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata, Viewport } from "next";
-import { Manrope, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
+import { Manrope, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
 import { PWARegister } from "@/components/PWARegister";
@@ -11,7 +11,7 @@ const manrope = Manrope({
   display: "swap",
 });
 
-const cormorant = Cormorant_Garamond({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
   weight: ["500", "600", "700"],
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1f4f7e",
+  themeColor: "#070814",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -52,7 +52,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${manrope.variable} ${cormorant.variable} ${jetbrainsMono.variable} h-full`}>
+    <html lang="en" className={`${manrope.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full`}>
       <body className="h-full bg-canvas font-sans text-ink antialiased">
         <AppProvider>{children}</AppProvider>
         <PWARegister />

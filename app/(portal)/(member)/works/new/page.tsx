@@ -160,7 +160,7 @@ export default function WorkDeclarationScreen() {
         </Section>
 
         {error && (
-          <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{error}</p>
+          <p className="rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>
         )}
 
         <Button type="submit" block size="lg" disabled={busy}>
@@ -183,8 +183,8 @@ function Section({
   return (
     <section className="card px-4 py-4">
       <div className="mb-3">
-        <h3 className="text-sm font-bold text-brand-900">{title}</h3>
-        {subtitle && <p className="text-[11px] text-slate-400">{subtitle}</p>}
+        <h3 className="text-sm font-bold text-white">{title}</h3>
+        {subtitle && <p className="text-[11px] text-night-400">{subtitle}</p>}
       </div>
       <div className="space-y-3">{children}</div>
     </section>

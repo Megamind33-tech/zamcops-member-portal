@@ -27,16 +27,18 @@ export default function AdminLoginScreen() {
   };
 
   return (
-    <div className="grid min-h-[100dvh] place-items-center bg-slate-100 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-card">
+    <div className="relative grid min-h-[100dvh] place-items-center overflow-hidden bg-night-950 px-4">
+      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-600/30 blur-[100px]" />
+      <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-iris-500/25 blur-[100px]" />
+      <div className="card relative w-full max-w-sm p-8">
         <div className="mb-6 flex items-center justify-between">
           <Logo size={40} subtitle="Staff Console" />
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-500/15 text-brand-200 ring-1 ring-brand-400/20">
             <ShieldCheck size={20} />
           </span>
         </div>
-        <h1 className="text-lg font-extrabold text-slate-900">Staff sign in</h1>
-        <p className="mt-1 text-sm text-slate-500">Review applications, submissions and royalties.</p>
+        <h1 className="font-display text-lg font-bold text-white">Staff sign in</h1>
+        <p className="mt-1 text-sm text-night-300">Review applications, submissions and royalties.</p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           <Field label="Staff email" required>
@@ -45,7 +47,7 @@ export default function AdminLoginScreen() {
           <Field label="Password" required>
             <TextInput type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
           </Field>
-          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{error}</p>}
+          {error && <p className="rounded-lg border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>}
           <Button type="submit" block size="lg" disabled={busy}>
             <LogIn size={18} /> {busy ? "Signing in…" : "Sign in"}
           </Button>

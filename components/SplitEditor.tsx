@@ -37,7 +37,7 @@ export function SplitEditor({
   return (
     <div className="space-y-2.5">
       {splits.map((s) => (
-        <div key={s.id} className="rounded-xl border border-slate-200 bg-white p-2.5">
+        <div key={s.id} className="card-raised p-2.5">
           <div className="flex items-center gap-2">
             <TextInput
               className="flex-1 px-3 py-2 text-sm"
@@ -48,7 +48,7 @@ export function SplitEditor({
             <button
               type="button"
               onClick={() => remove(s.id)}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-night-400 hover:bg-red-500/10 hover:text-red-300"
               aria-label="Remove split"
             >
               <Trash2 size={16} />
@@ -74,7 +74,7 @@ export function SplitEditor({
                 value={s.percentage || ""}
                 onChange={(e) => update(s.id, { percentage: Number(e.target.value) })}
               />
-              <span className="pointer-events-none absolute right-3 top-2.5 text-sm text-slate-400">%</span>
+              <span className="pointer-events-none absolute right-3 top-2.5 text-sm text-night-400">%</span>
             </div>
           </div>
         </div>
@@ -84,14 +84,14 @@ export function SplitEditor({
         <button
           type="button"
           onClick={add}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-300 hover:text-brand-200"
         >
           <Plus size={15} /> Add split
         </button>
         <span
           className={
             "inline-flex items-center gap-1 text-xs font-semibold " +
-            (valid ? "text-emerald-600" : "text-amber-600")
+            (valid ? "text-emerald-300" : "text-gold-300")
           }
         >
           {valid ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
@@ -99,7 +99,7 @@ export function SplitEditor({
         </span>
       </div>
       {!compact && !valid && (
-        <p className="text-[11px] text-amber-600">Ownership splits must add up to exactly 100%.</p>
+        <p className="text-[11px] text-gold-300">Ownership splits must add up to exactly 100%.</p>
       )}
     </div>
   );

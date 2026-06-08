@@ -16,7 +16,7 @@ export default function AdminWorksPage() {
       <Panel title="Declarations">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px]">
-            <thead className="bg-slate-50">
+            <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Title</Th>
                 <Th>Type</Th>
@@ -27,21 +27,21 @@ export default function AdminWorksPage() {
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {works.map((w) => (
-                <tr key={w.id} className="hover:bg-slate-50">
-                  <Td className="font-semibold text-slate-900">
+                <tr key={w.id} className="hover:bg-white/[0.03]">
+                  <Td className="font-semibold text-white">
                     {w.title}
-                    <span className="block text-xs font-normal text-slate-400">
+                    <span className="block text-xs font-normal text-night-400">
                       {w.genre} · {w.language}
                     </span>
                   </Td>
                   <Td>{w.workType}</Td>
                   <Td>{nameFor(w.ownerId)}</Td>
-                  <Td className="text-xs text-slate-500">
+                  <Td className="text-xs text-night-300">
                     {w.ownershipSplits.map((s) => `${s.party} ${s.percentage}%`).join(", ")}
                   </Td>
-                  <Td className="text-slate-500">{formatDate(w.submittedAt)}</Td>
+                  <Td className="text-night-300">{formatDate(w.submittedAt)}</Td>
                   <Td>
                     <StatusBadge status={w.status} />
                   </Td>
@@ -56,7 +56,7 @@ export default function AdminWorksPage() {
               ))}
               {works.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-slate-400">No work declarations yet.</Td>
+                  <Td className="py-8 text-center text-night-400">No work declarations yet.</Td>
                 </tr>
               )}
             </tbody>

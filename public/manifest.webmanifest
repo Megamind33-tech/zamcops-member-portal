@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1f4f7e",
-  "theme_color": "#1f4f7e",
+  "background_color": "#070814",
+  "theme_color": "#070814",
   "categories": ["music", "business", "productivity"],
   "icons": [
     {

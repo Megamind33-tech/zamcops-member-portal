@@ -62,7 +62,7 @@ export default function StatementsScreen() {
               onClick={() => setTab(t)}
               className={
                 "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (tab === t ? "bg-brand-600 text-white" : "bg-white text-slate-500 shadow-card")
+                (tab === t ? "brand-gradient text-white shadow-fab ring-1 ring-white/10" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
               }
             >
               {t === "All" ? "All" : t.replace(" Receipt", "").replace(" Statement", "")}
@@ -82,19 +82,19 @@ export default function StatementsScreen() {
               const Icon = icon[s.type];
               return (
                 <div key={s.id} className="card flex items-center gap-3 px-4 py-3.5">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                     <Icon size={18} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-brand-900">{s.title}</p>
-                    <p className="truncate text-xs text-slate-500">
+                    <p className="truncate text-sm font-semibold text-white">{s.title}</p>
+                    <p className="truncate text-xs text-night-400">
                       {s.reference} · {formatDate(s.issuedAt)}
                       {s.amount != null ? ` · ${formatKwacha(s.amount)}` : ""}
                     </p>
                   </div>
                   <button
                     onClick={() => download(s)}
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10 hover:bg-white/[0.1]"
                     aria-label="Download"
                   >
                     <Download size={16} />

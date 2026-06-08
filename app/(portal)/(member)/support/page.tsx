@@ -40,22 +40,22 @@ export default function SupportScreen() {
       <div className="space-y-5 px-4 py-4">
         {/* Contact */}
         <section className="card px-4 py-4">
-          <h3 className="mb-3 text-sm font-bold text-brand-900">Contact ZAMCOPS</h3>
+          <h3 className="mb-3 text-sm font-bold text-white">Contact ZAMCOPS</h3>
           <div className="space-y-2.5">
-            <a href="tel:+260211250082" className="flex items-center gap-3 text-sm text-brand-800">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-50 text-brand-600">
+            <a href="tel:+260211250082" className="flex items-center gap-3 text-sm text-night-200">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                 <Phone size={16} />
               </span>
               +260 211 250 082
             </a>
-            <a href="mailto:info@zamcops.org.zm" className="flex items-center gap-3 text-sm text-brand-800">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-50 text-brand-600">
+            <a href="mailto:info@zamcops.org.zm" className="flex items-center gap-3 text-sm text-night-200">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                 <Mail size={16} />
               </span>
               info@zamcops.org.zm
             </a>
-            <div className="flex items-center gap-3 text-sm text-brand-800">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-50 text-brand-600">
+            <div className="flex items-center gap-3 text-sm text-night-200">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                 <MapPin size={16} />
               </span>
               ZAMCOPS House, Lusaka, Zambia
@@ -65,11 +65,11 @@ export default function SupportScreen() {
 
         {/* Submit query */}
         <section className="card px-4 py-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-brand-900">
+          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-white">
             <MessageSquare size={16} /> Submit a query
           </h3>
           {sent ? (
-            <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-3 text-sm font-medium text-emerald-700">
+            <div className="flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-500/12 px-3 py-3 text-sm font-medium text-emerald-300">
               <CheckCircle2 size={18} /> Your query has been sent. We&apos;ll respond within 2 working days.
             </div>
           ) : (
@@ -103,8 +103,8 @@ export default function SupportScreen() {
 
         {/* FAQ */}
         <section>
-          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-slate-500">FAQ</h3>
-          <div className="card divide-y divide-slate-100">
+          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-night-300">FAQ</h3>
+          <div className="card divide-y divide-white/[0.06]">
             {faqs.map((f, i) => {
               const isOpen = open === i;
               return (
@@ -113,10 +113,10 @@ export default function SupportScreen() {
                     onClick={() => setOpen(isOpen ? null : i)}
                     className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
                   >
-                    <span className="flex-1 text-sm font-semibold text-brand-900">{f.q}</span>
-                    <ChevronDown size={18} className={"shrink-0 text-slate-400 transition " + (isOpen ? "rotate-180" : "")} />
+                    <span className="flex-1 text-sm font-semibold text-white">{f.q}</span>
+                    <ChevronDown size={18} className={"shrink-0 text-night-400 transition " + (isOpen ? "rotate-180" : "")} />
                   </button>
-                  {isOpen && <p className="px-4 pb-4 text-xs leading-relaxed text-slate-500">{f.a}</p>}
+                  {isOpen && <p className="px-4 pb-4 text-xs leading-relaxed text-night-300">{f.a}</p>}
                 </div>
               );
             })}

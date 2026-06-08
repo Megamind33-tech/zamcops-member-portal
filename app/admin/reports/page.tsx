@@ -50,18 +50,18 @@ export default function AdminReportsPage() {
       </div>
 
       <Panel title="Downloadable reports">
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-white/[0.06]">
           {reports.map((r) => (
             <div key={r.ref} className="flex items-center justify-between px-5 py-4">
               <div>
-                <p className="text-sm font-semibold text-slate-900">{r.title}</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-sm font-semibold text-white">{r.title}</p>
+                <p className="text-xs text-night-300">
                   {r.desc} · <span className="font-mono">{r.ref}</span>
                 </p>
               </div>
               <button
                 onClick={() => download(r.title, r.ref, r.desc)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700"
+                className="inline-flex items-center gap-1.5 rounded-lg brand-gradient px-3 py-2 text-xs font-semibold text-white shadow-fab hover:brightness-110"
               >
                 <Download size={14} /> Download
               </button>
@@ -84,17 +84,17 @@ function Breakdown({
 }) {
   const total = Object.values(data).reduce((a, b) => a + b, 0) || 1;
   const colors: Record<string, string> = {
-    Approved: "bg-emerald-500",
-    Pending: "bg-amber-500",
-    "Under Review": "bg-blue-500",
-    Rejected: "bg-red-500",
+    Approved: "bg-emerald-400",
+    Pending: "bg-gold-400",
+    "Under Review": "bg-brand-400",
+    Rejected: "bg-red-400",
   };
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-card">
-      <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-slate-800">
+    <div className="card p-5">
+      <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-white">
         {icon} {title}
       </h3>
-      <div className="mb-3 flex h-2.5 overflow-hidden rounded-full bg-slate-100">
+      <div className="mb-3 flex h-2.5 overflow-hidden rounded-full bg-white/[0.07]">
         {Object.entries(data).map(([k, v]) =>
           v > 0 ? <span key={k} className={colors[k]} style={{ width: `${(v / total) * 100}%` }} /> : null
         )}
@@ -102,10 +102,10 @@ function Breakdown({
       <div className="space-y-1.5">
         {Object.entries(data).map(([k, v]) => (
           <div key={k} className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1.5 text-slate-600">
-              <span className={"h-2 w-2 rounded-full " + (colors[k] ?? "bg-slate-300")} /> {k}
+            <span className="flex items-center gap-1.5 text-night-300">
+              <span className={"h-2 w-2 rounded-full " + (colors[k] ?? "bg-night-400")} /> {k}
             </span>
-            <span className="font-semibold text-slate-900">{v}</span>
+            <span className="font-semibold text-white">{v}</span>
           </div>
         ))}
       </div>

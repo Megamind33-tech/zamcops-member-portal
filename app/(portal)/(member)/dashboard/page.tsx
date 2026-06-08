@@ -11,15 +11,14 @@ import {
   Wallet,
   ChevronRight,
   Clock,
-  Library,
   Sparkles,
   ArrowUpRight,
 } from "lucide-react";
 import { useApp, useMemberData } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { ProgressBar, SectionTitle } from "@/components/ui/Misc";
-import { formatKwacha, timeAgo, initials } from "@/lib/format";
+import { SectionTitle } from "@/components/ui/Misc";
+import { formatKwacha, timeAgo } from "@/lib/format";
 
 export default function DashboardScreen() {
   const { currentMember } = useApp();
@@ -35,30 +34,10 @@ export default function DashboardScreen() {
   const latest = notifications.slice(0, 3);
 
   const quickActions = [
-    {
-      href: "/submit/single",
-      label: "Submit song",
-      hint: "Capture a new release",
-      icon: Music2,
-    },
-    {
-      href: "/works/new",
-      label: "Declare work",
-      hint: "Record ownership details",
-      icon: FilePlus2,
-    },
-    {
-      href: "/submit/album",
-      label: "Upload album",
-      hint: "Package tracks together",
-      icon: Disc3,
-    },
-    {
-      href: "/profile",
-      label: "Update profile",
-      hint: "Keep KYC current",
-      icon: UserCog,
-    },
+    { href: "/submit/single", label: "Submit song", hint: "Capture a new release", icon: Music2 },
+    { href: "/works/new", label: "Declare work", hint: "Record ownership details", icon: FilePlus2 },
+    { href: "/submit/album", label: "Upload album", hint: "Package tracks together", icon: Disc3 },
+    { href: "/profile", label: "Update profile", hint: "Keep KYC current", icon: UserCog },
   ];
 
   const nextStep =
@@ -86,39 +65,39 @@ export default function DashboardScreen() {
   return (
     <div className="px-4 pb-6 pt-4">
       <section
-        className="relative overflow-hidden rounded-[2.2rem] bg-gradient-to-br from-brand-800 via-brand-700 to-brand-600 px-5 py-5 text-white shadow-[0_24px_60px_rgba(16,45,73,0.22)] animate-fade-up"
+        className="relative overflow-hidden rounded-[2.2rem] brand-gradient px-5 py-5 text-white shadow-[0_30px_70px_-30px_rgba(84,96,248,0.7)] ring-1 ring-white/10 animate-fade-up"
         style={{ animationDelay: "40ms" }}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,rgba(255,255,255,0.08),transparent_36%,rgba(255,255,255,0.04)_64%,transparent)]" />
-        <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-gold-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,rgba(255,255,255,0.16),transparent_38%,rgba(0,0,0,0.12)_100%)]" />
+        <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-gold-400/25 blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-pop-500/20 blur-3xl" />
 
         <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0 space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.28em] text-brand-50">
-              <Sparkles size={12} className="text-gold-400" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white">
+              <Sparkles size={12} className="text-gold-300" />
               Member portal
             </div>
 
             <div className="min-w-0">
-              <p className="text-sm text-brand-100/90">Good to see you</p>
-              <h1 className="mt-1 truncate font-display text-[2rem] leading-none tracking-tight sm:text-[2.15rem]">
+              <p className="text-sm text-white/80">Good to see you</p>
+              <h1 className="mt-1 truncate font-display text-[2rem] font-bold leading-none tracking-tight sm:text-[2.15rem]">
                 {member.stageName || member.fullName}
               </h1>
-              <p className="mt-2 max-w-[20rem] text-sm leading-relaxed text-brand-50/90">
-                A calmer, richer home for declarations, submissions and royalties.
+              <p className="mt-2 max-w-[20rem] text-sm leading-relaxed text-white/85">
+                Your studio for declarations, submissions and royalties.
               </p>
             </div>
           </div>
 
           <Link
             href="/notifications"
-            className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/10 bg-white/10 text-white backdrop-blur transition hover:bg-white/10"
+            className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/15 bg-white/15 text-white backdrop-blur transition hover:bg-white/25"
             aria-label="Open notifications"
           >
             <Bell size={18} />
             {unread > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold-400 px-1 text-[10px] font-bold text-brand-900">
+              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold-400 px-1 text-[10px] font-bold text-night-950">
                 {unread}
               </span>
             )}
@@ -131,14 +110,14 @@ export default function DashboardScreen() {
           <MetricTile label="Works" value={String(works.length)} caption="declared" />
         </div>
 
-        <div className="relative mt-5 flex items-center justify-between gap-3 rounded-[1.5rem] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+        <div className="relative mt-5 flex items-center justify-between gap-3 rounded-[1.5rem] border border-white/15 bg-black/15 px-4 py-3 backdrop-blur">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-brand-100/75">
+            <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-white/70">
               Member code
             </p>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <p className="font-mono text-sm font-semibold text-white">{member.memberNumber}</p>
-              <StatusBadge status={member.membershipStatus} className="bg-white/90 text-brand-900" />
+              <StatusBadge status={member.membershipStatus} className="border-white/30 bg-white/90 text-night-900" />
             </div>
           </div>
 
@@ -146,24 +125,25 @@ export default function DashboardScreen() {
             {[12, 18, 10, 24, 16, 20].map((height, index) => (
               <span
                 key={index}
-                className="w-1.5 rounded-full bg-gradient-to-t from-gold-400/40 to-gold-400"
-                style={{ height: `${height}px` }}
+                className="w-1.5 origin-bottom rounded-full bg-gradient-to-t from-gold-400/50 to-gold-300 animate-equalize"
+                style={{ height: `${height}px`, animationDelay: `${index * 0.12}s`, animationDuration: `${0.9 + (index % 3) * 0.3}s` }}
               />
             ))}
           </div>
         </div>
 
-        <div className="relative mt-4 rounded-[1.4rem] border border-white/10 bg-brand-900/25 px-4 py-3 backdrop-blur">
+        <div className="relative mt-4 rounded-[1.4rem] border border-white/12 bg-black/20 px-4 py-3 backdrop-blur">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-brand-100/75">
+              <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-white/70">
                 Royalty snapshot
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
                 {formatKwacha(royalty?.totalEstimated ?? 0)}
               </p>
             </div>
-            <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-brand-50">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
               Live
             </span>
           </div>
@@ -183,19 +163,19 @@ export default function DashboardScreen() {
               <Link
                 key={action.href}
                 href={action.href}
-                className="group card relative overflow-hidden px-4 py-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-glow active:translate-y-px"
+                className="group card relative overflow-hidden px-4 py-4 transition duration-200 hover:-translate-y-0.5 hover:border-brand-400/40 hover:shadow-glow active:translate-y-px"
                 style={{ animationDelay: `${80 + index * 40}ms` }}
               >
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(31,79,126,0.08),transparent_42%)] opacity-0 transition group-hover:opacity-100" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(84,96,248,0.16),transparent_46%)] opacity-0 transition group-hover:opacity-100" />
                 <div className="relative flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="grid h-11 w-11 place-items-center rounded-[1.1rem] bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+                    <div className="grid h-11 w-11 place-items-center rounded-[1.1rem] bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                       <action.icon size={18} />
                     </div>
-                    <p className="mt-3 text-sm font-semibold text-brand-900">{action.label}</p>
-                    <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{action.hint}</p>
+                    <p className="mt-3 text-sm font-semibold text-white">{action.label}</p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-night-400">{action.hint}</p>
                   </div>
-                  <ArrowUpRight size={16} className="mt-1 text-slate-400 transition group-hover:text-brand-600" />
+                  <ArrowUpRight size={16} className="mt-1 text-night-400 transition group-hover:text-brand-300" />
                 </div>
               </Link>
             ))}
@@ -203,20 +183,20 @@ export default function DashboardScreen() {
         </section>
 
         <section className="card overflow-hidden animate-fade-up" style={{ animationDelay: "160ms" }}>
-          <div className="border-b border-white/70 bg-gradient-to-r from-brand-50/80 to-white px-4 py-3">
+          <div className="border-b border-white/[0.07] bg-white/[0.02] px-4 py-3">
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm font-semibold text-brand-800">
-                <Wallet size={16} className="text-gold-600" />
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Wallet size={16} className="text-gold-400" />
                 Royalty summary
               </div>
-              <ChevronRight size={16} className="text-slate-400" />
+              <ChevronRight size={16} className="text-night-400" />
             </div>
-            <p className="mt-1 text-[11px] text-slate-500">
+            <p className="mt-1 text-[11px] text-night-400">
               A quick look at what is estimated, pending, and paid.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 divide-x divide-slate-100 px-2 py-4 text-center">
+          <div className="grid grid-cols-3 divide-x divide-white/[0.06] px-2 py-4 text-center">
             <RoyaltyStat label="Estimated" value={royalty?.totalEstimated ?? 0} />
             <RoyaltyStat label="Pending" value={royalty?.pending ?? 0} />
             <RoyaltyStat label="Paid" value={royalty?.paid ?? 0} />
@@ -227,14 +207,14 @@ export default function DashboardScreen() {
           <SectionTitle
             title="Latest updates"
             action={
-              <Link href="/notifications" className="text-xs font-semibold text-brand-600">
+              <Link href="/notifications" className="text-xs font-semibold text-brand-300">
                 See all
               </Link>
             }
           />
-          <div className="card divide-y divide-slate-100 overflow-hidden">
+          <div className="card divide-y divide-white/[0.06] overflow-hidden">
             {latest.length === 0 && (
-              <p className="px-4 py-6 text-center text-xs text-slate-400">
+              <p className="px-4 py-6 text-center text-xs text-night-400">
                 No notifications yet.
               </p>
             )}
@@ -242,19 +222,19 @@ export default function DashboardScreen() {
               <Link
                 key={notification.id}
                 href="/notifications"
-                className="flex items-start gap-3 px-4 py-3.5 transition hover:bg-brand-50/40"
+                className="flex items-start gap-3 px-4 py-3.5 transition hover:bg-white/[0.03]"
               >
                 <span
                   className={
-                    "mt-1 h-2.5 w-2.5 shrink-0 rounded-full shadow-sm " +
-                    (notification.read ? "bg-slate-200" : "bg-gold-500")
+                    "mt-1 h-2.5 w-2.5 shrink-0 rounded-full " +
+                    (notification.read ? "bg-night-600" : "bg-gold-400 shadow-[0_0_10px_rgba(255,194,77,0.6)]")
                   }
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-brand-900">{notification.title}</p>
-                  <p className="mt-0.5 truncate text-xs text-slate-500">{notification.body}</p>
+                  <p className="truncate text-sm font-semibold text-white">{notification.title}</p>
+                  <p className="mt-0.5 truncate text-xs text-night-400">{notification.body}</p>
                 </div>
-                <span className="shrink-0 text-[10px] text-slate-400">
+                <span className="shrink-0 text-[10px] text-night-500">
                   {timeAgo(notification.createdAt)}
                 </span>
               </Link>
@@ -262,24 +242,25 @@ export default function DashboardScreen() {
           </div>
         </section>
 
-        <section className="card overflow-hidden bg-gradient-to-br from-white to-brand-50/60 p-4 animate-fade-up" style={{ animationDelay: "280ms" }}>
-          <div className="flex items-start justify-between gap-4">
+        <section className="card relative overflow-hidden p-4 animate-fade-up" style={{ animationDelay: "280ms" }}>
+          <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gold-400/12 blur-3xl" />
+          <div className="relative flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-600">
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">
                 Next step
               </p>
-              <h3 className="mt-1 font-display text-xl font-semibold tracking-tight text-brand-900">
+              <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-white">
                 {nextStep.title}
               </h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-500">{nextStep.body}</p>
+              <p className="mt-1 text-sm leading-relaxed text-night-300">{nextStep.body}</p>
             </div>
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[1.1rem] bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[1.1rem] bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
               <Clock size={18} />
             </span>
           </div>
           <Link
             href={nextStep.href}
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-800 px-4 py-2.5 text-sm font-semibold text-white shadow-fab transition hover:bg-brand-700"
+            className="relative mt-4 inline-flex items-center gap-2 rounded-full brand-gradient px-4 py-2.5 text-sm font-semibold text-white shadow-fab transition hover:brightness-110"
           >
             {nextStep.cta}
             <ChevronRight size={16} />
@@ -300,18 +281,18 @@ function MetricTile({
   caption: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-3 backdrop-blur">
-      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-100/80">{label}</p>
-      <p className="mt-2 font-display text-[1.35rem] font-semibold leading-none text-white">{value}</p>
-      <p className="mt-1 text-[11px] text-brand-100/75">{caption}</p>
+    <div className="rounded-2xl border border-white/12 bg-white/10 px-3 py-3 backdrop-blur">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">{label}</p>
+      <p className="mt-2 font-display text-[1.35rem] font-bold leading-none text-white">{value}</p>
+      <p className="mt-1 text-[11px] text-white/70">{caption}</p>
     </div>
   );
 }
 
 function MiniChip({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2 text-left backdrop-blur">
-      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-100/70">{label}</p>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2 text-left backdrop-blur">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">{label}</p>
       <p className="mt-1 truncate text-xs font-semibold text-white">{value}</p>
     </div>
   );
@@ -320,8 +301,8 @@ function MiniChip({ label, value }: { label: string; value: string }) {
 function RoyaltyStat({ label, value }: { label: string; value: number }) {
   return (
     <div className="px-1">
-      <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">{label}</p>
-      <p className="mt-1 font-display text-sm font-semibold text-brand-900">{formatKwacha(value)}</p>
+      <p className="text-[10px] uppercase tracking-[0.22em] text-night-400">{label}</p>
+      <p className="mt-1 font-display text-sm font-semibold text-white">{formatKwacha(value)}</p>
     </div>
   );
 }

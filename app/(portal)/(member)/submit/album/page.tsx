@@ -83,7 +83,7 @@ export default function AlbumSubmissionScreen() {
       <TopBar title="Submit an Album" back="/submit" />
       <form onSubmit={submit} className="space-y-5 px-4 py-4">
         <section className="card px-4 py-4">
-          <h3 className="mb-3 text-sm font-bold text-brand-900">Album details</h3>
+          <h3 className="mb-3 text-sm font-bold text-white">Album details</h3>
           <div className="space-y-3">
             <Field label="Album title" required>
               <TextInput placeholder="e.g. Kalulu Tales" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -100,13 +100,13 @@ export default function AlbumSubmissionScreen() {
 
         <div>
           <div className="mb-2 flex items-center justify-between px-1">
-            <h3 className="flex items-center gap-1.5 text-sm font-bold text-brand-900">
+            <h3 className="flex items-center gap-1.5 text-sm font-bold text-white">
               <ListMusic size={16} /> Tracklist ({tracks.length})
             </h3>
             <button
               type="button"
               onClick={addTrack}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-300 hover:text-brand-200"
             >
               <Plus size={15} /> Add track
             </button>
@@ -122,10 +122,10 @@ export default function AlbumSubmissionScreen() {
                     onClick={() => setOpen(isOpen ? null : t.id)}
                     className="flex w-full items-center gap-3 px-4 py-3 text-left"
                   >
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50 text-xs font-bold text-brand-600">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/[0.06] text-xs font-bold text-brand-300 ring-1 ring-white/10">
                       {idx + 1}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-brand-900">
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
                       {t.title || `Track ${idx + 1}`}
                     </span>
                     {tracks.length > 1 && (
@@ -136,19 +136,19 @@ export default function AlbumSubmissionScreen() {
                           e.stopPropagation();
                           removeTrack(t.id);
                         }}
-                        className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500"
+                        className="grid h-8 w-8 place-items-center rounded-lg text-night-400 hover:bg-red-500/10 hover:text-red-300"
                       >
                         <Trash2 size={15} />
                       </span>
                     )}
                     <ChevronDown
                       size={18}
-                      className={"shrink-0 text-slate-400 transition " + (isOpen ? "rotate-180" : "")}
+                      className={"shrink-0 text-night-400 transition " + (isOpen ? "rotate-180" : "")}
                     />
                   </button>
 
                   {isOpen && (
-                    <div className="space-y-3 border-t border-slate-100 px-4 py-4">
+                    <div className="space-y-3 border-t border-white/[0.06] px-4 py-4">
                       <Field label="Track title" required>
                         <TextInput value={t.title} onChange={(e) => updateTrack(t.id, { title: e.target.value })} />
                       </Field>
@@ -187,7 +187,7 @@ export default function AlbumSubmissionScreen() {
         </div>
 
         {error && (
-          <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{error}</p>
+          <p className="rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>
         )}
 
         <Button type="submit" block size="lg" disabled={busy}>

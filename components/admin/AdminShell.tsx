@@ -43,10 +43,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-slate-100 lg:flex">
+    <div className="min-h-[100dvh] bg-night-950 text-white lg:flex">
       {/* Sidebar (desktop) */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
-        <div className="border-b border-slate-100 px-5 py-5">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-white/[0.07] bg-night-900/80 backdrop-blur-xl lg:flex">
+        <div className="border-b border-white/[0.07] px-5 py-5">
           <Logo size={36} subtitle="Staff Console" />
         </div>
         <nav className="flex-1 space-y-1 p-3">
@@ -57,8 +57,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                 active(n.href, n.exact)
-                  ? "bg-brand-600 text-white"
-                  : "text-slate-600 hover:bg-slate-100"
+                  ? "brand-gradient text-white shadow-fab"
+                  : "text-night-300 hover:bg-white/[0.05] hover:text-white"
               )}
             >
               <n.icon size={18} />
@@ -66,16 +66,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="space-y-1 border-t border-slate-100 p-3">
+        <div className="space-y-1 border-t border-white/[0.07] p-3">
           <Link
             href="/dashboard"
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-night-300 transition hover:bg-white/[0.05] hover:text-white"
           >
             <Smartphone size={18} /> Member App
           </Link>
           <button
             onClick={doLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-300 transition hover:bg-red-500/10"
           >
             <LogOut size={18} /> Log out
           </button>
@@ -84,20 +84,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile top bar + horizontal nav */}
       <div className="lg:hidden">
-        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+        <div className="flex items-center justify-between border-b border-white/[0.07] bg-night-900/80 px-4 py-3 backdrop-blur-xl">
           <Logo size={32} subtitle="Staff Console" />
-          <button onClick={doLogout} className="rounded-lg bg-red-50 p-2 text-red-600">
+          <button onClick={doLogout} className="rounded-lg bg-red-500/12 p-2 text-red-300">
             <LogOut size={16} />
           </button>
         </div>
-        <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2">
+        <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-white/[0.07] bg-night-900/80 px-3 py-2 backdrop-blur-xl">
           {nav.map((n) => (
             <Link
               key={n.href}
               href={n.href}
               className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold",
-                active(n.href, n.exact) ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"
+                "shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition",
+                active(n.href, n.exact)
+                  ? "brand-gradient text-white"
+                  : "bg-white/[0.05] text-night-300 hover:text-white"
               )}
             >
               {n.label}
@@ -116,8 +118,8 @@ export function AdminHeader({ title, subtitle, right }: { title: string; subtitl
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-xl font-extrabold tracking-tight text-slate-900 lg:text-2xl">{title}</h1>
-        {subtitle && <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>}
+        <h1 className="font-display text-xl font-bold tracking-tight text-white lg:text-2xl">{title}</h1>
+        {subtitle && <p className="mt-0.5 text-sm text-night-300">{subtitle}</p>}
       </div>
       {right}
     </div>

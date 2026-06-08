@@ -1,10 +1,8 @@
 import React from "react";
-import { cn } from "@/lib/format";
 
 export function Logo({
   size = 36,
   withText = true,
-  light = false,
   subtitle = "Copyright Society",
 }: {
   size?: number;
@@ -15,28 +13,19 @@ export function Logo({
   return (
     <div className="flex items-center gap-2.5">
       <span
-        className="grid shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 font-black text-white shadow-fab ring-4 ring-white/70"
-        style={{ width: size, height: size, fontSize: size * 0.42 }}
+        className="relative grid shrink-0 place-items-center overflow-hidden rounded-[0.85rem] brand-gradient font-black text-white shadow-fab ring-1 ring-white/20"
+        style={{ width: size, height: size, fontSize: size * 0.44 }}
         aria-hidden
       >
-        Z
+        <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.4),transparent_45%)]" />
+        <span className="relative">Z</span>
       </span>
       {withText && (
         <span className="leading-tight">
-          <span
-            className={cn(
-              "block font-display text-[0.98rem] font-bold tracking-[0.18em]",
-              light ? "text-white" : "text-brand-800"
-            )}
-          >
+          <span className="block font-display text-[0.98rem] font-bold tracking-[0.14em] text-white">
             ZAMCOPS
           </span>
-          <span
-            className={cn(
-              "block text-[9px] font-semibold uppercase tracking-[0.24em]",
-              light ? "text-brand-100" : "text-gold-600"
-            )}
-          >
+          <span className="block text-[9px] font-semibold uppercase tracking-[0.22em] text-gold-400">
             {subtitle}
           </span>
         </span>

@@ -76,11 +76,11 @@ export default function RegisterScreen() {
         <Logo size={40} />
 
         <div className="mt-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-600">Join ZAMCOPS</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-brand-900">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">Join ZAMCOPS</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-white">
             Create your account
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+          <p className="mt-2 text-sm leading-relaxed text-night-300">
             Register as a ZAMCOPS member - it only takes a minute.
           </p>
         </div>
@@ -126,11 +126,11 @@ export default function RegisterScreen() {
           </div>
 
           {error && (
-            <p className="rounded-2xl bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{error}</p>
+            <p className="rounded-2xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>
           )}
 
-          <div className="flex items-start gap-2 rounded-2xl bg-brand-50/60 px-3 py-2.5 text-[11px] leading-relaxed text-slate-500">
-            <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-brand-500" />
+          <div className="flex items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-[11px] leading-relaxed text-night-300">
+            <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-brand-300" />
             By registering you agree to assign collection of public performance and mechanical royalties to ZAMCOPS under the Copyright Act of Zambia.
           </div>
 
@@ -139,9 +139,9 @@ export default function RegisterScreen() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-night-300">
           Already a member?{" "}
-          <Link href="/login" className="font-semibold text-brand-600 hover:underline">
+          <Link href="/login" className="font-semibold text-brand-300 hover:text-brand-200">
             Sign in
           </Link>
         </p>

@@ -30,18 +30,18 @@ export default function LoginScreen() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4">
-      <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-brand-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 bottom-4 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
+      <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-brand-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 bottom-4 h-64 w-64 rounded-full bg-iris-500/15 blur-3xl" />
 
       <div className="card relative z-10 flex flex-1 flex-col px-5 py-6">
         <Logo size={46} />
 
         <div className="mt-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-600">Member access</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-brand-900">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-400">Member access</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-white">
             Welcome back
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+          <p className="mt-2 text-sm leading-relaxed text-night-300">
             Sign in to manage your ZAMCOPS membership.
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function LoginScreen() {
             <div className="relative">
               <AtSign
                 size={16}
-                className="pointer-events-none absolute left-3.5 top-3.5 text-slate-400"
+                className="pointer-events-none absolute left-3.5 top-3.5 text-night-400"
               />
               <TextInput
                 className="pl-10"
@@ -67,7 +67,7 @@ export default function LoginScreen() {
             <div className="relative">
               <Lock
                 size={16}
-                className="pointer-events-none absolute left-3.5 top-3.5 text-slate-400"
+                className="pointer-events-none absolute left-3.5 top-3.5 text-night-400"
               />
               <TextInput
                 className="px-10"
@@ -80,7 +80,7 @@ export default function LoginScreen() {
               <button
                 type="button"
                 onClick={() => setShow((s) => !s)}
-                className="absolute right-3 top-3 text-slate-400 hover:text-brand-600"
+                className="absolute right-3 top-3 text-night-400 transition hover:text-white"
                 aria-label={show ? "Hide password" : "Show password"}
               >
                 {show ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -89,13 +89,13 @@ export default function LoginScreen() {
           </Field>
 
           <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-xs font-semibold text-brand-600 hover:underline">
+            <Link href="/forgot-password" className="text-xs font-semibold text-brand-300 hover:text-brand-200">
               Forgot password?
             </Link>
           </div>
 
           {error && (
-            <p className="rounded-2xl bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{error}</p>
+            <p className="rounded-2xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>
           )}
 
           <Button type="submit" block size="lg" disabled={busy}>
@@ -103,9 +103,9 @@ export default function LoginScreen() {
           </Button>
         </form>
 
-        <p className="mt-auto pt-8 text-center text-sm text-slate-500">
+        <p className="mt-auto pt-8 text-center text-sm text-night-300">
           New to ZAMCOPS?{" "}
-          <Link href="/register" className="font-semibold text-brand-600 hover:underline">
+          <Link href="/register" className="font-semibold text-brand-300 hover:text-brand-200">
             Create an account
           </Link>
         </p>

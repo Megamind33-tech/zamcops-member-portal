@@ -19,15 +19,16 @@ export function BottomNav() {
 
   return (
     <nav className="sticky bottom-0 z-30 mt-auto px-3 pb-3">
-      <div className="relative rounded-[1.75rem] border border-white/75 bg-white/80 shadow-nav backdrop-blur-2xl">
-        <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/70 to-transparent" />
+      <div className="relative rounded-[1.75rem] border border-white/10 bg-night-850/80 shadow-nav backdrop-blur-2xl">
+        <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand-400/60 to-transparent" />
 
         <Link
           href="/submit"
           aria-label="Submit song or declare work"
-          className="absolute -top-7 left-1/2 grid h-14 w-14 -translate-x-1/2 place-items-center rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 text-brand-900 shadow-fab ring-[6px] ring-white transition active:scale-95"
+          className="absolute -top-7 left-1/2 grid h-14 w-14 -translate-x-1/2 place-items-center rounded-full brand-gradient text-white shadow-fab ring-[5px] ring-night-900 transition active:scale-95"
         >
-          <Plus size={26} strokeWidth={2.5} />
+          <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.45),transparent_55%)]" />
+          <Plus size={26} strokeWidth={2.5} className="relative" />
         </Link>
 
         <ul className="grid grid-cols-5 items-end px-2 pb-[max(env(safe-area-inset-bottom),0.65rem)] pt-2">
@@ -36,7 +37,7 @@ export function BottomNav() {
           ))}
           <li aria-hidden className="flex flex-col items-center">
             <span className="h-7" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-gold-600">Submit</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-300">Submit</span>
           </li>
           {tabs.slice(2).map((t) => (
             <NavItem key={t.href} {...t} active={isActive(t.href)} />
@@ -65,8 +66,8 @@ function NavItem({
         className={cn(
           "flex flex-col items-center gap-1 rounded-2xl px-3 py-2 transition",
           active
-            ? "bg-brand-50/80 text-brand-800 shadow-sm ring-1 ring-brand-100/80"
-            : "text-slate-400 hover:bg-brand-50/50 hover:text-brand-600"
+            ? "bg-white/[0.08] text-white ring-1 ring-white/10"
+            : "text-night-400 hover:bg-white/[0.04] hover:text-night-200"
         )}
       >
         <Icon size={22} strokeWidth={active ? 2.4 : 2} />

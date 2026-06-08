@@ -25,7 +25,7 @@ export default function AdminFilesPage() {
             onClick={() => setFilter(f)}
             className={
               "rounded-full px-3.5 py-1.5 text-xs font-semibold " +
-              (filter === f ? "bg-brand-600 text-white" : "bg-white text-slate-500 shadow-card")
+              (filter === f ? "brand-gradient text-white shadow-fab" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:text-white")
             }
           >
             {f}
@@ -35,7 +35,7 @@ export default function AdminFilesPage() {
       <Panel title="Files">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px]">
-            <thead className="bg-slate-50">
+            <thead className="bg-white/[0.03]">
               <tr>
                 <Th>File name</Th>
                 <Th>Type</Th>
@@ -45,19 +45,19 @@ export default function AdminFilesPage() {
                 <Th>Status</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {shown.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-50">
-                  <Td className="font-mono text-xs font-semibold text-slate-900">{u.fileName}</Td>
+                <tr key={u.id} className="hover:bg-white/[0.03]">
+                  <Td className="font-mono text-xs font-semibold text-white">{u.fileName}</Td>
                   <Td>{u.fileType}</Td>
-                  <Td className="text-slate-500">{u.linkedTo ?? "—"}</Td>
+                  <Td className="text-night-300">{u.linkedTo ?? "—"}</Td>
                   <Td>{nameFor(u.ownerId)}</Td>
-                  <Td className="text-slate-500">{formatDate(u.uploadedAt)}</Td>
+                  <Td className="text-night-300">{formatDate(u.uploadedAt)}</Td>
                   <Td>
                     <div className="flex flex-col gap-1">
                       <StatusBadge status={u.status} />
                       {u.rejectionReason && (
-                        <span className="text-[11px] text-red-500">{u.rejectionReason}</span>
+                        <span className="text-[11px] text-red-300">{u.rejectionReason}</span>
                       )}
                     </div>
                   </Td>
@@ -65,7 +65,7 @@ export default function AdminFilesPage() {
               ))}
               {shown.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-slate-400">No files match this filter.</Td>
+                  <Td className="py-8 text-center text-night-400">No files match this filter.</Td>
                 </tr>
               )}
             </tbody>

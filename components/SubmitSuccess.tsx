@@ -23,15 +23,15 @@ export function SubmitSuccess({
 }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center animate-scale-in">
-      <div className="grid h-20 w-20 place-items-center rounded-3xl bg-emerald-50 text-emerald-600">
+      <div className="grid h-20 w-20 place-items-center rounded-3xl bg-emerald-500/12 text-emerald-300 ring-1 ring-emerald-400/20 shadow-glow">
         <CheckCircle2 size={44} />
       </div>
-      <h2 className="mt-5 text-xl font-extrabold text-brand-900">{title}</h2>
-      <p className="mt-2 max-w-xs text-sm text-slate-500">{message}</p>
+      <h2 className="mt-5 font-display text-xl font-bold text-white">{title}</h2>
+      <p className="mt-2 max-w-xs text-sm text-night-300">{message}</p>
 
-      <div className="mt-5 w-full max-w-xs rounded-2xl border border-dashed border-brand-200 bg-brand-50/50 px-4 py-3">
-        <p className="text-[11px] uppercase tracking-wide text-slate-400">Reference</p>
-        <p className="font-mono text-sm font-bold text-brand-700">{reference}</p>
+      <div className="mt-5 w-full max-w-xs rounded-2xl border border-dashed border-white/10 bg-white/[0.04] px-4 py-3">
+        <p className="text-[11px] uppercase tracking-wide text-night-400">Reference</p>
+        <p className="font-mono text-sm font-bold text-brand-300">{reference}</p>
       </div>
 
       <div className="mt-8 w-full max-w-xs space-y-3">

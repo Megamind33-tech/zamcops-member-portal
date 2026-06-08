@@ -36,7 +36,7 @@ export default function UploadsScreen() {
               onClick={() => setFilter(f)}
               className={
                 "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (filter === f ? "bg-brand-600 text-white" : "bg-white text-slate-500 shadow-card")
+                (filter === f ? "brand-gradient text-white shadow-fab ring-1 ring-white/10" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
               }
             >
               {f}
@@ -63,12 +63,12 @@ export default function UploadsScreen() {
                 <div key={u.id} className="card px-4 py-3.5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-start gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                         <Icon size={18} />
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-brand-900">{u.fileName}</p>
-                        <p className="truncate text-xs text-slate-500">
+                        <p className="truncate text-sm font-semibold text-white">{u.fileName}</p>
+                        <p className="truncate text-xs text-night-400">
                           {u.fileType}
                           {u.linkedTo ? ` · ${u.linkedTo}` : ""} · {formatDate(u.uploadedAt)}
                         </p>
@@ -77,7 +77,7 @@ export default function UploadsScreen() {
                     <StatusBadge status={u.status} />
                   </div>
                   {u.status === "Rejected" && u.rejectionReason && (
-                    <div className="mt-3 flex items-start gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-600">
+                    <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
                       <AlertCircle size={14} className="mt-0.5 shrink-0" />
                       <span>{u.rejectionReason}</span>
                     </div>

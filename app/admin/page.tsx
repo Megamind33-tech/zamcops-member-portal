@@ -45,7 +45,7 @@ export default function AdminDashboard() {
       <Panel title="Recent submissions">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[560px]">
-            <thead className="bg-slate-50">
+            <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Type</Th>
                 <Th>Title</Th>
@@ -53,16 +53,16 @@ export default function AdminDashboard() {
                 <Th>Status</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {recent.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50">
+                <tr key={r.id} className="hover:bg-white/[0.03]">
                   <Td>
-                    <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                    <span className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs font-semibold text-night-300">
                       {r.kind}
                     </span>
                   </Td>
-                  <Td className="font-semibold text-slate-900">{r.title}</Td>
-                  <Td className="text-slate-500">{formatDate(r.at)}</Td>
+                  <Td className="font-semibold text-white">{r.title}</Td>
+                  <Td className="text-night-300">{formatDate(r.at)}</Td>
                   <Td>
                     <StatusBadge status={r.status} />
                   </Td>
@@ -80,16 +80,16 @@ function QueueCard({ href, label, count }: { href: string; label: string; count:
   return (
     <Link
       href={href}
-      className="flex items-center justify-between rounded-2xl bg-white p-5 shadow-card transition hover:shadow-md"
+      className="card flex items-center justify-between p-5 transition hover:bg-white/[0.03]"
     >
       <div>
-        <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
+        <p className="flex items-center gap-1.5 text-xs font-semibold text-gold-400">
           <Clock size={13} /> Pending review
         </p>
-        <p className="mt-1 text-3xl font-extrabold text-slate-900">{count}</p>
-        <p className="text-sm text-slate-500">{label}</p>
+        <p className="mt-1 text-3xl font-extrabold text-white">{count}</p>
+        <p className="text-sm text-night-300">{label}</p>
       </div>
-      <ChevronRight className="text-slate-300" />
+      <ChevronRight className="text-night-400" />
     </Link>
   );
 }

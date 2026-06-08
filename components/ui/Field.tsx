@@ -18,10 +18,10 @@ export function Field({
     <label className={cn("block", className)}>
       <span className="field-label">
         {label}
-        {required && <span className="text-red-500"> *</span>}
+        {required && <span className="text-pop-400"> *</span>}
       </span>
       {children}
-      {hint && <span className="mt-1 block text-[11px] text-slate-400">{hint}</span>}
+      {hint && <span className="mt-1 block text-[11px] text-night-400">{hint}</span>}
     </label>
   );
 }
@@ -46,7 +46,13 @@ export function Select({
   ...props
 }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select className={cn("field-input appearance-none bg-white", className)} {...props}>
+    <select
+      className={cn(
+        "field-input appearance-none bg-night-850 [&>option]:bg-night-850 [&>option]:text-white",
+        className
+      )}
+      {...props}
+    >
       {children}
     </select>
   );
@@ -69,11 +75,11 @@ export function FilePicker({
 }) {
   return (
     <Field label={label} hint={hint}>
-      <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-dashed border-brand-200 bg-white/90 px-4 py-3 text-sm shadow-sm transition hover:border-brand-400 hover:bg-brand-50/40">
-        <span className={cn("truncate", value ? "font-medium text-brand-800" : "text-slate-400")}>
+      <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-brand-400/60 hover:bg-white/[0.06]">
+        <span className={cn("truncate", value ? "font-medium text-white" : "text-night-400")}>
           {value || "Tap to choose a file"}
         </span>
-        <span className="shrink-0 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 px-3 py-1.5 text-xs font-semibold text-white">
+        <span className="shrink-0 rounded-xl brand-gradient px-3 py-1.5 text-xs font-semibold text-white">
           Browse
         </span>
         <input

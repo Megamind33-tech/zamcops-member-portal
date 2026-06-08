@@ -55,30 +55,30 @@ export default function SettingsScreen() {
       <div className="space-y-5 px-4 py-4">
         {/* Account card */}
         <section className="card flex items-center gap-3 px-4 py-4">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-600 text-sm font-bold text-white">
+          <span className="grid h-12 w-12 place-items-center rounded-full brand-gradient text-sm font-bold text-white ring-1 ring-white/10">
             {initials(member.stageName || member.fullName)}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-brand-900">{member.fullName}</p>
-            <p className="truncate text-xs text-slate-500">{member.email}</p>
-            <p className="mt-0.5 font-mono text-[11px] text-slate-400">{member.memberNumber}</p>
+            <p className="truncate text-sm font-bold text-white">{member.fullName}</p>
+            <p className="truncate text-xs text-night-300">{member.email}</p>
+            <p className="mt-0.5 font-mono text-[11px] text-night-400">{member.memberNumber}</p>
           </div>
         </section>
 
         {/* Account details */}
         <section>
-          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-slate-500">Account</h3>
-          <div className="card divide-y divide-slate-100">
+          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-night-300">Account</h3>
+          <div className="card divide-y divide-white/[0.06]">
             <Row href="/profile" icon={<User size={17} />} label="Account details" sub="Name, contact and KYC" />
             <button onClick={() => setShowPw((s) => !s)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                 <Lock size={17} />
               </span>
               <span className="flex-1">
-                <span className="block text-sm font-semibold text-brand-900">Change password</span>
-                <span className="block text-xs text-slate-500">Update your sign-in password</span>
+                <span className="block text-sm font-semibold text-white">Change password</span>
+                <span className="block text-xs text-night-300">Update your sign-in password</span>
               </span>
-              <ChevronRight size={18} className={"text-slate-300 transition " + (showPw ? "rotate-90" : "")} />
+              <ChevronRight size={18} className={"text-night-400 transition " + (showPw ? "rotate-90" : "")} />
             </button>
             {showPw && (
               <form onSubmit={changePassword} className="space-y-3 px-4 py-4">
@@ -93,7 +93,7 @@ export default function SettingsScreen() {
                     <TextInput type="password" value={pw.confirm} onChange={(e) => setPw({ ...pw, confirm: e.target.value })} />
                   </Field>
                 </div>
-                {pwMsg && pwMsg !== "saved" && <p className="text-xs font-medium text-red-600">{pwMsg}</p>}
+                {pwMsg && pwMsg !== "saved" && <p className="text-xs font-medium text-red-300">{pwMsg}</p>}
                 <Button type="submit" block size="sm">
                   Update password
                 </Button>
@@ -101,7 +101,7 @@ export default function SettingsScreen() {
             )}
           </div>
           {pwMsg === "saved" && (
-            <p className="mt-2 flex items-center gap-1.5 px-1 text-xs font-medium text-emerald-600">
+            <p className="mt-2 flex items-center gap-1.5 px-1 text-xs font-medium text-emerald-300">
               <CheckCircle2 size={14} /> Password updated.
             </p>
           )}
@@ -109,10 +109,10 @@ export default function SettingsScreen() {
 
         {/* Notification preferences */}
         <section>
-          <h3 className="mb-2 flex items-center gap-1.5 px-1 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <h3 className="mb-2 flex items-center gap-1.5 px-1 text-xs font-bold uppercase tracking-wider text-night-300">
             <Bell size={13} /> Notification preferences
           </h3>
-          <div className="card divide-y divide-slate-100">
+          <div className="card divide-y divide-white/[0.06]">
             <Toggle label="Email notifications" on={prefs.email} onClick={() => togglePref("email")} />
             <Toggle label="SMS notifications" on={prefs.sms} onClick={() => togglePref("sms")} />
             <Toggle label="Royalty statement alerts" on={prefs.royalty} onClick={() => togglePref("royalty")} />
@@ -121,28 +121,28 @@ export default function SettingsScreen() {
 
         {/* More */}
         <section>
-          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-slate-500">More</h3>
-          <div className="card divide-y divide-slate-100">
+          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-night-300">More</h3>
+          <div className="card divide-y divide-white/[0.06]">
             <Row href="/statements" icon={<FileText size={17} />} label="Statements & receipts" />
             <Row href="/support" icon={<LifeBuoy size={17} />} label="Help & support" />
             <div className="flex items-center gap-3 px-4 py-3.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-50 text-emerald-600">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500/12 text-emerald-300 ring-1 ring-emerald-400/20">
                 <ShieldCheck size={17} />
               </span>
-              <span className="flex-1 text-sm font-semibold text-brand-900">Membership</span>
-              <span className="pill bg-emerald-50 text-emerald-700">{member.membershipStatus}</span>
+              <span className="flex-1 text-sm font-semibold text-white">Membership</span>
+              <span className="pill bg-emerald-400/12 text-emerald-300 border border-emerald-400/20">{member.membershipStatus}</span>
             </div>
           </div>
         </section>
 
         <button
           onClick={doLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 py-3 text-sm font-semibold text-red-600"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500/10 py-3 text-sm font-semibold text-red-300 border border-red-400/20"
         >
           <LogOut size={16} /> Log out
         </button>
 
-        <p className="pb-2 text-center text-[11px] text-slate-400">
+        <p className="pb-2 text-center text-[11px] text-night-400">
           ZAMCOPS Member Portal
         </p>
       </div>
@@ -163,12 +163,12 @@ function Row({
 }) {
   return (
     <Link href={href} className="flex items-center gap-3 px-4 py-3.5">
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600">{icon}</span>
+      <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">{icon}</span>
       <span className="flex-1">
-        <span className="block text-sm font-semibold text-brand-900">{label}</span>
-        {sub && <span className="block text-xs text-slate-500">{sub}</span>}
+        <span className="block text-sm font-semibold text-white">{label}</span>
+        {sub && <span className="block text-xs text-night-300">{sub}</span>}
       </span>
-      <ChevronRight size={18} className="text-slate-300" />
+      <ChevronRight size={18} className="text-night-400" />
     </Link>
   );
 }
@@ -176,12 +176,12 @@ function Row({
 function Toggle({ label, on, onClick }: { label: string; on: boolean; onClick: () => void }) {
   return (
     <div className="flex items-center justify-between px-4 py-3.5">
-      <span className="text-sm font-semibold text-brand-900">{label}</span>
+      <span className="text-sm font-semibold text-white">{label}</span>
       <button
         onClick={onClick}
         role="switch"
         aria-checked={on}
-        className={"relative h-6 w-11 rounded-full transition " + (on ? "bg-brand-600" : "bg-slate-200")}
+        className={"relative h-6 w-11 rounded-full transition " + (on ? "bg-brand-500" : "bg-white/[0.12] ring-1 ring-white/10")}
       >
         <span
           className={"absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition " + (on ? "left-[22px]" : "left-0.5")}

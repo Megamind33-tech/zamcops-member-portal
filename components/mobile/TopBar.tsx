@@ -20,30 +20,25 @@ export function TopBar({
   sticky?: boolean;
 }) {
   const router = useRouter();
+  const backClasses =
+    "grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.05] text-night-200 transition hover:bg-white/[0.1] hover:text-white";
   return (
     <header
       className={cn(
-        "relative z-30 overflow-hidden border-b border-white/70 bg-white/80 px-3 py-3 backdrop-blur-2xl",
+        "relative z-30 overflow-hidden border-b border-white/[0.07] bg-night-900/70 px-3 py-3 backdrop-blur-2xl",
         sticky && "sticky top-0"
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/70 to-transparent" />
-      <div className="pointer-events-none absolute -right-8 top-1 h-16 w-16 rounded-full bg-gold-400/10 blur-2xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-400/50 to-transparent" />
+      <div className="pointer-events-none absolute -right-8 top-1 h-16 w-16 rounded-full bg-iris-500/15 blur-2xl" />
       <div className="relative flex items-center gap-2">
         {back ? (
           typeof back === "string" ? (
-            <Link
-              href={back}
-              className="grid h-10 w-10 place-items-center rounded-full border border-brand-100/80 bg-brand-50/80 text-brand-700 shadow-sm transition hover:bg-brand-50"
-            >
+            <Link href={back} className={backClasses}>
               <ChevronLeft size={20} />
             </Link>
           ) : (
-            <button
-              onClick={() => router.back()}
-              className="grid h-10 w-10 place-items-center rounded-full border border-brand-100/80 bg-brand-50/80 text-brand-700 shadow-sm transition hover:bg-brand-50"
-              aria-label="Go back"
-            >
+            <button onClick={() => router.back()} className={backClasses} aria-label="Go back">
               <ChevronLeft size={20} />
             </button>
           )
@@ -51,11 +46,11 @@ export function TopBar({
           <span className="w-1" />
         )}
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-600">ZAMCOPS</p>
-          <h1 className="truncate font-display text-[1.15rem] font-semibold tracking-tight text-brand-900">
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-gold-400">ZAMCOPS</p>
+          <h1 className="truncate font-display text-[1.15rem] font-semibold tracking-tight text-white">
             {title}
           </h1>
-          {subtitle && <p className="truncate text-[11px] text-slate-500">{subtitle}</p>}
+          {subtitle && <p className="truncate text-[11px] text-night-300">{subtitle}</p>}
         </div>
         {right}
       </div>

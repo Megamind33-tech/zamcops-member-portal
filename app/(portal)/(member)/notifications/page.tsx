@@ -12,10 +12,10 @@ const styles: Record<
   AppNotification["type"],
   { icon: React.ComponentType<{ size?: number }>; bg: string; fg: string }
 > = {
-  info: { icon: Info, bg: "bg-blue-50", fg: "text-blue-600" },
-  success: { icon: CheckCircle2, bg: "bg-emerald-50", fg: "text-emerald-600" },
-  warning: { icon: AlertTriangle, bg: "bg-amber-50", fg: "text-amber-600" },
-  action: { icon: FileText, bg: "bg-brand-50", fg: "text-brand-600" },
+  info: { icon: Info, bg: "bg-brand-400/14 ring-1 ring-brand-400/25", fg: "text-brand-200" },
+  success: { icon: CheckCircle2, bg: "bg-emerald-500/12 ring-1 ring-emerald-400/20", fg: "text-emerald-300" },
+  warning: { icon: AlertTriangle, bg: "bg-gold-400/12 ring-1 ring-gold-400/20", fg: "text-gold-300" },
+  action: { icon: FileText, bg: "bg-white/[0.06] ring-1 ring-white/10", fg: "text-brand-300" },
 };
 
 export default function NotificationsScreen() {
@@ -32,7 +32,7 @@ export default function NotificationsScreen() {
           hasUnread ? (
             <button
               onClick={markAllRead}
-              className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-600"
+              className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-brand-300 ring-1 ring-white/10 hover:bg-white/[0.1]"
             >
               <CheckCheck size={14} /> Mark all
             </button>
@@ -53,8 +53,8 @@ export default function NotificationsScreen() {
                   key={n.id}
                   onClick={() => markNotificationRead(n.id)}
                   className={cn(
-                    "card flex w-full items-start gap-3 px-4 py-3.5 text-left transition",
-                    !n.read && "ring-1 ring-brand-100"
+                    "card flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-white/[0.03]",
+                    !n.read && "ring-1 ring-brand-400/30"
                   )}
                 >
                   <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-xl", s.bg, s.fg)}>
@@ -62,11 +62,11 @@ export default function NotificationsScreen() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-semibold text-brand-900">{n.title}</p>
-                      {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-gold-500" />}
+                      <p className="truncate text-sm font-semibold text-white">{n.title}</p>
+                      {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-gold-400" />}
                     </div>
-                    <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{n.body}</p>
-                    <p className="mt-1 text-[10px] text-slate-400">{timeAgo(n.createdAt)}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-night-300">{n.body}</p>
+                    <p className="mt-1 text-[10px] text-night-400">{timeAgo(n.createdAt)}</p>
                   </div>
                 </button>
               );

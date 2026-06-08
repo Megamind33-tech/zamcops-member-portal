@@ -26,7 +26,7 @@ export default function WorksScreen() {
         right={
           <Link
             href="/works/new"
-            className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-white"
+            className="grid h-9 w-9 place-items-center rounded-full brand-gradient text-white shadow-fab ring-1 ring-white/10"
             aria-label="Declare work"
           >
             <FilePlus2 size={17} />
@@ -42,7 +42,7 @@ export default function WorksScreen() {
               onClick={() => setFilter(f)}
               className={
                 "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (filter === f ? "bg-brand-600 text-white" : "bg-white text-slate-500 shadow-card")
+                (filter === f ? "brand-gradient text-white ring-1 ring-white/10" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:bg-white/[0.1]")
               }
             >
               {f}
@@ -67,19 +67,19 @@ export default function WorksScreen() {
               <div key={w.id} className="card px-4 py-3.5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
                       <Music4 size={18} />
                     </span>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-brand-900">{w.title}</p>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="truncate text-sm font-bold text-white">{w.title}</p>
+                      <p className="truncate text-xs text-night-300">
                         {w.workType} · {w.genre} · {w.language}
                       </p>
                     </div>
                   </div>
                   <StatusBadge status={w.status} />
                 </div>
-                <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 text-[11px] text-slate-400">
+                <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5 text-[11px] text-night-400">
                   <span className="inline-flex items-center gap-1">
                     <Clock size={12} /> {formatDate(w.submittedAt)}
                   </span>
