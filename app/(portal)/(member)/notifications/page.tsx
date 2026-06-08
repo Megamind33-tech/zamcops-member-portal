@@ -11,12 +11,40 @@ import type { AppNotification } from "@/types";
 
 const styles: Record<
   AppNotification["type"],
-  { icon: React.ComponentType<{ size?: number }>; bg: string; fg: string }
+  { icon: React.ComponentType<{ size?: number }>; kicker: string; ring: string; fg: string; glow: string; wash: string }
 > = {
-  info: { icon: Info, bg: "bg-brand-400/14 ring-1 ring-brand-400/25", fg: "text-brand-200" },
-  success: { icon: CheckCircle2, bg: "bg-emerald-500/12 ring-1 ring-emerald-400/20", fg: "text-emerald-300" },
-  warning: { icon: AlertTriangle, bg: "bg-gold-400/12 ring-1 ring-gold-400/20", fg: "text-gold-300" },
-  action: { icon: FileText, bg: "bg-white/[0.06] ring-1 ring-white/10", fg: "text-brand-300" },
+  info: {
+    icon: Info,
+    kicker: "Update",
+    ring: "ring-brand-400/30",
+    fg: "text-brand-200",
+    glow: "rgba(84,96,248,0.32)",
+    wash: "rgba(84,96,248,0.07)",
+  },
+  success: {
+    icon: CheckCircle2,
+    kicker: "Approved",
+    ring: "ring-emerald-400/30",
+    fg: "text-emerald-300",
+    glow: "rgba(16,185,129,0.32)",
+    wash: "rgba(16,185,129,0.07)",
+  },
+  warning: {
+    icon: AlertTriangle,
+    kicker: "Action needed",
+    ring: "ring-gold-400/30",
+    fg: "text-gold-300",
+    glow: "rgba(245,166,35,0.32)",
+    wash: "rgba(245,166,35,0.07)",
+  },
+  action: {
+    icon: FileText,
+    kicker: "Review",
+    ring: "ring-accent-400/30",
+    fg: "text-accent-300",
+    glow: "rgba(25,224,138,0.32)",
+    wash: "rgba(25,224,138,0.07)",
+  },
 };
 
 export default function NotificationsScreen() {
@@ -54,20 +82,30 @@ export default function NotificationsScreen() {
                   key={n.id}
                   onClick={() => markNotificationRead(n.id)}
                   className={cn(
-                    "card flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-white/[0.03]",
-                    !n.read && "ring-1 ring-brand-400/30"
+                    "card group relative flex w-full items-start gap-3.5 overflow-hidden px-4 py-4 text-left transition hover:bg-white/[0.03]",
+                    !n.read ? "ring-1 ring-white/[0.14]" : "opacity-70"
                   )}
                 >
-                  <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-xl", s.bg, s.fg)}>
+                  <span
+                    className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full blur-2xl transition group-hover:scale-110"
+                    style={{ background: s.glow, opacity: n.read ? 0.12 : 0.4 }}
+                  />
+                  <span
+                    className="pointer-events-none absolute inset-0"
+                    style={{ background: `linear-gradient(115deg, ${s.wash} 0%, transparent 60%)` }}
+                  />
+
+                  <span className={cn("relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/[0.05] ring-1", s.ring, s.fg)}>
                     <Icon size={18} />
+                    {!n.read && (
+                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 shadow-[0_0_8px_rgba(47,231,154,0.8)]" />
+                    )}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-semibold text-white">{n.title}</p>
-                      {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-accent-400" />}
-                    </div>
-                    <p className="mt-0.5 text-xs leading-relaxed text-night-300">{n.body}</p>
-                    <p className="mt-1 text-[10px] text-night-400">{timeAgo(n.createdAt)}</p>
+                  <div className="relative min-w-0 flex-1">
+                    <p className={cn("text-[10px] font-bold uppercase tracking-[0.2em]", s.fg)}>{s.kicker}</p>
+                    <p className="mt-0.5 truncate text-[15px] font-bold leading-tight text-white">{n.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-night-300">{n.body}</p>
+                    <p className="mt-1.5 text-[10px] uppercase tracking-[0.16em] text-night-500">{timeAgo(n.createdAt)}</p>
                   </div>
                 </button>
               );
