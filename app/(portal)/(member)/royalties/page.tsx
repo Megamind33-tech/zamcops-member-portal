@@ -132,7 +132,7 @@ export default function RoyaltiesScreen() {
 
         <a
           href="/statements"
-          className="flex items-center justify-center gap-2 rounded-xl bg-accent-500 py-3 text-sm font-semibold text-night-950 shadow-[0_16px_38px_-14px_rgba(25,224,138,0.6)] ring-1 ring-accent-300/30 transition hover:bg-accent-400"
+          className="flex items-center justify-center gap-2 rounded-xl bg-accent-500 py-3 text-sm font-semibold text-night-950 shadow-[0_16px_38px_-14px_rgba(255,138,61,0.6)] ring-1 ring-accent-300/30 transition hover:bg-accent-400"
         >
           <Download size={18} /> Download statement
         </a>

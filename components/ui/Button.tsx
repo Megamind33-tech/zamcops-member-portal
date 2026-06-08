@@ -7,7 +7,7 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-accent-500 text-night-950 shadow-[0_16px_38px_-14px_rgba(25,224,138,0.65)] hover:bg-accent-400 ring-1 ring-accent-300/30",
+    "bg-accent-500 text-night-950 shadow-[0_16px_38px_-14px_rgba(255,138,61,0.65)] hover:bg-accent-400 ring-1 ring-accent-300/30",
   gold:
     "bg-gold-400 text-night-950 shadow-gold hover:bg-gold-300 ring-1 ring-gold-300/30",
   secondary:

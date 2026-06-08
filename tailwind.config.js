@@ -42,14 +42,15 @@ module.exports = {
           400: "#ff6fae",
           500: "#f63d8b",
         },
-        // Signature ACTION accent — a single vivid mint/green. Primary CTAs are
-        // a confident solid of this (no gradient), the way a music OS would do it.
+        // Signature ACTION accent — warm amber/copper, the colour of stage
+        // lighting and vinyl sleeves rather than another fintech mint. Primary
+        // CTAs are a confident solid of this (no gradient).
         accent: {
-          300: "#5cf0b3",
-          400: "#2fe79a",
-          500: "#19e08a",
-          600: "#10b870",
-          700: "#0c8f57",
+          300: "#ffcf99",
+          400: "#ffac5c",
+          500: "#ff8a3d",
+          600: "#e8630a",
+          700: "#b84d08",
         },
         // Dark neutral surface scale — the canvas the whole app sits on.
         night: {

@@ -11,7 +11,6 @@ import {
   Wallet,
   ChevronRight,
   Clock,
-  Sparkles,
   ArrowUpRight,
 } from "lucide-react";
 import { useApp, useMemberData } from "@/lib/store";
@@ -26,6 +25,8 @@ export default function DashboardScreen() {
   const { works, singles, albums, notifications, royalty } = useMemberData();
   const member = currentMember!;
   const completion = profileCompletion(member);
+  const hour = new Date().getHours();
+  const greeting = hour < 5 ? "Still up" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Late session";
 
   const catalog = [
     ...singles.map((s) => ({ id: s.id, title: s.title, sub: s.genre || "Single", status: s.status, kind: "Single", date: s.submittedAt })),
@@ -83,21 +84,14 @@ export default function DashboardScreen() {
         <div className="pointer-events-none absolute -left-16 -top-10 h-48 w-48 rounded-full bg-accent-500/15 blur-3xl" />
 
         <div className="relative flex items-start justify-between gap-4">
-          <div className="min-w-0 space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white backdrop-blur">
-              <Sparkles size={12} className="text-accent-400" />
-              Member portal
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-sm text-white/80">Good to see you</p>
-              <h1 className="mt-1 truncate font-display text-[2rem] font-bold leading-none tracking-tight sm:text-[2.15rem]">
-                {member.stageName || member.fullName}
-              </h1>
-              <p className="mt-2 max-w-[20rem] text-sm leading-relaxed text-white/85">
-                Your studio for declarations, submissions and royalties.
-              </p>
-            </div>
+          <div className="min-w-0">
+            <p className="text-sm text-white/70">{greeting},</p>
+            <h1 className="mt-0.5 truncate font-display text-[2.3rem] font-bold leading-[1.05] tracking-tight sm:text-[2.5rem]">
+              {member.stageName || member.fullName}
+            </h1>
+            <p className="mt-2 max-w-[20rem] text-sm leading-relaxed text-white/70">
+              Your studio for declarations, submissions and royalties.
+            </p>
           </div>
 
           <Link
@@ -319,7 +313,7 @@ export default function DashboardScreen() {
                 <span
                   className={
                     "mt-1 h-2.5 w-2.5 shrink-0 rounded-full " +
-                    (notification.read ? "bg-night-600" : "bg-accent-400 shadow-[0_0_10px_rgba(47,231,154,0.55)]")
+                    (notification.read ? "bg-night-600" : "bg-accent-400 shadow-[0_0_10px_rgba(255,172,92,0.55)]")
                   }
                 />
                 <div className="min-w-0 flex-1">
@@ -352,7 +346,7 @@ export default function DashboardScreen() {
           </div>
           <Link
             href={nextStep.href}
-            className="relative mt-4 inline-flex items-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 shadow-[0_14px_30px_-12px_rgba(25,224,138,0.6)] transition hover:bg-accent-400"
+            className="relative mt-4 inline-flex items-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 shadow-[0_14px_30px_-12px_rgba(255,138,61,0.6)] transition hover:bg-accent-400"
           >
             {nextStep.cta}
             <ChevronRight size={16} />

@@ -57,7 +57,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                 active(n.href, n.exact)
-                  ? "bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(25,224,138,0.6)]"
+                  ? "bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(255,138,61,0.6)]"
                   : "text-night-300 hover:bg-white/[0.05] hover:text-white"
               )}
             >
