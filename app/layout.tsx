@@ -1,13 +1,20 @@
 import React from "react";
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Manrope, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
 import { PWARegister } from "@/components/PWARegister";
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -20,7 +27,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "ZAMCOPS Member Portal",
   description:
-    "ZAMCOPS Artist Membership Portal — register works, submit songs and albums, track royalties and manage your membership with the Zambian Music Copyright Protection Society.",
+    "ZAMCOPS Artist Membership Portal - register works, submit songs and albums, track royalties and manage your membership with the Zambian Music Copyright Protection Society.",
   manifest: "/manifest.webmanifest",
   applicationName: "ZAMCOPS",
   appleWebApp: {
@@ -45,8 +52,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} h-full`}>
-      <body className="h-full font-sans antialiased">
+    <html lang="en" className={`${manrope.variable} ${cormorant.variable} ${jetbrainsMono.variable} h-full`}>
+      <body className="h-full bg-canvas font-sans text-ink antialiased">
         <AppProvider>{children}</AppProvider>
         <PWARegister />
       </body>

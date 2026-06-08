@@ -15,7 +15,7 @@ export function Logo({
   return (
     <div className="flex items-center gap-2.5">
       <span
-        className="grid shrink-0 place-items-center rounded-xl bg-brand-600 font-black text-white shadow-sm"
+        className="grid shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 font-black text-white shadow-fab ring-4 ring-white/70"
         style={{ width: size, height: size, fontSize: size * 0.42 }}
         aria-hidden
       >
@@ -25,7 +25,7 @@ export function Logo({
         <span className="leading-tight">
           <span
             className={cn(
-              "block text-sm font-extrabold tracking-tight",
+              "block font-display text-[0.98rem] font-bold tracking-[0.18em]",
               light ? "text-white" : "text-brand-800"
             )}
           >
@@ -33,7 +33,7 @@ export function Logo({
           </span>
           <span
             className={cn(
-              "block text-[9px] font-bold uppercase tracking-[0.18em]",
+              "block text-[9px] font-semibold uppercase tracking-[0.24em]",
               light ? "text-brand-100" : "text-gold-600"
             )}
           >

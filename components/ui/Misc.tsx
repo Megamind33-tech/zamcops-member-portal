@@ -3,11 +3,18 @@ import { cn } from "@/lib/format";
 
 export function ProgressBar({ value, className }: { value: number; className?: string }) {
   return (
-    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-slate-100", className)}>
+    <div
+      className={cn(
+        "h-2 w-full overflow-hidden rounded-full bg-brand-100/70 ring-1 ring-inset ring-brand-100",
+        className
+      )}
+    >
       <div
-        className="h-full rounded-full bg-gold-500 transition-all"
+        className="relative h-full rounded-full bg-gradient-to-r from-gold-400 via-gold-500 to-brand-500 shadow-glow transition-all"
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
-      />
+      >
+        <span className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.6),transparent)] opacity-70" />
+      </div>
     </div>
   );
 }
@@ -20,8 +27,11 @@ export function SectionTitle({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-2 flex items-center justify-between px-1">
-      <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">{title}</h2>
+    <div className="mb-3 flex items-end justify-between gap-3 px-1">
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold-600">Section</p>
+        <h2 className="font-display text-lg font-semibold tracking-tight text-brand-900">{title}</h2>
+      </div>
       {action}
     </div>
   );
@@ -39,15 +49,16 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="card flex flex-col items-center px-6 py-10 text-center">
+    <div className="card relative flex flex-col items-center overflow-hidden px-6 py-10 text-center">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(31,79,126,0.08),transparent_45%)]" />
       {icon && (
-        <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+        <div className="relative mb-4 grid h-14 w-14 place-items-center rounded-[1.25rem] bg-gradient-to-br from-brand-50 to-white text-brand-600 ring-1 ring-brand-100">
           {icon}
         </div>
       )}
-      <p className="text-sm font-semibold text-brand-800">{title}</p>
-      <p className="mt-1 max-w-xs text-xs text-slate-500">{message}</p>
-      {action && <div className="mt-4">{action}</div>}
+      <p className="relative text-sm font-semibold text-brand-900">{title}</p>
+      <p className="relative mt-1 max-w-xs text-xs text-slate-500">{message}</p>
+      {action && <div className="relative mt-5">{action}</div>}
     </div>
   );
 }

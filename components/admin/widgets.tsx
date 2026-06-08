@@ -16,7 +16,7 @@ export function AdminStat({
 }) {
   const tones: Record<string, string> = {
     brand: "bg-brand-50 text-brand-600",
-    gold: "bg-gold-500/15 text-gold-600",
+    gold: "bg-gold-500/10 text-gold-600",
     emerald: "bg-emerald-50 text-emerald-600",
     amber: "bg-amber-50 text-amber-600",
   };

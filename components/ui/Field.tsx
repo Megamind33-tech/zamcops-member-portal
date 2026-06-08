@@ -52,8 +52,8 @@ export function Select({
   );
 }
 
-// A touch-friendly faux file picker — records the chosen file name only (no
-// backend yet). Falls back to a sensible placeholder name when empty.
+// A touch-friendly faux file picker that records the chosen file name only.
+// The app does not upload binary files yet.
 export function FilePicker({
   label,
   accept,
@@ -69,11 +69,11 @@ export function FilePicker({
 }) {
   return (
     <Field label={label} hint={hint}>
-      <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-brand-200 bg-brand-50/40 px-4 py-3 text-sm transition hover:border-brand-400">
+      <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-dashed border-brand-200 bg-white/90 px-4 py-3 text-sm shadow-sm transition hover:border-brand-400 hover:bg-brand-50/40">
         <span className={cn("truncate", value ? "font-medium text-brand-800" : "text-slate-400")}>
           {value || "Tap to choose a file"}
         </span>
-        <span className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white">
+        <span className="shrink-0 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 px-3 py-1.5 text-xs font-semibold text-white">
           Browse
         </span>
         <input
