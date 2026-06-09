@@ -11,6 +11,8 @@ import {
   Disc3,
   FolderOpen,
   Wallet,
+  CalendarRange,
+  Handshake,
   BarChart3,
   LogOut,
   Smartphone,
@@ -27,6 +29,8 @@ const nav = [
   { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
   { href: "/admin/files", label: "Uploaded Files", icon: FolderOpen },
   { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
+  { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
+  { href: "/admin/licensing", label: "Licensing Desk", icon: Handshake },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
 ];
 
@@ -57,7 +61,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                 active(n.href, n.exact)
-                  ? "bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(25,224,138,0.6)]"
+                  ? "bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(255,138,61,0.6)]"
                   : "text-night-300 hover:bg-white/[0.05] hover:text-white"
               )}
             >

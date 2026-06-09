@@ -42,8 +42,8 @@ const styles: Record<
     kicker: "Review",
     ring: "ring-accent-400/30",
     fg: "text-accent-300",
-    glow: "rgba(25,224,138,0.32)",
-    wash: "rgba(25,224,138,0.07)",
+    glow: "rgba(255,138,61,0.32)",
+    wash: "rgba(255,138,61,0.07)",
   },
 };
 
@@ -98,7 +98,7 @@ export default function NotificationsScreen() {
                   <span className={cn("relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/[0.05] ring-1", s.ring, s.fg)}>
                     <Icon size={18} />
                     {!n.read && (
-                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 shadow-[0_0_8px_rgba(47,231,154,0.8)]" />
+                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 shadow-[0_0_8px_rgba(255,172,92,0.8)]" />
                     )}
                   </span>
                   <div className="relative min-w-0 flex-1">

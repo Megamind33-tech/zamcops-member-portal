@@ -28,7 +28,7 @@ export default function WorksScreen() {
         right={
           <Link
             href="/works/new"
-            className="grid h-9 w-9 place-items-center rounded-full bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(25,224,138,0.6)] ring-1 ring-accent-300/30"
+            className="grid h-9 w-9 place-items-center rounded-full bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(255,138,61,0.6)] ring-1 ring-accent-300/30"
             aria-label="Declare work"
           >
             <FilePlus2 size={17} />

@@ -11,21 +11,27 @@ import {
   Wallet,
   ChevronRight,
   Clock,
-  Sparkles,
+  CheckCircle2,
   ArrowUpRight,
+  Handshake,
 } from "lucide-react";
 import { useApp, useMemberData } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { SectionTitle } from "@/components/ui/Misc";
 import { CoverArt, coverGlow } from "@/components/media/CoverArt";
-import { formatKwacha, timeAgo, cn } from "@/lib/format";
+import { formatKwacha, formatDate, timeAgo, cn } from "@/lib/format";
 
 export default function DashboardScreen() {
   const { currentMember } = useApp();
-  const { works, singles, albums, notifications, royalty } = useMemberData();
+  const { works, singles, albums, notifications, distributions, licensableWorks } = useMemberData();
   const member = currentMember!;
   const completion = profileCompletion(member);
+  // Members only ever see CONFIRMED payouts — distributions[0] is the most recently published period.
+  const lastDistribution = distributions[0] ?? null;
+  const lifetimeDistributed = distributions.reduce((s, d) => s + d.amount, 0);
+  const hour = new Date().getHours();
+  const greeting = hour < 5 ? "Still up" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Late session";
 
   const catalog = [
     ...singles.map((s) => ({ id: s.id, title: s.title, sub: s.genre || "Single", status: s.status, kind: "Single", date: s.submittedAt })),
@@ -83,21 +89,14 @@ export default function DashboardScreen() {
         <div className="pointer-events-none absolute -left-16 -top-10 h-48 w-48 rounded-full bg-accent-500/15 blur-3xl" />
 
         <div className="relative flex items-start justify-between gap-4">
-          <div className="min-w-0 space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white backdrop-blur">
-              <Sparkles size={12} className="text-accent-400" />
-              Member portal
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-sm text-white/80">Good to see you</p>
-              <h1 className="mt-1 truncate font-display text-[2rem] font-bold leading-none tracking-tight sm:text-[2.15rem]">
-                {member.stageName || member.fullName}
-              </h1>
-              <p className="mt-2 max-w-[20rem] text-sm leading-relaxed text-white/85">
-                Your studio for declarations, submissions and royalties.
-              </p>
-            </div>
+          <div className="min-w-0">
+            <p className="text-sm text-white/70">{greeting},</p>
+            <h1 className="mt-0.5 truncate font-display text-[2.3rem] font-bold leading-[1.05] tracking-tight sm:text-[2.5rem]">
+              {member.stageName || member.fullName}
+            </h1>
+            <p className="mt-2 max-w-[20rem] text-sm leading-relaxed text-white/70">
+              Your studio for declarations, submissions and royalties.
+            </p>
           </div>
 
           <Link
@@ -146,21 +145,28 @@ export default function DashboardScreen() {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-white/70">
-                Royalty snapshot
+                Last distribution
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
-                {formatKwacha(royalty?.totalEstimated ?? 0)}
+                {lastDistribution ? formatKwacha(lastDistribution.amount, lastDistribution.currency) : "Awaiting first payout"}
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
-              Live
-            </span>
+            {lastDistribution ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200">
+                <CheckCircle2 size={12} />
+                {lastDistribution.periodLabel}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-night-300">
+                <Clock size={12} />
+                Pending
+              </span>
+            )}
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <MiniChip label="Estimated" value={formatKwacha(royalty?.totalEstimated ?? 0)} />
-            <MiniChip label="Pending" value={formatKwacha(royalty?.pending ?? 0)} />
-            <MiniChip label="Paid" value={formatKwacha(royalty?.paid ?? 0)} />
+            <MiniChip label="This period" value={lastDistribution ? formatKwacha(lastDistribution.amount, lastDistribution.currency) : "—"} />
+            <MiniChip label="Lifetime" value={formatKwacha(lifetimeDistributed)} />
+            <MiniChip label="Periods" value={String(distributions.length)} />
           </div>
         </div>
       </section>
@@ -242,6 +248,26 @@ export default function DashboardScreen() {
           </div>
         </section>
 
+        <Link
+          href="/licensing"
+          className="group card relative flex animate-fade-up items-center gap-4 overflow-hidden p-4"
+          style={{ animationDelay: "140ms" }}
+        >
+          <span className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-emerald-500/12 blur-3xl transition group-hover:bg-emerald-500/20" />
+          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-700 text-white ring-1 ring-white/15">
+            <Handshake size={20} />
+          </span>
+          <div className="relative min-w-0 flex-1">
+            <p className="text-sm font-bold text-white">Licensing &amp; sync pool</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-night-400">
+              {licensableWorks.length > 0
+                ? `${licensableWorks.length} work${licensableWorks.length === 1 ? "" : "s"} open to brand, film & ad enquiries — ZAMCOPS brokers every deal.`
+                : "Open your catalog to brand, film and ad licensing — ZAMCOPS brokers the deal and finds you new income."}
+            </p>
+          </div>
+          <ChevronRight size={16} className="relative shrink-0 text-night-400 transition group-hover:translate-x-0.5 group-hover:text-white" />
+        </Link>
+
         <section
           className="grain relative isolate overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-night-800/70 p-5 shadow-card backdrop-blur-xl animate-fade-up"
           style={{ animationDelay: "160ms" }}
@@ -252,12 +278,16 @@ export default function DashboardScreen() {
             <div className="min-w-0">
               <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.28em] text-accent-400">
                 <Wallet size={12} />
-                This quarter's earnings
+                Last distribution
               </p>
               <p className="mt-2 font-display text-[2.4rem] font-bold leading-none tracking-tight text-white">
-                {formatKwacha(royalty?.totalEstimated ?? 0)}
+                {lastDistribution ? formatKwacha(lastDistribution.amount, lastDistribution.currency) : formatKwacha(0)}
               </p>
-              <p className="mt-1.5 text-xs text-night-400">Estimated across all detected airplay and streams</p>
+              <p className="mt-1.5 text-xs text-night-400">
+                {lastDistribution
+                  ? `Confirmed payout for ${lastDistribution.periodLabel} · published ${formatDate(lastDistribution.publishedAt ?? lastDistribution.createdAt)}`
+                  : "Your confirmed payout appears here once ZAMCOPS publishes its next distribution"}
+              </p>
             </div>
             <Link
               href="/royalties"
@@ -268,31 +298,29 @@ export default function DashboardScreen() {
             </Link>
           </div>
 
-          {(() => {
-            const paid = royalty?.paid ?? 0;
-            const pending = royalty?.pending ?? 0;
-            const total = Math.max(paid + pending, 1);
-            return (
-              <div className="relative mt-5">
-                <div className="flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
-                  <span className="h-full bg-gradient-to-r from-accent-500 to-accent-300" style={{ width: `${(paid / total) * 100}%` }} />
-                  <span className="h-full bg-gradient-to-r from-gold-500/70 to-gold-400/70" style={{ width: `${(pending / total) * 100}%` }} />
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-accent-400" />
-                    <span className="text-xs text-night-300">Paid</span>
-                    <span className="font-display text-sm font-bold text-white">{formatKwacha(paid)}</span>
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-gold-400" />
-                    <span className="text-xs text-night-300">Pending</span>
-                    <span className="font-display text-sm font-bold text-white">{formatKwacha(pending)}</span>
-                  </span>
-                </div>
+          {lastDistribution ? (
+            <div className="relative mt-5">
+              <div className="flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
+                <span className="h-full w-full bg-gradient-to-r from-accent-500 to-accent-300" />
               </div>
-            );
-          })()}
+              <div className="mt-3 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-accent-400" />
+                  <span className="text-xs text-night-300">{lastDistribution.periodLabel}</span>
+                  <span className="font-display text-sm font-bold text-white">{formatKwacha(lastDistribution.amount, lastDistribution.currency)}</span>
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-gold-400" />
+                  <span className="text-xs text-night-300">Lifetime</span>
+                  <span className="font-display text-sm font-bold text-white">{formatKwacha(lifetimeDistributed)}</span>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="relative mt-5 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs leading-relaxed text-night-400">
+              ZAMCOPS confirms royalties at the end of each distribution period — your payout will land here, and we&apos;ll notify you, the moment it&apos;s published.
+            </p>
+          )}
         </section>
 
         <section className="animate-fade-up" style={{ animationDelay: "220ms" }}>
@@ -319,7 +347,7 @@ export default function DashboardScreen() {
                 <span
                   className={
                     "mt-1 h-2.5 w-2.5 shrink-0 rounded-full " +
-                    (notification.read ? "bg-night-600" : "bg-accent-400 shadow-[0_0_10px_rgba(47,231,154,0.55)]")
+                    (notification.read ? "bg-night-600" : "bg-accent-400 shadow-[0_0_10px_rgba(255,172,92,0.55)]")
                   }
                 />
                 <div className="min-w-0 flex-1">
@@ -352,7 +380,7 @@ export default function DashboardScreen() {
           </div>
           <Link
             href={nextStep.href}
-            className="relative mt-4 inline-flex items-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 shadow-[0_14px_30px_-12px_rgba(25,224,138,0.6)] transition hover:bg-accent-400"
+            className="relative mt-4 inline-flex items-center gap-2 rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 shadow-[0_14px_30px_-12px_rgba(255,138,61,0.6)] transition hover:bg-accent-400"
           >
             {nextStep.cta}
             <ChevronRight size={16} />

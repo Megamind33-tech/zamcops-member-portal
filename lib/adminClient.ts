@@ -8,7 +8,18 @@ import type {
   AlbumSubmission,
   UploadFile,
   RoyaltySummary,
+  Distribution,
+  DistributionEntry,
+  LicensableWork,
+  LicenseRequest,
+  LicenseRequestStatus,
 } from "@/types";
+
+// A distribution period as seen by admin staff — includes every member's entry,
+// published or not (members themselves only ever see published entries).
+export interface AdminDistribution extends Distribution {
+  entries: DistributionEntry[];
+}
 
 interface Overview {
   members: Member[];
@@ -17,6 +28,9 @@ interface Overview {
   albums: AlbumSubmission[];
   uploads: UploadFile[];
   royalty: RoyaltySummary[];
+  distributions: AdminDistribution[];
+  licensableWorks: LicensableWork[];
+  licenseRequests: LicenseRequest[];
 }
 
 const emptyOverview: Overview = {
@@ -26,7 +40,20 @@ const emptyOverview: Overview = {
   albums: [],
   uploads: [],
   royalty: [],
+  distributions: [],
+  licensableWorks: [],
+  licenseRequests: [],
 };
+
+async function postJSON(url: string, body: unknown, method = "POST") {
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  return { res, data };
+}
 
 // Fetches the admin overview and exposes a review-status mutator.
 export function useAdminData() {
@@ -55,5 +82,55 @@ export function useAdminData() {
     [load]
   );
 
-  return { ...data, loading, setReviewStatus, reload: load };
+  // Opens a new (draft) distribution period.
+  const createDistribution = useCallback(
+    async (payload: { periodLabel: string; notes?: string }) => {
+      const { res, data: d } = await postJSON("/api/admin/distributions", payload);
+      if (!res.ok) return { ok: false as const, error: d.error || "Could not create distribution period." };
+      await load();
+      return { ok: true as const, item: d.distribution as Distribution };
+    },
+    [load]
+  );
+
+  // Publishes (or reverts) a distribution — the gate that reveals payouts to members.
+  const setDistributionStatus = useCallback(
+    async (id: string, status: "Draft" | "Published") => {
+      await postJSON("/api/admin/distributions", { id, status }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
+  // Creates or updates a member's confirmed payout within a distribution period.
+  const saveDistributionEntry = useCallback(
+    async (payload: { distributionId: string; ownerId: string; amount: number; currency?: string }) => {
+      const { res, data: d } = await postJSON("/api/admin/distributions/entries", payload);
+      if (!res.ok) return { ok: false as const, error: d.error || "Could not save entry." };
+      await load();
+      return { ok: true as const };
+    },
+    [load]
+  );
+
+  // Moves an inbound licensing enquiry through the desk's pipeline, optionally
+  // attaching the negotiated fee figures.
+  const setLicenseRequestStatus = useCallback(
+    async (id: string, status: LicenseRequestStatus, fees?: { proposedFee?: number; facilitationFee?: number }) => {
+      await postJSON("/api/admin/licensing", { id, status, ...fees }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
+  return {
+    ...data,
+    loading,
+    setReviewStatus,
+    createDistribution,
+    setDistributionStatus,
+    saveDistributionEntry,
+    setLicenseRequestStatus,
+    reload: load,
+  };
 }

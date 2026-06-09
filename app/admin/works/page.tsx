@@ -46,7 +46,9 @@ export default function AdminWorksPage() {
                   <Td>{w.workType}</Td>
                   <Td>{nameFor(w.ownerId)}</Td>
                   <Td className="text-xs text-night-300">
-                    {w.ownershipSplits.map((s) => `${s.party} ${s.percentage}%`).join(", ")}
+                    {w.ownershipSplits
+                      .map((s) => `${s.party} ${s.percentage}%${s.ipiNumber ? ` · IPI ${s.ipiNumber}` : ""}`)
+                      .join(", ")}
                   </Td>
                   <Td className="text-night-300">{formatDate(w.submittedAt)}</Td>
                   <Td>

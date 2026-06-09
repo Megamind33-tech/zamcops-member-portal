@@ -42,14 +42,15 @@ module.exports = {
           400: "#ff6fae",
           500: "#f63d8b",
         },
-        // Signature ACTION accent — a single vivid mint/green. Primary CTAs are
-        // a confident solid of this (no gradient), the way a music OS would do it.
+        // Signature ACTION accent — warm amber/copper, the colour of stage
+        // lighting and vinyl sleeves rather than another fintech mint. Primary
+        // CTAs are a confident solid of this (no gradient).
         accent: {
-          300: "#5cf0b3",
-          400: "#2fe79a",
-          500: "#19e08a",
-          600: "#10b870",
-          700: "#0c8f57",
+          300: "#ffcf99",
+          400: "#ffac5c",
+          500: "#ff8a3d",
+          600: "#e8630a",
+          700: "#b84d08",
         },
         // Dark neutral surface scale — the canvas the whole app sits on.
         night: {
@@ -75,7 +76,15 @@ module.exports = {
         mono: ["var(--font-mono)", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 0 rgba(255,255,255,0.04) inset, 0 24px 50px -24px rgba(0,0,0,0.7)",
+        // Multi-layer elevation: inset top-edge highlight (overhead-light illusion) +
+        // close ambient + mid lift + deep atmospheric pool below the card.
+        card: [
+          "inset 0 1px 0 rgba(255,255,255,0.10)",
+          "0 2px 4px rgba(0,0,0,0.35)",
+          "0 12px 28px -4px rgba(0,0,0,0.55)",
+          "0 40px 72px -12px rgba(0,0,0,0.55)",
+          "0 72px 120px -24px rgba(0,0,0,0.40)",
+        ].join(", "),
         nav: "0 -1px 0 rgba(255,255,255,0.05) inset, 0 -16px 40px rgba(0,0,0,0.55)",
         fab: "0 14px 34px -8px rgba(84,96,248,0.6)",
         glow: "0 18px 52px -12px rgba(139,92,246,0.45)",

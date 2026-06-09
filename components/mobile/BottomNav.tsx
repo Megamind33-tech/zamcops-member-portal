@@ -31,7 +31,7 @@ export function BottomNav() {
         <Link
           href="/submit"
           aria-label="Submit song or declare work"
-          className="absolute -top-7 left-1/2 grid h-14 w-14 -translate-x-1/2 place-items-center rounded-full bg-accent-500 text-night-950 shadow-[0_18px_40px_-14px_rgba(25,224,138,0.65)] ring-[5px] ring-night-900 transition active:scale-95"
+          className="absolute -top-7 left-1/2 grid h-14 w-14 -translate-x-1/2 place-items-center rounded-full bg-accent-500 text-night-950 shadow-[0_18px_40px_-14px_rgba(255,138,61,0.65)] ring-[5px] ring-night-900 transition active:scale-95"
         >
           <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.5),transparent_55%)]" />
           <Plus size={26} strokeWidth={2.5} className="relative" />
@@ -76,7 +76,7 @@ function NavItem({
       >
         {active && (
           <span className="pointer-events-none absolute inset-x-1 -top-0.5 bottom-1.5 rounded-2xl bg-accent-500/12 ring-1 ring-accent-400/25">
-            <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_50%_30%,rgba(25,224,138,0.28),transparent_70%)]" />
+            <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_50%_30%,rgba(255,138,61,0.28),transparent_70%)]" />
           </span>
         )}
         <Icon size={21} strokeWidth={active ? 2.3 : 1.9} className="relative" />
@@ -86,7 +86,7 @@ function NavItem({
         <span
           className={cn(
             "relative h-1 w-1 rounded-full transition",
-            active ? "bg-accent-400 shadow-[0_0_8px_rgba(47,231,154,0.8)]" : "bg-transparent"
+            active ? "bg-accent-400 shadow-[0_0_8px_rgba(255,172,92,0.8)]" : "bg-transparent"
           )}
         />
       </Link>

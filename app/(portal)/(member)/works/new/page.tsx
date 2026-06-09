@@ -29,6 +29,7 @@ export default function WorkDeclarationScreen() {
     authors: "",
     producers: "",
     publisher: "",
+    publisherIpi: "",
     isrc: "",
     iswc: "",
     dateCreated: "",
@@ -60,6 +61,7 @@ export default function WorkDeclarationScreen() {
       authors: list(form.authors),
       producers: list(form.producers),
       publisher: form.publisher,
+      publisherIpi: form.publisherIpi,
       ownershipSplits: splits,
       isrc: form.isrc,
       iswc: form.iswc,
@@ -139,9 +141,14 @@ export default function WorkDeclarationScreen() {
           <Field label="Producer(s)">
             <TextInput placeholder="Name 1, Name 2" value={form.producers} onChange={set("producers")} />
           </Field>
-          <Field label="Publisher">
-            <TextInput placeholder="e.g. Self-Published" value={form.publisher} onChange={set("publisher")} />
-          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Publisher">
+              <TextInput placeholder="e.g. Self-Published" value={form.publisher} onChange={set("publisher")} />
+            </Field>
+            <Field label="Publisher IPI / CAE" hint="For cross-society registration">
+              <TextInput placeholder="00000000000" value={form.publisherIpi} onChange={set("publisherIpi")} />
+            </Field>
+          </div>
         </Section>
 
         <Section title="Ownership splits" subtitle="Must total 100%">

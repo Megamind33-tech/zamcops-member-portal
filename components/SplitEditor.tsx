@@ -3,7 +3,7 @@
 import React from "react";
 import { Plus, Trash2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { TextInput, Select } from "@/components/ui/Field";
-import type { OwnershipSplit, ContributorRole } from "@/types";
+import type { OwnershipSplit, ContributorRole, RightsType } from "@/types";
 import { uid } from "@/lib/format";
 
 const ROLES: ContributorRole[] = [
@@ -14,6 +14,8 @@ const ROLES: ContributorRole[] = [
   "Publisher",
   "Arranger",
 ];
+
+const RIGHTS_TYPES: RightsType[] = ["Performing", "Mechanical", "Both"];
 
 // Editable list of ownership splits with a live total / 100% validity check.
 export function SplitEditor({
@@ -77,6 +79,27 @@ export function SplitEditor({
               <span className="pointer-events-none absolute right-3 top-2.5 text-sm text-night-400">%</span>
             </div>
           </div>
+          {/* Reciprocal-society registration fields — IPI cross-references this rights holder
+              across CISAC societies; rights type tells the society which royalty stream the share covers. */}
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <TextInput
+              className="px-3 py-2 text-sm"
+              placeholder="IPI / CAE number"
+              value={s.ipiNumber ?? ""}
+              onChange={(e) => update(s.id, { ipiNumber: e.target.value })}
+            />
+            <Select
+              className="px-3 py-2 text-sm"
+              value={s.rightsType ?? "Both"}
+              onChange={(e) => update(s.id, { rightsType: e.target.value as RightsType })}
+            >
+              {RIGHTS_TYPES.map((r) => (
+                <option key={r} value={r}>
+                  {r} rights
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
       ))}
 
@@ -100,6 +123,11 @@ export function SplitEditor({
       </div>
       {!compact && !valid && (
         <p className="text-[11px] text-gold-300">Ownership splits must add up to exactly 100%.</p>
+      )}
+      {!compact && (
+        <p className="text-[11px] text-night-400">
+          IPI/CAE numbers cross-reference a rights holder across reciprocal societies; rights type tells ZAMCOPS which royalty stream (performing or mechanical) the share applies to — both are optional but speed up international registration.
+        </p>
       )}
     </div>
   );

@@ -16,24 +16,26 @@ body {
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
   background-color: #05050c;
+  /* Three-orb composition: brand indigo (top-left studio light), iris violet
+     (top-right energy), warm gold (bottom warmth — stage glow / royalty value). */
   background-image:
-    radial-gradient(55% 45% at 6% -4%, rgba(84, 96, 248, 0.18), transparent 60%),
-    radial-gradient(50% 40% at 100% 2%, rgba(25, 224, 138, 0.1), transparent 58%);
+    radial-gradient(62% 52% at 5% -2%, rgba(84, 96, 248, 0.26) 0%, transparent 64%),
+    radial-gradient(44% 38% at 97% 5%, rgba(139, 92, 246, 0.14) 0%, transparent 55%),
+    radial-gradient(54% 46% at 80% 106%, rgba(245, 166, 35, 0.12) 0%, transparent 58%);
 }
 
-/* Subtle grid / grain so the dark surface never feels flat. */
+/* Concentric sound-ring pattern — vinyl record grooves / PRO frequency bands.
+   Far more on-brand than a developer crosshatch; immediately reads "music". */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 34px 34px;
-  mask-image: radial-gradient(circle at 50% 30%, rgba(0, 0, 0, 0.7), transparent 78%);
-  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Ccircle cx='120' cy='120' r='30' fill='none' stroke='white' stroke-width='0.5' opacity='0.10'/%3E%3Ccircle cx='120' cy='120' r='60' fill='none' stroke='white' stroke-width='0.5' opacity='0.075'/%3E%3Ccircle cx='120' cy='120' r='90' fill='none' stroke='white' stroke-width='0.5' opacity='0.055'/%3E%3Ccircle cx='120' cy='120' r='116' fill='none' stroke='white' stroke-width='0.5' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  mask-image: radial-gradient(ellipse 88% 60% at 50% 18%, rgba(0, 0, 0, 0.65) 0%, transparent 80%);
+  opacity: 0.55;
 }
 
 /* Film-grain overlay — a subtle tactile noise that lifts the dark surface
@@ -54,9 +56,18 @@ body::after {
 .app-frame {
   position: relative;
   isolation: isolate;
+  /* Hero zone is lighter-purple (brand presence at the top); deepens to near-black
+     through the content area; faint amber warmth bleeds in from the bottom
+     (stage light / royalty gold). */
   background:
-    linear-gradient(180deg, rgba(20, 22, 39, 0.72), rgba(11, 13, 26, 0.92)),
-    radial-gradient(120% 60% at 50% -10%, rgba(84, 96, 248, 0.16), transparent 60%);
+    linear-gradient(
+      180deg,
+      rgba(22, 24, 50, 0.82) 0%,
+      rgba(14, 15, 28, 0.88) 42%,
+      rgba(10, 12, 22, 0.95) 100%
+    ),
+    radial-gradient(118% 58% at 50% -8%, rgba(84, 96, 248, 0.22) 0%, transparent 60%),
+    radial-gradient(62% 34% at 92% 102%, rgba(245, 166, 35, 0.08) 0%, transparent 50%);
   min-height: 100dvh;
 }
 
@@ -93,14 +104,23 @@ body::after {
            placeholder:text-night-400 focus:border-accent-400/70 focus:bg-white/[0.06] focus:ring-4 focus:ring-accent-500/20;
   }
 
-  /* Default surface: a frosted dark glass panel with a hairline edge. */
+  /* Default surface — a dark material card with genuine physical elevation.
+     The gradient mimics overhead lighting (lighter at top, deeper at bottom);
+     the multi-layer shadow in tailwind.config gives the "floating panel" look
+     from the reference. */
   .card {
-    @apply rounded-[1.5rem] border border-white/[0.08] bg-night-800/70 shadow-card backdrop-blur-xl;
+    @apply rounded-[1.5rem] border border-white/[0.11] shadow-card backdrop-blur-xl;
+    background: linear-gradient(
+      158deg,
+      rgba(32, 36, 58, 0.94) 0%,
+      rgba(15, 17, 30, 0.97) 100%
+    );
   }
 
   /* A slightly brighter surface for nested / elevated elements. */
   .card-raised {
-    @apply rounded-[1.25rem] border border-white/[0.08] bg-white/[0.04];
+    @apply rounded-[1.25rem] border border-white/[0.09];
+    background: rgba(255, 255, 255, 0.045);
   }
 
   /* Faint photographic grain over dark surfaces — the difference between a

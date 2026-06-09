@@ -8,6 +8,10 @@ import {
   albumDTO,
   uploadDTO,
   royaltyDTO,
+  distributionDTO,
+  distributionEntryDTO,
+  licensableWorkDTO,
+  licenseRequestDTO,
 } from "@/lib/serialize";
 
 export const runtime = "nodejs";
@@ -16,14 +20,18 @@ export async function GET() {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
 
-  const [members, works, singles, albums, uploads, royalty] = await Promise.all([
-    prisma.member.findMany({ orderBy: { joinedAt: "desc" } }),
-    prisma.workDeclaration.findMany({ orderBy: { submittedAt: "desc" } }),
-    prisma.songSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
-    prisma.albumSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
-    prisma.uploadFile.findMany({ orderBy: { uploadedAt: "desc" } }),
-    prisma.royaltySummary.findMany(),
-  ]);
+  const [members, works, singles, albums, uploads, royalty, distributions, licensableWorks, licenseRequests] =
+    await Promise.all([
+      prisma.member.findMany({ orderBy: { joinedAt: "desc" } }),
+      prisma.workDeclaration.findMany({ orderBy: { submittedAt: "desc" } }),
+      prisma.songSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
+      prisma.albumSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
+      prisma.uploadFile.findMany({ orderBy: { uploadedAt: "desc" } }),
+      prisma.royaltySummary.findMany(),
+      prisma.distribution.findMany({ include: { entries: true }, orderBy: { createdAt: "desc" } }),
+      prisma.licensableWork.findMany({ orderBy: { createdAt: "desc" } }),
+      prisma.licenseRequest.findMany({ orderBy: { createdAt: "desc" } }),
+    ]);
 
   return json({
     members: members.map(memberDTO),
@@ -32,5 +40,8 @@ export async function GET() {
     albums: albums.map(albumDTO),
     uploads: uploads.map(uploadDTO),
     royalty: royalty.map((r) => royaltyDTO(r, r.ownerId)),
+    distributions: distributions.map((d) => ({ ...distributionDTO(d), entries: d.entries.map(distributionEntryDTO) })),
+    licensableWorks: licensableWorks.map(licensableWorkDTO),
+    licenseRequests: licenseRequests.map(licenseRequestDTO),
   });
 }

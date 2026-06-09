@@ -23,6 +23,7 @@ export default function SingleSubmissionScreen() {
     producer: "",
     genre: "Afro-Pop",
     releaseDate: "",
+    isrc: "",
     audioFile: "",
     coverArt: "",
     lyricsFile: "",
@@ -51,6 +52,7 @@ export default function SingleSubmissionScreen() {
       producer: form.producer,
       genre: form.genre,
       releaseDate: form.releaseDate,
+      isrc: form.isrc,
       audioFile: form.audioFile,
       coverArt: form.coverArt,
       lyricsFile: form.lyricsFile,
@@ -102,9 +104,14 @@ export default function SingleSubmissionScreen() {
               </Select>
             </Field>
           </div>
-          <Field label="Release date">
-            <TextInput type="date" value={form.releaseDate} onChange={set("releaseDate")} />
-          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Release date">
+              <TextInput type="date" value={form.releaseDate} onChange={set("releaseDate")} />
+            </Field>
+            <Field label="ISRC" hint="Recording identifier, if known">
+              <TextInput placeholder="ZM-A01-26-…" value={form.isrc} onChange={set("isrc")} />
+            </Field>
+          </div>
         </Section>
 
         <Section title="Files">

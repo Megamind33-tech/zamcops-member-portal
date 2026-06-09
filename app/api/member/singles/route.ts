@@ -32,6 +32,7 @@ export async function POST(req: Request) {
       audioFile: b.audioFile ?? "",
       coverArt: b.coverArt ?? "",
       lyricsFile: b.lyricsFile ?? "",
+      isrc: b.isrc ?? "",
       ownershipSplits: JSON.stringify(splits),
     },
   });
