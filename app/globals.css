@@ -93,14 +93,23 @@ body::after {
            placeholder:text-night-400 focus:border-accent-400/70 focus:bg-white/[0.06] focus:ring-4 focus:ring-accent-500/20;
   }
 
-  /* Default surface: a frosted dark glass panel with a hairline edge. */
+  /* Default surface — a dark material card with genuine physical elevation.
+     The gradient mimics overhead lighting (lighter at top, deeper at bottom);
+     the multi-layer shadow in tailwind.config gives the "floating panel" look
+     from the reference. */
   .card {
-    @apply rounded-[1.5rem] border border-white/[0.08] bg-night-800/70 shadow-card backdrop-blur-xl;
+    @apply rounded-[1.5rem] border border-white/[0.11] shadow-card backdrop-blur-xl;
+    background: linear-gradient(
+      158deg,
+      rgba(32, 36, 58, 0.94) 0%,
+      rgba(15, 17, 30, 0.97) 100%
+    );
   }
 
   /* A slightly brighter surface for nested / elevated elements. */
   .card-raised {
-    @apply rounded-[1.25rem] border border-white/[0.08] bg-white/[0.04];
+    @apply rounded-[1.25rem] border border-white/[0.09];
+    background: rgba(255, 255, 255, 0.045);
   }
 
   /* Faint photographic grain over dark surfaces — the difference between a
