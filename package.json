@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "predev": "prisma db push --skip-generate",
     "dev": "next dev",
+    "prebuild": "prisma db push --skip-generate",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

@@ -26,10 +26,12 @@ The app has two clearly-separated areas:
 ## Run locally
 
 ```bash
-npm install          # also runs `prisma generate`
-npm run db:push      # create the SQLite database from the schema
-npm run dev          # http://localhost:3000
+npm install      # also runs `prisma generate`
+npm run dev      # creates the SQLite DB if needed, then starts http://localhost:3000
 ```
+
+No `.env` is required — the app runs with sensible defaults. `npm run dev` (and
+`npm run build`) automatically create the local SQLite database from the schema.
 
 Build for production:
 
@@ -37,14 +39,13 @@ Build for production:
 npm run build && npm start
 ```
 
-### Environment
+### Environment (optional)
 
-Copy `.env.example` to `.env` and adjust as needed:
+Copy `.env.example` to `.env` to override defaults:
 
-- `DATABASE_URL` — defaults to a local SQLite file (`file:./dev.db`).
-- `AUTH_SECRET` — secret used to sign session tokens.
+- `AUTH_SECRET` — secret used to sign session tokens (set this in production).
 - `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` — the staff account, created
-  automatically on first admin sign-in.
+  automatically on first admin sign-in (defaults: `admin@zamcops.org.zm` / `admin123`).
 
 ## Accounts
 
