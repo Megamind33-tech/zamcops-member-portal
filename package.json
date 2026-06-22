@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && (prisma db push --skip-generate || echo 'db push skipped (database not reachable at install time)')",
     "db:push": "prisma db push",
     "db:studio": "prisma studio"
   },
