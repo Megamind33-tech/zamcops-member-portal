@@ -1,16 +1,16 @@
-// ZAMCOPS Member Portal — database schema
-// Prototype uses SQLite for a self-contained, runnable backend. To deploy on a
-// hosted database, change `provider` to "postgresql" and set DATABASE_URL.
+// ZAMCOPS Member Portal — database schema (PostgreSQL).
+// DATABASE_URL is the pooled connection used at runtime; DIRECT_URL is the
+// direct (non-pooled) connection used for migrations / `prisma db push`.
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
-  // Local-file SQLite so the app runs with zero config. For a hosted deploy,
-  // change provider to "postgresql" and use url = env("DATABASE_URL").
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // Staff accounts for the admin dashboard (separate from members).
