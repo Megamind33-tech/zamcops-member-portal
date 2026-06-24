@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, ReceiptText, FileText, Wallet } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { EmptyState } from "@/components/ui/Misc";
-import { Illustration } from "@/components/media/Illustration";
+import { Download, ReceiptText, FileText, Wallet, Eye } from "lucide-react";
 import { useApp, useMemberData } from "@/lib/store";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card } from "@/components/zam/Card";
+import { Button } from "@/components/zam/Button";
+import { EmptyState } from "@/components/zam/Misc";
 import { formatDate, formatKwacha } from "@/lib/format";
 import type { Statement, StatementType } from "@/types";
 
@@ -52,60 +53,65 @@ export default function StatementsScreen() {
   };
 
   return (
-    <div>
-      <TopBar title="Statements & Receipts" back="/dashboard" />
+    <div className="space-y-6">
+      <PageHeader title="Statements & Receipts" subtitle="Receipts and statements for your membership, submissions and royalties." />
 
-      <div className="px-4 py-4">
-        <div className="no-scrollbar -mx-1 mb-4 flex gap-2 overflow-x-auto px-1">
-          {tabs.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={
-                "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (tab === t ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
-              }
-            >
-              {t === "All" ? "All" : t.replace(" Receipt", "").replace(" Statement", "")}
-            </button>
-          ))}
-        </div>
+      <div className="inline-flex flex-wrap gap-1 rounded-2xl border border-zam-line bg-white p-1">
+        {tabs.map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={
+              "rounded-xl px-3.5 py-2 text-sm font-semibold transition-colors " +
+              (tab === t ? "bg-zam-orange text-white" : "text-zam-muted hover:text-zam-ink")
+            }
+          >
+            {t === "All" ? "All" : t.replace(" Receipt", "").replace(" Statement", "")}
+          </button>
+        ))}
+      </div>
 
-        {shown.length === 0 ? (
+      {shown.length === 0 ? (
+        <Card>
           <EmptyState
-            art={<Illustration name="vinyl" />}
+            icon={<ReceiptText size={28} />}
             title="No documents yet"
-            message="Receipts and statements are generated as you register, submit and earn royalties."
+            description="Receipts and statements are generated as you register, submit and earn royalties."
           />
-        ) : (
-          <div className="space-y-3">
+        </Card>
+      ) : (
+        <Card>
+          <div className="divide-y divide-zam-line">
             {shown.map((s) => {
               const Icon = icon[s.type];
               return (
-                <div key={s.id} className="card flex items-center gap-3 px-4 py-3.5">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
-                    <Icon size={18} />
+                <div key={s.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-zam-orange-soft text-zam-orange">
+                    <Icon size={20} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-white">{s.title}</p>
-                    <p className="truncate text-xs text-night-400">
-                      {s.reference} · {formatDate(s.issuedAt)}
-                      {s.amount != null ? ` · ${formatKwacha(s.amount)}` : ""}
+                    <p className="truncate font-semibold text-zam-ink">{s.title}</p>
+                    <p className="mt-0.5 truncate text-sm text-zam-muted">
+                      Ref <span className="font-mono">{s.reference}</span> · {formatDate(s.issuedAt)}
                     </p>
                   </div>
-                  <button
-                    onClick={() => download(s)}
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10 hover:bg-white/[0.1]"
-                    aria-label="Download"
-                  >
-                    <Download size={16} />
-                  </button>
+                  {s.amount != null && (
+                    <p className="font-display text-lg font-bold text-zam-ink sm:text-right">{formatKwacha(s.amount)}</p>
+                  )}
+                  <div className="flex shrink-0 gap-2">
+                    <Button variant="secondary" size="sm" icon={<Eye size={15} />} onClick={() => download(s)}>
+                      View
+                    </Button>
+                    <Button variant="ghost" size="sm" icon={<Download size={15} />} onClick={() => download(s)}>
+                      PDF
+                    </Button>
+                  </div>
                 </div>
               );
             })}
           </div>
-        )}
-      </div>
+        </Card>
+      )}
     </div>
   );
 }

@@ -2,74 +2,79 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { AtSign, MailCheck, ArrowLeft, ArrowRight } from "lucide-react";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { AuthScreen, AuthHeading } from "@/components/auth/AuthScreen";
+import { MailCheck, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/zam/Button";
+import { Field, Input } from "@/components/zam/Input";
+import { Logo } from "@/components/ui/Logo";
 
 export default function ForgotPasswordScreen() {
   const [sent, setSent] = useState(false);
   const [contact, setContact] = useState("");
 
   return (
-    <AuthScreen
-      photo="piano"
-      topRight={
-        <Link href="/login" className="inline-flex items-center gap-1 text-[13px] font-semibold text-white/70 transition hover:text-white">
-          <ArrowLeft size={16} /> Back to sign in
-        </Link>
-      }
-    >
-      {sent ? (
-        <>
-          <div className="grid h-16 w-16 place-items-center rounded-[1.25rem] border border-accent-400/20 bg-accent-500/12 text-accent-300">
-            <MailCheck size={32} />
+    <div className="min-h-screen flex items-center justify-center bg-zam-canvas p-6">
+      <div className="w-full max-w-sm">
+        <div className="flex justify-center mb-6">
+          <div className="bg-white rounded-2xl px-4 py-3 inline-flex shadow-card">
+            <Logo size={30} onDark={false} />
           </div>
-          <AuthHeading
-            kicker="Account help"
-            title={<>Check your<br />inbox</>}
-          />
-          <p className="mt-3 max-w-[19rem] text-[15px] leading-relaxed text-white/70">
-            If an account exists for{" "}
-            <span className="font-semibold text-accent-400">{contact}</span>,
-            we&apos;ve sent password reset instructions.
-          </p>
-          <ButtonLink href="/login" block size="lg" className="mt-7 h-[58px] rounded-[18px] text-[16px]">
-            Return to sign in <ArrowRight size={18} />
-          </ButtonLink>
-        </>
-      ) : (
-        <>
-          <AuthHeading
-            kicker="Account help"
-            title={<>Reset<br />access</>}
-            sub="Enter the phone or email linked to your membership and we'll send reset instructions."
-          />
+        </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSent(true);
-            }}
-            className="mt-7"
-          >
-            <div className="glass-group">
-              <div className="glass-field">
-                <AtSign size={17} className="shrink-0 text-white/55" />
-                <input
-                  className="w-full bg-transparent outline-none placeholder:text-white/45"
-                  placeholder="you@email.com or +260…"
-                  value={contact}
-                  onChange={(e) => setContact(e.target.value)}
-                />
+        <div className="bg-white border border-zam-line rounded-3xl shadow-card p-7">
+          {sent ? (
+            <div className="text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zam-green-soft text-zam-green">
+                <MailCheck size={26} />
               </div>
+              <h1 className="mt-5 font-display font-bold text-2xl text-zam-ink">Check your inbox</h1>
+              <p className="mt-2 text-sm text-zam-muted">
+                If an account exists for{" "}
+                <span className="font-semibold text-zam-ink">{contact}</span>, we&apos;ve sent password reset instructions.
+              </p>
+              <Link
+                href="/login"
+                className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
+              >
+                <ArrowLeft size={16} /> Back to sign in
+              </Link>
             </div>
+          ) : (
+            <>
+              <h1 className="font-display font-bold text-2xl text-zam-ink">Reset your password</h1>
+              <p className="mt-1 text-sm text-zam-muted">
+                Enter the phone or email linked to your membership and we&apos;ll send reset instructions.
+              </p>
 
-            <Button type="submit" block size="lg" className="mt-5 h-[58px] rounded-[18px] text-[16px]" disabled={!contact}>
-              Send reset link <ArrowRight size={18} />
-            </Button>
-          </form>
-        </>
-      )}
-    </AuthScreen>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setSent(true);
+                }}
+                className="mt-6 space-y-4"
+              >
+                <Field label="Phone or email" required>
+                  <Input
+                    placeholder="you@email.com or +260…"
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                  />
+                </Field>
+
+                <Button type="submit" className="w-full" disabled={!contact}>
+                  Send reset link
+                </Button>
+              </form>
+
+              <Link
+                href="/login"
+                className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
+              >
+                <ArrowLeft size={16} /> Back to sign in
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

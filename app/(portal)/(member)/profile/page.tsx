@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Save, CheckCircle2, IdCard, MapPin, Wallet, Users, FileUp } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
-import { ProgressBar } from "@/components/ui/Misc";
+import { toast } from "sonner";
+import { User, MapPin, Banknote, Users, FileUp, Camera } from "lucide-react";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card, CardHeader } from "@/components/zam/Card";
+import { Field, Input, Select } from "@/components/zam/Input";
+import { Button } from "@/components/zam/Button";
+import { Progress, Avatar } from "@/components/zam/Misc";
+import { FilePicker } from "@/components/zam/FilePicker";
 import { useApp } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
 import { ZM_PROVINCES } from "@/data/reference";
@@ -15,51 +18,84 @@ export default function ProfileScreen() {
   const { currentMember, updateProfile } = useApp();
   const member = currentMember!;
   const [form, setForm] = useState<Member>(member);
-  const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const set = (k: keyof Member) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
-  const setFile = (k: keyof Member) => (name: string) => setForm((f) => ({ ...f, [k]: name }));
+  const setFile = (k: keyof Member) => (name: string | undefined) => setForm((f) => ({ ...f, [k]: name }));
 
   const completion = profileCompletion(form);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBusy(true);
     const res = await updateProfile(form);
-    if (res.ok) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    setBusy(false);
+    if (res.ok) toast.success("Profile updated successfully.");
+    else toast.error(res.error || "Could not save profile.");
   };
 
   return (
-    <div>
-      <TopBar title="Profile & KYC" subtitle={member.memberNumber} back="/dashboard" />
+    <form onSubmit={save}>
+      <PageHeader
+        title="Profile & KYC"
+        subtitle="Keep your details up to date so ZAMCOPS can pay you correctly."
+        action={
+          <Button type="submit" loading={busy}>
+            Save changes
+          </Button>
+        }
+      />
 
-      <div className="px-4 py-4">
-        <div className="card mb-4 px-4 py-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-white">KYC completion</span>
-            <span className="text-sm font-bold text-accent-400">{completion}%</span>
+      {/* Completion meter */}
+      <Card className="mb-6 p-5">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Avatar name={form.fullName} size={64} />
+            <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-zam-orange text-white">
+              <Camera className="h-3.5 w-3.5" />
+            </span>
           </div>
-          <ProgressBar value={completion} className="mt-3" />
+          <div className="flex-1">
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-sm font-semibold text-zam-ink">Profile completion</span>
+              <span className="text-sm font-bold text-zam-orange">{completion}%</span>
+            </div>
+            <Progress value={completion} tone={completion === 100 ? "green" : "orange"} />
+            <p className="mt-1.5 text-xs text-zam-muted">
+              {completion === 100
+                ? "Your profile is complete — you're ready to receive payouts."
+                : "Complete all sections to unlock royalty payouts."}
+            </p>
+          </div>
         </div>
+      </Card>
 
-        <form onSubmit={save} className="space-y-5">
-          <Section icon={<IdCard size={15} />} title="Identity">
-            <Field label="Full name" required>
-              <TextInput value={form.fullName} onChange={set("fullName")} />
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        {/* Identity */}
+        <Card>
+          <CardHeader
+            title={
+              <span className="flex items-center gap-2">
+                <User className="h-4 w-4 text-zam-orange" /> Identity
+              </span>
+            }
+          />
+          <div className="space-y-4 p-5">
+            <Field label="Full legal name" required>
+              <Input value={form.fullName} onChange={set("fullName")} />
             </Field>
-            <Field label="Stage name">
-              <TextInput value={form.stageName} onChange={set("stageName")} />
-            </Field>
-            <Field label="NRC / passport">
-              <TextInput value={form.nrcOrPassport} onChange={set("nrcOrPassport")} />
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Stage name">
+                <Input value={form.stageName} onChange={set("stageName")} />
+              </Field>
+              <Field label="NRC / Passport">
+                <Input value={form.nrcOrPassport} onChange={set("nrcOrPassport")} />
+              </Field>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Date of birth">
-                <TextInput type="date" value={form.dateOfBirth ?? ""} onChange={set("dateOfBirth")} />
+                <Input type="date" value={form.dateOfBirth ?? ""} onChange={set("dateOfBirth")} />
               </Field>
               <Field label="Gender">
                 <Select value={form.gender ?? ""} onChange={set("gender")}>
@@ -70,18 +106,28 @@ export default function ProfileScreen() {
                 </Select>
               </Field>
             </div>
-          </Section>
+          </div>
+        </Card>
 
-          <Section icon={<MapPin size={15} />} title="Contact & location">
-            <div className="grid grid-cols-2 gap-3">
+        {/* Contact & location */}
+        <Card>
+          <CardHeader
+            title={
+              <span className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-zam-orange" /> Contact &amp; location
+              </span>
+            }
+          />
+          <div className="space-y-4 p-5">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Phone">
-                <TextInput type="tel" value={form.phone} onChange={set("phone")} />
+                <Input type="tel" value={form.phone} onChange={set("phone")} />
               </Field>
               <Field label="Email">
-                <TextInput type="email" value={form.email} onChange={set("email")} />
+                <Input type="email" value={form.email} onChange={set("email")} />
               </Field>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Province">
                 <Select value={form.province ?? ""} onChange={set("province")}>
                   <option value="">Select…</option>
@@ -91,87 +137,94 @@ export default function ProfileScreen() {
                 </Select>
               </Field>
               <Field label="District">
-                <TextInput value={form.district ?? ""} onChange={set("district")} />
+                <Input value={form.district ?? ""} onChange={set("district")} />
               </Field>
             </div>
             <Field label="Residential address">
-              <TextInput value={form.address ?? ""} onChange={set("address")} />
+              <Input value={form.address ?? ""} onChange={set("address")} />
             </Field>
-          </Section>
+          </div>
+        </Card>
 
-          <Section icon={<Wallet size={15} />} title="Payout details">
-            <div className="grid grid-cols-2 gap-3">
+        {/* Payout */}
+        <Card>
+          <CardHeader
+            title={
+              <span className="flex items-center gap-2">
+                <Banknote className="h-4 w-4 text-zam-orange" /> Payout details
+              </span>
+            }
+            description="Where ZAMCOPS sends your royalties"
+          />
+          <div className="space-y-4 p-5">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Bank name">
-                <TextInput value={form.bankName ?? ""} onChange={set("bankName")} />
+                <Input value={form.bankName ?? ""} onChange={set("bankName")} />
               </Field>
               <Field label="Bank account">
-                <TextInput value={form.bankAccount ?? ""} onChange={set("bankAccount")} />
+                <Input value={form.bankAccount ?? ""} onChange={set("bankAccount")} />
               </Field>
             </div>
             <Field label="Mobile money number">
-              <TextInput type="tel" value={form.mobileMoneyNumber ?? ""} onChange={set("mobileMoneyNumber")} />
+              <Input type="tel" value={form.mobileMoneyNumber ?? ""} onChange={set("mobileMoneyNumber")} placeholder="+260 …" />
             </Field>
-          </Section>
+          </div>
+        </Card>
 
-          <Section icon={<Users size={15} />} title="Next of kin">
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Full name">
-                <TextInput value={form.nextOfKinName ?? ""} onChange={set("nextOfKinName")} />
-              </Field>
-              <Field label="Phone">
-                <TextInput type="tel" value={form.nextOfKinPhone ?? ""} onChange={set("nextOfKinPhone")} />
-              </Field>
-            </div>
-          </Section>
+        {/* Next of kin */}
+        <Card>
+          <CardHeader
+            title={
+              <span className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-zam-orange" /> Next of kin
+              </span>
+            }
+            description="Beneficiary / representative"
+          />
+          <div className="grid gap-4 p-5 sm:grid-cols-2">
+            <Field label="Full name">
+              <Input value={form.nextOfKinName ?? ""} onChange={set("nextOfKinName")} />
+            </Field>
+            <Field label="Phone">
+              <Input type="tel" value={form.nextOfKinPhone ?? ""} onChange={set("nextOfKinPhone")} />
+            </Field>
+          </div>
+        </Card>
 
-          <Section icon={<FileUp size={15} />} title="Documents">
+        {/* Documents */}
+        <Card className="lg:col-span-2">
+          <CardHeader
+            title={
+              <span className="flex items-center gap-2">
+                <FileUp className="h-4 w-4 text-zam-orange" /> Document uploads
+              </span>
+            }
+            description="Required for KYC verification"
+          />
+          <div className="grid gap-3 p-5 sm:grid-cols-2">
             <FilePicker
-              label="Upload NRC / passport"
-              accept="image/*,application/pdf"
+              label="NRC / Passport copy"
+              hint="PDF or image"
+              kind="document"
               value={form.nrcDocument}
-              onPick={setFile("nrcDocument")}
+              onChange={setFile("nrcDocument")}
             />
             <FilePicker
-              label="Upload profile photo"
-              accept="image/*"
+              label="Profile photo"
+              hint="Clear headshot"
+              kind="image"
               value={form.profilePhoto}
-              onPick={setFile("profilePhoto")}
+              onChange={setFile("profilePhoto")}
             />
-          </Section>
-
-          <Button type="submit" block size="lg">
-            <Save size={18} /> Save profile
-          </Button>
-        </form>
+          </div>
+        </Card>
       </div>
 
-      {saved && (
-        <div className="fixed inset-x-0 bottom-24 z-40 mx-auto flex max-w-app justify-center px-4">
-          <span className="flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-glow">
-            <CheckCircle2 size={16} /> Profile saved
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Section({
-  icon,
-  title,
-  children,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="card px-4 py-4">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">{icon}</span>
-        <h3 className="text-sm font-bold text-white">{title}</h3>
+      <div className="mt-6 flex justify-end">
+        <Button type="submit" size="lg" loading={busy}>
+          Save changes
+        </Button>
       </div>
-      <div className="space-y-3">{children}</div>
-    </section>
+    </form>
   );
 }

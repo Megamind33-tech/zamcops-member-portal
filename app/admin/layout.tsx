@@ -20,8 +20,8 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 
   if (authed === null || authed === false) {
     return (
-      <div className="grid min-h-[100dvh] place-items-center bg-night-950">
-        <span className="h-7 w-7 animate-spin rounded-full border-2 border-white/15 border-t-brand-400" />
+      <div className="admin-surface grid place-items-center">
+        <span className="h-7 w-7 animate-spin rounded-full border-2 border-zam-line border-t-zam-orange" />
       </div>
     );
   }

@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AtSign, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { AuthScreen, AuthHeading } from "@/components/auth/AuthScreen";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, ShieldCheck, Music, Coins } from "lucide-react";
+import { Button } from "@/components/zam/Button";
+import { Field, Input } from "@/components/zam/Input";
+import { Logo } from "@/components/ui/Logo";
 import { useApp } from "@/lib/store";
 
 export default function LoginScreen() {
@@ -28,74 +30,127 @@ export default function LoginScreen() {
   };
 
   return (
-    <AuthScreen photo="auth-mic" position="center 32%">
-      <AuthHeading kicker="Member access" title={<>Welcome<br />back</>} sub="Pick up your declarations, submissions and royalties." />
-
-      <form onSubmit={submit} className="mt-7">
-        <div className="glass-group">
-          <div className="glass-field">
-            <AtSign size={17} className="shrink-0 text-white/55" />
-            <input
-              className="w-full bg-transparent outline-none placeholder:text-white/45"
-              placeholder="you@email.com or +260…"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              autoComplete="username"
-            />
-          </div>
-          <div className="glass-field">
-            <Lock size={17} className="shrink-0 text-white/55" />
-            <input
-              className="w-full bg-transparent outline-none placeholder:text-white/45"
-              type={show ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-            <button
-              type="button"
-              onClick={() => setShow((s) => !s)}
-              className="shrink-0 text-white/55 transition hover:text-white"
-              aria-label={show ? "Hide password" : "Show password"}
-            >
-              {show ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
+    <div className="min-h-screen grid lg:grid-cols-2 bg-zam-canvas">
+      {/* Brand panel */}
+      <div className="hidden lg:flex flex-col justify-between bg-zam-ink text-white p-12 relative overflow-hidden">
+        <div className="relative z-10">
+          <div className="bg-white rounded-2xl px-4 py-3 inline-flex shadow-card-lg">
+            <Logo size={30} onDark={false} />
           </div>
         </div>
 
-        <div className="mt-3 flex justify-end">
-          <Link href="/forgot-password" className="text-[13px] font-semibold text-white/70 transition hover:text-white">
-            Forgot password?
-          </Link>
-        </div>
-
-        {error && (
-          <p className="mt-3 rounded-2xl border border-red-400/25 bg-red-500/15 px-3 py-2.5 text-[13px] font-medium text-red-200 backdrop-blur">
-            {error}
+        <div className="relative z-10 max-w-md">
+          <h2 className="font-display font-bold text-3xl leading-tight">
+            Protecting Zambian music, one work at a time.
+          </h2>
+          <p className="mt-4 text-white/70 leading-relaxed">
+            Your home for declarations, submissions and royalties as a ZAMCOPS member.
           </p>
-        )}
 
-        <Button type="submit" block size="lg" className="mt-5 h-[58px] rounded-[18px] text-[16px]" disabled={busy}>
-          {busy ? "Signing in…" : "Sign in"} <ArrowRight size={18} />
-        </Button>
-      </form>
+          <div className="mt-8 space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-zam-orange">
+                <ShieldCheck size={20} />
+              </span>
+              <span className="text-sm text-white/85">Official copyright registration &amp; protection</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-zam-orange">
+                <Music size={20} />
+              </span>
+              <span className="text-sm text-white/85">Declare works, singles and albums</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-zam-orange">
+                <Coins size={20} />
+              </span>
+              <span className="text-sm text-white/85">Track royalties from radio &amp; TV across Zambia</span>
+            </div>
+          </div>
+        </div>
 
-      <p className="mt-6 text-center text-[14px] text-white/65">
-        New here?{" "}
-        <Link href="/register" className="font-bold text-accent-400">
-          Create an account
-        </Link>
-      </p>
+        <p className="relative z-10 text-xs text-white/50">
+          © 2026 Zambian Music Copyright Protection Society
+        </p>
 
-      <p className="mt-3 text-center">
-        <Link
-          href="/admin/login"
-          className="text-[12px] font-medium text-white/40 underline-offset-4 transition hover:text-white/75 hover:underline"
+        {/* Decorative circles */}
+        <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full border-[32px] border-zam-orange/20" />
+        <div className="pointer-events-none absolute bottom-10 right-10 h-40 w-40 rounded-full border-[20px] border-zam-orange/30" />
+      </div>
+
+      {/* Form panel */}
+      <div className="flex items-center justify-center p-6 sm:p-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-sm"
         >
-          ZAMCOPS staff sign-in
-        </Link>
-      </p>
-    </AuthScreen>
+          <div className="lg:hidden flex justify-center mb-8">
+            <div className="bg-white rounded-2xl px-4 py-3 inline-flex shadow-card">
+              <Logo size={30} onDark={false} />
+            </div>
+          </div>
+
+          <h1 className="font-display font-bold text-2xl text-zam-ink">Welcome back</h1>
+          <p className="mt-1 text-sm text-zam-muted">Sign in to your member portal.</p>
+
+          <form onSubmit={submit} className="mt-7 space-y-4">
+            <Field label="Phone or email" required>
+              <Input
+                placeholder="you@email.com or +260…"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                autoComplete="username"
+              />
+            </Field>
+
+            <Field label="Password" required>
+              <div className="relative">
+                <Input
+                  type={show ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  className="pr-11"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShow((s) => !s)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zam-muted transition hover:text-zam-ink"
+                  aria-label={show ? "Hide password" : "Show password"}
+                >
+                  {show ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </Field>
+
+            {error && <p className="text-sm text-zam-red">{error}</p>}
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-zam-muted">
+                <input type="checkbox" className="h-4 w-4 rounded border-zam-line text-zam-orange focus:ring-zam-orange/40" />
+                Remember me
+              </label>
+              <Link href="/forgot-password" className="text-sm font-semibold text-zam-orange hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+
+            <Button type="submit" className="w-full" loading={busy}>
+              Sign in
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-zam-muted">
+            New to ZAMCOPS?{" "}
+            <Link href="/register" className="font-semibold text-zam-orange hover:underline">
+              Create an account
+            </Link>
+          </p>
+        </motion.div>
+      </div>
+    </div>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import { FilePlus2, Clock } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { EmptyState } from "@/components/ui/Misc";
-import { ButtonLink } from "@/components/ui/Button";
-import { CoverArt } from "@/components/media/CoverArt";
-import { Illustration } from "@/components/media/Illustration";
+import { FilePlus2, Music } from "lucide-react";
 import { useMemberData } from "@/lib/store";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card } from "@/components/zam/Card";
+import { Button } from "@/components/zam/Button";
+import { StatusBadge } from "@/components/zam/StatusBadge";
+import { FilterChips } from "@/components/zam/FilterChips";
+import { SearchInput, EmptyState } from "@/components/zam/Misc";
+import { TableShell, Th, Td, Tr } from "@/components/zam/Table";
 import { formatDate } from "@/lib/format";
 import type { ReviewStatus } from "@/types";
 
@@ -18,81 +19,123 @@ const filters: ("All" | ReviewStatus)[] = ["All", "Pending", "Approved", "Reject
 export default function WorksScreen() {
   const { works } = useMemberData();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
-  const shown = works.filter((w) => filter === "All" || w.status === filter);
+  const [query, setQuery] = useState("");
+
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return works.filter((w) => {
+      const matchFilter = filter === "All" || w.status === filter;
+      const matchQuery =
+        !q ||
+        w.title.toLowerCase().includes(q) ||
+        (w.genre ?? "").toLowerCase().includes(q) ||
+        (w.isrc ?? "").toLowerCase().includes(q);
+      return matchFilter && matchQuery;
+    });
+  }, [works, filter, query]);
+
+  const chips = filters.map((f) => ({
+    label: f,
+    value: f,
+    count: f === "All" ? works.length : works.filter((w) => w.status === f).length,
+  }));
 
   return (
-    <div>
-      <TopBar
+    <div className="space-y-6">
+      <PageHeader
         title="My Works"
         subtitle={`${works.length} declared`}
-        right={
-          <Link
-            href="/works/new"
-            className="grid h-9 w-9 place-items-center rounded-full bg-accent-500 text-night-950 shadow-[0_14px_30px_-12px_rgba(255,138,61,0.6)] ring-1 ring-accent-300/30"
-            aria-label="Declare work"
-          >
-            <FilePlus2 size={17} />
+        action={
+          <Link href="/works/new">
+            <Button icon={<FilePlus2 size={16} />}>Declare a work</Button>
           </Link>
         }
       />
 
-      <div className="px-4 py-4">
-        <div className="no-scrollbar -mx-1 mb-4 flex gap-2 overflow-x-auto px-1">
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={
-                "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (filter === f ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:bg-white/[0.1]")
-              }
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <FilterChips chips={chips} active={filter} onChange={(v) => setFilter(v as (typeof filters)[number])} />
+        <SearchInput
+          placeholder="Search title, genre, ISRC…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="sm:w-72"
+        />
+      </div>
 
-        {shown.length === 0 ? (
+      {shown.length === 0 ? (
+        <Card>
           <EmptyState
-            art={<Illustration name="works" />}
+            icon={<Music size={28} />}
             title="No work declarations"
-            message="Declare a musical work to record its copyright ownership and splits."
+            description="Declare a musical work to record its copyright ownership and splits."
             action={
-              <ButtonLink href="/works/new" size="sm">
-                <FilePlus2 size={16} /> Declare a work
-              </ButtonLink>
+              <Link href="/works/new">
+                <Button size="sm" icon={<FilePlus2 size={16} />}>
+                  Declare a work
+                </Button>
+              </Link>
             }
           />
-        ) : (
-          <div className="space-y-3">
+        </Card>
+      ) : (
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block">
+            <TableShell>
+              <thead>
+                <Tr>
+                  <Th>Title</Th>
+                  <Th>Type</Th>
+                  <Th>Genre</Th>
+                  <Th>Splits</Th>
+                  <Th>ISRC</Th>
+                  <Th>Created</Th>
+                  <Th>Status</Th>
+                </Tr>
+              </thead>
+              <tbody>
+                {shown.map((w) => (
+                  <Tr key={w.id}>
+                    <Td className="font-semibold text-zam-ink">{w.title}</Td>
+                    <Td className="text-zam-muted">{w.workType}</Td>
+                    <Td className="text-zam-muted">{w.genre}</Td>
+                    <Td className="text-zam-muted">{w.ownershipSplits.length}</Td>
+                    <Td className="font-mono text-xs text-zam-muted">{w.isrc || "—"}</Td>
+                    <Td className="text-zam-muted">{formatDate(w.submittedAt)}</Td>
+                    <Td>
+                      <StatusBadge status={w.status} />
+                    </Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </TableShell>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="space-y-3 md:hidden">
             {shown.map((w) => (
-              <div key={w.id} className="card px-4 py-3.5">
+              <Card key={w.id} className="p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-start gap-3">
-                    <CoverArt seed={w.title} size={44} rounded="rounded-xl" />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-white">{w.title}</p>
-                      <p className="truncate text-xs text-night-300">
-                        {w.workType} · {w.genre} · {w.language}
-                      </p>
-                    </div>
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-zam-ink">{w.title}</p>
+                    <p className="mt-0.5 truncate text-sm text-zam-muted">
+                      {w.workType} · {w.genre} · {w.language}
+                    </p>
                   </div>
                   <StatusBadge status={w.status} />
                 </div>
-                <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5 text-[11px] text-night-400">
-                  <span className="inline-flex items-center gap-1">
-                    <Clock size={12} /> {formatDate(w.submittedAt)}
-                  </span>
+                <div className="mt-3 flex items-center justify-between border-t border-zam-line pt-2.5 text-xs text-zam-muted">
+                  <span>{formatDate(w.submittedAt)}</span>
                   <span>
                     {w.ownershipSplits.length} split{w.ownershipSplits.length === 1 ? "" : "s"}
                     {w.isrc ? ` · ISRC ${w.isrc}` : ""}
                   </span>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }

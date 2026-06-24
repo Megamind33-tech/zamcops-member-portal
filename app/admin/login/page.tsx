@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, LogIn } from "lucide-react";
+import { ShieldCheck, LogIn, ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
-import { Button } from "@/components/ui/Button";
-import { Field, TextInput } from "@/components/ui/Field";
 import { useAdminAuth } from "@/lib/adminAuth";
 
 export default function AdminLoginScreen() {
@@ -27,31 +26,66 @@ export default function AdminLoginScreen() {
   };
 
   return (
-    <div className="relative grid min-h-[100dvh] place-items-center overflow-hidden bg-night-950 px-4">
-      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-600/30 blur-[100px]" />
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-iris-500/25 blur-[100px]" />
-      <div className="card relative w-full max-w-sm p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <Logo size={40} subtitle="Staff Console" />
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-500/15 text-brand-200 ring-1 ring-brand-400/20">
-            <ShieldCheck size={20} />
+    <div className="relative grid min-h-[100dvh] place-items-center overflow-hidden bg-zam-ink px-4">
+      <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full border-[40px] border-zam-orange/10" />
+      <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full border-[28px] border-zam-orange/10" />
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="mb-6 flex justify-center">
+          <span className="inline-flex rounded-2xl bg-white px-4 py-3 shadow-lg">
+            <Logo size={34} onDark={false} />
           </span>
         </div>
-        <h1 className="font-display text-lg font-bold text-white">Staff sign in</h1>
-        <p className="mt-1 text-sm text-night-300">Review applications, submissions and royalties.</p>
+        <div className="card-lite relative overflow-hidden p-7">
+          <div className="zam-flagline absolute inset-x-0 top-0 rounded-none" />
+          <div className="mb-1 flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-zam-ink text-white">
+              <ShieldCheck size={16} />
+            </span>
+            <h1 className="font-display text-xl font-bold text-zam-ink">Staff Console</h1>
+          </div>
+          <p className="mb-6 text-sm text-zam-muted">Sign in to the ZAMCOPS administration dashboard.</p>
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          <Field label="Staff email" required>
-            <TextInput type="email" placeholder="admin@zamcops.org.zm" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </Field>
-          <Field label="Password" required>
-            <TextInput type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </Field>
-          {error && <p className="rounded-lg border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>}
-          <Button type="submit" block size="lg" disabled={busy}>
-            <LogIn size={18} /> {busy ? "Signing in…" : "Sign in"}
-          </Button>
+        <form onSubmit={submit} className="space-y-4">
+          <label className="block">
+            <span className="field-label-lite">Staff email <span className="text-zam-red">*</span></span>
+            <input
+              type="email"
+              className="field-input-lite"
+              placeholder="admin@zamcops.org.zm"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <label className="block">
+            <span className="field-label-lite">Password <span className="text-zam-red">*</span></span>
+            <input
+              type="password"
+              className="field-input-lite"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          {error && (
+            <p className="rounded-lg border border-zam-red/20 bg-zam-red/10 px-3 py-2 text-xs font-medium text-zam-red">{error}</p>
+          )}
+          <button
+            type="submit"
+            disabled={busy}
+            className="brand-gradient-zam inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-white shadow-[0_16px_38px_-14px_rgba(242,108,33,0.65)] transition hover:opacity-95 disabled:opacity-50"
+          >
+            <LogIn size={18} /> {busy ? "Signing in…" : "Sign in to console"}
+          </button>
         </form>
+
+          <Link
+            href="/login"
+            className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-zam-muted transition hover:text-zam-ink"
+          >
+            <ArrowLeft size={16} /> Back to member portal
+          </Link>
+        </div>
+        <p className="mt-6 text-center text-xs text-white/40">Authorised personnel only · ZAMCOPS © 2026</p>
       </div>
     </div>
   );
