@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check, X, Ban, RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { Check, X, Ban, RotateCcw, Download, ChevronRight } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { formatDate, initials } from "@/lib/format";
+import { downloadMembers } from "@/lib/export";
 import type { Member } from "@/types";
 
 export default function AdminMembersPage() {
@@ -34,17 +36,31 @@ export default function AdminMembersPage() {
         title="Member Applications"
         subtitle={`${members.length} registered · ${pendingCount} pending review`}
         right={
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search members…"
-            className="field-input h-10 w-56"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search members…"
+              className="field-input h-10 w-48"
+            />
+            <button
+              onClick={() => downloadMembers(shown, "csv")}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-white/[0.06] px-3 text-xs font-semibold text-night-200 ring-1 ring-white/10 hover:text-white"
+            >
+              <Download size={14} /> CSV
+            </button>
+            <button
+              onClick={() => downloadMembers(shown, "xls")}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-white/[0.06] px-3 text-xs font-semibold text-night-200 ring-1 ring-white/10 hover:text-white"
+            >
+              <Download size={14} /> Excel
+            </button>
+          </div>
         }
       />
       <Panel title="Members">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[860px]">
+          <table className="w-full min-w-[900px]">
             <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Member</Th>
@@ -60,15 +76,16 @@ export default function AdminMembersPage() {
               {shown.map((m) => (
                 <tr key={m.id} className="hover:bg-white/[0.03]">
                   <Td>
-                    <div className="flex items-center gap-3">
+                    <Link href={`/admin/members/${m.id}`} className="group flex items-center gap-3">
                       <span className="grid h-9 w-9 place-items-center rounded-full bg-accent-500 text-xs font-bold text-night-950">
                         {initials(m.stageName || m.fullName)}
                       </span>
                       <div>
-                        <p className="font-semibold text-white">{m.fullName}</p>
-                        <p className="text-xs text-night-300">{m.stageName}</p>
+                        <p className="font-semibold text-white group-hover:text-accent-300">{m.fullName}</p>
+                        <p className="text-xs text-night-300">{m.stageName || "—"}</p>
                       </div>
-                    </div>
+                      <ChevronRight size={15} className="text-night-500 opacity-0 transition group-hover:opacity-100" />
+                    </Link>
                   </Td>
                   <Td className="font-mono text-xs">{m.memberNumber}</Td>
                   <Td>{m.role}</Td>

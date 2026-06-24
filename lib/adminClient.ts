@@ -13,6 +13,7 @@ import type {
   LicensableWork,
   LicenseRequest,
   LicenseRequestStatus,
+  MemberDocument,
 } from "@/types";
 
 // A distribution period as seen by admin staff — includes every member's entry,
@@ -31,6 +32,7 @@ interface Overview {
   distributions: AdminDistribution[];
   licensableWorks: LicensableWork[];
   licenseRequests: LicenseRequest[];
+  memberDocuments: MemberDocument[];
 }
 
 const emptyOverview: Overview = {
@@ -43,6 +45,7 @@ const emptyOverview: Overview = {
   distributions: [],
   licensableWorks: [],
   licenseRequests: [],
+  memberDocuments: [],
 };
 
 async function postJSON(url: string, body: unknown, method = "POST") {
@@ -86,6 +89,25 @@ export function useAdminData() {
   const setMemberStatus = useCallback(
     async (id: string, status: string) => {
       await postJSON("/api/admin/members", { id, status }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
+  // Attach an official document (clearance letter, deed of assignment, etc.).
+  const attachDocument = useCallback(
+    async (payload: { ownerId: string; docType: string; fileName: string; reference?: string; note?: string }) => {
+      const { res, data: d } = await postJSON("/api/admin/member-documents", payload);
+      if (!res.ok) return { ok: false as const, error: d.error || "Could not attach document." };
+      await load();
+      return { ok: true as const };
+    },
+    [load]
+  );
+
+  const removeDocument = useCallback(
+    async (id: string) => {
+      await postJSON("/api/admin/member-documents", { id }, "DELETE");
       await load();
     },
     [load]
@@ -137,6 +159,8 @@ export function useAdminData() {
     loading,
     setReviewStatus,
     setMemberStatus,
+    attachDocument,
+    removeDocument,
     createDistribution,
     setDistributionStatus,
     saveDistributionEntry,
