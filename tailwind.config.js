@@ -69,6 +69,22 @@ module.exports = {
         },
         ink: "#f5f6fb",
         canvas: "#0b0d1a",
+        // ZAMCOPS "zam" institutional light palette (ported from the Magic
+        // Patterns design). Zambian-flag colour family — eagle orange + red +
+        // green over clean paper. Used by the staff console and brand flourishes.
+        zam: {
+          orange: "#F26C21",
+          "orange-dark": "#D85A14",
+          "orange-soft": "#FEF1E8",
+          red: "#E2342B",
+          green: "#2BA45A",
+          amber: "#F5A623",
+          blue: "#2F6FED",
+          ink: "#1A1D21",
+          muted: "#5A6470",
+          line: "#E7E9ED",
+          canvas: "#F6F7F9",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

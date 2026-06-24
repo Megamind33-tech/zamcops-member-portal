@@ -158,3 +158,170 @@ body::after {
            placeholder:text-white/45;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   ZAMCOPS brand flourishes + the "zam" light design system (ported from the
+   Magic Patterns reference). These power the staff console and any surface
+   that should read distinctly ZAMCOPS rather than generic.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* The signature Zambian-flag flagline — eagle orange, red, neutral, green. */
+.zam-flagline {
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #f26c21 0 28%,
+    #e2342b 28% 52%,
+    #c9ceda 52% 74%,
+    #2ba45a 74% 100%
+  );
+}
+
+/* Same flagline tuned for dark surfaces (neutral band brightened). */
+.zam-flagline-dark {
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #f26c21 0 28%,
+    #e2342b 28% 52%,
+    rgba(255, 255, 255, 0.55) 52% 74%,
+    #2ba45a 74% 100%
+  );
+}
+
+/* Warm ZAMCOPS orange gradient — brand mark, active nav tiles, primary CTAs. */
+.brand-gradient-zam {
+  background-image: linear-gradient(135deg, #f26c21, #d85a14);
+}
+
+/* Orange→red text gradient for hero numerals / headings. */
+.text-gradient-zam {
+  background-image: linear-gradient(120deg, #f26c21, #e2342b 75%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Subtle dotted texture for dark brand headers in the light theme. */
+.ink-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* A clean, opaque light canvas that lifts above the dark body textures.
+   The staff console and admin auth sit inside this. */
+.admin-surface {
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+  min-height: 100dvh;
+  background-color: #f6f7f9;
+  color: #1a1d21;
+}
+
+@layer components {
+  /* Light material card — the default staff-console surface. */
+  .card-lite {
+    @apply rounded-2xl border border-zam-line bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_24px_-12px_rgba(16,24,40,0.12)];
+  }
+
+  .field-label-lite {
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em] text-zam-muted;
+  }
+
+  /* Light input used across the staff console. */
+  .field-input-lite {
+    @apply w-full rounded-xl border border-zam-line bg-white px-3.5 py-2.5 text-sm text-zam-ink outline-none transition
+           placeholder:text-zam-muted/60 focus:border-zam-orange focus:ring-4 focus:ring-zam-orange/15;
+  }
+}
+
+/* Scoped light overrides: any shared primitive (card / field / selection)
+   rendered inside the staff console inherits the light treatment automatically,
+   so the member app's dark styling is untouched. Higher specificity wins. */
+.admin-surface .card {
+  border-color: #e7e9ed;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
+  backdrop-filter: none;
+}
+.admin-surface .card-raised {
+  border-color: #e7e9ed;
+  background: #f6f7f9;
+}
+.admin-surface .field-label {
+  color: #5a6470;
+}
+.admin-surface .field-input {
+  border-color: #e7e9ed;
+  background: #ffffff;
+  color: #1a1d21;
+}
+.admin-surface .field-input::placeholder {
+  color: rgba(90, 100, 112, 0.6);
+}
+.admin-surface .field-input:focus {
+  border-color: #f26c21;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(242, 108, 33, 0.15);
+}
+.admin-surface .pill {
+  border-color: #e7e9ed;
+  background: #f6f7f9;
+  color: #1a1d21;
+}
+.admin-surface ::selection {
+  background: rgba(242, 108, 33, 0.22);
+  color: #1a1d21;
+}
+
+/* Neutralise the dark utility classes used inside the staff pages so the
+   existing markup renders on the light "zam" canvas. Unlayered → wins over
+   Tailwind's layered utilities. The member app (outside .admin-surface) keeps
+   its dark styling untouched. */
+.admin-surface .text-white,
+.admin-surface .text-night-100,
+.admin-surface .text-night-200 { color: #1a1d21; }
+.admin-surface .text-night-300 { color: #5a6470; }
+.admin-surface .text-night-400 { color: #6a7382; }
+.admin-surface .text-night-500 { color: #98a2b3; }
+.admin-surface .hover\:text-white:hover { color: #1a1d21; }
+
+.admin-surface .text-accent-300,
+.admin-surface .text-accent-400,
+.admin-surface .hover\:text-accent-300:hover { color: #f26c21; }
+.admin-surface .text-brand-200 { color: #2f6fed; }
+.admin-surface .text-emerald-300 { color: #2ba45a; }
+.admin-surface .text-red-300,
+.admin-surface .hover\:text-red-300:hover { color: #e2342b; }
+.admin-surface .text-gold-300,
+.admin-surface .text-gold-400 { color: #b8791a; }
+
+.admin-surface .bg-night-950,
+.admin-surface .bg-night-900,
+.admin-surface .bg-night-850,
+.admin-surface .bg-night-900\/80,
+.admin-surface .bg-white\/\[0\.03\],
+.admin-surface .bg-white\/\[0\.04\],
+.admin-surface .bg-white\/\[0\.05\],
+.admin-surface .bg-white\/\[0\.06\],
+.admin-surface .bg-white\/\[0\.07\],
+.admin-surface .bg-white\/\[0\.08\] { background-color: #f6f7f9; }
+.admin-surface .hover\:bg-white\/\[0\.03\]:hover,
+.admin-surface .hover\:bg-white\/\[0\.06\]:hover,
+.admin-surface .hover\:bg-white\/\[0\.1\]:hover,
+.admin-surface .hover\:bg-white\/\[0\.12\]:hover { background-color: #eef0f3; }
+
+.admin-surface .border-white\/10,
+.admin-surface .border-white\/15,
+.admin-surface .border-white\/\[0\.07\],
+.admin-surface .border-white\/\[0\.08\],
+.admin-surface .border-white\/\[0\.09\],
+.admin-surface .border-white\/\[0\.11\] { border-color: #e7e9ed; }
+.admin-surface .ring-white\/10,
+.admin-surface .ring-white\/\[0\.06\],
+.admin-surface .ring-white\/\[0\.07\] { --tw-ring-color: #e7e9ed; }
+.admin-surface .divide-white\/\[0\.06\] > :not([hidden]) ~ :not([hidden]),
+.admin-surface .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-color: #e7e9ed; }

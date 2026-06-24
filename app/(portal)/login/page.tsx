@@ -87,15 +87,6 @@ export default function LoginScreen() {
           Create an account
         </Link>
       </p>
-
-      <p className="mt-3 text-center">
-        <Link
-          href="/admin/login"
-          className="text-[12px] font-medium text-white/40 underline-offset-4 transition hover:text-white/75 hover:underline"
-        >
-          ZAMCOPS staff sign-in
-        </Link>
-      </p>
     </AuthScreen>
   );
 }
