@@ -3,9 +3,9 @@
 import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { useAdminAuth } from "@/lib/adminAuth";
+import { AdminAuthProvider, useAdminAuth } from "@/lib/adminAuth";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { authed } = useAdminAuth();
@@ -27,4 +27,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return <AdminShell>{children}</AdminShell>;
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  // The provider wraps both the login page and the guard so a successful login
+  // updates the same auth state the guard reads — no stale bounce.
+  return (
+    <AdminAuthProvider>
+      <AdminGuard>{children}</AdminGuard>
+    </AdminAuthProvider>
+  );
 }
