@@ -1,16 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { Send } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
-import { SplitEditor, splitsValid } from "@/components/SplitEditor";
-import { SubmitSuccess } from "@/components/SubmitSuccess";
+import Link from "next/link";
+import { ArrowLeft, Send } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card, CardHeader } from "@/components/zam/Card";
+import { Button } from "@/components/zam/Button";
+import { Field, Input, Select } from "@/components/zam/Input";
+import { SplitsEditor } from "@/components/zam/SplitsEditor";
+import { FilePicker } from "@/components/zam/FilePicker";
+import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES } from "@/data/reference";
 import { uid } from "@/lib/format";
 import type { OwnershipSplit } from "@/types";
+
+const splitsValid = (splits: OwnershipSplit[]) =>
+  splits.length > 0 && splits.reduce((sum, s) => sum + (Number(s.percentage) || 0), 0) === 100;
 
 export default function SingleSubmissionScreen() {
   const { addSingle, currentMember } = useApp();
@@ -34,9 +41,12 @@ export default function SingleSubmissionScreen() {
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
-  const setFile = (k: keyof typeof form) => (name: string) => setForm((f) => ({ ...f, [k]: name }));
+  const setFile = (k: keyof typeof form) => (name: string | undefined) =>
+    setForm((f) => ({ ...f, [k]: name ?? "" }));
 
   const [busy, setBusy] = useState(false);
+
+  const valid = form.title.trim() !== "" && !!form.audioFile && splitsValid(splits);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,99 +69,121 @@ export default function SingleSubmissionScreen() {
       ownershipSplits: splits,
     });
     setBusy(false);
-    if (res.ok && res.item) setDone({ ref: `SR-S-${res.item.id.slice(-5).toUpperCase()}`, title: res.item.title });
-    else setError(res.error || "Could not submit single.");
+    if (res.ok && res.item) {
+      toast.success("Single submitted");
+      setDone({ ref: `SR-S-${res.item.id.slice(-5).toUpperCase()}`, title: res.item.title });
+    } else {
+      setError(res.error || "Could not submit single.");
+    }
   };
 
   if (done) {
-    return (
-      <>
-        <TopBar title="Single submitted" back="/dashboard" />
-        <SubmitSuccess
-          title="Single submitted"
-          message={`“${done.title}” has been submitted and is pending review.`}
-          reference={done.ref}
-          primaryHref="/uploads"
-          primaryLabel="Track submission"
-        />
-      </>
-    );
+    return <SubmitSuccess title={done.title} kind="Single Submission" reference={done.ref} primaryTo="/uploads" />;
   }
 
   return (
     <div>
-      <TopBar title="Submit a Single" back="/submit" />
-      <form onSubmit={submit} className="space-y-5 px-4 py-4">
-        <Section title="Song details">
-          <Field label="Song title" required>
-            <TextInput placeholder="e.g. Night Drive" value={form.title} onChange={set("title")} />
-          </Field>
-          <Field label="Artist name" required>
-            <TextInput value={form.artistName} onChange={set("artistName")} />
-          </Field>
-          <Field label="Featured artists">
-            <TextInput placeholder="e.g. Wezi" value={form.featuredArtists} onChange={set("featuredArtists")} />
-          </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Producer">
-              <TextInput value={form.producer} onChange={set("producer")} />
-            </Field>
-            <Field label="Genre">
-              <Select value={form.genre} onChange={set("genre")}>
-                {GENRES.map((g) => (
-                  <option key={g}>{g}</option>
-                ))}
-              </Select>
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Release date">
-              <TextInput type="date" value={form.releaseDate} onChange={set("releaseDate")} />
-            </Field>
-            <Field label="ISRC" hint="Recording identifier, if known">
-              <TextInput placeholder="ZM-A01-26-…" value={form.isrc} onChange={set("isrc")} />
-            </Field>
-          </div>
-        </Section>
+      <Link
+        href="/submit"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to Submit
+      </Link>
 
-        <Section title="Files">
-          <FilePicker label="Audio file" accept="audio/*" value={form.audioFile} onPick={setFile("audioFile")} hint="WAV or high-quality MP3" />
-          <FilePicker label="Cover art" accept="image/*" value={form.coverArt} onPick={setFile("coverArt")} hint="Min. 1400×1400px" />
-          <FilePicker label="Lyrics (optional)" accept=".pdf,.txt,.doc,.docx" value={form.lyricsFile} onPick={setFile("lyricsFile")} />
-        </Section>
+      <div className="mt-4">
+        <PageHeader title="Submit a Single" subtitle="Register one release with its audio and splits." />
+      </div>
 
-        <Section title="Ownership splits" subtitle="Confirm the split — must total 100%">
-          <SplitEditor splits={splits} onChange={setSplits} />
-        </Section>
+      <form onSubmit={submit} className="grid lg:grid-cols-3 gap-6 items-start">
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader title="Song details" />
+            <div className="p-5 space-y-4">
+              <Field label="Song title" required>
+                <Input placeholder="e.g. Night Drive" value={form.title} onChange={set("title")} />
+              </Field>
+              <Field label="Artist name" required>
+                <Input value={form.artistName} onChange={set("artistName")} />
+              </Field>
+              <Field label="Featured artists">
+                <Input placeholder="e.g. Wezi" value={form.featuredArtists} onChange={set("featuredArtists")} />
+              </Field>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="Producer">
+                  <Input value={form.producer} onChange={set("producer")} />
+                </Field>
+                <Field label="Genre">
+                  <Select value={form.genre} onChange={set("genre")}>
+                    {GENRES.map((g) => (
+                      <option key={g}>{g}</option>
+                    ))}
+                  </Select>
+                </Field>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="Release date">
+                  <Input type="date" value={form.releaseDate} onChange={set("releaseDate")} />
+                </Field>
+                <Field label="ISRC" hint="Recording identifier, if known">
+                  <Input placeholder="ZM-A01-26-…" value={form.isrc} onChange={set("isrc")} />
+                </Field>
+              </div>
+            </div>
+          </Card>
 
-        {error && (
-          <p className="rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>
-        )}
+          <Card>
+            <CardHeader title="Files" />
+            <div className="p-5 space-y-3">
+              <FilePicker
+                label="Master audio file"
+                kind="audio"
+                hint="WAV or high-quality MP3"
+                value={form.audioFile}
+                onChange={setFile("audioFile")}
+              />
+              <FilePicker
+                label="Cover art"
+                kind="image"
+                hint="Min. 1400×1400px"
+                value={form.coverArt}
+                onChange={setFile("coverArt")}
+              />
+              <FilePicker
+                label="Lyrics (optional)"
+                kind="document"
+                value={form.lyricsFile}
+                onChange={setFile("lyricsFile")}
+              />
+            </div>
+          </Card>
+        </div>
 
-        <Button type="submit" block size="lg" disabled={busy}>
-          <Send size={18} /> {busy ? "Submitting…" : "Submit single"}
-        </Button>
+        <div className="lg:sticky lg:top-6 space-y-4">
+          <Card>
+            <CardHeader title="Ownership splits" description="Must total 100%." />
+            <div className="p-5">
+              <SplitsEditor splits={splits} onChange={(s) => setSplits(s as OwnershipSplit[])} />
+            </div>
+          </Card>
+
+          {error && (
+            <p className="rounded-xl border border-zam-red/20 bg-red-50 px-3 py-2 text-sm font-medium text-zam-red">
+              {error}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full"
+            loading={busy}
+            disabled={busy || !valid}
+            icon={<Send className="h-5 w-5" />}
+          >
+            {busy ? "Submitting…" : "Submit single"}
+          </Button>
+        </div>
       </form>
     </div>
-  );
-}
-
-function Section({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="card px-4 py-4">
-      <div className="mb-3">
-        <h3 className="text-sm font-bold text-white">{title}</h3>
-        {subtitle && <p className="text-[11px] text-night-400">{subtitle}</p>}
-      </div>
-      <div className="space-y-3">{children}</div>
-    </section>
   );
 }

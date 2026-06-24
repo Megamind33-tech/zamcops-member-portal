@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Mic2, IdCard, Phone, AtSign, Briefcase, Lock, ShieldCheck, CheckCircle2, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { AuthScreen, AuthHeading } from "@/components/auth/AuthScreen";
+import { CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/zam/Button";
+import { Field, Input, Select } from "@/components/zam/Input";
+import { Logo } from "@/components/ui/Logo";
 import { useApp } from "@/lib/store";
 import type { MemberRole } from "@/types";
 
@@ -67,131 +68,72 @@ export default function RegisterScreen() {
   };
 
   return (
-    <AuthScreen photo="synth" position="center 30%">
-      <AuthHeading
-        kicker="Become a member"
-        title={<>Join<br />ZAMCOPS</>}
-        sub="Register as a ZAMCOPS member — it only takes a minute."
-      />
-
-      <form onSubmit={submit} className="mt-7">
-        <div className="max-h-[42vh] space-y-3 overflow-y-auto no-scrollbar pb-1">
-          {/* Identity */}
-          <div className="glass-group">
-            <div className="glass-field">
-              <User size={17} className="shrink-0 text-white/55" />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-white/45"
-                placeholder="Full legal name *"
-                value={form.fullName}
-                onChange={set("fullName")}
-              />
-            </div>
-            <div className="glass-field">
-              <Mic2 size={17} className="shrink-0 text-white/55" />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-white/45"
-                placeholder="Stage name"
-                value={form.stageName}
-                onChange={set("stageName")}
-              />
-            </div>
-            <div className="glass-field">
-              <IdCard size={17} className="shrink-0 text-white/55" />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-white/45"
-                placeholder="NRC / passport number"
-                value={form.nrcOrPassport}
-                onChange={set("nrcOrPassport")}
-              />
-            </div>
-          </div>
-
-          {/* Contact + role */}
-          <div className="glass-group">
-            <div className="glass-field">
-              <Phone size={17} className="shrink-0 text-white/55" />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-white/45"
-                type="tel"
-                placeholder="Phone number *"
-                value={form.phone}
-                onChange={set("phone")}
-              />
-            </div>
-            <div className="glass-field">
-              <AtSign size={17} className="shrink-0 text-white/55" />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-white/45"
-                type="email"
-                placeholder="Email *"
-                value={form.email}
-                onChange={set("email")}
-              />
-            </div>
-            <div className="glass-field">
-              <Briefcase size={17} className="shrink-0 text-white/55" />
-              <select
-                className="w-full appearance-none bg-transparent text-white outline-none [&>option]:bg-night-850 [&>option]:text-white"
-                value={form.role}
-                onChange={set("role")}
-              >
-                {roles.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Security */}
-          <div className="glass-group">
-            <div className="glass-field">
-              <Lock size={17} className="shrink-0 text-white/55" />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-white/45"
-                type="password"
-                placeholder="Password (min. 6 characters) *"
-                value={form.password}
-                onChange={set("password")}
-              />
-            </div>
-            <div className="glass-field">
-              <ShieldCheck size={17} className="shrink-0 text-white/55" />
-              <input
-                className="w-full bg-transparent outline-none placeholder:text-white/45"
-                type="password"
-                placeholder="Confirm password *"
-                value={form.confirm}
-                onChange={set("confirm")}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2.5 text-[11px] leading-relaxed text-white/70 backdrop-blur">
-            <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-accent-300" />
-            By registering you agree to assign collection of public performance and mechanical royalties to ZAMCOPS under the Copyright Act of Zambia.
+    <div className="min-h-screen flex items-center justify-center bg-zam-canvas p-4 sm:p-8">
+      <div className="w-full max-w-xl">
+        <div className="flex justify-center mb-6">
+          <div className="bg-white rounded-2xl px-4 py-3 inline-flex shadow-card">
+            <Logo size={30} onDark={false} />
           </div>
         </div>
 
-        {error && (
-          <p className="mt-3 rounded-2xl border border-red-400/25 bg-red-500/15 px-3 py-2.5 text-[13px] font-medium text-red-200 backdrop-blur">
-            {error}
+        <div className="bg-white border border-zam-line rounded-3xl shadow-card p-6 sm:p-8">
+          <h1 className="font-display font-bold text-2xl text-zam-ink">Create your account</h1>
+          <p className="mt-1 text-sm text-zam-muted">Register as a ZAMCOPS member — it only takes a minute.</p>
+
+          <form onSubmit={submit} className="mt-6">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="Full legal name" required>
+                <Input placeholder="Full legal name" value={form.fullName} onChange={set("fullName")} />
+              </Field>
+              <Field label="Stage name">
+                <Input placeholder="Stage name" value={form.stageName} onChange={set("stageName")} />
+              </Field>
+              <Field label="NRC / passport number">
+                <Input placeholder="NRC / passport number" value={form.nrcOrPassport} onChange={set("nrcOrPassport")} />
+              </Field>
+              <Field label="Role">
+                <Select value={form.role} onChange={set("role")}>
+                  {roles.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="Phone number" required>
+                <Input type="tel" placeholder="+260…" value={form.phone} onChange={set("phone")} />
+              </Field>
+              <Field label="Email" required>
+                <Input type="email" placeholder="you@email.com" value={form.email} onChange={set("email")} />
+              </Field>
+              <Field label="Password" required>
+                <Input type="password" placeholder="Min. 6 characters" value={form.password} onChange={set("password")} />
+              </Field>
+              <Field label="Confirm password" required>
+                <Input type="password" placeholder="Re-enter password" value={form.confirm} onChange={set("confirm")} />
+              </Field>
+            </div>
+
+            <div className="mt-4 flex items-start gap-2 rounded-xl bg-zam-orange-soft/50 border border-zam-orange/20 p-3.5 text-xs leading-relaxed text-zam-ink">
+              <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-zam-orange" />
+              By registering you agree to assign collection of public performance and mechanical royalties to ZAMCOPS under the Copyright Act of Zambia.
+            </div>
+
+            {error && <p className="mt-3 text-sm text-zam-red">{error}</p>}
+
+            <Button type="submit" className="w-full mt-5" loading={busy}>
+              Create account
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-zam-muted">
+            Already a member?{" "}
+            <Link href="/login" className="font-semibold text-zam-orange hover:underline">
+              Sign in
+            </Link>
           </p>
-        )}
-
-        <Button type="submit" block size="lg" className="mt-5 h-[58px] rounded-[18px] text-[16px]" disabled={busy}>
-          {busy ? "Creating account…" : "Create account"} <ArrowRight size={18} />
-        </Button>
-      </form>
-
-      <p className="mt-6 text-center text-[14px] text-white/65">
-        Already a member?{" "}
-        <Link href="/login" className="font-bold text-accent-400">
-          Sign in
-        </Link>
-      </p>
-    </AuthScreen>
+        </div>
+      </div>
+    </div>
   );
 }

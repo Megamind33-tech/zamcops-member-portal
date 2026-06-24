@@ -1,34 +1,31 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { AuthScreen, AuthHeading } from "@/components/auth/AuthScreen";
+import { Button } from "@/components/zam/Button";
+import { Logo } from "@/components/ui/Logo";
 
 const slides = [
   {
-    photo: "synth" as const,
     kicker: "01 — Register",
-    title: "Your music,\nprotected",
+    title: "Your music, protected",
     body: "Declare your songs, compositions, beats and lyrics so your copyright ownership is recorded and protected.",
   },
   {
-    photo: "dj-console" as const,
     kicker: "02 — Track",
-    title: "Follow every\nsubmission",
+    title: "Follow every submission",
     body: "Track every single, album and work declaration from submission through to review and approval.",
   },
   {
-    photo: "piano" as const,
     kicker: "03 — Earn",
-    title: "See your\nroyalties",
+    title: "See your royalties",
     body: "Estimated, pending and paid royalties from radio and broadcast usage of your music across Zambia.",
   },
   {
-    photo: "hands" as const,
     kicker: "04 — Belong",
-    title: "Manage your\nmembership",
+    title: "Manage your membership",
     body: "Keep your profile, KYC and payout details up to date and access receipts and statements anytime.",
   },
 ];
@@ -45,54 +42,70 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <AuthScreen
-      photo={slide.photo}
-      topRight={
-        <button onClick={finish} className="text-[13px] font-semibold text-white/70 transition hover:text-white">
+    <div className="min-h-[100dvh] flex flex-col bg-zam-canvas">
+      <header className="flex items-center justify-between p-6">
+        <div className="bg-white rounded-2xl px-4 py-3 inline-flex shadow-card">
+          <Logo size={30} onDark={false} />
+        </div>
+        <button
+          onClick={finish}
+          className="text-sm font-semibold text-zam-muted transition hover:text-zam-ink"
+        >
           Skip
         </button>
-      }
-    >
-      <div key={i} className="animate-fade-up">
-        <AuthHeading
-          kicker={slide.kicker}
-          title={slide.title.split("\n").map((line, idx) => (
-            <React.Fragment key={idx}>
-              {line}
-              {idx === 0 && <br />}
-            </React.Fragment>
-          ))}
-          sub={slide.body}
-        />
-      </div>
+      </header>
 
-      <div className="mt-7 flex items-center gap-2">
-        {slides.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setI(idx)}
-            aria-label={`Go to slide ${idx + 1}`}
-            className={"h-1.5 rounded-full transition-all " + (idx === i ? "w-8 bg-accent-500" : "w-2 bg-white/25")}
-          />
-        ))}
-      </div>
+      <main className="flex flex-1 flex-col items-center justify-center px-6">
+        <div key={i} className="w-full max-w-md text-center">
+          <div className="zam-flagline w-16 mx-auto" />
+          <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-zam-orange">
+            {slide.kicker}
+          </p>
+          <h1 className="mt-3 font-display font-bold text-3xl text-zam-ink leading-tight">
+            {slide.title}
+          </h1>
+          <p className="mt-4 text-zam-muted leading-relaxed">{slide.body}</p>
 
-      <div className="mt-6 space-y-3">
+          <div className="mt-8 flex items-center justify-center gap-2">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setI(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={
+                  "h-1.5 rounded-full transition-all " +
+                  (idx === i ? "w-8 bg-zam-orange" : "w-2 bg-zam-line")
+                }
+              />
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <footer className="mx-auto w-full max-w-md space-y-3 p-6">
         {last ? (
           <>
-            <Button block size="lg" onClick={finish} className="h-[58px] rounded-[18px] text-[16px]">
-              Get started <ArrowRight size={18} />
+            <Button className="w-full" onClick={finish} icon={<ArrowRight size={18} />}>
+              Get started
             </Button>
-            <ButtonLink href="/login" variant="ghost" block size="md">
+            <Button variant="ghost" className="w-full" onClick={() => router.replace("/login")}>
               I already have an account
-            </ButtonLink>
+            </Button>
           </>
         ) : (
-          <Button block size="lg" onClick={() => setI((v) => v + 1)} className="h-[58px] rounded-[18px] text-[16px]">
-            Next <ArrowRight size={18} />
-          </Button>
+          <>
+            <Button className="w-full" onClick={() => setI((v) => v + 1)} icon={<ArrowRight size={18} />}>
+              Continue
+            </Button>
+            <Link
+              href="/login"
+              className="block text-center text-sm font-semibold text-zam-muted hover:text-zam-ink"
+            >
+              I already have an account
+            </Link>
+          </>
         )}
-      </div>
-    </AuthScreen>
+      </footer>
+    </div>
   );
 }

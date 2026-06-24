@@ -10,6 +10,24 @@ export function formatKwacha(amount: number, currency = "ZMW"): string {
   })}`;
 }
 
+// Alias used by the ported zam design components.
+export function formatZMW(amount: number): string {
+  return formatKwacha(amount, "ZMW");
+}
+
+export function formatDateTime(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return (
+      d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) +
+      " · " +
+      d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+    );
+  } catch {
+    return iso;
+  }
+}
+
 export function formatDate(iso: string): string {
   try {
     return new Date(iso).toLocaleDateString("en-GB", {

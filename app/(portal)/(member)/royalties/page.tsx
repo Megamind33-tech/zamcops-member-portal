@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Radio, TrendingUp, CalendarCheck2 } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { EmptyState } from "@/components/ui/Misc";
-import { CoverArt } from "@/components/media/CoverArt";
-import { Illustration } from "@/components/media/Illustration";
+import Link from "next/link";
+import { Download, Radio, Info } from "lucide-react";
 import { useMemberData } from "@/lib/store";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card, CardHeader } from "@/components/zam/Card";
+import { Button } from "@/components/zam/Button";
+import { Progress, EmptyState } from "@/components/zam/Misc";
+import { TableShell, Th, Td, Tr } from "@/components/zam/Table";
 import { formatKwacha, formatDate } from "@/lib/format";
 
 const periods = ["All time", "Q1 2026", "2025"];
@@ -21,15 +23,15 @@ export default function RoyaltiesScreen() {
 
   if (!lastDistribution && !hasDetectedActivity) {
     return (
-      <div>
-        <TopBar title="Royalties" back="/dashboard" />
-        <div className="px-4 py-6">
+      <div className="space-y-6">
+        <PageHeader title="Royalties" subtitle="Confirmed payouts & detected usage" />
+        <Card>
           <EmptyState
-            art={<Illustration name="royalty" />}
+            icon={<Radio size={28} />}
             title="No royalty activity yet"
-            message="Once your registered works are detected on radio and broadcast — and ZAMCOPS publishes its next distribution — your confirmed payouts will appear here."
+            description="Once your registered works are detected on radio and broadcast — and ZAMCOPS publishes its next distribution — your confirmed payouts will appear here."
           />
-        </div>
+        </Card>
       </div>
     );
   }
@@ -39,151 +41,126 @@ export default function RoyaltiesScreen() {
       ? royalty?.usageLogs ?? []
       : (royalty?.usageLogs ?? []).filter((l) => l.period === period);
 
+  const totalEstimated = royalty?.totalEstimated ?? lastDistribution?.amount ?? 0;
+  const pending = royalty?.pending ?? 0;
+  const paid = royalty?.paid ?? lifetimeDistributed;
+  const currency = royalty?.currency ?? lastDistribution?.currency ?? "ZMW";
+  const maxPlays = Math.max(1, ...(royalty?.topSongs ?? []).map((s) => s.plays));
+
   return (
-    <div>
-      <TopBar title="Royalties" subtitle="Confirmed payouts & detected usage" back="/dashboard" />
+    <div className="space-y-6">
+      <PageHeader
+        title="Royalties"
+        subtitle="Confirmed payouts & detected usage"
+        action={
+          <div className="flex items-center gap-2">
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+              className="h-11 rounded-xl border border-zam-line bg-white px-3 text-sm text-zam-ink focus:border-zam-orange focus:outline-none focus:ring-2 focus:ring-zam-orange/20"
+            >
+              {periods.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <Link href="/statements">
+              <Button variant="secondary" icon={<Download size={16} />}>
+                Download statement
+              </Button>
+            </Link>
+          </div>
+        }
+      />
 
-      <div className="space-y-5 px-4 py-4">
-        {/* Hero — confirmed, published payout only. We never show speculative figures here. */}
-        <div className="relative overflow-hidden rounded-[1.75rem] bg-night-900 px-5 py-5 text-white shadow-[0_30px_70px_-30px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
-          <div className="pointer-events-none absolute inset-0">
-            <img src="/img/dj-console.webp" alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
-          </div>
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(165deg,rgba(5,5,12,0.6)_0%,rgba(5,5,12,0.85)_55%,rgba(5,5,12,0.96)_100%)]" />
-          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent-500/15 blur-3xl" />
-          <p className="relative text-xs font-semibold uppercase tracking-[0.2em] text-white/70">Last distribution</p>
-          <p className="relative mt-1.5 font-display text-3xl font-extrabold tracking-tight text-white">
-            {lastDistribution ? formatKwacha(lastDistribution.amount, lastDistribution.currency) : formatKwacha(0)}
-          </p>
-          <p className="relative mt-1 text-xs text-white/60">
-            {lastDistribution
-              ? `${lastDistribution.periodLabel} · published ${formatDate(lastDistribution.publishedAt ?? lastDistribution.createdAt)}`
-              : "Confirmed once ZAMCOPS publishes its next distribution"}
-          </p>
-          <div className="relative mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-white/12 bg-black/20 px-3 py-2.5 backdrop-blur">
-              <p className="text-[11px] text-white/60">Lifetime confirmed</p>
-              <p className="text-sm font-bold text-white">{formatKwacha(lifetimeDistributed)}</p>
-            </div>
-            <div className="rounded-xl border border-white/12 bg-black/20 px-3 py-2.5 backdrop-blur">
-              <p className="text-[11px] text-white/60">Periods published</p>
-              <p className="text-sm font-bold text-white">{distributions.length}</p>
-            </div>
-          </div>
+      <div className="rounded-xl border border-zam-blue/20 bg-zam-blue-soft p-3.5">
+        <div className="flex items-start gap-2.5 text-sm text-zam-ink">
+          <Info size={16} className="mt-0.5 shrink-0 text-zam-blue" />
+          <span>
+            Detected-usage figures are indicative estimates only — they show what ZAMCOPS is tracking, not a promised payout.
+            Your confirmed earnings are the published distribution amounts.
+          </span>
         </div>
+      </div>
 
-        {/* Distribution history — the gated, confirmed record. */}
-        <section>
-          <h3 className="mb-2 flex items-center gap-1.5 px-1 text-xs font-bold uppercase tracking-wider text-night-300">
-            <CalendarCheck2 size={14} /> Distribution history
-          </h3>
-          <div className="card divide-y divide-white/[0.06]">
-            {distributions.length === 0 && (
-              <p className="px-4 py-6 text-center text-xs text-night-400">
-                Nothing published yet — your first confirmed payout will appear here once ZAMCOPS closes a distribution period.
-              </p>
-            )}
-            {distributions.map((d) => (
-              <div key={d.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-white">{d.periodLabel}</p>
-                  <p className="truncate text-xs text-night-400">
-                    Published {formatDate(d.publishedAt ?? d.createdAt)}
-                    {d.topSongs[0] ? ` · led by “${d.topSongs[0].title}”` : ""}
-                  </p>
+      {/* Hero tiles */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card className="bg-zam-ink p-6 text-white">
+          <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Total estimated</p>
+          <p className="mt-2 font-display text-3xl font-bold">{formatKwacha(totalEstimated, currency)}</p>
+          {lastDistribution && (
+            <p className="mt-1 text-xs text-white/60">
+              {lastDistribution.periodLabel} · published {formatDate(lastDistribution.publishedAt ?? lastDistribution.createdAt)}
+            </p>
+          )}
+        </Card>
+        <Card className="p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Pending</p>
+          <p className="mt-2 font-display text-3xl font-bold text-zam-amber">{formatKwacha(pending, currency)}</p>
+        </Card>
+        <Card className="p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Paid</p>
+          <p className="mt-2 font-display text-3xl font-bold text-zam-green">{formatKwacha(paid, currency)}</p>
+        </Card>
+      </div>
+
+      {/* Usage logs */}
+      <Card>
+        <CardHeader title="Radio & TV usage logs" description="Detected plays of your registered works." />
+        {logs.length === 0 ? (
+          <p className="px-5 py-8 text-center text-sm text-zam-muted">No usage logs for {period}.</p>
+        ) : (
+          <div className="p-4">
+            <TableShell>
+              <thead>
+                <Tr>
+                  <Th>Song</Th>
+                  <Th>Source</Th>
+                  <Th>Plays</Th>
+                  <Th>Period</Th>
+                  <Th className="text-right">Estimated</Th>
+                </Tr>
+              </thead>
+              <tbody>
+                {logs.map((l) => (
+                  <Tr key={l.id}>
+                    <Td className="font-semibold text-zam-ink">{l.songTitle}</Td>
+                    <Td className="text-zam-muted">{l.source}</Td>
+                    <Td className="text-zam-muted">{l.plays.toLocaleString()}</Td>
+                    <Td className="text-zam-muted">{l.period}</Td>
+                    <Td className="text-right font-semibold text-zam-ink">~{formatKwacha(l.estimatedAmount, currency)}</Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </TableShell>
+          </div>
+        )}
+      </Card>
+
+      {/* Top songs */}
+      {royalty && royalty.topSongs.length > 0 && (
+        <Card>
+          <CardHeader title="Top detected songs" />
+          <div className="divide-y divide-zam-line">
+            {royalty.topSongs.map((s, i) => (
+              <div key={s.title} className="px-5 py-4">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-zam-orange-soft text-xs font-bold text-zam-orange">
+                      {i + 1}
+                    </span>
+                    <p className="truncate font-semibold text-zam-ink">{s.title}</p>
+                  </div>
+                  <span className="shrink-0 text-sm font-semibold text-zam-muted">~{formatKwacha(s.amount, currency)}</span>
                 </div>
-                <span className="shrink-0 text-sm font-bold text-emerald-300">
-                  {formatKwacha(d.amount, d.currency)}
-                </span>
+                <Progress value={(s.plays / maxPlays) * 100} />
+                <p className="mt-1 text-xs text-zam-muted">{s.plays.toLocaleString()} plays detected</p>
               </div>
             ))}
           </div>
-        </section>
-
-        {hasDetectedActivity && (
-          <>
-            {/* Period filter */}
-            <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1">
-              {periods.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={
-                    "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                    (period === p ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
-                  }
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-
-            {/* Top songs */}
-            {royalty!.topSongs.length > 0 && (
-              <section>
-                <h3 className="mb-2 flex items-center gap-1.5 px-1 text-xs font-bold uppercase tracking-wider text-night-300">
-                  <TrendingUp size={14} /> Top detected songs
-                </h3>
-                <div className="card divide-y divide-white/[0.06]">
-                  {royalty!.topSongs.map((s, i) => (
-                    <div key={s.title} className="flex items-center gap-3 px-4 py-3">
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent-500/12 text-xs font-bold text-accent-300 ring-1 ring-accent-400/20">
-                        {i + 1}
-                      </span>
-                      <CoverArt seed={s.title} size={40} rounded="rounded-lg" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-white">{s.title}</p>
-                        <p className="text-xs text-night-400">{s.plays.toLocaleString()} plays detected</p>
-                      </div>
-                      <span className="text-sm font-bold text-night-300">
-                        ~{formatKwacha(s.amount, royalty!.currency)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Usage logs */}
-            <section>
-              <h3 className="mb-2 flex items-center gap-1.5 px-1 text-xs font-bold uppercase tracking-wider text-night-300">
-                <Radio size={14} /> Radio / usage logs
-              </h3>
-              <div className="card divide-y divide-white/[0.06]">
-                {logs.length === 0 && (
-                  <p className="px-4 py-6 text-center text-xs text-night-400">
-                    No usage logs for {period}.
-                  </p>
-                )}
-                {logs.map((l) => (
-                  <div key={l.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-white">{l.songTitle}</p>
-                      <p className="truncate text-xs text-night-400">
-                        {l.source} · {l.plays} plays · {l.period}
-                      </p>
-                    </div>
-                    <span className="shrink-0 text-sm font-bold text-night-300">
-                      ~{formatKwacha(l.estimatedAmount, royalty!.currency)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <p className="px-1 text-center text-[11px] text-night-400">
-              Detected-usage figures are indicative only — they show what ZAMCOPS is tracking, not a promised payout. Your confirmed earnings are the published distribution amounts above.
-            </p>
-          </>
-        )}
-
-        <a
-          href="/statements"
-          className="flex items-center justify-center gap-2 rounded-xl bg-accent-500 py-3 text-sm font-semibold text-night-950 shadow-[0_16px_38px_-14px_rgba(255,138,61,0.6)] ring-1 ring-accent-300/30 transition hover:bg-accent-400"
-        >
-          <Download size={18} /> Download statement
-        </a>
-      </div>
+        </Card>
+      )}
     </div>
   );
 }

@@ -1,85 +1,110 @@
 "use client";
 
-import React, { useState } from "react";
-import { AlertCircle } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { EmptyState } from "@/components/ui/Misc";
-import { ButtonLink } from "@/components/ui/Button";
-import { CoverArt } from "@/components/media/CoverArt";
-import { Illustration } from "@/components/media/Illustration";
+import React, { useMemo, useState } from "react";
+import Link from "next/link";
+import { AlertCircle, FolderUp, FileAudio, Image, FileText, File } from "lucide-react";
 import { useMemberData } from "@/lib/store";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card } from "@/components/zam/Card";
+import { Button } from "@/components/zam/Button";
+import { StatusBadge } from "@/components/zam/StatusBadge";
+import { FilterChips } from "@/components/zam/FilterChips";
+import { EmptyState } from "@/components/zam/Misc";
+import { TableShell, Th, Td, Tr } from "@/components/zam/Table";
 import { formatDate } from "@/lib/format";
-import type { UploadStatus } from "@/types";
+import type { UploadFile, UploadStatus } from "@/types";
 
 const filters: ("All" | UploadStatus)[] = ["All", "Pending", "Processing", "Approved", "Rejected"];
+
+const fileIcon: Record<UploadFile["fileType"], React.ComponentType<{ size?: number }>> = {
+  Audio: FileAudio,
+  "Cover Art": Image,
+  Lyrics: FileText,
+  Document: File,
+};
 
 export default function UploadsScreen() {
   const { uploads } = useMemberData();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
-  const shown = uploads.filter((u) => filter === "All" || u.status === filter);
+
+  const shown = useMemo(
+    () => uploads.filter((u) => filter === "All" || u.status === filter),
+    [uploads, filter]
+  );
+  const rejected = shown.filter((u) => u.status === "Rejected" && u.rejectionReason);
+
+  const chips = filters.map((f) => ({
+    label: f,
+    value: f,
+    count: f === "All" ? uploads.length : uploads.filter((u) => u.status === f).length,
+  }));
 
   return (
-    <div>
-      <TopBar title="Music Uploads" subtitle={`${uploads.length} files`} back="/dashboard" />
+    <div className="space-y-6">
+      <PageHeader title="Music Uploads" subtitle={`${uploads.length} files`} />
 
-      <div className="px-4 py-4">
-        <div className="no-scrollbar -mx-1 mb-4 flex gap-2 overflow-x-auto px-1">
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={
-                "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition " +
-                (filter === f ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "border border-white/10 bg-white/[0.05] text-night-300 hover:bg-white/[0.08]")
-              }
-            >
-              {f}
-            </button>
-          ))}
+      <FilterChips chips={chips} active={filter} onChange={(v) => setFilter(v as (typeof filters)[number])} />
+
+      {rejected.map((u) => (
+        <div key={u.id} className="rounded-2xl border border-zam-red/30 bg-red-50 p-4">
+          <div className="flex items-start gap-2.5 text-sm text-zam-red">
+            <AlertCircle size={16} className="mt-0.5 shrink-0" />
+            <span>
+              <span className="font-semibold">{u.fileName}</span> was rejected: {u.rejectionReason}
+            </span>
+          </div>
         </div>
+      ))}
 
-        {shown.length === 0 ? (
+      {shown.length === 0 ? (
+        <Card>
           <EmptyState
-            art={<Illustration name="upload" />}
+            icon={<FolderUp size={28} />}
             title="No uploads yet"
-            message="Files you attach to singles and albums appear here with their processing status."
+            description="Files you attach to singles and albums appear here with their processing status."
             action={
-              <ButtonLink href="/submit" size="sm">
-                Submit music
-              </ButtonLink>
+              <Link href="/submit">
+                <Button size="sm">Submit music</Button>
+              </Link>
             }
           />
-        ) : (
-          <div className="space-y-3">
+        </Card>
+      ) : (
+        <TableShell>
+          <thead>
+            <Tr>
+              <Th>File</Th>
+              <Th>Type</Th>
+              <Th>Linked to</Th>
+              <Th>Uploaded</Th>
+              <Th>Status</Th>
+            </Tr>
+          </thead>
+          <tbody>
             {shown.map((u) => {
+              const Icon = fileIcon[u.fileType] ?? File;
               return (
-                <div key={u.id} className="card px-4 py-3.5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-start gap-3">
-                      <CoverArt seed={u.fileName} size={44} rounded="rounded-xl" />
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-white">{u.fileName}</p>
-                        <p className="truncate text-xs text-night-400">
-                          {u.fileType}
-                          {u.linkedTo ? ` · ${u.linkedTo}` : ""} · {formatDate(u.uploadedAt)}
-                        </p>
-                      </div>
+                <Tr key={u.id}>
+                  <Td>
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zam-canvas text-zam-muted">
+                        <Icon size={16} />
+                      </span>
+                      <span className="font-semibold text-zam-ink">{u.fileName}</span>
                     </div>
+                  </Td>
+                  <Td className="text-zam-muted">{u.fileType}</Td>
+                  <Td className="text-zam-muted">{u.linkedTo || "—"}</Td>
+                  <Td className="text-zam-muted">{formatDate(u.uploadedAt)}</Td>
+                  <Td>
                     <StatusBadge status={u.status} />
-                  </div>
-                  {u.status === "Rejected" && u.rejectionReason && (
-                    <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
-                      <AlertCircle size={14} className="mt-0.5 shrink-0" />
-                      <span>{u.rejectionReason}</span>
-                    </div>
-                  )}
-                </div>
+                  </Td>
+                </Tr>
               );
             })}
-          </div>
-        )}
-      </div>
+          </tbody>
+        </TableShell>
+      )}
     </div>
   );
 }

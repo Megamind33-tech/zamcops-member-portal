@@ -1,17 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { Send, Plus, Trash2, ChevronDown, ListMusic } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { CoverArt } from "@/components/media/CoverArt";
-import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
-import { SplitEditor, splitsValid } from "@/components/SplitEditor";
-import { SubmitSuccess } from "@/components/SubmitSuccess";
+import Link from "next/link";
+import { ArrowLeft, Send, Plus, Trash2, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card, CardHeader } from "@/components/zam/Card";
+import { Button } from "@/components/zam/Button";
+import { Field, Input, Select } from "@/components/zam/Input";
+import { SplitsEditor } from "@/components/zam/SplitsEditor";
+import { FilePicker } from "@/components/zam/FilePicker";
+import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES } from "@/data/reference";
 import { uid } from "@/lib/format";
-import type { Track } from "@/types";
+import type { OwnershipSplit, Track } from "@/types";
+
+const splitsValid = (splits: OwnershipSplit[]) =>
+  splits.length > 0 && splits.reduce((sum, s) => sum + (Number(s.percentage) || 0), 0) === 100;
 
 function newTrack(owner: string): Track {
   return {
@@ -48,6 +54,11 @@ export default function AlbumSubmissionScreen() {
   const removeTrack = (id: string) => setTracks((ts) => ts.filter((t) => t.id !== id));
   const [busy, setBusy] = useState(false);
 
+  const valid =
+    title.trim() !== "" &&
+    tracks.length > 0 &&
+    tracks.every((t) => t.title.trim() !== "" && splitsValid(t.ownershipSplits));
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -59,107 +70,116 @@ export default function AlbumSubmissionScreen() {
     setBusy(true);
     const res = await addAlbum({ title, artistName, releaseDate, coverArt, tracks });
     setBusy(false);
-    if (res.ok && res.item) setDone({ ref: `SR-A-${res.item.id.slice(-5).toUpperCase()}`, title: res.item.title });
-    else setError(res.error || "Could not submit album.");
+    if (res.ok && res.item) {
+      toast.success("Album submitted");
+      setDone({ ref: `SR-A-${res.item.id.slice(-5).toUpperCase()}`, title: res.item.title });
+    } else {
+      setError(res.error || "Could not submit album.");
+    }
   };
 
   if (done) {
-    return (
-      <>
-        <TopBar title="Album submitted" back="/dashboard" />
-        <SubmitSuccess
-          title="Album submitted"
-          message={`“${done.title}” has been submitted with ${tracks.length} track${
-            tracks.length === 1 ? "" : "s"
-          } and is pending review.`}
-          reference={done.ref}
-          primaryHref="/uploads"
-          primaryLabel="Track submission"
-        />
-      </>
-    );
+    return <SubmitSuccess title={done.title} kind="Album Submission" reference={done.ref} primaryTo="/uploads" />;
   }
 
   return (
     <div>
-      <TopBar title="Submit an Album" back="/submit" />
-      <form onSubmit={submit} className="space-y-5 px-4 py-4">
-        <section className="card px-4 py-4">
-          <div className="mb-3 flex items-center gap-3">
-            <CoverArt seed={title || "New album"} size={44} rounded="rounded-xl" />
-            <h3 className="text-sm font-bold text-white">Album details</h3>
-          </div>
-          <div className="space-y-3">
+      <Link
+        href="/submit"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to Submit
+      </Link>
+
+      <div className="mt-4">
+        <PageHeader title="Submit an Album" subtitle="Create an album and add each of its tracks." />
+      </div>
+
+      <form onSubmit={submit} className="space-y-6">
+        <Card>
+          <CardHeader title="Album details" />
+          <div className="p-5 space-y-4">
             <Field label="Album title" required>
-              <TextInput placeholder="e.g. Kalulu Tales" value={title} onChange={(e) => setTitle(e.target.value)} />
+              <Input placeholder="e.g. Kalulu Tales" value={title} onChange={(e) => setTitle(e.target.value)} />
             </Field>
             <Field label="Artist name" required>
-              <TextInput value={artistName} onChange={(e) => setArtistName(e.target.value)} />
+              <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
             </Field>
             <Field label="Release date">
-              <TextInput type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} />
+              <Input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} />
             </Field>
-            <FilePicker label="Cover art" accept="image/*" value={coverArt} onPick={setCoverArt} hint="Min. 1400×1400px" />
+            <FilePicker
+              label="Album cover art"
+              kind="image"
+              hint="Min. 1400×1400px"
+              value={coverArt}
+              onChange={(name) => setCoverArt(name ?? "")}
+            />
           </div>
-        </section>
+        </Card>
 
-        <div>
-          <div className="mb-2 flex items-center justify-between px-1">
-            <h3 className="flex items-center gap-1.5 text-sm font-bold text-white">
-              <ListMusic size={16} /> Tracklist ({tracks.length})
-            </h3>
-            <button
-              type="button"
-              onClick={addTrack}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-300 hover:text-brand-200"
-            >
-              <Plus size={15} /> Add track
-            </button>
-          </div>
-
-          <div className="space-y-3">
+        <Card>
+          <CardHeader
+            title={`Tracklist (${tracks.length})`}
+            action={
+              <Button type="button" variant="secondary" size="sm" icon={<Plus className="h-4 w-4" />} onClick={addTrack}>
+                Add track
+              </Button>
+            }
+          />
+          <div className="p-5 space-y-3">
             {tracks.map((t, idx) => {
               const isOpen = open === t.id;
+              const trackValid = t.title.trim() !== "" && splitsValid(t.ownershipSplits);
               return (
-                <div key={t.id} className="card overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setOpen(isOpen ? null : t.id)}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left"
-                  >
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/[0.06] text-xs font-bold text-brand-300 ring-1 ring-white/10">
+                <div key={t.id} className="rounded-2xl border border-zam-line overflow-hidden">
+                  <div className="flex items-center gap-3 bg-zam-canvas px-4 py-3">
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                        trackValid ? "bg-zam-green text-white" : "bg-white text-zam-muted border border-zam-line"
+                      }`}
+                    >
                       {idx + 1}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
+                    <button
+                      type="button"
+                      onClick={() => setOpen(isOpen ? null : t.id)}
+                      className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-zam-ink"
+                    >
                       {t.title || `Track ${idx + 1}`}
-                    </span>
+                    </button>
                     {tracks.length > 1 && (
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeTrack(t.id);
-                        }}
-                        className="grid h-8 w-8 place-items-center rounded-lg text-night-400 hover:bg-red-500/10 hover:text-red-300"
+                      <button
+                        type="button"
+                        onClick={() => removeTrack(t.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-zam-muted hover:bg-red-50 hover:text-zam-red"
+                        aria-label="Remove track"
                       >
-                        <Trash2 size={15} />
-                      </span>
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     )}
-                    <ChevronDown
-                      size={18}
-                      className={"shrink-0 text-night-400 transition " + (isOpen ? "rotate-180" : "")}
-                    />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setOpen(isOpen ? null : t.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-zam-muted hover:bg-white"
+                      aria-label="Toggle track"
+                    >
+                      <ChevronDown className={"h-4 w-4 transition " + (isOpen ? "rotate-180" : "")} />
+                    </button>
+                  </div>
 
                   {isOpen && (
-                    <div className="space-y-3 border-t border-white/[0.06] px-4 py-4">
+                    <div className="space-y-4 border-t border-zam-line bg-white px-4 py-4">
                       <Field label="Track title" required>
-                        <TextInput value={t.title} onChange={(e) => updateTrack(t.id, { title: e.target.value })} />
+                        <Input value={t.title} onChange={(e) => updateTrack(t.id, { title: e.target.value })} />
                       </Field>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid sm:grid-cols-2 gap-4">
                         <Field label="Duration" hint="mm:ss">
-                          <TextInput placeholder="03:30" value={t.duration} onChange={(e) => updateTrack(t.id, { duration: e.target.value })} />
+                          <Input
+                            placeholder="03:30"
+                            value={t.duration}
+                            onChange={(e) => updateTrack(t.id, { duration: e.target.value })}
+                          />
                         </Field>
                         <Field label="Genre">
                           <Select value={t.genre} onChange={(e) => updateTrack(t.id, { genre: e.target.value })}>
@@ -170,20 +190,23 @@ export default function AlbumSubmissionScreen() {
                         </Field>
                       </div>
                       <Field label="ISRC" hint="Recording identifier, if known">
-                        <TextInput placeholder="ZM-A01-26-…" value={t.isrc ?? ""} onChange={(e) => updateTrack(t.id, { isrc: e.target.value })} />
+                        <Input
+                          placeholder="ZM-A01-26-…"
+                          value={t.isrc ?? ""}
+                          onChange={(e) => updateTrack(t.id, { isrc: e.target.value })}
+                        />
                       </Field>
                       <FilePicker
-                        label="Audio file"
-                        accept="audio/*"
+                        label="Track audio file"
+                        kind="audio"
                         value={t.audioFile}
-                        onPick={(name) => updateTrack(t.id, { audioFile: name })}
+                        onChange={(name) => updateTrack(t.id, { audioFile: name ?? "" })}
                       />
                       <div>
-                        <span className="field-label">Ownership splits</span>
-                        <SplitEditor
-                          compact
+                        <span className="block text-sm font-semibold text-zam-ink mb-1.5">Ownership splits</span>
+                        <SplitsEditor
                           splits={t.ownershipSplits}
-                          onChange={(next) => updateTrack(t.id, { ownershipSplits: next })}
+                          onChange={(next) => updateTrack(t.id, { ownershipSplits: next as OwnershipSplit[] })}
                         />
                       </div>
                     </div>
@@ -192,14 +215,23 @@ export default function AlbumSubmissionScreen() {
               );
             })}
           </div>
-        </div>
+        </Card>
 
         {error && (
-          <p className="rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>
+          <p className="rounded-xl border border-zam-red/20 bg-red-50 px-3 py-2 text-sm font-medium text-zam-red">
+            {error}
+          </p>
         )}
 
-        <Button type="submit" block size="lg" disabled={busy}>
-          <Send size={18} /> {busy ? "Submitting…" : "Submit album"}
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          loading={busy}
+          disabled={busy || !valid}
+          icon={<Send className="h-5 w-5" />}
+        >
+          {busy ? "Submitting…" : "Submit album"}
         </Button>
       </form>
     </div>

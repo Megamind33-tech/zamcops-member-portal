@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata, Viewport } from "next";
 import { Manrope, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 import { AppProvider } from "@/lib/store";
 import { PWARegister } from "@/components/PWARegister";
 
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070814",
+  themeColor: "#F26C21",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -53,8 +54,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${manrope.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full`}>
-      <body className="h-full bg-canvas font-sans text-ink antialiased">
+      <body className="h-full bg-zam-canvas font-sans text-zam-ink antialiased">
         <AppProvider>{children}</AppProvider>
+        <Toaster
+          position="top-right"
+          toastOptions={{ style: { borderRadius: "12px", border: "1px solid #E7E9ED", fontFamily: "var(--font-sans), Manrope, sans-serif" } }}
+        />
         <PWARegister />
       </body>
     </html>

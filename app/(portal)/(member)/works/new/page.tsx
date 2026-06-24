@@ -1,18 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileCheck2 } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { Field, TextInput, Select } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
-import { SplitEditor, splitsValid } from "@/components/SplitEditor";
-import { SubmitSuccess } from "@/components/SubmitSuccess";
+import Link from "next/link";
+import { ArrowLeft, FileCheck2 } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card, CardHeader } from "@/components/zam/Card";
+import { Button } from "@/components/zam/Button";
+import { Field, Input, Select } from "@/components/zam/Input";
+import { SplitsEditor } from "@/components/zam/SplitsEditor";
+import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES, LANGUAGES } from "@/data/reference";
 import { uid } from "@/lib/format";
 import type { OwnershipSplit, WorkType } from "@/types";
 
 const WORK_TYPES: WorkType[] = ["Song", "Instrumental", "Beat", "Composition", "Lyric", "Arrangement"];
+
+const splitsValid = (splits: OwnershipSplit[]) =>
+  splits.length > 0 && splits.reduce((sum, s) => sum + (Number(s.percentage) || 0), 0) === 100;
 
 export default function WorkDeclarationScreen() {
   const { addWork, currentMember } = useApp();
@@ -44,6 +50,8 @@ export default function WorkDeclarationScreen() {
 
   const [busy, setBusy] = useState(false);
 
+  const valid = form.title.trim() !== "" && splitsValid(splits);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -68,132 +76,140 @@ export default function WorkDeclarationScreen() {
       dateCreated: form.dateCreated,
     });
     setBusy(false);
-    if (res.ok && res.item) setDone({ ref: `SR-W-${res.item.id.slice(-5).toUpperCase()}`, title: res.item.title });
-    else setError(res.error || "Could not submit declaration.");
+    if (res.ok && res.item) {
+      toast.success("Work declaration submitted");
+      setDone({ ref: `SR-W-${res.item.id.slice(-5).toUpperCase()}`, title: res.item.title });
+    } else {
+      setError(res.error || "Could not submit declaration.");
+    }
   };
 
   if (done) {
-    return (
-      <>
-        <TopBar title="Work declared" back="/works" />
-        <SubmitSuccess
-          title="Work declaration submitted"
-          message={`“${done.title}” has been recorded and is pending review by ZAMCOPS.`}
-          reference={done.ref}
-          primaryHref="/works"
-          primaryLabel="View my works"
-        />
-      </>
-    );
+    return <SubmitSuccess title={done.title} kind="Work Declaration" reference={done.ref} primaryTo="/works" />;
   }
 
   return (
     <div>
-      <TopBar title="Declare a Work" subtitle="Record copyright ownership" back="/submit" />
-      <form onSubmit={submit} className="space-y-5 px-4 py-4">
-        <Section title="Work details">
-          <Field label="Work title" required>
-            <TextInput placeholder="e.g. Zambezi Sunrise" value={form.title} onChange={set("title")} />
-          </Field>
-          <Field label="Alternative title">
-            <TextInput value={form.alternativeTitle} onChange={set("alternativeTitle")} />
-          </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Work type" required>
-              <Select value={form.workType} onChange={set("workType")}>
-                {WORK_TYPES.map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Duration" hint="mm:ss">
-              <TextInput placeholder="03:48" value={form.duration} onChange={set("duration")} />
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Language">
-              <Select value={form.language} onChange={set("language")}>
-                {LANGUAGES.map((l) => (
-                  <option key={l}>{l}</option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Genre">
-              <Select value={form.genre} onChange={set("genre")}>
-                {GENRES.map((g) => (
-                  <option key={g}>{g}</option>
-                ))}
-              </Select>
-            </Field>
-          </div>
-          <Field label="Date created">
-            <TextInput type="date" value={form.dateCreated} onChange={set("dateCreated")} />
-          </Field>
-        </Section>
+      <Link
+        href="/submit"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to Submit
+      </Link>
 
-        <Section title="Contributors" subtitle="Separate multiple names with commas">
-          <Field label="Composer(s)">
-            <TextInput placeholder="Name 1, Name 2" value={form.composers} onChange={set("composers")} />
-          </Field>
-          <Field label="Author / lyricist(s)">
-            <TextInput placeholder="Name 1, Name 2" value={form.authors} onChange={set("authors")} />
-          </Field>
-          <Field label="Producer(s)">
-            <TextInput placeholder="Name 1, Name 2" value={form.producers} onChange={set("producers")} />
-          </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Publisher">
-              <TextInput placeholder="e.g. Self-Published" value={form.publisher} onChange={set("publisher")} />
-            </Field>
-            <Field label="Publisher IPI / CAE" hint="For cross-society registration">
-              <TextInput placeholder="00000000000" value={form.publisherIpi} onChange={set("publisherIpi")} />
-            </Field>
-          </div>
-        </Section>
+      <div className="mt-4">
+        <PageHeader title="Declare a Work" subtitle="Record copyright ownership of your composition." />
+      </div>
 
-        <Section title="Ownership splits" subtitle="Must total 100%">
-          <SplitEditor splits={splits} onChange={setSplits} />
-        </Section>
+      <form onSubmit={submit} className="grid lg:grid-cols-3 gap-6 items-start">
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader title="Work details" />
+            <div className="p-5 space-y-4">
+              <Field label="Work title" required>
+                <Input placeholder="e.g. Zambezi Sunrise" value={form.title} onChange={set("title")} />
+              </Field>
+              <Field label="Alternative title">
+                <Input value={form.alternativeTitle} onChange={set("alternativeTitle")} />
+              </Field>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="Work type" required>
+                  <Select value={form.workType} onChange={set("workType")}>
+                    {WORK_TYPES.map((t) => (
+                      <option key={t}>{t}</option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="Duration" hint="mm:ss">
+                  <Input placeholder="03:48" value={form.duration} onChange={set("duration")} />
+                </Field>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="Language">
+                  <Select value={form.language} onChange={set("language")}>
+                    {LANGUAGES.map((l) => (
+                      <option key={l}>{l}</option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field label="Genre">
+                  <Select value={form.genre} onChange={set("genre")}>
+                    {GENRES.map((g) => (
+                      <option key={g}>{g}</option>
+                    ))}
+                  </Select>
+                </Field>
+              </div>
+              <Field label="Date created">
+                <Input type="date" value={form.dateCreated} onChange={set("dateCreated")} />
+              </Field>
+            </div>
+          </Card>
 
-        <Section title="Identifiers" subtitle="Optional — add if available">
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="ISRC">
-              <TextInput placeholder="ZM-A01-26-…" value={form.isrc} onChange={set("isrc")} />
-            </Field>
-            <Field label="ISWC">
-              <TextInput placeholder="T-000.000.000-0" value={form.iswc} onChange={set("iswc")} />
-            </Field>
-          </div>
-        </Section>
+          <Card>
+            <CardHeader title="Contributors" description="Separate multiple names with commas." />
+            <div className="p-5 space-y-4">
+              <Field label="Composer(s)">
+                <Input placeholder="Name 1, Name 2" value={form.composers} onChange={set("composers")} />
+              </Field>
+              <Field label="Author / lyricist(s)">
+                <Input placeholder="Name 1, Name 2" value={form.authors} onChange={set("authors")} />
+              </Field>
+              <Field label="Producer(s)">
+                <Input placeholder="Name 1, Name 2" value={form.producers} onChange={set("producers")} />
+              </Field>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="Publisher">
+                  <Input placeholder="e.g. Self-Published" value={form.publisher} onChange={set("publisher")} />
+                </Field>
+                <Field label="Publisher IPI / CAE" hint="For cross-society registration">
+                  <Input placeholder="00000000000" value={form.publisherIpi} onChange={set("publisherIpi")} />
+                </Field>
+              </div>
+            </div>
+          </Card>
 
-        {error && (
-          <p className="rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300">{error}</p>
-        )}
+          <Card>
+            <CardHeader title="Identifiers & publishing" description="Optional — add if available." />
+            <div className="p-5">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label="ISRC">
+                  <Input placeholder="ZM-A01-26-…" value={form.isrc} onChange={set("isrc")} />
+                </Field>
+                <Field label="ISWC">
+                  <Input placeholder="T-000.000.000-0" value={form.iswc} onChange={set("iswc")} />
+                </Field>
+              </div>
+            </div>
+          </Card>
+        </div>
 
-        <Button type="submit" block size="lg" disabled={busy}>
-          <FileCheck2 size={18} /> {busy ? "Submitting…" : "Submit declaration"}
-        </Button>
+        <div className="lg:sticky lg:top-6 space-y-4">
+          <Card>
+            <CardHeader title="Ownership splits" description="Must total 100%." />
+            <div className="p-5">
+              <SplitsEditor splits={splits} onChange={(s) => setSplits(s as OwnershipSplit[])} />
+            </div>
+          </Card>
+
+          {error && (
+            <p className="rounded-xl border border-zam-red/20 bg-red-50 px-3 py-2 text-sm font-medium text-zam-red">
+              {error}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full"
+            loading={busy}
+            disabled={busy || !valid}
+            icon={<FileCheck2 className="h-5 w-5" />}
+          >
+            {busy ? "Submitting…" : "Submit declaration"}
+          </Button>
+        </div>
       </form>
     </div>
-  );
-}
-
-function Section({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="card px-4 py-4">
-      <div className="mb-3">
-        <h3 className="text-sm font-bold text-white">{title}</h3>
-        {subtitle && <p className="text-[11px] text-night-400">{subtitle}</p>}
-      </div>
-      <div className="space-y-3">{children}</div>
-    </section>
   );
 }

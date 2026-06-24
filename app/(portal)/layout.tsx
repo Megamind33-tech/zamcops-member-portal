@@ -1,12 +1,7 @@
 import React from "react";
 
-// Phone-width column shared by the splash, onboarding, auth and member screens.
-// On wider viewports it presents as a centered app surface, keeping the
-// experience mobile-first rather than stretching to a desktop layout.
-export default function MobileLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mx-auto flex min-h-[100dvh] w-full max-w-app flex-col app-frame">
-      {children}
-    </div>
-  );
+// The portal renders full-bleed, responsive surfaces. Auth, splash, onboarding
+// and the member app each own their own layout, so this is a pass-through.
+export default function PortalLayout({ children }: { children: React.ReactNode }) {
+  return <div className="min-h-[100dvh] bg-zam-canvas">{children}</div>;
 }

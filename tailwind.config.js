@@ -78,8 +78,11 @@ module.exports = {
           "orange-soft": "#FEF1E8",
           red: "#E2342B",
           green: "#2BA45A",
+          "green-soft": "#E7F6EE",
           amber: "#F5A623",
+          "amber-soft": "#FEF4E2",
           blue: "#2F6FED",
+          "blue-soft": "#E9F0FE",
           ink: "#1A1D21",
           muted: "#5A6470",
           line: "#E7E9ED",
@@ -92,19 +95,10 @@ module.exports = {
         mono: ["var(--font-mono)", "monospace"],
       },
       boxShadow: {
-        // Multi-layer elevation: inset top-edge highlight (overhead-light illusion) +
-        // close ambient + mid lift + deep atmospheric pool below the card.
-        card: [
-          "inset 0 1px 0 rgba(255,255,255,0.10)",
-          "0 2px 4px rgba(0,0,0,0.35)",
-          "0 12px 28px -4px rgba(0,0,0,0.55)",
-          "0 40px 72px -12px rgba(0,0,0,0.55)",
-          "0 72px 120px -24px rgba(0,0,0,0.40)",
-        ].join(", "),
-        nav: "0 -1px 0 rgba(255,255,255,0.05) inset, 0 -16px 40px rgba(0,0,0,0.55)",
-        fab: "0 14px 34px -8px rgba(84,96,248,0.6)",
-        glow: "0 18px 52px -12px rgba(139,92,246,0.45)",
-        gold: "0 16px 40px -12px rgba(245,166,35,0.45)",
+        // Light "zam" elevation (ported from the reference design).
+        card: "0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)",
+        "card-lg": "0 4px 16px rgba(16,24,40,0.08)",
+        nav: "0 -1px 0 rgba(16,24,40,0.04) inset, 0 -10px 30px rgba(16,24,40,0.06)",
       },
       maxWidth: {
         app: "480px",

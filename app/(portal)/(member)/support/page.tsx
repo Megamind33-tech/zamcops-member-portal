@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Phone, Mail, MapPin, ChevronDown, MessageSquare, CheckCircle2 } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
-import { Field, TextInput, TextArea, Select } from "@/components/ui/Field";
-import { Button } from "@/components/ui/Button";
+import { Phone, Mail, MapPin, ChevronDown, LifeBuoy } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card, CardHeader } from "@/components/zam/Card";
+import { Field, Textarea, Select, Input } from "@/components/zam/Input";
+import { Button } from "@/components/zam/Button";
 
 const faqs = [
   {
@@ -29,100 +31,96 @@ const topics = ["Membership", "Work declarations", "Submissions & uploads", "Roy
 
 export default function SupportScreen() {
   const [open, setOpen] = useState<number | null>(0);
-  const [sent, setSent] = useState(false);
-  const [topic, setTopic] = useState(topics[0]);
   const [message, setMessage] = useState("");
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    toast.success("Your query has been sent — we'll respond within 2 working days.");
+    setMessage("");
+    (e.target as HTMLFormElement).reset();
+  };
+
+  const contacts = [
+    { icon: Phone, label: "Phone", value: "+260 211 250 082" },
+    { icon: Mail, label: "Email", value: "info@zamcops.org.zm" },
+    { icon: MapPin, label: "Office", value: "ZAMCOPS House, Lusaka, Zambia" },
+  ];
 
   return (
     <div>
-      <TopBar title="Support" back="/dashboard" />
+      <PageHeader title="Support" subtitle="Get help from the ZAMCOPS team." />
 
-      <div className="space-y-5 px-4 py-4">
-        {/* Contact */}
-        <section className="card px-4 py-4">
-          <h3 className="mb-3 text-sm font-bold text-white">Contact ZAMCOPS</h3>
-          <div className="space-y-2.5">
-            <a href="tel:+260211250082" className="flex items-center gap-3 text-sm text-night-200">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
-                <Phone size={16} />
-              </span>
-              +260 211 250 082
-            </a>
-            <a href="mailto:info@zamcops.org.zm" className="flex items-center gap-3 text-sm text-night-200">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
-                <Mail size={16} />
-              </span>
-              info@zamcops.org.zm
-            </a>
-            <div className="flex items-center gap-3 text-sm text-night-200">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/[0.06] text-brand-300 ring-1 ring-white/10">
-                <MapPin size={16} />
-              </span>
-              ZAMCOPS House, Lusaka, Zambia
-            </div>
-          </div>
-        </section>
-
-        {/* Submit query */}
-        <section className="card px-4 py-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-white">
-            <MessageSquare size={16} /> Submit a query
-          </h3>
-          {sent ? (
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-500/12 px-3 py-3 text-sm font-medium text-emerald-300">
-              <CheckCircle2 size={18} /> Your query has been sent. We&apos;ll respond within 2 working days.
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (message.trim()) setSent(true);
-              }}
-              className="space-y-3"
-            >
+      <div className="grid items-start gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          <Card>
+            <CardHeader title="Submit a query" description="Tell us what you need help with and we'll get back to you." />
+            <form onSubmit={submit} className="space-y-4 p-5">
               <Field label="Help topic">
-                <Select value={topic} onChange={(e) => setTopic(e.target.value)}>
+                <Select name="topic" defaultValue={topics[0]}>
                   {topics.map((t) => (
                     <option key={t}>{t}</option>
                   ))}
                 </Select>
               </Field>
-              <Field label="Your message">
-                <TextArea
+              <Field label="Your message" required>
+                <Textarea
                   placeholder="Describe your question or issue…"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
+                  required
                 />
               </Field>
-              <Button type="submit" block disabled={!message.trim()}>
-                Send query
-              </Button>
+              <div className="flex justify-end">
+                <Button type="submit" disabled={!message.trim()}>
+                  Send query
+                </Button>
+              </div>
             </form>
-          )}
-        </section>
+          </Card>
+        </div>
 
-        {/* FAQ */}
-        <section>
-          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-night-300">FAQ</h3>
-          <div className="card divide-y divide-white/[0.06]">
-            {faqs.map((f, i) => {
-              const isOpen = open === i;
-              return (
-                <div key={i}>
-                  <button
-                    onClick={() => setOpen(isOpen ? null : i)}
-                    className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
-                  >
-                    <span className="flex-1 text-sm font-semibold text-white">{f.q}</span>
-                    <ChevronDown size={18} className={"shrink-0 text-night-400 transition " + (isOpen ? "rotate-180" : "")} />
-                  </button>
-                  {isOpen && <p className="px-4 pb-4 text-xs leading-relaxed text-night-300">{f.a}</p>}
+        <Card>
+          <CardHeader title="Contact ZAMCOPS" />
+          <div className="space-y-4 p-5">
+            {contacts.map((c) => (
+              <div key={c.label} className="flex items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-zam-orange-soft text-zam-orange">
+                  <c.icon className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold text-zam-muted">{c.label}</p>
+                  <p className="text-sm font-medium text-zam-ink">{c.value}</p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
+            <div className="flex items-start gap-2.5 rounded-xl bg-zam-canvas p-3.5">
+              <LifeBuoy className="mt-0.5 h-4 w-4 shrink-0 text-zam-orange" />
+              <p className="text-xs text-zam-muted">Office hours: Mon–Fri, 08:00–17:00 CAT.</p>
+            </div>
           </div>
-        </section>
+        </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader title="Frequently asked questions" />
+        <div className="divide-y divide-zam-line">
+          {faqs.map((f, i) => (
+            <div key={i}>
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left hover:bg-zam-canvas/50"
+              >
+                <span className="font-semibold text-zam-ink">{f.q}</span>
+                <ChevronDown
+                  className={`h-5 w-5 shrink-0 text-zam-muted transition-transform ${open === i ? "rotate-180" : ""}`}
+                />
+              </button>
+              {open === i && <p className="px-5 pb-4 text-sm leading-relaxed text-zam-muted">{f.a}</p>}
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }

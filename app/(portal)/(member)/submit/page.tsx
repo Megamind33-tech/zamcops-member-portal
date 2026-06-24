@@ -2,64 +2,72 @@
 
 import React from "react";
 import Link from "next/link";
-import { Music2, Disc3, FilePlus2, ChevronRight, Info } from "lucide-react";
-import { TopBar } from "@/components/mobile/TopBar";
+import { Music2, Disc3, FilePlus2, ArrowRight, ShieldCheck } from "lucide-react";
+import { PageHeader } from "@/app/(portal)/(member)/layout";
+import { Card } from "@/components/zam/Card";
 
 const options = [
   {
+    href: "/works/new",
+    icon: FilePlus2,
+    tag: "Copyright",
+    title: "Declare a Work",
+    body: "Register copyright ownership of a song, composition, beat or lyric.",
+  },
+  {
     href: "/submit/single",
     icon: Music2,
+    tag: "Release",
     title: "Submit a Single",
     body: "Upload one song with its audio, cover art and ownership splits.",
-    tint: "from-accent-400 to-accent-700",
   },
   {
     href: "/submit/album",
     icon: Disc3,
+    tag: "Release",
     title: "Submit an Album",
     body: "Create an album and add multiple tracks, each with its own details.",
-    tint: "from-gold-400 to-pop-500",
-  },
-  {
-    href: "/works/new",
-    icon: FilePlus2,
-    title: "Declare a Work",
-    body: "Register copyright ownership of a song, composition, beat or lyric.",
-    tint: "from-iris-400 to-brand-700",
   },
 ];
 
 export default function SubmitHubScreen() {
   return (
     <div>
-      <TopBar title="Submit & Declare" back="/dashboard" />
-      <div className="px-4 py-5">
-        <div className="mb-4 flex items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-xs text-night-300">
-          <Info size={16} className="mt-0.5 shrink-0 text-brand-300" />
-          <p>
-            <span className="font-semibold">Submitting</span> a single or album registers a release.
-            <span className="font-semibold"> Declaring a work</span> records the underlying copyright
-            ownership — they are related but separate.
-          </p>
-        </div>
+      <PageHeader
+        title="Submit"
+        subtitle="Declare a work or register a new release with ZAMCOPS."
+      />
 
-        <div className="space-y-3">
-          {options.map((o) => (
-            <Link
-              key={o.href}
-              href={o.href}
-              className="card flex items-center gap-3 px-4 py-4 transition hover:bg-white/[0.03] active:scale-[0.99]"
-            >
-              <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${o.tint} text-white shadow-[0_14px_30px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/10`}>
-                <o.icon size={20} />
+      <div className="grid md:grid-cols-3 gap-5">
+        {options.map((o) => (
+          <Link key={o.href} href={o.href} className="group">
+            <Card className="p-6 h-full hover:shadow-card-lg hover:border-zam-orange/40 transition">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zam-orange-soft text-zam-orange group-hover:bg-zam-orange group-hover:text-white transition-colors">
+                <o.icon className="h-6 w-6" />
               </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-white">{o.title}</p>
-                <p className="text-xs text-night-300">{o.body}</p>
-              </div>
-              <ChevronRight size={18} className="shrink-0 text-night-400" />
-            </Link>
-          ))}
+              <span className="mt-4 inline-block rounded-full bg-zam-canvas px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-zam-muted">
+                {o.tag}
+              </span>
+              <h3 className="mt-3 font-display font-semibold text-lg text-zam-ink">{o.title}</h3>
+              <p className="mt-1 text-sm text-zam-muted">{o.body}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-zam-orange">
+                Start <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-5 flex items-start gap-3 rounded-2xl border border-zam-line bg-white p-5">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zam-green-soft text-zam-green">
+          <ShieldCheck className="h-5 w-5" />
+        </span>
+        <div>
+          <p className="text-sm font-semibold text-zam-ink">Every submission is reviewed</p>
+          <p className="mt-0.5 text-sm text-zam-muted">
+            Our team verifies each work and release before it is registered. Submitting a single or album
+            registers a release, while declaring a work records the underlying copyright ownership.
+          </p>
         </div>
       </div>
     </div>
