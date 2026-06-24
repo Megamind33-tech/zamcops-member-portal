@@ -204,6 +204,23 @@ export interface Statement {
   issuedAt: string;
 }
 
+export type MemberDocType =
+  | "Clearance Letter"
+  | "Deed of Assignment"
+  | "Contract"
+  | "ID Document"
+  | "Other";
+
+export interface MemberDocument {
+  id: string;
+  ownerId: string;
+  docType: MemberDocType;
+  fileName: string;
+  reference?: string;
+  note?: string;
+  uploadedAt: string;
+}
+
 export type DistributionStatus = "Draft" | "Published";
 
 // A society-wide distribution period. Members only ever see Published periods —

@@ -237,3 +237,15 @@ export function licenseRequestDTO(r: any): LicenseRequest {
     updatedAt: iso(r.updatedAt),
   };
 }
+
+export function memberDocumentDTO(d: any) {
+  return {
+    id: d.id,
+    ownerId: d.ownerId,
+    docType: d.docType,
+    fileName: d.fileName,
+    reference: d.reference || undefined,
+    note: d.note || undefined,
+    uploadedAt: iso(d.uploadedAt),
+  };
+}

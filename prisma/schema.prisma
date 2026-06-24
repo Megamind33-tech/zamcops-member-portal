@@ -64,6 +64,7 @@ model Member {
   distributionEntries DistributionEntry[]
   licensableWorks     LicensableWork[]
   licenseRequests     LicenseRequest[]
+  documents           MemberDocument[]
 }
 
 model WorkDeclaration {
@@ -253,4 +254,20 @@ model LicenseRequest {
 
   @@index([ownerId])
   @@index([workId])
+}
+
+// Official documents an admin attaches to a member's file — clearance letters,
+// deeds of assignment, signed contracts, ID copies, etc. (File bytes are not
+// stored yet; this records the document metadata / filename.)
+model MemberDocument {
+  id         String   @id @default(cuid())
+  owner      Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String
+  docType    String // Clearance Letter | Deed of Assignment | Contract | ID Document | Other
+  fileName   String
+  reference  String   @default("")
+  note       String   @default("")
+  uploadedAt DateTime @default(now())
+
+  @@index([ownerId])
 }
