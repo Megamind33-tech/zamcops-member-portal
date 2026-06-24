@@ -9,7 +9,7 @@ export type MemberRole =
   | "Label"
   | "Next of Kin/Representative";
 
-export type MembershipStatus = "Pending" | "Active" | "Suspended" | "Lapsed";
+export type MembershipStatus = "Pending" | "Active" | "Suspended" | "Lapsed" | "Rejected";
 
 export type ReviewStatus = "Pending" | "Approved" | "Rejected" | "Under Review";
 
