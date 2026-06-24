@@ -1,5 +1,6 @@
 import React from "react";
 import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
+import { Logo } from "@/components/ui/Logo";
 
 type Photo =
   | "auth-mic"
@@ -33,18 +34,7 @@ export function AuthScreen({
 
       {(badge || topRight) && (
         <div className="relative z-10 flex items-center justify-between px-6 pt-7">
-          {badge ? (
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-xl border border-white/20 bg-white/10 font-display text-base font-bold text-white backdrop-blur">
-                Z
-              </span>
-              <span className="font-display text-[13px] font-bold uppercase tracking-[0.2em] text-white">
-                ZAMCOPS
-              </span>
-            </div>
-          ) : (
-            <span />
-          )}
+          {badge ? <Logo size={20} onDark tagline={false} /> : <span />}
           {topRight}
         </div>
       )}

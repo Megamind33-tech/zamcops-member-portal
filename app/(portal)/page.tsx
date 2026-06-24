@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/lib/store";
 import { PhotoBackdrop } from "@/components/media/PhotoBackdrop";
+import { Logo } from "@/components/ui/Logo";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -42,10 +43,10 @@ export default function SplashScreen() {
               />
             ))}
           </div>
-          <h1 className="mt-5 font-display text-[3rem] font-bold leading-[0.95] tracking-[-0.03em]">
-            ZAMCOPS
-          </h1>
-          <p className="mt-2 text-[12px] font-bold uppercase tracking-[0.26em] text-white/70">
+          <div className="mt-5">
+            <Logo size={46} onDark tagline={false} />
+          </div>
+          <p className="mt-3 text-[12px] font-bold uppercase tracking-[0.26em] text-white/70">
             Member Portal
           </p>
           <p className="mt-5 max-w-[18rem] text-[13px] leading-relaxed text-white/55">
