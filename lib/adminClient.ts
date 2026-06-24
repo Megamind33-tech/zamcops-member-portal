@@ -82,6 +82,15 @@ export function useAdminData() {
     [load]
   );
 
+  // Approve / reject / suspend a member's application and notify them.
+  const setMemberStatus = useCallback(
+    async (id: string, status: string) => {
+      await postJSON("/api/admin/members", { id, status }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
   // Opens a new (draft) distribution period.
   const createDistribution = useCallback(
     async (payload: { periodLabel: string; notes?: string }) => {
@@ -127,6 +136,7 @@ export function useAdminData() {
     ...data,
     loading,
     setReviewStatus,
+    setMemberStatus,
     createDistribution,
     setDistributionStatus,
     saveDistributionEntry,
