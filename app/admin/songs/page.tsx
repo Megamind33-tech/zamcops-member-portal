@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
@@ -9,7 +10,12 @@ import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
 export default function AdminSongsPage() {
-  const { singles, setReviewStatus } = useAdminData();
+  const { singles, setReviewStatus, deleteSubmission } = useAdminData();
+
+  const del = async (id: string, title: string) => {
+    if (!window.confirm(`Permanently delete the single “${title}”? This can't be undone.`)) return;
+    await deleteSubmission("single", id);
+  };
 
   return (
     <div>
@@ -54,11 +60,20 @@ export default function AdminSongsPage() {
                     <StatusBadge status={s.status} />
                   </Td>
                   <Td>
-                    <ReviewActions
-                      disabled={s.status === "Approved" || s.status === "Rejected"}
-                      onApprove={() => setReviewStatus("single", s.id, "Approved")}
-                      onReject={() => setReviewStatus("single", s.id, "Rejected")}
-                    />
+                    <div className="flex items-center justify-end gap-2">
+                      <ReviewActions
+                        disabled={s.status === "Approved" || s.status === "Rejected"}
+                        onApprove={() => setReviewStatus("single", s.id, "Approved")}
+                        onReject={() => setReviewStatus("single", s.id, "Rejected")}
+                      />
+                      <button
+                        onClick={() => del(s.id, s.title)}
+                        title="Delete single"
+                        className="inline-flex items-center gap-1 rounded-lg bg-zam-red/10 px-2.5 py-1.5 text-xs font-semibold text-zam-red transition hover:bg-zam-red/20"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
                   </Td>
                 </tr>
               ))}

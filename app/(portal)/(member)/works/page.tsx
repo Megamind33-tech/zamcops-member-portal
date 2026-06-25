@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import { FilePlus2, Music, Trash2 } from "lucide-react";
+import { FilePlus2, Music, Trash2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useApp, useMemberData } from "@/lib/store";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
@@ -119,13 +119,19 @@ export default function WorksScreen() {
                       <StatusBadge status={w.status} />
                     </Td>
                     <Td className="text-right">
-                      <button
-                        onClick={() => remove(w.id, w.title)}
-                        disabled={busyId === w.id}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
-                      >
-                        <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
-                      </button>
+                      {w.status === "Approved" ? (
+                        <span className="inline-flex items-center gap-1 text-xs italic text-zam-muted">
+                          <Lock size={12} /> Registered
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => remove(w.id, w.title)}
+                          disabled={busyId === w.id}
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                        >
+                          <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                        </button>
+                      )}
                     </Td>
                   </Tr>
                 ))}
@@ -154,13 +160,19 @@ export default function WorksScreen() {
                   </span>
                 </div>
                 <div className="mt-2 flex justify-end">
-                  <button
-                    onClick={() => remove(w.id, w.title)}
-                    disabled={busyId === w.id}
-                    className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
-                  >
-                    <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
-                  </button>
+                  {w.status === "Approved" ? (
+                    <span className="inline-flex items-center gap-1 text-xs italic text-zam-muted">
+                      <Lock size={12} /> Registered — contact ZAMCOPS to amend
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => remove(w.id, w.title)}
+                      disabled={busyId === w.id}
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                    >
+                      <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                    </button>
+                  )}
                 </div>
               </Card>
             ))}
