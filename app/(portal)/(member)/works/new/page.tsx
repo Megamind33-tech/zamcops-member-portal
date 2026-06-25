@@ -191,7 +191,7 @@ export default function WorkDeclarationScreen() {
             <div className="p-5">
               <AudioUpload
                 label="Upload audio file"
-                hint="WAV or MP3 of the work · max 4MB"
+                hint="WAV or MP3 of the work"
                 value={audioFile}
                 onChange={setAudioFile}
                 linkedTo={form.title}

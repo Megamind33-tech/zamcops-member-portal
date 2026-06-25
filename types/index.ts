@@ -168,6 +168,7 @@ export interface UploadFile {
   hasFile?: boolean; // a downloadable/playable binary is stored
   fileSize?: number; // bytes
   mimeType?: string;
+  url?: string; // Vercel Blob URL, when stored there
 }
 
 export interface RoyaltyUsageLog {

@@ -137,7 +137,7 @@ export default function SingleSubmissionScreen() {
             <div className="p-5 space-y-3">
               <AudioUpload
                 label="Upload master audio"
-                hint="WAV or high-quality MP3 · max 4MB"
+                hint="WAV or high-quality MP3"
                 value={form.audioFile}
                 onChange={(name) => setFile("audioFile")(name)}
                 linkedTo={form.title}

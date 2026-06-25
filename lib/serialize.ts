@@ -126,9 +126,10 @@ export function uploadDTO(u: any): UploadFile {
     uploadedAt: iso(u.uploadedAt),
     status: u.status,
     rejectionReason: u.rejectionReason || undefined,
-    hasFile: !!u.data,
+    hasFile: !!(u.data || u.url),
     fileSize: u.fileSize ?? 0,
     mimeType: u.mimeType || undefined,
+    url: u.url || undefined,
   };
 }
 

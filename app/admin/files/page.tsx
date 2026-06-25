@@ -73,7 +73,7 @@ export default function AdminFilesPage() {
                           <audio
                             controls
                             preload="none"
-                            src={`/api/admin/files/${u.id}`}
+                            src={u.url || `/api/admin/files/${u.id}`}
                             className="mt-2 h-8 w-[240px] max-w-full"
                           />
                         )}
@@ -96,8 +96,10 @@ export default function AdminFilesPage() {
                     <div className="flex items-center justify-end gap-2">
                       {u.hasFile && (
                         <a
-                          href={`/api/admin/files/${u.id}?download=1`}
-                          download
+                          href={u.url || `/api/admin/files/${u.id}?download=1`}
+                          download={u.fileName}
+                          target={u.url ? "_blank" : undefined}
+                          rel={u.url ? "noopener noreferrer" : undefined}
                           className="inline-flex items-center gap-1 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink ring-1 ring-zam-line transition hover:bg-white"
                         >
                           <Download size={14} /> Download

@@ -197,7 +197,7 @@ export default function AlbumSubmissionScreen() {
                       </Field>
                       <AudioUpload
                         label="Upload track audio"
-                        hint="WAV or MP3 · max 4MB"
+                        hint="WAV or MP3"
                         value={t.audioFile}
                         onChange={(name) => updateTrack(t.id, { audioFile: name })}
                         linkedTo={`${title || "Album"} · ${t.title || `Track ${idx + 1}`}`}

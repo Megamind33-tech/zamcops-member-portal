@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import { Music, UploadCloud, Trash2, Loader2, CheckCircle2 } from "lucide-react";
 
-const MAX_BYTES = 4 * 1024 * 1024; // keep under the serverless request limit
+const INLINE_MAX = 4 * 1024 * 1024; // inline fallback limit (serverless body)
 
 function prettySize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -32,31 +33,66 @@ export function AudioUpload({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [uploadId, setUploadId] = useState<string>("");
 
+  // Record an already-uploaded Blob file on an UploadFile row.
+  const recordBlob = async (file: File, blobUrl: string): Promise<string> => {
+    const res = await fetch("/api/member/upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: blobUrl,
+        fileName: file.name,
+        fileType: "Audio",
+        fileSize: file.size,
+        mimeType: file.type,
+        linkedTo: linkedTo || "",
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Could not save the upload.");
+    return data.id as string;
+  };
+
+  // Inline fallback for small files when no Blob store is connected.
+  const inlineUpload = async (file: File): Promise<string> => {
+    if (file.size > INLINE_MAX)
+      throw new Error(`File is too large (${prettySize(file.size)}). Blob storage isn't connected — max 4MB without it.`);
+    const qs = new URLSearchParams({ type: "Audio", name: file.name, linkedTo: linkedTo || "" });
+    const res = await fetch(`/api/member/upload?${qs.toString()}`, {
+      method: "POST",
+      headers: { "Content-Type": file.type || "application/octet-stream" },
+      body: file,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Upload failed.");
+    return data.id as string;
+  };
+
   const pick = async (file: File | undefined | null) => {
     if (!file) return;
     setError("");
     if (!file.type.startsWith("audio/")) return setError("Please choose an audio file (MP3, WAV, M4A…).");
-    if (file.size > MAX_BYTES) return setError(`File is too large (${prettySize(file.size)}). Max 4MB.`);
 
     setBusy(true);
     try {
-      const qs = new URLSearchParams({ type: "Audio", name: file.name, linkedTo: linkedTo || "" });
-      const res = await fetch(`/api/member/upload?${qs.toString()}`, {
-        method: "POST",
-        headers: { "Content-Type": file.type || "application/octet-stream" },
-        body: file,
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data.error || "Upload failed.");
-        return;
+      let id: string;
+      try {
+        // Preferred: direct-to-Blob upload (no size limit).
+        const blob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/blob/upload",
+          contentType: file.type,
+        });
+        id = await recordBlob(file, blob.url);
+      } catch {
+        // Blob store not connected (or upload blocked) → inline fallback.
+        id = await inlineUpload(file);
       }
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setPreviewUrl(URL.createObjectURL(file));
-      setUploadId(data.id);
+      setUploadId(id);
       onChange(file.name);
-    } catch {
-      setError("Upload failed. Please try again.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -116,7 +152,7 @@ export function AudioUpload({
         </span>
         <span className="min-w-0">
           <span className="block text-sm font-semibold text-zam-ink">{busy ? "Uploading…" : label}</span>
-          <span className="block text-xs text-zam-muted">{hint || "MP3, WAV or M4A · max 4MB"}</span>
+          <span className="block text-xs text-zam-muted">{hint || "MP3, WAV or M4A"}</span>
         </span>
       </button>
       {error && <p className="mt-1 text-xs text-zam-red">{error}</p>}
