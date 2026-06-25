@@ -10,7 +10,8 @@ import {
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
 import { useAdminData } from "@/lib/adminClient";
-import { formatDate, initials } from "@/lib/format";
+import { formatDate } from "@/lib/format";
+import { Avatar } from "@/components/zam/Misc";
 import type { MemberDocType } from "@/types";
 
 const DOC_TYPES: MemberDocType[] = ["Clearance Letter", "Deed of Assignment", "Contract", "ID Document", "Other"];
@@ -59,9 +60,7 @@ export default function AdminMemberDetailPage() {
       {/* Header */}
       <div className="card flex flex-wrap items-center justify-between gap-4 p-5">
         <div className="flex items-center gap-4">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-accent-500 text-lg font-bold text-night-950">
-            {initials(member.stageName || member.fullName)}
-          </span>
+          <Avatar name={member.stageName || member.fullName} src={member.profilePhoto || undefined} size={56} />
           <div>
             <h1 className="text-xl font-extrabold text-white">{member.fullName}</h1>
             <p className="text-sm text-night-300">

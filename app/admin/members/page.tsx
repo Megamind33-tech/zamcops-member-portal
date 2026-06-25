@@ -6,7 +6,8 @@ import { Check, X, Ban, RotateCcw, Download, ChevronRight } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
-import { formatDate, initials } from "@/lib/format";
+import { formatDate } from "@/lib/format";
+import { Avatar } from "@/components/zam/Misc";
 import { downloadMembers } from "@/lib/export";
 import type { Member } from "@/types";
 
@@ -77,9 +78,7 @@ export default function AdminMembersPage() {
                 <tr key={m.id} className="hover:bg-white/[0.03]">
                   <Td>
                     <Link href={`/admin/members/${m.id}`} className="group flex items-center gap-3">
-                      <span className="grid h-9 w-9 place-items-center rounded-full bg-accent-500 text-xs font-bold text-night-950">
-                        {initials(m.stageName || m.fullName)}
-                      </span>
+                      <Avatar name={m.stageName || m.fullName} src={m.profilePhoto || undefined} size={36} />
                       <div>
                         <p className="font-semibold text-white group-hover:text-accent-300">{m.fullName}</p>
                         <p className="text-xs text-night-300">{m.stageName || "—"}</p>
