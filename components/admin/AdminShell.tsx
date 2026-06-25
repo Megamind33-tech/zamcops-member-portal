@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
+  Contact,
   FileText,
   Music2,
   Disc3,
@@ -30,6 +31,7 @@ import { cn } from "@/lib/format";
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/members", label: "Member Applications", icon: Users },
+  { href: "/admin/directory", label: "All Members", icon: Contact },
   { href: "/admin/works", label: "Work Declarations", icon: FileText },
   { href: "/admin/songs", label: "Song Submissions", icon: Music2 },
   { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
