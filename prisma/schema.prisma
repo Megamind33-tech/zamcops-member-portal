@@ -85,6 +85,7 @@ model WorkDeclaration {
   ownershipSplits  String   @default("[]") // JSON OwnershipSplit[] — each entry now also carries ipiNumber + rightsType
   isrc             String   @default("")
   iswc             String   @default("")
+  audioFile        String   @default("") // reference recording — file name
   dateCreated      String   @default("")
   status           String   @default("Pending")
   submittedAt      DateTime @default(now())
@@ -120,7 +121,8 @@ model AlbumSubmission {
   title       String
   artistName  String
   releaseDate String   @default("")
-  coverArt    String   @default("")
+  coverArt    String   @default("") // front cover — image data URL
+  backCover   String   @default("") // back cover — image data URL
   tracks      String   @default("[]") // JSON Track[]
   status      String   @default("Pending")
   submittedAt DateTime @default(now())

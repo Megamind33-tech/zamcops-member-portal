@@ -10,6 +10,7 @@ import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { SplitsEditor } from "@/components/zam/SplitsEditor";
 import { FilePicker } from "@/components/zam/FilePicker";
+import { CoverUpload } from "@/components/zam/CoverUpload";
 import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES } from "@/data/reference";
@@ -41,6 +42,7 @@ export default function AlbumSubmissionScreen() {
   const [artistName, setArtistName] = useState(owner);
   const [releaseDate, setReleaseDate] = useState("");
   const [coverArt, setCoverArt] = useState("");
+  const [backCover, setBackCover] = useState("");
   const [tracks, setTracks] = useState<Track[]>([newTrack(owner)]);
   const [open, setOpen] = useState<string | null>(tracks[0]?.id ?? null);
 
@@ -68,7 +70,7 @@ export default function AlbumSubmissionScreen() {
     if (tracks.some((t) => !splitsValid(t.ownershipSplits)))
       return setError("Each track's ownership splits must total 100%.");
     setBusy(true);
-    const res = await addAlbum({ title, artistName, releaseDate, coverArt, tracks });
+    const res = await addAlbum({ title, artistName, releaseDate, coverArt, backCover, tracks });
     setBusy(false);
     if (res.ok && res.item) {
       toast.success("Album submitted");
@@ -108,13 +110,10 @@ export default function AlbumSubmissionScreen() {
             <Field label="Release date">
               <Input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} />
             </Field>
-            <FilePicker
-              label="Album cover art"
-              kind="image"
-              hint="Min. 1400×1400px"
-              value={coverArt}
-              onChange={(name) => setCoverArt(name ?? "")}
-            />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <CoverUpload label="Front cover" hint="Min. 1400×1400px" value={coverArt} onChange={setCoverArt} />
+              <CoverUpload label="Back cover" hint="Tracklist / sleeve art" value={backCover} onChange={setBackCover} />
+            </div>
           </div>
         </Card>
 

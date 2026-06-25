@@ -39,7 +39,12 @@ export default function AdminAlbumsPage() {
                 <tr key={a.id} className="align-top hover:bg-white/[0.03]">
                   <Td className="font-semibold text-white">
                     <div className="flex items-center gap-3">
-                      <CoverArt seed={a.title} size={40} rounded="rounded-lg" />
+                      {a.coverArt ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={a.coverArt} alt={`${a.title} cover`} className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-zam-line" />
+                      ) : (
+                        <CoverArt seed={a.title} size={40} rounded="rounded-lg" />
+                      )}
                       <div className="min-w-0">
                         {a.title}
                         <span className="mt-1 block text-xs font-normal text-night-400">

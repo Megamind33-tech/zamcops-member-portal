@@ -36,9 +36,23 @@ export async function POST(req: Request) {
       ownershipSplits: JSON.stringify(splits),
       isrc: b.isrc ?? "",
       iswc: b.iswc ?? "",
+      audioFile: b.audioFile ?? "",
       dateCreated: b.dateCreated ?? "",
     },
   });
+
+  // Record the reference recording so it appears on the Uploads screen.
+  if (work.audioFile) {
+    await prisma.uploadFile.create({
+      data: {
+        ownerId: session.sub,
+        fileName: work.audioFile,
+        fileType: "Audio",
+        linkedTo: work.title,
+        status: "Processing",
+      },
+    });
+  }
 
   await prisma.statement.create({
     data: {

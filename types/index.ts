@@ -108,6 +108,7 @@ export interface WorkDeclaration {
   ownershipSplits: OwnershipSplit[];
   isrc?: string;
   iswc?: string;
+  audioFile?: string; // reference recording — file name
   dateCreated: string;
   status: ReviewStatus;
   submittedAt: string;
@@ -148,7 +149,8 @@ export interface AlbumSubmission {
   title: string;
   artistName: string;
   releaseDate: string;
-  coverArt?: string;
+  coverArt?: string; // front cover — image data URL
+  backCover?: string; // back cover — image data URL
   tracks: Track[];
   status: ReviewStatus;
   submittedAt: string;
