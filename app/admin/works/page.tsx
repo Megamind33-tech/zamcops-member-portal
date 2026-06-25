@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
@@ -9,8 +10,14 @@ import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
 export default function AdminWorksPage() {
-  const { works, members, setReviewStatus } = useAdminData();
+  const { works, members, setReviewStatus, deleteSubmission } = useAdminData();
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
+
+  const del = async (id: string, title: string) => {
+    if (!window.confirm(`Permanently delete the declaration “${title}”? This removes it from the member's repertoire and can't be undone.`))
+      return;
+    await deleteSubmission("work", id);
+  };
 
   return (
     <div>
@@ -55,11 +62,20 @@ export default function AdminWorksPage() {
                     <StatusBadge status={w.status} />
                   </Td>
                   <Td>
-                    <ReviewActions
-                      disabled={w.status === "Approved" || w.status === "Rejected"}
-                      onApprove={() => setReviewStatus("work", w.id, "Approved")}
-                      onReject={() => setReviewStatus("work", w.id, "Rejected")}
-                    />
+                    <div className="flex items-center justify-end gap-2">
+                      <ReviewActions
+                        disabled={w.status === "Approved" || w.status === "Rejected"}
+                        onApprove={() => setReviewStatus("work", w.id, "Approved")}
+                        onReject={() => setReviewStatus("work", w.id, "Rejected")}
+                      />
+                      <button
+                        onClick={() => del(w.id, w.title)}
+                        title="Delete declaration"
+                        className="inline-flex items-center gap-1 rounded-lg bg-zam-red/10 px-2.5 py-1.5 text-xs font-semibold text-zam-red transition hover:bg-zam-red/20"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
                   </Td>
                 </tr>
               ))}

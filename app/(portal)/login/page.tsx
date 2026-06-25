@@ -72,10 +72,6 @@ export default function LoginScreen() {
         <p className="relative z-10 text-xs text-white/50">
           © 2026 Zambian Music Copyright Protection Society
         </p>
-
-        {/* Decorative circles */}
-        <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full border-[32px] border-zam-orange/20" />
-        <div className="pointer-events-none absolute bottom-10 right-10 h-40 w-40 rounded-full border-[20px] border-zam-orange/30" />
       </div>
 
       {/* Form panel */}

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { AdminHeader } from "@/components/admin/AdminShell";
-import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
+import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { CoverArt } from "@/components/media/CoverArt";
 import { Illustration } from "@/components/media/Illustration";
@@ -12,10 +12,17 @@ import type { UploadStatus } from "@/types";
 const filters: ("All" | UploadStatus)[] = ["All", "Pending", "Processing", "Approved", "Rejected"];
 
 export default function AdminFilesPage() {
-  const { uploads, members } = useAdminData();
+  const { uploads, members, setFileStatus } = useAdminData();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
+  const [busyId, setBusyId] = useState<string | null>(null);
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
   const shown = uploads.filter((u) => filter === "All" || u.status === filter);
+
+  const act = async (id: string, status: "Approved" | "Rejected") => {
+    setBusyId(id);
+    await setFileStatus(id, status);
+    setBusyId(null);
+  };
 
   return (
     <div>
@@ -45,6 +52,7 @@ export default function AdminFilesPage() {
                 <Th>Member</Th>
                 <Th>Uploaded</Th>
                 <Th>Status</Th>
+                <Th className="text-right">Actions</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06]">
@@ -68,11 +76,22 @@ export default function AdminFilesPage() {
                       )}
                     </div>
                   </Td>
+                  <Td className="text-right">
+                    {u.status === "Pending" || u.status === "Processing" ? (
+                      <ReviewActions
+                        disabled={busyId === u.id}
+                        onApprove={() => act(u.id, "Approved")}
+                        onReject={() => act(u.id, "Rejected")}
+                      />
+                    ) : (
+                      <span className="text-xs italic text-zam-muted">No actions</span>
+                    )}
+                  </Td>
                 </tr>
               ))}
               {shown.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">
+                  <Td colSpan={7} className="py-8 text-center text-night-400">
                     <div className="flex flex-col items-center gap-3">
                       <Illustration name="upload" />
                       <span>No files match this filter.</span>

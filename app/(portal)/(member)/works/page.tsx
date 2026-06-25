@@ -2,8 +2,9 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import { FilePlus2, Music } from "lucide-react";
-import { useMemberData } from "@/lib/store";
+import { FilePlus2, Music, Trash2, Lock } from "lucide-react";
+import { toast } from "sonner";
+import { useApp, useMemberData } from "@/lib/store";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
 import { Card } from "@/components/zam/Card";
 import { Button } from "@/components/zam/Button";
@@ -18,8 +19,19 @@ const filters: ("All" | ReviewStatus)[] = ["All", "Pending", "Approved", "Reject
 
 export default function WorksScreen() {
   const { works } = useMemberData();
+  const { deleteWork } = useApp();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
   const [query, setQuery] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const remove = async (id: string, title: string) => {
+    if (!window.confirm(`Delete the declaration for “${title}”? This can't be undone.`)) return;
+    setBusyId(id);
+    const res = await deleteWork(id);
+    setBusyId(null);
+    if (res.ok) toast.success("Work declaration deleted.");
+    else toast.error(res.error || "Could not delete this declaration.");
+  };
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -91,6 +103,7 @@ export default function WorksScreen() {
                   <Th>ISRC</Th>
                   <Th>Created</Th>
                   <Th>Status</Th>
+                  <Th className="text-right">Actions</Th>
                 </Tr>
               </thead>
               <tbody>
@@ -104,6 +117,21 @@ export default function WorksScreen() {
                     <Td className="text-zam-muted">{formatDate(w.submittedAt)}</Td>
                     <Td>
                       <StatusBadge status={w.status} />
+                    </Td>
+                    <Td className="text-right">
+                      {w.status === "Approved" ? (
+                        <span className="inline-flex items-center gap-1 text-xs italic text-zam-muted">
+                          <Lock size={12} /> Registered
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => remove(w.id, w.title)}
+                          disabled={busyId === w.id}
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                        >
+                          <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                        </button>
+                      )}
                     </Td>
                   </Tr>
                 ))}
@@ -130,6 +158,21 @@ export default function WorksScreen() {
                     {w.ownershipSplits.length} split{w.ownershipSplits.length === 1 ? "" : "s"}
                     {w.isrc ? ` · ISRC ${w.isrc}` : ""}
                   </span>
+                </div>
+                <div className="mt-2 flex justify-end">
+                  {w.status === "Approved" ? (
+                    <span className="inline-flex items-center gap-1 text-xs italic text-zam-muted">
+                      <Lock size={12} /> Registered — contact ZAMCOPS to amend
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => remove(w.id, w.title)}
+                      disabled={busyId === w.id}
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                    >
+                      <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                    </button>
+                  )}
                 </div>
               </Card>
             ))}

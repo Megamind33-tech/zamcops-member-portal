@@ -85,6 +85,24 @@ export function useAdminData() {
     [load]
   );
 
+  // Permanently delete a submission (admin-only — including registered ones).
+  const deleteSubmission = useCallback(
+    async (kind: "work" | "single" | "album", id: string) => {
+      await postJSON("/api/admin/review", { kind, id }, "DELETE");
+      await load();
+    },
+    [load]
+  );
+
+  // Approve / reject an uploaded file and notify the owner.
+  const setFileStatus = useCallback(
+    async (id: string, status: string, reason?: string) => {
+      await postJSON("/api/admin/files", { id, status, reason }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
   // Approve / reject / suspend a member's application and notify them.
   const setMemberStatus = useCallback(
     async (id: string, status: string) => {
@@ -158,6 +176,8 @@ export function useAdminData() {
     ...data,
     loading,
     setReviewStatus,
+    deleteSubmission,
+    setFileStatus,
     setMemberStatus,
     attachDocument,
     removeDocument,

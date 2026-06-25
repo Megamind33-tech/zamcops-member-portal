@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { User, MapPin, Banknote, Users, FileUp, Camera } from "lucide-react";
+import { User, MapPin, Banknote, Users, FileUp } from "lucide-react";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
 import { Card, CardHeader } from "@/components/zam/Card";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { Button } from "@/components/zam/Button";
-import { Progress, Avatar } from "@/components/zam/Misc";
+import { Progress } from "@/components/zam/Misc";
 import { FilePicker } from "@/components/zam/FilePicker";
+import { ImageUpload } from "@/components/zam/ImageUpload";
 import { useApp } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
 import { ZM_PROVINCES } from "@/data/reference";
@@ -47,27 +48,24 @@ export default function ProfileScreen() {
         }
       />
 
-      {/* Completion meter */}
+      {/* Profile photo + completion meter */}
       <Card className="mb-6 p-5">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Avatar name={form.fullName} size={64} />
-            <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-zam-orange text-white">
-              <Camera className="h-3.5 w-3.5" />
-            </span>
+        <ImageUpload
+          name={form.fullName}
+          value={form.profilePhoto}
+          onChange={(dataUrl) => setForm((f) => ({ ...f, profilePhoto: dataUrl }))}
+        />
+        <div className="mt-5 border-t border-zam-line pt-4">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-sm font-semibold text-zam-ink">Profile completion</span>
+            <span className="text-sm font-bold text-zam-orange">{completion}%</span>
           </div>
-          <div className="flex-1">
-            <div className="mb-1.5 flex items-center justify-between">
-              <span className="text-sm font-semibold text-zam-ink">Profile completion</span>
-              <span className="text-sm font-bold text-zam-orange">{completion}%</span>
-            </div>
-            <Progress value={completion} tone={completion === 100 ? "green" : "orange"} />
-            <p className="mt-1.5 text-xs text-zam-muted">
-              {completion === 100
-                ? "Your profile is complete — you're ready to receive payouts."
-                : "Complete all sections to unlock royalty payouts."}
-            </p>
-          </div>
+          <Progress value={completion} tone={completion === 100 ? "green" : "orange"} />
+          <p className="mt-1.5 text-xs text-zam-muted">
+            {completion === 100
+              ? "Your profile is complete — you're ready to receive payouts."
+              : "Complete all sections to unlock royalty payouts. Don't forget to save your changes."}
+          </p>
         </div>
       </Card>
 
@@ -201,20 +199,13 @@ export default function ProfileScreen() {
             }
             description="Required for KYC verification"
           />
-          <div className="grid gap-3 p-5 sm:grid-cols-2">
+          <div className="p-5">
             <FilePicker
               label="NRC / Passport copy"
               hint="PDF or image"
               kind="document"
               value={form.nrcDocument}
               onChange={setFile("nrcDocument")}
-            />
-            <FilePicker
-              label="Profile photo"
-              hint="Clear headshot"
-              kind="image"
-              value={form.profilePhoto}
-              onChange={setFile("profilePhoto")}
             />
           </div>
         </Card>
