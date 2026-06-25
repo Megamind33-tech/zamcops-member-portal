@@ -27,8 +27,6 @@ export default function AdminLoginScreen() {
 
   return (
     <div className="relative grid min-h-[100dvh] place-items-center overflow-hidden bg-zam-ink px-4">
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full border-[40px] border-zam-orange/10" />
-      <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full border-[28px] border-zam-orange/10" />
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-6 flex justify-center">
           <span className="inline-flex rounded-2xl bg-white px-4 py-3 shadow-lg">
