@@ -119,17 +119,13 @@ export default function WorksScreen() {
                       <StatusBadge status={w.status} />
                     </Td>
                     <Td className="text-right">
-                      {w.status === "Approved" ? (
-                        <span className="text-xs italic text-zam-muted">Registered</span>
-                      ) : (
-                        <button
-                          onClick={() => remove(w.id, w.title)}
-                          disabled={busyId === w.id}
-                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
-                        >
-                          <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
-                        </button>
-                      )}
+                      <button
+                        onClick={() => remove(w.id, w.title)}
+                        disabled={busyId === w.id}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                      >
+                        <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                      </button>
                     </Td>
                   </Tr>
                 ))}
@@ -157,17 +153,15 @@ export default function WorksScreen() {
                     {w.isrc ? ` · ISRC ${w.isrc}` : ""}
                   </span>
                 </div>
-                {w.status !== "Approved" && (
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      onClick={() => remove(w.id, w.title)}
-                      disabled={busyId === w.id}
-                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
-                    >
-                      <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
-                    </button>
-                  </div>
-                )}
+                <div className="mt-2 flex justify-end">
+                  <button
+                    onClick={() => remove(w.id, w.title)}
+                    disabled={busyId === w.id}
+                    className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                  >
+                    <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
               </Card>
             ))}
           </div>

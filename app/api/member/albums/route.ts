@@ -53,7 +53,7 @@ export async function POST(req: Request) {
   return json({ album: albumDTO(album) }, 201);
 }
 
-// Members may delete their own album while not yet registered (Approved).
+// Members may delete their own album (any status).
 export async function DELETE(req: Request) {
   const session = await requireMember();
   if (!session) return bad("Not authenticated.", 401);
@@ -64,8 +64,6 @@ export async function DELETE(req: Request) {
 
   const row = await prisma.albumSubmission.findUnique({ where: { id } });
   if (!row || row.ownerId !== session.sub) return bad("Album not found.", 404);
-  if (row.status === "Approved")
-    return bad("Approved albums are part of your registered repertoire and can't be deleted. Contact ZAMCOPS to amend them.", 409);
 
   await prisma.albumSubmission.delete({ where: { id } });
   return json({ ok: true });

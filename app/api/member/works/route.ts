@@ -60,7 +60,7 @@ export async function POST(req: Request) {
   return json({ work: workDTO(work) }, 201);
 }
 
-// Members may delete their own declarations while not yet registered (Approved).
+// Members may delete their own declarations (any status).
 export async function DELETE(req: Request) {
   const session = await requireMember();
   if (!session) return bad("Not authenticated.", 401);
@@ -71,8 +71,6 @@ export async function DELETE(req: Request) {
 
   const row = await prisma.workDeclaration.findUnique({ where: { id } });
   if (!row || row.ownerId !== session.sub) return bad("Declaration not found.", 404);
-  if (row.status === "Approved")
-    return bad("Approved works are part of your registered repertoire and can't be deleted. Contact ZAMCOPS to amend a registered work.", 409);
 
   await prisma.workDeclaration.delete({ where: { id } });
   return json({ ok: true });
