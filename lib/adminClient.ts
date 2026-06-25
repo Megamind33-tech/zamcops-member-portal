@@ -85,6 +85,15 @@ export function useAdminData() {
     [load]
   );
 
+  // Approve / reject an uploaded file and notify the owner.
+  const setFileStatus = useCallback(
+    async (id: string, status: string, reason?: string) => {
+      await postJSON("/api/admin/files", { id, status, reason }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
   // Approve / reject / suspend a member's application and notify them.
   const setMemberStatus = useCallback(
     async (id: string, status: string) => {
@@ -158,6 +167,7 @@ export function useAdminData() {
     ...data,
     loading,
     setReviewStatus,
+    setFileStatus,
     setMemberStatus,
     attachDocument,
     removeDocument,

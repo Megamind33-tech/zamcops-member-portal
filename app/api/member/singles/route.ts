@@ -66,3 +66,21 @@ export async function POST(req: Request) {
 
   return json({ single: singleDTO(song) }, 201);
 }
+
+// Members may delete their own single while not yet registered (Approved).
+export async function DELETE(req: Request) {
+  const session = await requireMember();
+  if (!session) return bad("Not authenticated.", 401);
+
+  const b = await req.json().catch(() => null);
+  const id = b?.id ? String(b.id) : "";
+  if (!id) return bad("A submission id is required.");
+
+  const row = await prisma.songSubmission.findUnique({ where: { id } });
+  if (!row || row.ownerId !== session.sub) return bad("Single not found.", 404);
+  if (row.status === "Approved")
+    return bad("Approved singles are part of your registered repertoire and can't be deleted. Contact ZAMCOPS to amend them.", 409);
+
+  await prisma.songSubmission.delete({ where: { id } });
+  return json({ ok: true });
+}

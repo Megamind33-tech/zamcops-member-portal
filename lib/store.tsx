@@ -57,6 +57,9 @@ interface AppContextValue extends MemberState {
   addWork: (w: Record<string, unknown>) => Promise<Result<WorkDeclaration>>;
   addSingle: (s: Record<string, unknown>) => Promise<Result<SongSubmission>>;
   addAlbum: (a: Record<string, unknown>) => Promise<Result<AlbumSubmission>>;
+  deleteWork: (id: string) => Promise<Result>;
+  deleteSingle: (id: string) => Promise<Result>;
+  deleteAlbum: (id: string) => Promise<Result>;
   markNotificationRead: (id: string) => Promise<void>;
   markAllRead: () => Promise<void>;
   addLicensableWork: (w: Record<string, unknown>) => Promise<Result<LicensableWork>>;
@@ -185,6 +188,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [refresh]
   );
 
+  const makeDelete = (url: string) =>
+    async (id: string): Promise<Result> => {
+      const { res, data } = await postJSON(url, { id }, "DELETE");
+      if (!res.ok) return { ok: false, error: data.error || "Could not delete this submission." };
+      await refresh();
+      return { ok: true };
+    };
+
+  const deleteWork = useCallback<AppContextValue["deleteWork"]>((id) => makeDelete("/api/member/works")(id), [refresh]);
+  const deleteSingle = useCallback<AppContextValue["deleteSingle"]>((id) => makeDelete("/api/member/singles")(id), [refresh]);
+  const deleteAlbum = useCallback<AppContextValue["deleteAlbum"]>((id) => makeDelete("/api/member/albums")(id), [refresh]);
+
   const markNotificationRead = useCallback(async (id: string) => {
     setState((s) => ({
       ...s,
@@ -231,6 +246,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addWork,
     addSingle,
     addAlbum,
+    deleteWork,
+    deleteSingle,
+    deleteAlbum,
     markNotificationRead,
     markAllRead,
     addLicensableWork,
