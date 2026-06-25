@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Download } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
@@ -59,9 +60,24 @@ export default function AdminFilesPage() {
               {shown.map((u) => (
                 <tr key={u.id} className="hover:bg-white/[0.03]">
                   <Td className="font-mono text-xs font-semibold text-white">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-start gap-3">
                       <CoverArt seed={u.fileName} size={40} rounded="rounded-lg" />
-                      <span>{u.fileName}</span>
+                      <div className="min-w-0">
+                        <span className="block max-w-[240px] truncate">{u.fileName}</span>
+                        {u.fileSize ? (
+                          <span className="block text-[11px] font-sans font-normal text-night-400">
+                            {(u.fileSize / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                        ) : null}
+                        {u.hasFile && u.fileType === "Audio" && (
+                          <audio
+                            controls
+                            preload="none"
+                            src={`/api/admin/files/${u.id}`}
+                            className="mt-2 h-8 w-[240px] max-w-full"
+                          />
+                        )}
+                      </div>
                     </div>
                   </Td>
                   <Td>{u.fileType}</Td>
@@ -77,15 +93,26 @@ export default function AdminFilesPage() {
                     </div>
                   </Td>
                   <Td className="text-right">
-                    {u.status === "Pending" || u.status === "Processing" ? (
-                      <ReviewActions
-                        disabled={busyId === u.id}
-                        onApprove={() => act(u.id, "Approved")}
-                        onReject={() => act(u.id, "Rejected")}
-                      />
-                    ) : (
-                      <span className="text-xs italic text-zam-muted">No actions</span>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                      {u.hasFile && (
+                        <a
+                          href={`/api/admin/files/${u.id}?download=1`}
+                          download
+                          className="inline-flex items-center gap-1 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink ring-1 ring-zam-line transition hover:bg-white"
+                        >
+                          <Download size={14} /> Download
+                        </a>
+                      )}
+                      {u.status === "Pending" || u.status === "Processing" ? (
+                        <ReviewActions
+                          disabled={busyId === u.id}
+                          onApprove={() => act(u.id, "Approved")}
+                          onReject={() => act(u.id, "Rejected")}
+                        />
+                      ) : (
+                        !u.hasFile && <span className="text-xs italic text-zam-muted">No actions</span>
+                      )}
+                    </div>
                   </Td>
                 </tr>
               ))}

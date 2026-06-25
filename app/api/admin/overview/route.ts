@@ -27,7 +27,7 @@ export async function GET() {
       prisma.workDeclaration.findMany({ orderBy: { submittedAt: "desc" } }),
       prisma.songSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
       prisma.albumSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
-      prisma.uploadFile.findMany({ orderBy: { uploadedAt: "desc" } }),
+      prisma.uploadFile.findMany({ orderBy: { uploadedAt: "desc" }, omit: { data: true } }),
       prisma.royaltySummary.findMany(),
       prisma.distribution.findMany({ include: { entries: true }, orderBy: { createdAt: "desc" } }),
       prisma.licensableWork.findMany({ orderBy: { createdAt: "desc" } }),

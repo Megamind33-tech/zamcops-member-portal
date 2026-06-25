@@ -9,7 +9,7 @@ import { Card, CardHeader } from "@/components/zam/Card";
 import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { SplitsEditor } from "@/components/zam/SplitsEditor";
-import { FilePicker } from "@/components/zam/FilePicker";
+import { AudioUpload } from "@/components/zam/AudioUpload";
 import { CoverUpload } from "@/components/zam/CoverUpload";
 import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
@@ -195,11 +195,12 @@ export default function AlbumSubmissionScreen() {
                           onChange={(e) => updateTrack(t.id, { isrc: e.target.value })}
                         />
                       </Field>
-                      <FilePicker
-                        label="Track audio file"
-                        kind="audio"
+                      <AudioUpload
+                        label="Upload track audio"
+                        hint="WAV or MP3 · max 4MB"
                         value={t.audioFile}
-                        onChange={(name) => updateTrack(t.id, { audioFile: name ?? "" })}
+                        onChange={(name) => updateTrack(t.id, { audioFile: name })}
+                        linkedTo={`${title || "Album"} · ${t.title || `Track ${idx + 1}`}`}
                       />
                       <div>
                         <span className="block text-sm font-semibold text-zam-ink mb-1.5">Ownership splits</span>

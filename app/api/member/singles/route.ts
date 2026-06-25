@@ -37,10 +37,9 @@ export async function POST(req: Request) {
     },
   });
 
-  // Record uploaded files so they appear on the Uploads screen.
+  // Record cover / lyrics metadata (the audio file is uploaded separately with
+  // its bytes via /api/member/upload). Avoids duplicating the audio row.
   const uploads = [];
-  if (song.audioFile)
-    uploads.push({ ownerId: session.sub, fileName: song.audioFile, fileType: "Audio", linkedTo: song.title, status: "Processing" });
   if (song.coverArt)
     uploads.push({ ownerId: session.sub, fileName: song.coverArt, fileType: "Cover Art", linkedTo: song.title, status: "Pending" });
   if (song.lyricsFile)

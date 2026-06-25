@@ -10,6 +10,7 @@ import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { SplitsEditor } from "@/components/zam/SplitsEditor";
 import { FilePicker } from "@/components/zam/FilePicker";
+import { AudioUpload } from "@/components/zam/AudioUpload";
 import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES } from "@/data/reference";
@@ -134,12 +135,12 @@ export default function SingleSubmissionScreen() {
           <Card>
             <CardHeader title="Files" />
             <div className="p-5 space-y-3">
-              <FilePicker
-                label="Master audio file"
-                kind="audio"
-                hint="WAV or high-quality MP3"
+              <AudioUpload
+                label="Upload master audio"
+                hint="WAV or high-quality MP3 · max 4MB"
                 value={form.audioFile}
-                onChange={setFile("audioFile")}
+                onChange={(name) => setFile("audioFile")(name)}
+                linkedTo={form.title}
               />
               <FilePicker
                 label="Cover art"
