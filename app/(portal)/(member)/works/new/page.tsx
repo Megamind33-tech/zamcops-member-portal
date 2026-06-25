@@ -9,6 +9,7 @@ import { Card, CardHeader } from "@/components/zam/Card";
 import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { SplitsEditor } from "@/components/zam/SplitsEditor";
+import { FilePicker } from "@/components/zam/FilePicker";
 import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES, LANGUAGES } from "@/data/reference";
@@ -43,6 +44,7 @@ export default function WorkDeclarationScreen() {
   const [splits, setSplits] = useState<OwnershipSplit[]>([
     { id: uid("split"), party: currentMember?.fullName ?? "", role: "Composer", percentage: 100 },
   ]);
+  const [audioFile, setAudioFile] = useState("");
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -73,6 +75,7 @@ export default function WorkDeclarationScreen() {
       ownershipSplits: splits,
       isrc: form.isrc,
       iswc: form.iswc,
+      audioFile,
       dateCreated: form.dateCreated,
     });
     setBusy(false);
@@ -180,6 +183,19 @@ export default function WorkDeclarationScreen() {
                   <Input placeholder="T-000.000.000-0" value={form.iswc} onChange={set("iswc")} />
                 </Field>
               </div>
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader title="Reference recording" description="Optional — attach an audio file of this work." />
+            <div className="p-5">
+              <FilePicker
+                label="Audio file"
+                kind="audio"
+                hint="WAV or MP3 of the work"
+                value={audioFile}
+                onChange={(name) => setAudioFile(name ?? "")}
+              />
             </div>
           </Card>
         </div>

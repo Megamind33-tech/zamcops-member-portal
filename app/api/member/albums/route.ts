@@ -29,9 +29,22 @@ export async function POST(req: Request) {
       artistName: b.artistName ?? "",
       releaseDate: b.releaseDate ?? "",
       coverArt: b.coverArt ?? "",
+      backCover: b.backCover ?? "",
       tracks: JSON.stringify(tracks),
     },
   });
+
+  // Record the covers + each track's audio so they appear on the Uploads screen.
+  const uploads: { ownerId: string; fileName: string; fileType: string; linkedTo: string; status: string }[] = [];
+  if (b.coverArt)
+    uploads.push({ ownerId: session.sub, fileName: `${album.title} — front cover`, fileType: "Cover Art", linkedTo: album.title, status: "Pending" });
+  if (b.backCover)
+    uploads.push({ ownerId: session.sub, fileName: `${album.title} — back cover`, fileType: "Cover Art", linkedTo: album.title, status: "Pending" });
+  for (const t of tracks) {
+    if (t.audioFile)
+      uploads.push({ ownerId: session.sub, fileName: t.audioFile, fileType: "Audio", linkedTo: `${album.title} · ${t.title}`, status: "Processing" });
+  }
+  if (uploads.length) await prisma.uploadFile.createMany({ data: uploads });
 
   await prisma.statement.create({
     data: {
