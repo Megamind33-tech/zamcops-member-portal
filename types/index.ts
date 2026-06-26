@@ -165,6 +165,9 @@ export interface UploadFile {
   uploadedAt: string;
   status: UploadStatus;
   rejectionReason?: string;
+  hasFile?: boolean; // a downloadable/playable binary is stored (served via the staff proxy)
+  fileSize?: number; // bytes
+  mimeType?: string;
 }
 
 export interface RoyaltyUsageLog {

@@ -40,7 +40,7 @@ export async function GET() {
     prisma.workDeclaration.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
     prisma.songSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
     prisma.albumSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
-    prisma.uploadFile.findMany({ where: { ownerId: id }, orderBy: { uploadedAt: "desc" } }),
+    prisma.uploadFile.findMany({ where: { ownerId: id }, orderBy: { uploadedAt: "desc" }, omit: { data: true } }),
     prisma.notification.findMany({ where: { ownerId: id }, orderBy: { createdAt: "desc" } }),
     prisma.statement.findMany({ where: { ownerId: id }, orderBy: { issuedAt: "desc" } }),
     prisma.royaltySummary.findUnique({ where: { ownerId: id } }),

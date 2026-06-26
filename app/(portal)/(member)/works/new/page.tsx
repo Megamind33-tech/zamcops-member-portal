@@ -9,7 +9,7 @@ import { Card, CardHeader } from "@/components/zam/Card";
 import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { SplitsEditor } from "@/components/zam/SplitsEditor";
-import { FilePicker } from "@/components/zam/FilePicker";
+import { AudioUpload } from "@/components/zam/AudioUpload";
 import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES, LANGUAGES } from "@/data/reference";
@@ -189,12 +189,12 @@ export default function WorkDeclarationScreen() {
           <Card>
             <CardHeader title="Reference recording" description="Optional — attach an audio file of this work." />
             <div className="p-5">
-              <FilePicker
-                label="Audio file"
-                kind="audio"
+              <AudioUpload
+                label="Upload audio file"
                 hint="WAV or MP3 of the work"
                 value={audioFile}
-                onChange={(name) => setAudioFile(name ?? "")}
+                onChange={setAudioFile}
+                linkedTo={form.title}
               />
             </div>
           </Card>

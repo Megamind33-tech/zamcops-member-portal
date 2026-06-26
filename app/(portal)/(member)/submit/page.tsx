@@ -12,21 +12,21 @@ const options = [
     icon: FilePlus2,
     tag: "Copyright",
     title: "Declare a Work",
-    body: "Register copyright ownership of a song, composition, beat or lyric.",
+    body: "Register the underlying composition — songwriters, publishers and ownership splits. Do this once per song to record who owns it.",
   },
   {
     href: "/submit/single",
     icon: Music2,
     tag: "Release",
     title: "Submit a Single",
-    body: "Upload one song with its audio, cover art and ownership splits.",
+    body: "Register a finished recording of one song — master audio, cover art and credits — for distribution and royalties.",
   },
   {
     href: "/submit/album",
     icon: Disc3,
     tag: "Release",
     title: "Submit an Album",
-    body: "Create an album and add multiple tracks, each with its own details.",
+    body: "Register a multi-track release — front & back covers plus each track's audio and details.",
   },
 ];
 
@@ -63,10 +63,11 @@ export default function SubmitHubScreen() {
           <ShieldCheck className="h-5 w-5" />
         </span>
         <div>
-          <p className="text-sm font-semibold text-zam-ink">Every submission is reviewed</p>
+          <p className="text-sm font-semibold text-zam-ink">Work vs. release — what's the difference?</p>
           <p className="mt-0.5 text-sm text-zam-muted">
-            Our team verifies each work and release before it is registered. Submitting a single or album
-            registers a release, while declaring a work records the underlying copyright ownership.
+            A <strong>work</strong> is the composition itself — the songwriting and who owns it (declared once).
+            A <strong>release</strong> is a specific recording of that work — a single or album you put out.
+            Most songs need both: declare the work, then submit the release. Every submission is reviewed before it's registered.
           </p>
         </div>
       </div>

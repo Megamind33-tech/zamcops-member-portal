@@ -139,6 +139,10 @@ model UploadFile {
   linkedTo        String   @default("")
   status          String   @default("Pending")
   rejectionReason String   @default("")
+  mimeType        String   @default("")
+  fileSize        Int      @default(0)
+  data            String   @default("") @db.Text // base64 of the file (small files only — inline fallback)
+  url             String   @default("") // Vercel Blob URL (large files)
   uploadedAt      DateTime @default(now())
 
   @@index([ownerId])
