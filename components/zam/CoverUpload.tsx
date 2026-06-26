@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import { ImagePlus, Trash2, Loader2 } from "lucide-react";
 
 // Resize an image to fit within `max`px (keeping aspect — no crop, so the full
-// artwork is preserved) and return a compact JPEG data URL. Small enough to
-// store directly on the submission record (no blob storage needed).
-function fileToDataUrl(file: File, max = 900, quality = 0.85): Promise<string> {
+// artwork is preserved) onto a canvas.
+function resizeToCanvas(file: File, max = 1200, quality = 0.85): Promise<{ canvas: HTMLCanvasElement; quality: number }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("Could not read the file."));
@@ -25,12 +25,33 @@ function fileToDataUrl(file: File, max = 900, quality = 0.85): Promise<string> {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
+        resolve({ canvas, quality });
       };
       img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
   });
+}
+
+// Returns a usable <img src>: a Vercel Blob URL when a store is connected,
+// otherwise a compact inline JPEG data URL. Cover art is public artwork, so the
+// Blob URL is fine to embed directly.
+async function processCover(file: File): Promise<string> {
+  const { canvas, quality } = await resizeToCanvas(file);
+  const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), "image/jpeg", quality));
+  if (blob) {
+    try {
+      const result = await upload(`album-cover-${Date.now()}.jpg`, blob, {
+        access: "public",
+        handleUploadUrl: "/api/blob/upload",
+        contentType: "image/jpeg",
+      });
+      return result.url;
+    } catch {
+      /* no Blob store connected → inline fallback */
+    }
+  }
+  return canvas.toDataURL("image/jpeg", quality);
 }
 
 export function CoverUpload({
@@ -55,7 +76,7 @@ export function CoverUpload({
     if (file.size > 15 * 1024 * 1024) return setError("Image is too large (max 15MB).");
     setBusy(true);
     try {
-      onChange(await fileToDataUrl(file));
+      onChange(await processCover(file));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not process the image.");
     } finally {

@@ -129,7 +129,6 @@ export function uploadDTO(u: any): UploadFile {
     hasFile: !!(u.data || u.url),
     fileSize: u.fileSize ?? 0,
     mimeType: u.mimeType || undefined,
-    url: u.url || undefined,
   };
 }
 
