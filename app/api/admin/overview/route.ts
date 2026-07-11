@@ -13,6 +13,7 @@ import {
   licensableWorkDTO,
   licenseRequestDTO,
   memberDocumentDTO,
+  supportTicketDTO,
 } from "@/lib/serialize";
 
 export const runtime = "nodejs";
@@ -21,7 +22,7 @@ export async function GET() {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
 
-  const [members, works, singles, albums, uploads, royalty, distributions, licensableWorks, licenseRequests, memberDocuments] =
+  const [members, works, singles, albums, uploads, royalty, distributions, licensableWorks, licenseRequests, memberDocuments, supportTickets] =
     await Promise.all([
       prisma.member.findMany({ orderBy: { joinedAt: "desc" } }),
       prisma.workDeclaration.findMany({ orderBy: { submittedAt: "desc" } }),
@@ -33,6 +34,7 @@ export async function GET() {
       prisma.licensableWork.findMany({ orderBy: { createdAt: "desc" } }),
       prisma.licenseRequest.findMany({ orderBy: { createdAt: "desc" } }),
       prisma.memberDocument.findMany({ orderBy: { uploadedAt: "desc" } }),
+      prisma.supportTicket.findMany({ orderBy: { createdAt: "desc" } }),
     ]);
 
   return json({
@@ -46,5 +48,6 @@ export async function GET() {
     licensableWorks: licensableWorks.map(licensableWorkDTO),
     licenseRequests: licenseRequests.map(licenseRequestDTO),
     memberDocuments: memberDocuments.map(memberDocumentDTO),
+    supportTickets: supportTickets.map(supportTicketDTO),
   });
 }

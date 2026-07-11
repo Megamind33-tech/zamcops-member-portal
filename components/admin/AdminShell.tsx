@@ -15,6 +15,7 @@ import {
   CalendarRange,
   Handshake,
   BarChart3,
+  LifeBuoy,
   LogOut,
   Smartphone,
   Menu,
@@ -39,6 +40,7 @@ const nav = [
   { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
   { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
   { href: "/admin/licensing", label: "Licensing Desk", icon: Handshake },
+  { href: "/admin/support", label: "Support Inbox", icon: LifeBuoy },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
 ];
 
@@ -48,12 +50,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout } = useAdminAuth();
-  const { members } = useAdminData();
+  const { members, supportTickets } = useAdminData();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const pendingMembers = members.filter((m) => m.membershipStatus === "Pending").length;
+  const openTickets = supportTickets.filter((t) => t.status === "Open").length;
 
   // Close the mobile drawer on navigation.
   useEffect(() => {
@@ -138,6 +141,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 {n.href === "/admin/members" && pendingMembers > 0 && (
                   <span className="grid h-5 min-w-[20px] place-items-center rounded-full bg-zam-amber px-1.5 text-[11px] font-bold text-white">
                     {pendingMembers}
+                  </span>
+                )}
+                {n.href === "/admin/support" && openTickets > 0 && (
+                  <span className="grid h-5 min-w-[20px] place-items-center rounded-full bg-zam-amber px-1.5 text-[11px] font-bold text-white">
+                    {openTickets}
                   </span>
                 )}
               </Link>

@@ -10,6 +10,7 @@ const EDITABLE = [
   "fullName", "stageName", "nrcOrPassport", "dateOfBirth", "gender", "phone",
   "province", "district", "address", "bankName", "bankAccount",
   "mobileMoneyNumber", "nextOfKinName", "nextOfKinPhone", "nrcDocument", "profilePhoto",
+  "notificationPrefs",
 ] as const;
 
 export async function PATCH(req: Request) {

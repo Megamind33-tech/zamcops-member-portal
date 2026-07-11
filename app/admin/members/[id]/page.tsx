@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import {
   ArrowLeft, Check, X, Ban, RotateCcw, Music2, FileText, Disc3,
   Paperclip, Trash2, IdCard, MapPin, Wallet, Users, FilePlus2,
+  KeyRound, Copy,
 } from "lucide-react";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
@@ -20,7 +21,7 @@ export default function AdminMemberDetailPage() {
   const { id } = useParams<{ id: string }>();
   const {
     members, singles, works, albums, uploads, memberDocuments,
-    setMemberStatus, attachDocument, removeDocument, loading,
+    setMemberStatus, attachDocument, removeDocument, resetMemberPassword, loading,
   } = useAdminData();
 
   const member = members.find((m) => m.id === id);
@@ -31,10 +32,32 @@ export default function AdminMemberDetailPage() {
   const mDocs = memberDocuments.filter((d) => d.ownerId === id);
 
   const [busy, setBusy] = useState(false);
+  const [tempPassword, setTempPassword] = useState("");
+  const [copied, setCopied] = useState(false);
   const act = async (status: string) => {
     setBusy(true);
     await setMemberStatus(id, status);
     setBusy(false);
+  };
+
+  const doReset = async () => {
+    if (!window.confirm("Issue a temporary password for this member? Their current password stops working immediately.")) return;
+    setBusy(true);
+    const res = await resetMemberPassword(id);
+    setBusy(false);
+    if (res.ok) {
+      setTempPassword(res.tempPassword);
+      setCopied(false);
+    }
+  };
+
+  const copyTemp = async () => {
+    try {
+      await navigator.clipboard.writeText(tempPassword);
+      setCopied(true);
+    } catch {
+      /* clipboard unavailable — staff can select the text */
+    }
   };
 
   if (loading && !member) {
@@ -74,8 +97,40 @@ export default function AdminMemberDetailPage() {
           {s === "Pending" && <Btn tone="reject" busy={busy} onClick={() => act("Rejected")} icon={<X size={15} />} label="Reject" />}
           {s === "Active" && <Btn tone="reject" busy={busy} onClick={() => act("Suspended")} icon={<Ban size={15} />} label="Suspend" />}
           {(s === "Suspended" || s === "Lapsed") && <Btn tone="approve" busy={busy} onClick={() => act("Active")} icon={<RotateCcw size={15} />} label="Reactivate" />}
+          <button
+            onClick={doReset}
+            disabled={busy}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.06] px-4 py-2 text-sm font-semibold text-night-300 transition hover:bg-white/[0.1] disabled:opacity-40"
+          >
+            <KeyRound size={15} /> Reset password
+          </button>
         </div>
       </div>
+
+      {tempPassword && (
+        <div className="card flex flex-wrap items-center gap-3 border border-zam-amber/40 p-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zam-amber/15 text-zam-amber"><KeyRound size={16} /></span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-white">Temporary password issued — shown only once</p>
+            <p className="text-xs text-night-400">
+              Verify the member's identity, share it securely, and ask them to change it under Settings after signing in.
+            </p>
+          </div>
+          <code className="rounded-lg bg-white/[0.06] px-3 py-1.5 font-mono text-base font-bold tracking-wider text-white">{tempPassword}</code>
+          <button
+            onClick={copyTemp}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-night-300 hover:bg-white/[0.1]"
+          >
+            <Copy size={13} /> {copied ? "Copied" : "Copy"}
+          </button>
+          <button
+            onClick={() => setTempPassword("")}
+            className="rounded-lg px-2 py-1.5 text-xs font-semibold text-night-400 hover:text-white"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Profile / KYC */}
       <Panel title="Profile & KYC">

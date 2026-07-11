@@ -51,6 +51,8 @@ model Member {
   nrcDocument  String @default("")
   profilePhoto String @default("")
 
+  notificationPrefs String @default("") // JSON { email, sms, royalty, marketing }
+
   membershipStatus String   @default("Pending")
   joinedAt         DateTime @default(now())
 
@@ -65,6 +67,7 @@ model Member {
   licensableWorks     LicensableWork[]
   licenseRequests     LicenseRequest[]
   documents           MemberDocument[]
+  supportTickets      SupportTicket[]
 }
 
 model WorkDeclaration {
@@ -260,6 +263,25 @@ model LicenseRequest {
 
   @@index([ownerId])
   @@index([workId])
+}
+
+// A help-desk query from a member (or a signed-out visitor asking for a
+// password reset). Staff answer and resolve these from the admin Support Inbox;
+// the reply is pushed back to the member as a notification and shown on the
+// member's Support page.
+model SupportTicket {
+  id         String    @id @default(cuid())
+  owner      Member?   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String?
+  contact    String    @default("") // identifier supplied on signed-out requests
+  topic      String
+  message    String    @db.Text
+  status     String    @default("Open") // Open | Resolved
+  reply      String    @default("")
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([ownerId])
 }
 
 // Official documents an admin attaches to a member's file — clearance letters,
