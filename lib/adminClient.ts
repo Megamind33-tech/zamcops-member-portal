@@ -77,11 +77,11 @@ export function useAdminData() {
   }, [load]);
 
   const setReviewStatus = useCallback(
-    async (kind: "work" | "single" | "album", id: string, status: string) => {
+    async (kind: "work" | "single" | "album", id: string, status: string, reason?: string) => {
       await fetch("/api/admin/review", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, id, status }),
+        body: JSON.stringify({ kind, id, status, reason }),
       });
       await load();
     },

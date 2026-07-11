@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { memberDocumentDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -32,13 +34,16 @@ export async function POST(req: Request) {
     },
   });
 
-  await prisma.notification.create({
-    data: {
-      ownerId,
-      title: "Document added to your file",
-      body: `ZAMCOPS attached a ${doc.docType} (“${doc.fileName}”) to your membership record.`,
-      type: "info",
-    },
+  await notifyMember(ownerId, {
+    title: "Document added to your file",
+    body: `ZAMCOPS attached a ${doc.docType} (“${doc.fileName}”) to your membership record.`,
+    type: "info",
+  });
+
+  await logAudit(session.sub, "document.attached", {
+    targetType: "MemberDocument",
+    targetId: doc.id,
+    summary: `Attached ${doc.docType} “${doc.fileName}” to ${member.fullName}`,
   });
 
   return json({ document: memberDocumentDTO(doc) }, 201);
@@ -51,6 +56,15 @@ export async function DELETE(req: Request) {
 
   const b = await req.json().catch(() => null);
   if (!b?.id) return bad("Document id required.");
-  await prisma.memberDocument.delete({ where: { id: b.id } }).catch(() => null);
+  const doc = await prisma.memberDocument.delete({ where: { id: b.id } }).catch(() => null);
+
+  if (doc) {
+    await logAudit(session.sub, "document.removed", {
+      targetType: "MemberDocument",
+      targetId: doc.id,
+      summary: `Removed ${doc.docType} “${doc.fileName}”`,
+    });
+  }
+
   return json({ ok: true });
 }

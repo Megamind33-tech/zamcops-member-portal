@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { hashPassword, verifyPassword, setSessionCookie } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
+import { rateLimit, clientIp } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -18,6 +19,10 @@ async function ensureSeedAdmin() {
 }
 
 export async function POST(req: Request) {
+  if (!rateLimit(`admin-login:${clientIp(req)}`, 10, 5 * 60_000)) {
+    return bad("Too many sign-in attempts — please wait a few minutes and try again.", 429);
+  }
+
   const body = await req.json().catch(() => null);
   if (!body) return bad("Invalid request body.");
   const { email, password } = body;

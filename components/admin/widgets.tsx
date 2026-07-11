@@ -127,16 +127,23 @@ export function StatusBadge({ status, className }: { status: string; className?:
   );
 }
 
-// Approve / reject controls for a review queue row.
+// Approve / reject controls for a review queue row. Rejections ask for a
+// reason, which is stored on the record and sent to the member.
 export function ReviewActions({
   onApprove,
   onReject,
   disabled,
 }: {
   onApprove: () => void;
-  onReject: () => void;
+  onReject: (reason: string) => void;
   disabled?: boolean;
 }) {
+  const reject = () => {
+    const reason = window.prompt("Why is this being rejected? The member will see this explanation.", "");
+    if (reason === null) return; // cancelled
+    onReject(reason.trim());
+  };
+
   return (
     <div className="flex justify-end gap-2">
       <button
@@ -147,7 +154,7 @@ export function ReviewActions({
         <Check size={14} /> Approve
       </button>
       <button
-        onClick={onReject}
+        onClick={reject}
         disabled={disabled}
         className="inline-flex items-center gap-1 rounded-lg bg-zam-red/10 px-2.5 py-1.5 text-xs font-semibold text-zam-red transition hover:bg-zam-red/20 disabled:opacity-40"
       >

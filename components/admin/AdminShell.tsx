@@ -42,14 +42,21 @@ const nav = [
   { href: "/admin/licensing", label: "Licensing Desk", icon: Handshake },
   { href: "/admin/support", label: "Support Inbox", icon: LifeBuoy },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+  { href: "/admin/team", label: "Team & Activity", icon: ShieldCheck },
 ];
 
 const crumbs: Record<string, string> = Object.fromEntries(nav.map((n) => [n.href, n.label]));
 
+function initials(name?: string): string {
+  if (!name) return "ZS";
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || "ZS";
+}
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAdminAuth();
+  const { logout, admin } = useAdminAuth();
   const { members, supportTickets } = useAdminData();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -205,18 +212,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="flex items-center gap-2.5 rounded-xl p-1 pr-2 hover:bg-zam-canvas"
             >
               <span className="grid h-9 w-9 place-items-center rounded-full brand-gradient-zam text-sm font-bold text-white">
-                ZS
+                {initials(admin?.name)}
               </span>
               <span className="hidden flex-col items-start leading-tight sm:flex">
-                <span className="text-sm font-semibold text-zam-ink">ZAMCOPS Staff</span>
+                <span className="text-sm font-semibold text-zam-ink">{admin?.name ?? "ZAMCOPS Staff"}</span>
                 <span className="text-xs text-zam-muted">Administrator</span>
               </span>
             </button>
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-zam-line bg-white p-2 shadow-[0_4px_16px_rgba(16,24,40,0.08)]">
                 <div className="mb-1 border-b border-zam-line px-3 py-2.5">
-                  <p className="text-sm font-semibold text-zam-ink">ZAMCOPS Staff</p>
-                  <p className="text-xs text-zam-muted">Staff Console</p>
+                  <p className="text-sm font-semibold text-zam-ink">{admin?.name ?? "ZAMCOPS Staff"}</p>
+                  <p className="text-xs text-zam-muted">{admin?.email ?? "Staff Console"}</p>
                 </div>
                 <Link
                   href="/dashboard"

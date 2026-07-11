@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { licensableWorkDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
 import type { LicenseUsageType } from "@/types";
 
 export const runtime = "nodejs";
@@ -31,13 +32,10 @@ export async function POST(req: Request) {
     },
   });
 
-  await prisma.notification.create({
-    data: {
-      ownerId: session.sub,
-      title: "Added to licensing pool",
-      body: `“${work.workTitle}” is now visible to ZAMCOPS' licensing desk for sync & direct licensing enquiries.`,
-      type: "success",
-    },
+  await notifyMember(session.sub, {
+    title: "Added to licensing pool",
+    body: `“${work.workTitle}” is now visible to ZAMCOPS' licensing desk for sync & direct licensing enquiries.`,
+    type: "success",
   });
 
   return json({ work: licensableWorkDTO(work) }, 201);

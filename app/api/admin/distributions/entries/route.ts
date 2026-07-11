@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,13 @@ export async function POST(req: Request) {
     update: { amount, currency: b.currency || "ZMW" },
     create: { distributionId: b.distributionId, ownerId: b.ownerId, amount, currency: b.currency || "ZMW" },
   });
+
+  await logAudit(session.sub, "distribution.entry-saved", {
+    targetType: "DistributionEntry",
+    targetId: entry.id,
+    summary: `Set payout of ${entry.currency} ${amount.toFixed(2)} for member ${b.ownerId}`,
+  });
+
   return json({ entry });
 }
 
@@ -30,6 +38,13 @@ export async function DELETE(req: Request) {
   const b = await req.json().catch(() => null);
   if (!b?.id) return bad("Missing entry id.");
 
-  await prisma.distributionEntry.delete({ where: { id: b.id } });
+  const removed = await prisma.distributionEntry.delete({ where: { id: b.id } });
+
+  await logAudit(session.sub, "distribution.entry-removed", {
+    targetType: "DistributionEntry",
+    targetId: removed.id,
+    summary: `Removed payout entry for member ${removed.ownerId}`,
+  });
+
   return json({ ok: true });
 }

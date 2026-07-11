@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { licenseRequestDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -38,13 +40,16 @@ export async function POST(req: Request) {
     },
   });
 
-  await prisma.notification.create({
-    data: {
-      ownerId: work.ownerId,
-      title: "New licensing enquiry",
-      body: `${row.requesterCompany || row.requesterName} enquired about licensing “${work.workTitle}” (${row.usageType}). ZAMCOPS is handling the negotiation.`,
-      type: "info",
-    },
+  await notifyMember(work.ownerId, {
+    title: "New licensing enquiry",
+    body: `${row.requesterCompany || row.requesterName} enquired about licensing “${work.workTitle}” (${row.usageType}). ZAMCOPS is handling the negotiation.`,
+    type: "info",
+  });
+
+  await logAudit(session.sub, "licensing.enquiry-logged", {
+    targetType: "LicenseRequest",
+    targetId: row.id,
+    summary: `Logged enquiry from ${row.requesterCompany || row.requesterName} for “${work.workTitle}”`,
   });
 
   return json({ request: licenseRequestDTO(row) }, 201);
@@ -69,13 +74,16 @@ export async function PATCH(req: Request) {
     include: { work: true },
   });
 
-  await prisma.notification.create({
-    data: {
-      ownerId: row.ownerId,
-      title: "Licensing enquiry update",
-      body: `An enquiry for “${row.work.workTitle}” from ${row.requesterCompany || row.requesterName} is now “${row.status}”.`,
-      type: row.status === "Accepted" ? "success" : row.status === "Declined" ? "warning" : "info",
-    },
+  await notifyMember(row.ownerId, {
+    title: "Licensing enquiry update",
+    body: `An enquiry for “${row.work.workTitle}” from ${row.requesterCompany || row.requesterName} is now “${row.status}”.`,
+    type: row.status === "Accepted" ? "success" : row.status === "Declined" ? "warning" : "info",
+  });
+
+  await logAudit(session.sub, "licensing.status", {
+    targetType: "LicenseRequest",
+    targetId: row.id,
+    summary: `Enquiry for “${row.work.workTitle}” → ${row.status}`,
   });
 
   return json({ request: licenseRequestDTO(row) });

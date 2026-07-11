@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin, hashPassword } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
+import { notifyMember } from "@/lib/notify";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -32,13 +34,18 @@ export async function POST(req: Request) {
     data: { passwordHash: await hashPassword(password) },
   });
 
-  await prisma.notification.create({
-    data: {
-      ownerId: member.id,
-      title: "Password reset by ZAMCOPS staff",
-      body: "A temporary password was issued for your account. Sign in with it, then change your password under Settings.",
-      type: "warning",
-    },
+  await notifyMember(member.id, {
+    title: "Password reset by ZAMCOPS staff",
+    body: "A temporary password was issued for your account. Sign in with it, then change your password under Settings. If you did not request this, contact ZAMCOPS immediately.",
+    type: "warning",
+    category: "security",
+    sms: "A temporary password was issued for your ZAMCOPS account. If you did not request this, contact us immediately.",
+  });
+
+  await logAudit(session.sub, "member.password-reset", {
+    targetType: "Member",
+    targetId: member.id,
+    summary: `Issued temporary password for ${member.fullName} (${member.memberNumber})`,
   });
 
   return json({ tempPassword: password });

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
+import { notifyMember } from "@/lib/notify";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -15,6 +17,13 @@ export async function POST(req: Request) {
   const distribution = await prisma.distribution.create({
     data: { periodLabel: b.periodLabel.trim(), notes: b.notes ?? "" },
   });
+
+  await logAudit(session.sub, "distribution.created", {
+    targetType: "Distribution",
+    targetId: distribution.id,
+    summary: `Opened distribution period “${distribution.periodLabel}”`,
+  });
+
   return json({ distribution }, 201);
 }
 
@@ -36,17 +45,22 @@ export async function PATCH(req: Request) {
   if (b.status === "Published") {
     await Promise.all(
       distribution.entries.map((e) =>
-        prisma.notification.create({
-          data: {
-            ownerId: e.ownerId,
-            title: "Royalties distributed",
-            body: `Your confirmed payout for ${distribution.periodLabel} is now available to view.`,
-            type: "success",
-          },
+        notifyMember(e.ownerId, {
+          title: "Royalties distributed",
+          body: `Your confirmed payout for ${distribution.periodLabel} is now available to view in the member portal.`,
+          type: "success",
+          category: "royalty",
+          sms: `Your confirmed royalty payout for ${distribution.periodLabel} is now available in the ZAMCOPS member portal.`,
         })
       )
     );
   }
+
+  await logAudit(session.sub, `distribution.${b.status.toLowerCase()}`, {
+    targetType: "Distribution",
+    targetId: distribution.id,
+    summary: `Distribution “${distribution.periodLabel}” → ${b.status} (${distribution.entries.length} entries)`,
+  });
 
   return json({ ok: true });
 }

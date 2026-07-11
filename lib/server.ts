@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { notifyMember } from "@/lib/notify";
 
 export const json = (data: unknown, status = 200) => NextResponse.json(data, { status });
 export const bad = (message: string, status = 400) => NextResponse.json({ error: message }, { status });
@@ -14,13 +15,10 @@ export function genMemberNumber(): string {
 // membership application receipt.
 export async function seedMemberDefaults(memberId: string, memberNumber: string) {
   await prisma.royaltySummary.create({ data: { ownerId: memberId } });
-  await prisma.notification.create({
-    data: {
-      ownerId: memberId,
-      title: "Welcome to ZAMCOPS",
-      body: "Your membership application has been received. Complete your profile to speed up verification.",
-      type: "info",
-    },
+  await notifyMember(memberId, {
+    title: "Welcome to ZAMCOPS",
+    body: "Your membership application has been received. Complete your profile to speed up verification.",
+    type: "info",
   });
   await prisma.statement.create({
     data: {

@@ -79,6 +79,7 @@ export function workDTO(w: any): WorkDeclaration {
     audioFile: w.audioFile,
     dateCreated: w.dateCreated,
     status: w.status,
+    rejectionReason: w.rejectionReason || undefined,
     submittedAt: iso(w.submittedAt),
   };
 }
@@ -99,6 +100,7 @@ export function singleDTO(s: any): SongSubmission {
     lyricsFile: s.lyricsFile,
     ownershipSplits: parse<OwnershipSplit[]>(s.ownershipSplits, []),
     status: s.status,
+    rejectionReason: s.rejectionReason || undefined,
     submittedAt: iso(s.submittedAt),
   };
 }
@@ -114,6 +116,7 @@ export function albumDTO(a: any): AlbumSubmission {
     backCover: a.backCover,
     tracks: parse<Track[]>(a.tracks, []),
     status: a.status,
+    rejectionReason: a.rejectionReason || undefined,
     submittedAt: iso(a.submittedAt),
   };
 }

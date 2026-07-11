@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { supportTicketDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -29,17 +31,20 @@ export async function PATCH(req: Request) {
   const ticket = await prisma.supportTicket.update({ where: { id: b.id }, data });
 
   if (ticket.ownerId && status === "Resolved") {
-    await prisma.notification.create({
-      data: {
-        ownerId: ticket.ownerId,
-        title: "Support query answered",
-        body: ticket.reply
-          ? `ZAMCOPS support replied to your “${ticket.topic}” query: ${ticket.reply}`
-          : `Your “${ticket.topic}” support query has been resolved.`,
-        type: "info",
-      },
+    await notifyMember(ticket.ownerId, {
+      title: "Support query answered",
+      body: ticket.reply
+        ? `ZAMCOPS support replied to your “${ticket.topic}” query: ${ticket.reply}`
+        : `Your “${ticket.topic}” support query has been resolved.`,
+      type: "info",
     });
   }
+
+  await logAudit(session.sub, `support.${status.toLowerCase()}`, {
+    targetType: "SupportTicket",
+    targetId: ticket.id,
+    summary: `Ticket “${ticket.topic}” → ${status}${ticket.reply ? ` (replied)` : ""}`,
+  });
 
   return json({ ticket: supportTicketDTO(ticket) });
 }

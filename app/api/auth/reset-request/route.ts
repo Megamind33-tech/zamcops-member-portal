@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { json, bad } from "@/lib/server";
+import { rateLimit, clientIp } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -8,6 +9,10 @@ export const runtime = "nodejs";
 // verify the member and issue a temporary password from the member's detail
 // page. Always responds ok so account existence can't be probed.
 export async function POST(req: Request) {
+  if (!rateLimit(`reset:${clientIp(req)}`, 5, 15 * 60_000)) {
+    return bad("Too many reset requests — please wait a while and try again.", 429);
+  }
+
   const b = await req.json().catch(() => null);
   const identifier = String(b?.identifier ?? "").trim();
   if (!identifier) return bad("Enter the phone or email on your membership.");

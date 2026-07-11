@@ -113,6 +113,7 @@ export interface WorkDeclaration {
   audioFile?: string; // reference recording — file name
   dateCreated: string;
   status: ReviewStatus;
+  rejectionReason?: string;
   submittedAt: string;
 }
 
@@ -131,6 +132,7 @@ export interface SongSubmission {
   lyricsFile?: string;
   ownershipSplits: OwnershipSplit[];
   status: ReviewStatus;
+  rejectionReason?: string;
   submittedAt: string;
 }
 
@@ -155,6 +157,7 @@ export interface AlbumSubmission {
   backCover?: string; // back cover — image data URL
   tracks: Track[];
   status: ReviewStatus;
+  rejectionReason?: string;
   submittedAt: string;
 }
 

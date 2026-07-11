@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import { FilePlus2, Music, Trash2, Lock } from "lucide-react";
+import { AlertCircle, FilePlus2, Music, Trash2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useApp, useMemberData } from "@/lib/store";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
@@ -52,6 +52,8 @@ export default function WorksScreen() {
     count: f === "All" ? works.length : works.filter((w) => w.status === f).length,
   }));
 
+  const rejected = shown.filter((w) => w.status === "Rejected" && w.rejectionReason);
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -73,6 +75,17 @@ export default function WorksScreen() {
           className="sm:w-72"
         />
       </div>
+
+      {rejected.map((w) => (
+        <div key={w.id} className="rounded-2xl border border-zam-red/30 bg-red-50 p-4">
+          <div className="flex items-start gap-2.5 text-sm text-zam-red">
+            <AlertCircle size={16} className="mt-0.5 shrink-0" />
+            <span>
+              <span className="font-semibold">“{w.title}”</span> was rejected: {w.rejectionReason}
+            </span>
+          </div>
+        </div>
+      ))}
 
       {shown.length === 0 ? (
         <Card>

@@ -6,9 +6,10 @@ import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { formatKwacha } from "@/lib/format";
+import { downloadMembers, downloadRepertoire, downloadDistributions } from "@/lib/export";
 
 export default function AdminReportsPage() {
-  const { works, singles, albums, members, royalty } = useAdminData();
+  const { works, singles, albums, members, royalty, distributions } = useAdminData();
 
   const reviewBreakdown = (items: { status: string }[]) => {
     const b = { Approved: 0, Pending: 0, Rejected: 0, "Under Review": 0 } as Record<string, number>;
@@ -21,23 +22,35 @@ export default function AdminReportsPage() {
   const albums$ = reviewBreakdown(albums);
   const totalEstimated = royalty.reduce((s, r) => s + r.totalEstimated, 0);
 
-  const reports = [
-    { title: "Membership Register", desc: `${members.length} members`, ref: "RPT-MEM-2026" },
-    { title: "Repertoire Report", desc: `${works.length} works · ${singles.length} singles · ${albums.length} albums`, ref: "RPT-REP-2026" },
-    { title: "Royalty Distribution Report", desc: `${formatKwacha(totalEstimated)} estimated`, ref: "RPT-ROY-2026-Q1" },
-  ];
-
-  const download = (title: string, ref: string, body: string) => {
-    const blob = new Blob([`ZAMCOPS Staff Report\n${title}\nReference: ${ref}\n\n${body}`], {
-      type: "text/plain",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${ref}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
+  const labelFor = (id: string) => {
+    const m = members.find((x) => x.id === id);
+    return { name: m?.fullName ?? "Unknown", number: m?.memberNumber ?? "" };
   };
+
+  const entryCount = distributions.reduce((s, d) => s + d.entries.length, 0);
+  const year = new Date().getFullYear();
+
+  const reports = [
+    {
+      title: "Membership Register",
+      desc: `${members.length} members — full contact, KYC and status columns`,
+      ref: `RPT-MEM-${year}`,
+      run: () => downloadMembers(members, "csv"),
+    },
+    {
+      title: "Repertoire Report",
+      desc: `${works.length} works · ${singles.length} singles · ${albums.length} albums`,
+      ref: `RPT-REP-${year}`,
+      run: () => downloadRepertoire(works, singles, albums, nameFor),
+    },
+    {
+      title: "Royalty Distribution Report",
+      desc: `${entryCount} payout entries across ${distributions.length} periods · ${formatKwacha(totalEstimated)} estimated activity`,
+      ref: `RPT-ROY-${year}`,
+      run: () => downloadDistributions(distributions, labelFor),
+    },
+  ];
 
   return (
     <div>
@@ -60,10 +73,10 @@ export default function AdminReportsPage() {
                 </p>
               </div>
               <button
-                onClick={() => download(r.title, r.ref, r.desc)}
+                onClick={r.run}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-accent-500 px-3 py-2 text-xs font-semibold text-night-950 shadow-fab hover:bg-accent-400"
               >
-                <Download size={14} /> Download
+                <Download size={14} /> CSV
               </button>
             </div>
           ))}
