@@ -12,9 +12,15 @@ export interface Session {
   email: string;
 }
 
+let warnedMissingSecret = false;
+
 function secret(): Uint8Array {
-  const s = process.env.AUTH_SECRET || "dev-zamcops-secret-change-in-production";
-  return new TextEncoder().encode(s);
+  const s = process.env.AUTH_SECRET;
+  if (!s && process.env.NODE_ENV === "production" && !warnedMissingSecret) {
+    warnedMissingSecret = true;
+    console.warn("[auth] AUTH_SECRET is not set — sessions are signed with the built-in dev secret. Set AUTH_SECRET in production.");
+  }
+  return new TextEncoder().encode(s || "dev-zamcops-secret-change-in-production");
 }
 
 export async function hashPassword(plain: string): Promise<string> {

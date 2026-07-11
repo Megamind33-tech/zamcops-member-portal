@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { workDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
 import type { OwnershipSplit } from "@/types";
 
 export const runtime = "nodejs";
@@ -49,13 +50,10 @@ export async function POST(req: Request) {
       reference: `SR-W-${work.id.slice(-5).toUpperCase()}`,
     },
   });
-  await prisma.notification.create({
-    data: {
-      ownerId: session.sub,
-      title: "Work declaration pending review",
-      body: `Your declaration for “${work.title}” has been received and is queued for review.`,
-      type: "info",
-    },
+  await notifyMember(session.sub, {
+    title: "Work declaration pending review",
+    body: `Your declaration for “${work.title}” has been received and is queued for review.`,
+    type: "info",
   });
 
   return json({ work: workDTO(work) }, 201);

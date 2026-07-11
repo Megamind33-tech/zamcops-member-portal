@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { Phone, Mail, MapPin, ChevronDown, LifeBuoy } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Phone, Mail, MapPin, ChevronDown, LifeBuoy, MessageSquareText } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
 import { Card, CardHeader } from "@/components/zam/Card";
-import { Field, Textarea, Select, Input } from "@/components/zam/Input";
+import { Field, Textarea, Select } from "@/components/zam/Input";
 import { Button } from "@/components/zam/Button";
+import { StatusBadge } from "@/components/zam/StatusBadge";
+import { formatDate } from "@/lib/format";
+import type { SupportTicket } from "@/types";
 
 const faqs = [
   {
@@ -31,14 +34,42 @@ const topics = ["Membership", "Work declarations", "Submissions & uploads", "Roy
 
 export default function SupportScreen() {
   const [open, setOpen] = useState<number | null>(0);
+  const [topic, setTopic] = useState(topics[0]);
   const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
 
-  const submit = (e: React.FormEvent) => {
+  const loadTickets = useCallback(async () => {
+    try {
+      const res = await fetch("/api/member/support");
+      if (res.ok) setTickets((await res.json()).tickets ?? []);
+    } catch {
+      /* non-fatal */
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTickets();
+  }, [loadTickets]);
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    setBusy(true);
+    const res = await fetch("/api/member/support", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, message }),
+    });
+    setBusy(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      toast.error(data.error || "Could not send your query — please try again.");
+      return;
+    }
     toast.success("Your query has been sent — we'll respond within 2 working days.");
     setMessage("");
-    (e.target as HTMLFormElement).reset();
+    await loadTickets();
   };
 
   const contacts = [
@@ -57,7 +88,7 @@ export default function SupportScreen() {
             <CardHeader title="Submit a query" description="Tell us what you need help with and we'll get back to you." />
             <form onSubmit={submit} className="space-y-4 p-5">
               <Field label="Help topic">
-                <Select name="topic" defaultValue={topics[0]}>
+                <Select value={topic} onChange={(e) => setTopic(e.target.value)}>
                   {topics.map((t) => (
                     <option key={t}>{t}</option>
                   ))}
@@ -72,12 +103,41 @@ export default function SupportScreen() {
                 />
               </Field>
               <div className="flex justify-end">
-                <Button type="submit" disabled={!message.trim()}>
-                  Send query
+                <Button type="submit" disabled={!message.trim() || busy}>
+                  {busy ? "Sending…" : "Send query"}
                 </Button>
               </div>
             </form>
           </Card>
+
+          {tickets.length > 0 && (
+            <Card>
+              <CardHeader title="Your recent queries" description="Staff replies also arrive as notifications." />
+              <div className="divide-y divide-zam-line">
+                {tickets.map((t) => (
+                  <div key={t.id} className="flex items-start gap-3 px-5 py-4">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-zam-orange-soft text-zam-orange">
+                      <MessageSquareText size={18} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold text-zam-ink">{t.topic}</p>
+                        <StatusBadge status={t.status === "Open" ? "Pending" : "Approved"} />
+                        <span className="ml-auto text-xs text-zam-muted">{formatDate(t.createdAt)}</span>
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-sm text-zam-muted">{t.message}</p>
+                      {t.reply && (
+                        <p className="mt-2 rounded-xl bg-zam-canvas px-3 py-2 text-sm text-zam-ink">
+                          <span className="text-xs font-bold uppercase tracking-wide text-zam-muted">ZAMCOPS · </span>
+                          {t.reply}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
 
         <Card>

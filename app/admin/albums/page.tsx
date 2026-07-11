@@ -65,7 +65,7 @@ export default function AdminAlbumsPage() {
                       <ReviewActions
                         disabled={a.status === "Approved" || a.status === "Rejected"}
                         onApprove={() => setReviewStatus("album", a.id, "Approved")}
-                        onReject={() => setReviewStatus("album", a.id, "Rejected")}
+                        onReject={(reason) => setReviewStatus("album", a.id, "Rejected", reason)}
                       />
                       <button
                         onClick={() => del(a.id, a.title)}

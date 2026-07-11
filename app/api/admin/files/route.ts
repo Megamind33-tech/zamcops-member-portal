@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
+import { notifyMember } from "@/lib/notify";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -25,18 +27,21 @@ export async function PATCH(req: Request) {
   });
 
   if (status === "Approved" || status === "Rejected") {
-    await prisma.notification.create({
-      data: {
-        ownerId: file.ownerId,
-        title: `File ${status.toLowerCase()}`,
-        body:
-          status === "Rejected"
-            ? `Your file “${file.fileName}” was rejected: ${reason}`
-            : `Your file “${file.fileName}” has been approved.`,
-        type: status === "Approved" ? "success" : "warning",
-      },
+    await notifyMember(file.ownerId, {
+      title: `File ${status.toLowerCase()}`,
+      body:
+        status === "Rejected"
+          ? `Your file “${file.fileName}” was rejected: ${reason}`
+          : `Your file “${file.fileName}” has been approved.`,
+      type: status === "Approved" ? "success" : "warning",
     });
   }
+
+  await logAudit(session.sub, `file.${status.toLowerCase()}`, {
+    targetType: "File",
+    targetId: id,
+    summary: `File “${file.fileName}” → ${status}${reason ? ` (${reason})` : ""}`,
+  });
 
   return json({ ok: true });
 }

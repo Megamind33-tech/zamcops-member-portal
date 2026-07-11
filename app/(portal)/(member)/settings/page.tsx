@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { UserCog, Lock, Bell, LogOut, Handshake, FileText, LifeBuoy } from "lucide-react";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
 import { Card, CardHeader } from "@/components/zam/Card";
@@ -27,13 +28,33 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   );
 }
 
+const DEFAULT_PREFS = { email: true, sms: true, royalty: true, marketing: false };
+
+function parsePrefs(raw?: string): typeof DEFAULT_PREFS {
+  try {
+    return { ...DEFAULT_PREFS, ...(raw ? JSON.parse(raw) : {}) };
+  } catch {
+    return { ...DEFAULT_PREFS };
+  }
+}
+
 export default function SettingsScreen() {
   const router = useRouter();
-  const { currentMember, logout, changePassword: changePasswordApi } = useApp();
+  const { currentMember, logout, changePassword: changePasswordApi, updateProfile } = useApp();
   const member = currentMember!;
   const [pw, setPw] = useState({ current: "", next: "", confirm: "" });
   const [pwMsg, setPwMsg] = useState("");
-  const [prefs, setPrefs] = useState({ email: true, sms: true, royalty: true, marketing: false });
+  const [prefs, setPrefs] = useState(() => parsePrefs(member.notificationPrefs));
+
+  const savePref = async (patch: Partial<typeof DEFAULT_PREFS>) => {
+    const next = { ...prefs, ...patch };
+    setPrefs(next);
+    const res = await updateProfile({ notificationPrefs: JSON.stringify(next) });
+    if (!res.ok) {
+      setPrefs(prefs); // roll back on failure
+      toast.error(res.error || "Could not save your preference.");
+    }
+  };
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +179,7 @@ export default function SettingsScreen() {
                   <p className="text-sm font-semibold text-zam-ink">{p.label}</p>
                   <p className="text-xs text-zam-muted">{p.desc}</p>
                 </div>
-                <Toggle checked={prefs[p.key]} onChange={(v) => setPrefs((s) => ({ ...s, [p.key]: v }))} />
+                <Toggle checked={prefs[p.key]} onChange={(v) => savePref({ [p.key]: v })} />
               </div>
             ))}
           </div>

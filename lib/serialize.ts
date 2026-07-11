@@ -16,6 +16,7 @@ import type {
   LicensableWork,
   LicenseRequest,
   LicenseUsageType,
+  SupportTicket,
 } from "@/types";
 
 const iso = (d: Date | string): string => (d instanceof Date ? d.toISOString() : d);
@@ -51,6 +52,7 @@ export function memberDTO(m: any): Member {
     nextOfKinPhone: m.nextOfKinPhone,
     nrcDocument: m.nrcDocument,
     profilePhoto: m.profilePhoto,
+    notificationPrefs: m.notificationPrefs,
     membershipStatus: m.membershipStatus,
     joinedAt: iso(m.joinedAt),
   };
@@ -77,6 +79,7 @@ export function workDTO(w: any): WorkDeclaration {
     audioFile: w.audioFile,
     dateCreated: w.dateCreated,
     status: w.status,
+    rejectionReason: w.rejectionReason || undefined,
     submittedAt: iso(w.submittedAt),
   };
 }
@@ -97,6 +100,7 @@ export function singleDTO(s: any): SongSubmission {
     lyricsFile: s.lyricsFile,
     ownershipSplits: parse<OwnershipSplit[]>(s.ownershipSplits, []),
     status: s.status,
+    rejectionReason: s.rejectionReason || undefined,
     submittedAt: iso(s.submittedAt),
   };
 }
@@ -112,6 +116,7 @@ export function albumDTO(a: any): AlbumSubmission {
     backCover: a.backCover,
     tracks: parse<Track[]>(a.tracks, []),
     status: a.status,
+    rejectionReason: a.rejectionReason || undefined,
     submittedAt: iso(a.submittedAt),
   };
 }
@@ -252,5 +257,19 @@ export function memberDocumentDTO(d: any) {
     reference: d.reference || undefined,
     note: d.note || undefined,
     uploadedAt: iso(d.uploadedAt),
+  };
+}
+
+export function supportTicketDTO(t: any): SupportTicket {
+  return {
+    id: t.id,
+    ownerId: t.ownerId || undefined,
+    contact: t.contact || undefined,
+    topic: t.topic,
+    message: t.message,
+    status: t.status,
+    reply: t.reply || undefined,
+    createdAt: iso(t.createdAt),
+    resolvedAt: t.resolvedAt ? iso(t.resolvedAt) : undefined,
   };
 }

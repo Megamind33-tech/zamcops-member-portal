@@ -85,6 +85,8 @@ export interface Member {
   // Documents
   nrcDocument?: string; // uploaded file name
   profilePhoto?: string; // uploaded file name
+  // Preferences
+  notificationPrefs?: string; // JSON { email, sms, royalty, marketing }
   // Membership
   membershipStatus: MembershipStatus;
   joinedAt: string;
@@ -111,6 +113,7 @@ export interface WorkDeclaration {
   audioFile?: string; // reference recording — file name
   dateCreated: string;
   status: ReviewStatus;
+  rejectionReason?: string;
   submittedAt: string;
 }
 
@@ -129,6 +132,7 @@ export interface SongSubmission {
   lyricsFile?: string;
   ownershipSplits: OwnershipSplit[];
   status: ReviewStatus;
+  rejectionReason?: string;
   submittedAt: string;
 }
 
@@ -153,6 +157,7 @@ export interface AlbumSubmission {
   backCover?: string; // back cover — image data URL
   tracks: Track[];
   status: ReviewStatus;
+  rejectionReason?: string;
   submittedAt: string;
 }
 
@@ -224,6 +229,22 @@ export interface MemberDocument {
   reference?: string;
   note?: string;
   uploadedAt: string;
+}
+
+export type SupportTicketStatus = "Open" | "Resolved";
+
+// A help-desk query — filed by a signed-in member, or by a signed-out visitor
+// requesting a password reset (ownerId empty, contact carries the identifier).
+export interface SupportTicket {
+  id: string;
+  ownerId?: string;
+  contact?: string;
+  topic: string;
+  message: string;
+  status: SupportTicketStatus;
+  reply?: string;
+  createdAt: string;
+  resolvedAt?: string;
 }
 
 export type DistributionStatus = "Draft" | "Published";

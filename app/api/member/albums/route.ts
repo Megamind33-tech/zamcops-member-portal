@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { albumDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
 import type { Track, OwnershipSplit } from "@/types";
 
 export const runtime = "nodejs";
@@ -51,13 +52,10 @@ export async function POST(req: Request) {
       reference: `SR-A-${album.id.slice(-5).toUpperCase()}`,
     },
   });
-  await prisma.notification.create({
-    data: {
-      ownerId: session.sub,
-      title: "Album submission received",
-      body: `“${album.title}” (${tracks.length} tracks) is now pending review.`,
-      type: "info",
-    },
+  await notifyMember(session.sub, {
+    title: "Album submission received",
+    body: `“${album.title}” (${tracks.length} tracks) is now pending review.`,
+    type: "info",
   });
 
   return json({ album: albumDTO(album) }, 201);

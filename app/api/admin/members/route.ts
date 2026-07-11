@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { memberDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -49,10 +51,18 @@ export async function PATCH(req: Request) {
 
   const notice = NOTICE[status];
   if (notice) {
-    await prisma.notification.create({
-      data: { ownerId: id, title: notice.title, body: notice.body, type: notice.type },
+    await notifyMember(id, {
+      title: notice.title,
+      body: notice.body,
+      type: notice.type as "success" | "warning",
     });
   }
+
+  await logAudit(session.sub, "member.status", {
+    targetType: "Member",
+    targetId: id,
+    summary: `${member.fullName} (${member.memberNumber}) → ${status}`,
+  });
 
   return json({ member: memberDTO(member) });
 }

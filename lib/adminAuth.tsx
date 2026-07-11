@@ -2,8 +2,15 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
+export interface AdminIdentity {
+  id: string;
+  name: string;
+  email: string;
+}
+
 interface AdminAuthValue {
   authed: boolean | null; // null while checking
+  admin: AdminIdentity | null; // the signed-in staff account
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   recheck: () => Promise<void>;
@@ -17,13 +24,17 @@ const AdminAuthContext = createContext<AdminAuthValue | null>(null);
 // bounces back to /admin/login.
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState<boolean | null>(null);
+  const [admin, setAdmin] = useState<AdminIdentity | null>(null);
 
   const recheck = useCallback(async () => {
     try {
       const me = await fetch("/api/auth/me").then((r) => r.json());
-      setAuthed(me.authenticated && me.role === "admin");
+      const ok = me.authenticated && me.role === "admin";
+      setAuthed(ok);
+      setAdmin(ok ? me.admin ?? null : null);
     } catch {
       setAuthed(false);
+      setAdmin(null);
     }
   }, []);
 
@@ -38,7 +49,9 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       body: JSON.stringify({ email, password }),
     });
     if (res.ok) {
+      const data = await res.json().catch(() => ({}));
       setAuthed(true);
+      setAdmin(data.admin ?? null);
       return true;
     }
     return false;
@@ -47,10 +60,11 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     setAuthed(false);
+    setAdmin(null);
   }, []);
 
   return (
-    <AdminAuthContext.Provider value={{ authed, login, logout, recheck }}>
+    <AdminAuthContext.Provider value={{ authed, admin, login, logout, recheck }}>
       {children}
     </AdminAuthContext.Provider>
   );

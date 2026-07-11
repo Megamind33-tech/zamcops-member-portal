@@ -22,27 +22,43 @@ model AdminUser {
   createdAt    DateTime @default(now())
 }
 
+// Who did what on the staff console. Admin identity is denormalised so the
+// trail survives even if the staff account is later removed.
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  adminName  String
+  adminEmail String   @default("")
+  action     String // e.g. "member.status", "review.rejected", "password.reset"
+  targetType String   @default("") // Member | Work | Single | Album | File | Distribution | ...
+  targetId   String   @default("")
+  summary    String   @default("")
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 // Members of the society — artists, composers, producers, publishers, labels.
 model Member {
-  id           String   @id @default(cuid())
-  memberNumber String   @unique
-  email        String   @unique
+  id           String @id @default(cuid())
+  memberNumber String @unique
+  email        String @unique
   phone        String
   passwordHash String
 
-  fullName     String
-  stageName    String   @default("")
-  nrcOrPassport String  @default("")
-  dateOfBirth  String   @default("")
-  gender       String   @default("")
-  role         String   @default("Artist")
+  fullName      String
+  stageName     String @default("")
+  nrcOrPassport String @default("")
+  dateOfBirth   String @default("")
+  gender        String @default("")
+  role          String @default("Artist")
 
-  province     String   @default("")
-  district     String   @default("")
-  address      String   @default("")
+  province String @default("")
+  district String @default("")
+  address  String @default("")
 
-  bankName         String @default("")
-  bankAccount      String @default("")
+  bankName          String @default("")
+  bankAccount       String @default("")
   mobileMoneyNumber String @default("")
 
   nextOfKinName  String @default("")
@@ -50,6 +66,8 @@ model Member {
 
   nrcDocument  String @default("")
   profilePhoto String @default("")
+
+  notificationPrefs String @default("") // JSON { email, sms, royalty, marketing }
 
   membershipStatus String   @default("Pending")
   joinedAt         DateTime @default(now())
@@ -65,6 +83,7 @@ model Member {
   licensableWorks     LicensableWork[]
   licenseRequests     LicenseRequest[]
   documents           MemberDocument[]
+  supportTickets      SupportTicket[]
 }
 
 model WorkDeclaration {
@@ -88,6 +107,7 @@ model WorkDeclaration {
   audioFile        String   @default("") // reference recording — file name
   dateCreated      String   @default("")
   status           String   @default("Pending")
+  rejectionReason  String   @default("")
   submittedAt      DateTime @default(now())
 
   @@index([ownerId])
@@ -109,23 +129,25 @@ model SongSubmission {
   lyricsFile      String   @default("")
   ownershipSplits String   @default("[]")
   status          String   @default("Pending")
+  rejectionReason String   @default("")
   submittedAt     DateTime @default(now())
 
   @@index([ownerId])
 }
 
 model AlbumSubmission {
-  id          String   @id @default(cuid())
-  owner       Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId     String
-  title       String
-  artistName  String
-  releaseDate String   @default("")
-  coverArt    String   @default("") // front cover — image data URL
-  backCover   String   @default("") // back cover — image data URL
-  tracks      String   @default("[]") // JSON Track[]
-  status      String   @default("Pending")
-  submittedAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  owner           Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId         String
+  title           String
+  artistName      String
+  releaseDate     String   @default("")
+  coverArt        String   @default("") // front cover — image data URL
+  backCover       String   @default("") // back cover — image data URL
+  tracks          String   @default("[]") // JSON Track[]
+  status          String   @default("Pending")
+  rejectionReason String   @default("")
+  submittedAt     DateTime @default(now())
 
   @@index([ownerId])
 }
@@ -260,6 +282,25 @@ model LicenseRequest {
 
   @@index([ownerId])
   @@index([workId])
+}
+
+// A help-desk query from a member (or a signed-out visitor asking for a
+// password reset). Staff answer and resolve these from the admin Support Inbox;
+// the reply is pushed back to the member as a notification and shown on the
+// member's Support page.
+model SupportTicket {
+  id         String    @id @default(cuid())
+  owner      Member?   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String?
+  contact    String    @default("") // identifier supplied on signed-out requests
+  topic      String
+  message    String    @db.Text
+  status     String    @default("Open") // Open | Resolved
+  reply      String    @default("")
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([ownerId])
 }
 
 // Official documents an admin attaches to a member's file — clearance letters,

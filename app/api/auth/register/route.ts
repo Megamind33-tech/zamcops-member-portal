@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { hashPassword, setSessionCookie } from "@/lib/auth";
 import { json, bad, genMemberNumber, seedMemberDefaults } from "@/lib/server";
+import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { memberDTO } from "@/lib/serialize";
 
 export const runtime = "nodejs";
@@ -8,6 +9,10 @@ export const runtime = "nodejs";
 const ROLES = ["Artist", "Composer", "Producer", "Publisher", "Label", "Next of Kin/Representative"];
 
 export async function POST(req: Request) {
+  if (!rateLimit(`register:${clientIp(req)}`, 5, 15 * 60_000)) {
+    return bad("Too many registration attempts — please wait a while and try again.", 429);
+  }
+
   const body = await req.json().catch(() => null);
   if (!body) return bad("Invalid request body.");
 

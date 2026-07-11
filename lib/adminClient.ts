@@ -14,6 +14,7 @@ import type {
   LicenseRequest,
   LicenseRequestStatus,
   MemberDocument,
+  SupportTicket,
 } from "@/types";
 
 // A distribution period as seen by admin staff — includes every member's entry,
@@ -33,6 +34,7 @@ interface Overview {
   licensableWorks: LicensableWork[];
   licenseRequests: LicenseRequest[];
   memberDocuments: MemberDocument[];
+  supportTickets: SupportTicket[];
 }
 
 const emptyOverview: Overview = {
@@ -46,6 +48,7 @@ const emptyOverview: Overview = {
   licensableWorks: [],
   licenseRequests: [],
   memberDocuments: [],
+  supportTickets: [],
 };
 
 async function postJSON(url: string, body: unknown, method = "POST") {
@@ -74,11 +77,11 @@ export function useAdminData() {
   }, [load]);
 
   const setReviewStatus = useCallback(
-    async (kind: "work" | "single" | "album", id: string, status: string) => {
+    async (kind: "work" | "single" | "album", id: string, status: string, reason?: string) => {
       await fetch("/api/admin/review", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, id, status }),
+        body: JSON.stringify({ kind, id, status, reason }),
       });
       await load();
     },
@@ -162,6 +165,42 @@ export function useAdminData() {
     [load]
   );
 
+  // Issues a temporary password for a member (staff-assisted reset). The
+  // password is returned exactly once for staff to hand to the verified member.
+  const resetMemberPassword = useCallback(async (id: string) => {
+    const { res, data: d } = await postJSON("/api/admin/members/reset-password", { id });
+    if (!res.ok) return { ok: false as const, error: d.error || "Could not reset password." };
+    return { ok: true as const, tempPassword: d.tempPassword as string };
+  }, []);
+
+  // Replies to / resolves / reopens a support ticket.
+  const setTicketStatus = useCallback(
+    async (id: string, status: "Open" | "Resolved", reply?: string) => {
+      await postJSON("/api/admin/support", { id, status, reply }, "PATCH");
+      await load();
+    },
+    [load]
+  );
+
+  // Logs an inbound licensing enquiry from a business against a listed work.
+  const logLicenseEnquiry = useCallback(
+    async (payload: {
+      workId: string;
+      requesterName: string;
+      requesterCompany?: string;
+      requesterEmail: string;
+      usageType: string;
+      description?: string;
+      proposedFee?: number;
+    }) => {
+      const { res, data: d } = await postJSON("/api/admin/licensing", payload);
+      if (!res.ok) return { ok: false as const, error: d.error || "Could not log enquiry." };
+      await load();
+      return { ok: true as const };
+    },
+    [load]
+  );
+
   // Moves an inbound licensing enquiry through the desk's pipeline, optionally
   // attaching the negotiated fee figures.
   const setLicenseRequestStatus = useCallback(
@@ -185,6 +224,9 @@ export function useAdminData() {
     setDistributionStatus,
     saveDistributionEntry,
     setLicenseRequestStatus,
+    resetMemberPassword,
+    setTicketStatus,
+    logLicenseEnquiry,
     reload: load,
   };
 }

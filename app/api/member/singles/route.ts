@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { singleDTO } from "@/lib/serialize";
+import { notifyMember } from "@/lib/notify";
 import type { OwnershipSplit } from "@/types";
 
 export const runtime = "nodejs";
@@ -54,13 +55,10 @@ export async function POST(req: Request) {
       reference: `SR-S-${song.id.slice(-5).toUpperCase()}`,
     },
   });
-  await prisma.notification.create({
-    data: {
-      ownerId: session.sub,
-      title: "Single submission received",
-      body: `“${song.title}” is now pending review.`,
-      type: "info",
-    },
+  await notifyMember(session.sub, {
+    title: "Single submission received",
+    body: `“${song.title}” is now pending review.`,
+    type: "info",
   });
 
   return json({ single: singleDTO(song) }, 201);
