@@ -21,6 +21,7 @@ import {
   applicantName,
 } from "@/lib/applicationForms";
 import { DEED_TITLE, DEED_RECITAL, DEED_CLAUSES } from "@/lib/deedText";
+import { BRAND_LOGO_PNG, BRAND_LOGO_RATIO } from "@/lib/brandLogo";
 
 const INK: [number, number, number] = [26, 29, 33];
 const MUTED: [number, number, number] = [90, 100, 112];
@@ -75,32 +76,41 @@ class Page {
   }
 }
 
-// The society letterhead: name, tagline, address, flag line, document title.
+// The society letterhead: official logo, name, tagline, address, flag line,
+// document title.
 function letterhead(doc: jsPDF, title: string): Page {
+  const logoH = 13;
+  const logoW = logoH * BRAND_LOGO_RATIO;
+  try {
+    doc.addImage(BRAND_LOGO_PNG, "PNG", (W - logoW) / 2, 8, logoW, logoH);
+  } catch {
+    // The letterhead stays usable even if the artwork can't be embedded.
+  }
+
   doc.setTextColor(...INK);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text(SOCIETY_NAME, W / 2, 18, { align: "center" });
+  doc.setFontSize(12);
+  doc.text(SOCIETY_NAME, W / 2, 27.5, { align: "center" });
   doc.setFont("helvetica", "italic");
   doc.setFontSize(7.5);
   doc.setTextColor(...MUTED);
-  doc.text(SOCIETY_TAGLINE, W / 2, 23, { align: "center" });
+  doc.text(SOCIETY_TAGLINE, W / 2, 32, { align: "center" });
   doc.setFont("helvetica", "normal");
-  doc.text(SOCIETY_ADDRESS, W / 2, 27.5, { align: "center" });
-  doc.text(SOCIETY_CONTACT, W / 2, 31.5, { align: "center" });
+  doc.text(SOCIETY_ADDRESS, W / 2, 36, { align: "center" });
+  doc.text(SOCIETY_CONTACT, W / 2, 40, { align: "center" });
 
   const flagW = (W - M * 2) / 4;
   FLAG.forEach((c, i) => {
     doc.setFillColor(...c);
-    doc.rect(M + i * flagW, 35, flagW, 1.2, "F");
+    doc.rect(M + i * flagW, 43.5, flagW, 1.2, "F");
   });
 
   doc.setTextColor(...INK);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12.5);
-  doc.text(title, W / 2, 44, { align: "center" });
+  doc.text(title, W / 2, 52.5, { align: "center" });
 
-  return new Page(doc, 52);
+  return new Page(doc, 60);
 }
 
 function footer(doc: jsPDF, reference: string) {
@@ -387,7 +397,7 @@ export function generateAdmissionLetterPdf(opts: {
 }): GeneratedPdf {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const p = letterhead(doc, "");
-  p.y = 50;
+  p.y = 54;
 
   const name = applicantName(opts.formType, opts.payload, opts.member.fullName);
   const addressLines = [
