@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
+import { ApplicationPanel, AdminDocDownload } from "@/components/admin/ApplicationPanel";
 import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
 import { Avatar } from "@/components/zam/Misc";
@@ -21,7 +22,7 @@ export default function AdminMemberDetailPage() {
   const { id } = useParams<{ id: string }>();
   const {
     members, singles, works, albums, uploads, memberDocuments,
-    setMemberStatus, attachDocument, removeDocument, resetMemberPassword, loading,
+    setMemberStatus, attachDocument, removeDocument, resetMemberPassword, loading, reload,
   } = useAdminData();
 
   const member = members.find((m) => m.id === id);
@@ -162,6 +163,9 @@ export default function AdminMemberDetailPage() {
         </div>
       </Panel>
 
+      {/* Official membership application — review, internal fields, approval */}
+      <ApplicationPanel ownerId={id} onDecided={reload} />
+
       {/* Songs / Works / Albums */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ListPanel title="Submitted Songs" icon={<Music2 size={15} />} count={mSingles.length}
@@ -239,7 +243,7 @@ function DocumentsPanel({
   onAttach,
   onRemove,
 }: {
-  docs: { id: string; docType: string; fileName: string; reference?: string; note?: string; uploadedAt: string }[];
+  docs: { id: string; docType: string; fileName: string; reference?: string; note?: string; uploadedAt: string; hasFile?: boolean; generated?: boolean }[];
   onAttach: (p: { docType: string; fileName: string; reference?: string; note?: string }) => Promise<{ ok: boolean; error?: string }>;
   onRemove: (id: string) => void;
 }) {
@@ -277,6 +281,7 @@ function DocumentsPanel({
                 </p>
                 {d.note && <p className="truncate text-xs text-night-500">{d.note}</p>}
               </div>
+              <AdminDocDownload id={d.id} hasFile={d.hasFile} />
               <button onClick={() => onRemove(d.id)} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-night-400 hover:bg-red-400/15 hover:text-red-300" aria-label="Remove document">
                 <Trash2 size={15} />
               </button>

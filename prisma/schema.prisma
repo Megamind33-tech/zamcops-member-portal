@@ -66,6 +66,7 @@ model Member {
 
   nrcDocument  String @default("")
   profilePhoto String @default("")
+  signature    String @default("") @db.Text // member's signature — transparent PNG data URL, reused on every document they sign
 
   notificationPrefs String @default("") // JSON { email, sms, royalty, marketing }
 
@@ -84,6 +85,43 @@ model Member {
   licenseRequests     LicenseRequest[]
   documents           MemberDocument[]
   supportTickets      SupportTicket[]
+  application         MembershipApplication?
+}
+
+// The official ZAMCOPS membership application (Individual / Group / Publisher),
+// digitised field-for-field from the paper forms. One per member. The member
+// fills `payload` (shape defined by lib/applicationForms.ts), staff fill
+// `adminFields` (internal number, file, subscription, admission dates, ...).
+model MembershipApplication {
+  id              String    @id @default(cuid())
+  owner           Member    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId         String    @unique
+  formType        String    @default("Individual") // Individual | Group | Publisher
+  payload         String    @default("{}") @db.Text // JSON — applicant answers
+  adminFields     String    @default("{}") @db.Text // JSON — staff-only fields
+  status          String    @default("Draft") // Draft | Submitted | Approved | Rejected
+  rejectionReason String    @default("")
+  membershipClass String    @default("") // e.g. CANDIDATE | FULL — set by staff at approval
+  deedAgreedAt    DateTime? // when the member executed the Deed of Assignment
+  submittedAt     DateTime?
+  decidedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Reusable official signatures (transparent PNGs) applied at document-generation
+// time: the General Manager signs admission letters, the Board Secretary
+// counter-signs Deeds of Assignment. Uploading a new image supersedes the old
+// one for all future documents. Never exposed through member-facing APIs.
+model OfficialSignature {
+  id           String   @id @default(cuid())
+  office       String   @unique // GENERAL_MANAGER | BOARD_SECRETARY
+  officerName  String
+  officerTitle String
+  image        String   @db.Text // transparent PNG data URL
+  updatedBy    String   @default("") // staff name, for the audit trail
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model WorkDeclaration {
@@ -303,17 +341,23 @@ model SupportTicket {
   @@index([ownerId])
 }
 
-// Official documents an admin attaches to a member's file — clearance letters,
-// deeds of assignment, signed contracts, ID copies, etc. (File bytes are not
-// stored yet; this records the document metadata / filename.)
+// Official documents on a member's file — clearance letters, deeds of
+// assignment, signed contracts, ID copies, plus the PDFs the system generates
+// at approval (application form, signed deed, admission letter). Generated
+// PDFs carry their bytes inline in `data`; members may download them only
+// once their membership is approved.
 model MemberDocument {
   id         String   @id @default(cuid())
   owner      Member   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId    String
-  docType    String // Clearance Letter | Deed of Assignment | Contract | ID Document | Other
+  docType    String // Clearance Letter | Deed of Assignment | Contract | ID Document | Membership Application | Admission Letter | Other
   fileName   String
   reference  String   @default("")
   note       String   @default("")
+  mimeType   String   @default("")
+  data       String   @default("") @db.Text // base64 of the file (generated PDFs)
+  url        String   @default("") // external/Blob URL alternative
+  generated  Boolean  @default(false) // true when issued by the system at approval
   uploadedAt DateTime @default(now())
 
   @@index([ownerId])

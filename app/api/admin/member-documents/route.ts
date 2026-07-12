@@ -7,7 +7,15 @@ import { logAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
-const DOC_TYPES = ["Clearance Letter", "Deed of Assignment", "Contract", "ID Document", "Other"];
+const DOC_TYPES = [
+  "Clearance Letter",
+  "Deed of Assignment",
+  "Contract",
+  "ID Document",
+  "Membership Application",
+  "Admission Letter",
+  "Other",
+];
 
 // Attach an official document (clearance letter, deed of assignment, etc.) to a
 // member's file, and notify the member it was added.

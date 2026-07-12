@@ -21,6 +21,7 @@ import {
   Menu,
   X,
   ShieldCheck,
+  PenLine,
   ChevronRight,
   UserRound,
 } from "lucide-react";
@@ -41,6 +42,7 @@ const nav = [
   { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
   { href: "/admin/licensing", label: "Licensing Desk", icon: Handshake },
   { href: "/admin/support", label: "Support Inbox", icon: LifeBuoy },
+  { href: "/admin/signatures", label: "Official Signatures", icon: PenLine },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
   { href: "/admin/team", label: "Team & Activity", icon: ShieldCheck },
 ];

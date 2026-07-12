@@ -90,7 +90,40 @@ export interface Member {
   // Membership
   membershipStatus: MembershipStatus;
   joinedAt: string;
+  hasSignature?: boolean; // a reusable signature image is stored on file
   password?: string; // demo-only, never do this in production
+}
+
+// ── Official membership application (digitised paper forms) ────────────────
+
+export type ApplicationFormType = "Individual" | "Group" | "Publisher";
+export type ApplicationStatus = "Draft" | "Submitted" | "Approved" | "Rejected";
+
+export interface MembershipApplication {
+  id: string;
+  ownerId: string;
+  formType: ApplicationFormType;
+  payload: Record<string, unknown>; // applicant answers — shape per lib/applicationForms.ts
+  adminFields: Record<string, string>; // staff-only fields (internal number, file, ...)
+  status: ApplicationStatus;
+  rejectionReason?: string;
+  membershipClass?: string; // e.g. CANDIDATE — set by staff at approval
+  deedAgreedAt?: string;
+  submittedAt?: string;
+  decidedAt?: string;
+  updatedAt: string;
+}
+
+export type SignatureOffice = "GENERAL_MANAGER" | "BOARD_SECRETARY";
+
+// A reusable official signature, managed by staff and applied to generated
+// documents (GM → admission letters, Board Secretary → deeds of assignment).
+export interface OfficialSignatureInfo {
+  office: SignatureOffice;
+  officerName: string;
+  officerTitle: string;
+  image?: string; // transparent PNG data URL — admin console only
+  updatedAt: string;
 }
 
 export interface WorkDeclaration {
@@ -219,6 +252,8 @@ export type MemberDocType =
   | "Deed of Assignment"
   | "Contract"
   | "ID Document"
+  | "Membership Application"
+  | "Admission Letter"
   | "Other";
 
 export interface MemberDocument {
@@ -229,6 +264,8 @@ export interface MemberDocument {
   reference?: string;
   note?: string;
   uploadedAt: string;
+  hasFile?: boolean; // downloadable bytes are stored
+  generated?: boolean; // issued by the system at approval
 }
 
 export type SupportTicketStatus = "Open" | "Resolved";

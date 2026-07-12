@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  ClipboardList,
+  FileText,
   Music,
   Upload,
   FolderUp,
@@ -23,6 +25,8 @@ import { cn } from "@/lib/format";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/application", label: "Membership", icon: ClipboardList },
+  { to: "/documents", label: "My Documents", icon: FileText },
   { to: "/works", label: "My Works", icon: Music },
   { to: "/submit", label: "Submit", icon: Upload },
   { to: "/uploads", label: "Music Uploads", icon: FolderUp },

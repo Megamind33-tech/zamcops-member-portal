@@ -17,6 +17,7 @@ import type {
   LicenseRequest,
   LicenseUsageType,
   SupportTicket,
+  MembershipApplication,
 } from "@/types";
 
 const iso = (d: Date | string): string => (d instanceof Date ? d.toISOString() : d);
@@ -55,6 +56,24 @@ export function memberDTO(m: any): Member {
     notificationPrefs: m.notificationPrefs,
     membershipStatus: m.membershipStatus,
     joinedAt: iso(m.joinedAt),
+    hasSignature: !!m.signature,
+  };
+}
+
+export function applicationDTO(a: any): MembershipApplication {
+  return {
+    id: a.id,
+    ownerId: a.ownerId,
+    formType: a.formType,
+    payload: parse<Record<string, unknown>>(a.payload, {}),
+    adminFields: parse<Record<string, string>>(a.adminFields, {}),
+    status: a.status,
+    rejectionReason: a.rejectionReason || undefined,
+    membershipClass: a.membershipClass || undefined,
+    deedAgreedAt: a.deedAgreedAt ? iso(a.deedAgreedAt) : undefined,
+    submittedAt: a.submittedAt ? iso(a.submittedAt) : undefined,
+    decidedAt: a.decidedAt ? iso(a.decidedAt) : undefined,
+    updatedAt: iso(a.updatedAt),
   };
 }
 
@@ -257,6 +276,8 @@ export function memberDocumentDTO(d: any) {
     reference: d.reference || undefined,
     note: d.note || undefined,
     uploadedAt: iso(d.uploadedAt),
+    hasFile: !!(d.data || d.url),
+    generated: !!d.generated,
   };
 }
 
