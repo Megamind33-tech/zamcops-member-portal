@@ -33,7 +33,7 @@ export async function GET() {
       prisma.distribution.findMany({ include: { entries: true }, orderBy: { createdAt: "desc" } }),
       prisma.licensableWork.findMany({ orderBy: { createdAt: "desc" } }),
       prisma.licenseRequest.findMany({ orderBy: { createdAt: "desc" } }),
-      prisma.memberDocument.findMany({ orderBy: { uploadedAt: "desc" } }),
+      prisma.memberDocument.findMany({ orderBy: { uploadedAt: "desc" }, omit: { data: true } }),
       prisma.supportTicket.findMany({ orderBy: { createdAt: "desc" } }),
     ]);
 

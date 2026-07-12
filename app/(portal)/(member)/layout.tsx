@@ -9,6 +9,8 @@ import { MemberBottomBar } from "@/components/member/MemberBottomBar";
 
 const titles: Record<string, string> = {
   "/dashboard": "Dashboard",
+  "/application": "Membership Application",
+  "/documents": "My Documents",
   "/works": "My Works",
   "/submit": "Submit",
   "/uploads": "Music Uploads",
