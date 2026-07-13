@@ -73,6 +73,12 @@ model Member {
   membershipStatus String   @default("Pending")
   joinedAt         DateTime @default(now())
 
+  // Email verification (OTP sent via Resend at registration).
+  emailVerifiedAt DateTime?
+  otpHash         String    @default("") // bcrypt hash of the current 6-digit code
+  otpExpiresAt    DateTime?
+  otpAttempts     Int       @default(0)
+
   works               WorkDeclaration[]
   singles             SongSubmission[]
   albums              AlbumSubmission[]

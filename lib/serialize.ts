@@ -57,6 +57,7 @@ export function memberDTO(m: any): Member {
     membershipStatus: m.membershipStatus,
     joinedAt: iso(m.joinedAt),
     hasSignature: !!m.signature,
+    emailVerified: !!m.emailVerifiedAt,
   };
 }
 

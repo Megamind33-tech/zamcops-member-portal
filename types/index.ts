@@ -87,6 +87,7 @@ export interface Member {
   membershipStatus: MembershipStatus;
   joinedAt: string;
   hasSignature?: boolean; // a reusable signature image is stored on file
+  emailVerified?: boolean; // email confirmed via OTP
   password?: string; // demo-only, never do this in production
 }
 
