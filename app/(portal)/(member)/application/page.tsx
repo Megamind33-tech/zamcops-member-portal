@@ -27,9 +27,9 @@ import type { MembershipApplication, Member } from "@/types";
 type Payload = Record<string, unknown>;
 
 const TYPE_META: Record<ApplicationFormType, { icon: React.ReactNode; blurb: string }> = {
-  Individual: { icon: <User size={20} />, blurb: "Authors, composers, arrangers and other individual creators." },
-  Group: { icon: <Users size={20} />, blurb: "Bands, choirs and other performing groups with a representative." },
-  Publisher: { icon: <Building2 size={20} />, blurb: "Music publishing companies and labels." },
+  Individual: { icon: <User size={20} />, blurb: "Composers, authors and arrangers — individual creators of musical works." },
+  Group: { icon: <Users size={20} />, blurb: "Groups of composers/authors applying together, with a representative." },
+  Publisher: { icon: <Building2 size={20} />, blurb: "Music publishing companies." },
 };
 
 // Sensible starting answers taken from the member's account profile.
@@ -204,7 +204,7 @@ function Wizard({
   onDone: () => Promise<void>;
 }) {
   const defaultType: ApplicationFormType =
-    application?.formType ?? (member.role === "Publisher" || member.role === "Label" ? "Publisher" : "Individual");
+    application?.formType ?? (member.role === "Publisher" ? "Publisher" : "Individual");
   const [formType, setFormType] = useState<ApplicationFormType>(defaultType);
   const [payload, setPayload] = useState<Payload>(
     () => (application?.payload as Payload) ?? prefill(defaultType, member)

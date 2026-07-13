@@ -1,13 +1,9 @@
 // ZAMCOPS Artist Membership Portal — Domain Models
 // Shared across the artist mobile app and the admin dashboard.
 
-export type MemberRole =
-  | "Artist"
-  | "Composer"
-  | "Producer"
-  | "Publisher"
-  | "Label"
-  | "Next of Kin/Representative";
+// ZAMCOPS is an authors' society: it represents composers, authors and
+// publishers of musical works (per its mandate and CISAC affiliation).
+export type MemberRole = "Composer" | "Author" | "Publisher";
 
 export type MembershipStatus = "Pending" | "Active" | "Suspended" | "Lapsed" | "Rejected";
 
@@ -21,13 +17,13 @@ export type WorkType =
   | "Lyric"
   | "Arrangement";
 
+// Rights-holder roles on a work, per the official application form
+// (Author / Arranger / Publisher) plus Composer.
 export type ContributorRole =
   | "Composer"
   | "Author/Lyricist"
-  | "Producer"
-  | "Performer"
-  | "Publisher"
-  | "Arranger";
+  | "Arranger"
+  | "Publisher";
 
 export type UploadStatus = "Pending" | "Processing" | "Approved" | "Rejected";
 

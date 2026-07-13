@@ -37,7 +37,7 @@ export default function SingleSubmissionScreen() {
     lyricsFile: "",
   });
   const [splits, setSplits] = useState<OwnershipSplit[]>([
-    { id: uid("split"), party: currentMember?.stageName || currentMember?.fullName || "", role: "Performer", percentage: 100 },
+    { id: uid("split"), party: currentMember?.stageName || currentMember?.fullName || "", role: "Composer", percentage: 100 },
   ]);
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>

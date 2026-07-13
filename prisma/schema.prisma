@@ -51,7 +51,7 @@ model Member {
   nrcOrPassport String @default("")
   dateOfBirth   String @default("")
   gender        String @default("")
-  role          String @default("Artist")
+  role          String @default("Composer") // Composer | Author | Publisher
 
   province String @default("")
   district String @default("")

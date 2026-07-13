@@ -9,10 +9,8 @@ import { uid } from "@/lib/format";
 const ROLES: ContributorRole[] = [
   "Composer",
   "Author/Lyricist",
-  "Producer",
-  "Performer",
-  "Publisher",
   "Arranger",
+  "Publisher",
 ];
 
 const RIGHTS_TYPES: RightsType[] = ["Performing", "Mechanical", "Both"];

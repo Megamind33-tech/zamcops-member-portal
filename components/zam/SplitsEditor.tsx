@@ -17,7 +17,8 @@ export interface OwnershipSplit {
   percentage: number;
 }
 
-const ROLES = ["Composer", "Author", "Producer", "Main Artist", "Featured", "Publisher", "Arranger", "Label"];
+// Rights-holder roles ZAMCOPS administers: composers, authors, arrangers, publishers.
+const ROLES = ["Composer", "Author", "Arranger", "Publisher"];
 
 export function SplitsEditor({
   splits,
