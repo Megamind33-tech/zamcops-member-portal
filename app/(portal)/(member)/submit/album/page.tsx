@@ -27,7 +27,7 @@ function newTrack(owner: string): Track {
     duration: "",
     genre: "Afro-Pop",
     contributors: [],
-    ownershipSplits: [{ id: uid("split"), party: owner, role: "Performer", percentage: 100 }],
+    ownershipSplits: [{ id: uid("split"), party: owner, role: "Composer", percentage: 100 }],
     isrc: "",
     audioFile: "",
   };

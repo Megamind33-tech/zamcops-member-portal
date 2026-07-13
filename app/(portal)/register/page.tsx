@@ -10,14 +10,8 @@ import { Logo } from "@/components/ui/Logo";
 import { useApp } from "@/lib/store";
 import type { MemberRole } from "@/types";
 
-const roles: MemberRole[] = [
-  "Artist",
-  "Composer",
-  "Producer",
-  "Publisher",
-  "Label",
-  "Next of Kin/Representative",
-];
+// ZAMCOPS represents composers, authors and publishers of musical works.
+const roles: MemberRole[] = ["Composer", "Author", "Publisher"];
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -28,7 +22,7 @@ export default function RegisterScreen() {
     nrcOrPassport: "",
     phone: "",
     email: "",
-    role: "Artist" as MemberRole,
+    role: "Composer" as MemberRole,
     password: "",
     confirm: "",
   });

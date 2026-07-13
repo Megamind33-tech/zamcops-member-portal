@@ -6,7 +6,8 @@ import { memberDTO } from "@/lib/serialize";
 
 export const runtime = "nodejs";
 
-const ROLES = ["Artist", "Composer", "Producer", "Publisher", "Label", "Next of Kin/Representative"];
+// ZAMCOPS membership is open to composers, authors and publishers.
+const ROLES = ["Composer", "Author", "Publisher"];
 
 export async function POST(req: Request) {
   if (!rateLimit(`register:${clientIp(req)}`, 5, 15 * 60_000)) {
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
       fullName,
       stageName: stageName ?? "",
       nrcOrPassport: nrcOrPassport ?? "",
-      role: role ?? "Artist",
+      role: role ?? "Composer",
     },
   });
 
