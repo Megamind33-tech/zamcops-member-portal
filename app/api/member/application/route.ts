@@ -77,6 +77,9 @@ export async function POST(req: Request) {
 
   const member = await prisma.member.findUnique({ where: { id: session.sub } });
   if (!member) return bad("Not authenticated.", 401);
+  if (!member.emailVerifiedAt) {
+    return bad("Please verify your email address before submitting — check your inbox for the code.");
+  }
   if (!member.signature) return bad("Please add your signature before submitting.");
 
   const missing = missingRequiredFields(FORM_DEFS[body.formType], body.payload);

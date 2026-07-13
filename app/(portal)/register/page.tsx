@@ -57,7 +57,7 @@ export default function RegisterScreen() {
       password: form.password,
     });
     setBusy(false);
-    if (res.ok) router.replace("/dashboard");
+    if (res.ok) router.replace("/verify-email");
     else setError(res.error || "Registration failed.");
   };
 

@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { MailWarning } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { MemberSidebar } from "@/components/member/MemberSidebar";
 import { MemberTopbar } from "@/components/member/MemberTopbar";
@@ -54,6 +56,20 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
       <MemberSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
         <MemberTopbar breadcrumb={breadcrumb} onMenu={() => setSidebarOpen(true)} />
+        {!currentMember.emailVerified && (
+          <div className="mx-auto mt-4 w-full max-w-[1400px] px-4 lg:px-8">
+            <Link
+              href="/verify-email"
+              className="flex items-center gap-3 rounded-2xl border border-zam-amber/40 bg-zam-amber/10 px-4 py-3 text-sm text-zam-ink transition hover:bg-zam-amber/15"
+            >
+              <MailWarning size={17} className="shrink-0 text-zam-amber" />
+              <span>
+                <strong>Verify your email address</strong> to submit your membership application — tap here to enter
+                the code we sent to {currentMember.email}.
+              </span>
+            </Link>
+          </div>
+        )}
         <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-24 pt-6 lg:px-8 lg:pb-10">{children}</main>
         <MemberBottomBar />
       </div>

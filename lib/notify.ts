@@ -50,10 +50,18 @@ function normalizePhone(phone: string): string {
   return p;
 }
 
+// Transactional email (OTP codes, verification) — always sends when Resend is
+// configured, regardless of the member's notification preferences. Falls back
+// to Resend's shared onboarding sender until EMAIL_FROM is set to an address
+// on a domain verified in the Resend dashboard.
+export async function sendTransactionalEmail(to: string, subject: string, body: string): Promise<void> {
+  return sendEmail(to, subject, body);
+}
+
 async function sendEmail(to: string, subject: string, body: string): Promise<void> {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
-  if (!key || !from || !to) return;
+  const from = process.env.EMAIL_FROM || "ZAMCOPS <onboarding@resend.dev>";
+  if (!key || !to) return;
 
   const html = `
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#1a1d21">

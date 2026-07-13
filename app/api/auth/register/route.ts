@@ -3,6 +3,7 @@ import { hashPassword, setSessionCookie } from "@/lib/auth";
 import { json, bad, genMemberNumber, seedMemberDefaults } from "@/lib/server";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { memberDTO } from "@/lib/serialize";
+import { issueEmailOtp } from "@/lib/otp";
 
 export const runtime = "nodejs";
 
@@ -42,6 +43,7 @@ export async function POST(req: Request) {
   });
 
   await seedMemberDefaults(member.id, memberNumber);
+  await issueEmailOtp(member.id); // emails the 6-digit verification code
   await setSessionCookie({ sub: member.id, role: "member", email: member.email });
 
   return json({ member: memberDTO(member) }, 201);
