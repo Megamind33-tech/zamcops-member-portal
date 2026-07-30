@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
-import { json, bad } from "@/lib/server";
+import { json, bad, markHasData } from "@/lib/server";
 import {
   memberDTO,
   workDTO,
@@ -29,6 +29,7 @@ export async function GET() {
     singles,
     albums,
     uploads,
+    uploadsWithData,
     notifications,
     statements,
     royalty,
@@ -41,6 +42,7 @@ export async function GET() {
     prisma.songSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
     prisma.albumSubmission.findMany({ where: { ownerId: id }, orderBy: { submittedAt: "desc" } }),
     prisma.uploadFile.findMany({ where: { ownerId: id }, orderBy: { uploadedAt: "desc" }, omit: { data: true } }),
+    prisma.uploadFile.findMany({ where: { ownerId: id, NOT: { data: "" } }, select: { id: true } }),
     prisma.notification.findMany({ where: { ownerId: id }, orderBy: { createdAt: "desc" } }),
     prisma.statement.findMany({ where: { ownerId: id }, orderBy: { issuedAt: "desc" } }),
     prisma.royaltySummary.findUnique({ where: { ownerId: id } }),
@@ -61,7 +63,7 @@ export async function GET() {
     works: works.map(workDTO),
     singles: singles.map(singleDTO),
     albums: albums.map(albumDTO),
-    uploads: uploads.map(uploadDTO),
+    uploads: markHasData(uploads, uploadsWithData).map(uploadDTO),
     notifications: notifications.map(notificationDTO),
     statements: statements.map(statementDTO),
     royalty: royaltyDTO(royalty, id),

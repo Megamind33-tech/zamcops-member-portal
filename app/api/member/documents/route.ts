@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
-import { json, bad } from "@/lib/server";
+import { json, bad, markHasData } from "@/lib/server";
 import { memberDocumentDTO } from "@/lib/serialize";
 
 export const runtime = "nodejs";
@@ -11,17 +11,18 @@ export async function GET() {
   const session = await requireMember();
   if (!session) return bad("Not authenticated.", 401);
 
-  const [documents, member] = await Promise.all([
+  const [documents, documentsWithData, member] = await Promise.all([
     prisma.memberDocument.findMany({
       where: { ownerId: session.sub },
       orderBy: { uploadedAt: "desc" },
       omit: { data: true },
     }),
+    prisma.memberDocument.findMany({ where: { ownerId: session.sub, NOT: { data: "" } }, select: { id: true } }),
     prisma.member.findUnique({ where: { id: session.sub }, select: { membershipStatus: true } }),
   ]);
 
   return json({
-    documents: documents.map(memberDocumentDTO),
+    documents: markHasData(documents, documentsWithData).map(memberDocumentDTO),
     canDownload: member?.membershipStatus === "Active",
   });
 }

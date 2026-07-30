@@ -151,7 +151,9 @@ export function uploadDTO(u: any): UploadFile {
     uploadedAt: iso(u.uploadedAt),
     status: u.status,
     rejectionReason: u.rejectionReason || undefined,
-    hasFile: !!(u.data || u.url),
+    // List queries omit `data` (payload size) and pass `hasData` instead —
+    // computed server-side so inline-stored files still report a file.
+    hasFile: !!(u.data || u.url || u.hasData),
     fileSize: u.fileSize ?? 0,
     mimeType: u.mimeType || undefined,
   };
@@ -277,7 +279,7 @@ export function memberDocumentDTO(d: any) {
     reference: d.reference || undefined,
     note: d.note || undefined,
     uploadedAt: iso(d.uploadedAt),
-    hasFile: !!(d.data || d.url),
+    hasFile: !!(d.data || d.url || d.hasData),
     generated: !!d.generated,
   };
 }

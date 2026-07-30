@@ -5,6 +5,17 @@ import { notifyMember } from "@/lib/notify";
 export const json = (data: unknown, status = 200) => NextResponse.json(data, { status });
 export const bad = (message: string, status = 400) => NextResponse.json({ error: message }, { status });
 
+// List queries omit `data` to keep payloads small, so DTOs can't see inline
+// bytes. Attach `hasData` from a companion id-only query (rows with data != "")
+// so `hasFile` still reflects inline-stored files.
+export function markHasData<T extends { id: string }>(
+  rows: T[],
+  idsWithData: { id: string }[],
+): (T & { hasData: boolean })[] {
+  const set = new Set(idsWithData.map((r) => r.id));
+  return rows.map((r) => ({ ...r, hasData: set.has(r.id) }));
+}
+
 export function genMemberNumber(): string {
   const year = new Date().getFullYear();
   const n = Math.floor(10000 + Math.random() * 89999);
