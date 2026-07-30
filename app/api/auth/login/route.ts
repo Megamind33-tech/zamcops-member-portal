@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { verifyPassword, setSessionCookie } from "@/lib/auth";
-import { json, bad } from "@/lib/server";
+import { json, bad, normalizePhone } from "@/lib/server";
 import { memberDTO } from "@/lib/serialize";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   const id = String(identifier).trim();
   const member = await prisma.member.findFirst({
-    where: { OR: [{ email: id.toLowerCase() }, { phone: id }] },
+    where: { OR: [{ email: id.toLowerCase() }, { phone: normalizePhone(id) }] },
   });
   if (!member || !(await verifyPassword(password, member.passwordHash))) {
     return bad("Incorrect phone/email or password.", 401);

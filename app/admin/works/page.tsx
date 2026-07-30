@@ -67,6 +67,7 @@ export default function AdminWorksPage() {
                         disabled={w.status === "Approved" || w.status === "Rejected"}
                         onApprove={() => setReviewStatus("work", w.id, "Approved")}
                         onReject={(reason) => setReviewStatus("work", w.id, "Rejected", reason)}
+                        onUnderReview={() => setReviewStatus("work", w.id, "Under Review")}
                       />
                       <button
                         onClick={() => del(w.id, w.title)}

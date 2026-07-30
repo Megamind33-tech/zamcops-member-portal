@@ -15,7 +15,7 @@ import { TableShell, Th, Td, Tr } from "@/components/zam/Table";
 import { formatDate } from "@/lib/format";
 import type { ReviewStatus } from "@/types";
 
-const filters: ("All" | ReviewStatus)[] = ["All", "Pending", "Approved", "Rejected"];
+const filters: ("All" | ReviewStatus)[] = ["All", "Pending", "Under Review", "Approved", "Rejected"];
 
 export default function WorksScreen() {
   const { works } = useMemberData();

@@ -6,7 +6,11 @@ import { json, bad } from "@/lib/server";
 export const runtime = "nodejs";
 
 const MAX_BYTES = 4 * 1024 * 1024; // 4MB — inline fallback stays under the serverless body limit
-type UploadType = "Audio" | "Cover Art" | "Lyrics" | "Document";
+const UPLOAD_TYPES = ["Audio", "Cover Art", "Lyrics", "Document"] as const;
+type UploadType = (typeof UPLOAD_TYPES)[number];
+
+const asUploadType = (v: unknown): UploadType =>
+  UPLOAD_TYPES.includes(v as UploadType) ? (v as UploadType) : "Document";
 
 const statusFor = (t: string) => (t === "Audio" ? "Processing" : "Pending");
 
@@ -22,7 +26,7 @@ export async function POST(req: Request) {
   if (req.headers.get("content-type")?.includes("application/json")) {
     const b = await req.json().catch(() => null);
     if (!b?.url) return bad("Missing blob url.");
-    const fileType = (b.fileType as UploadType) || "Document";
+    const fileType = asUploadType(b.fileType);
     const upload = await prisma.uploadFile.create({
       data: {
         ownerId: session.sub,
@@ -40,7 +44,7 @@ export async function POST(req: Request) {
 
   // Inline fallback: small file sent as a raw binary body.
   const url = new URL(req.url);
-  const fileType = (url.searchParams.get("type") as UploadType) || "Document";
+  const fileType = asUploadType(url.searchParams.get("type"));
   const fileName = url.searchParams.get("name") || "upload";
   const linkedTo = url.searchParams.get("linkedTo") || "";
   const mimeType = req.headers.get("content-type") || "application/octet-stream";

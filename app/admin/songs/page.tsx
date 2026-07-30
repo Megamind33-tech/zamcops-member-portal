@@ -65,6 +65,7 @@ export default function AdminSongsPage() {
                         disabled={s.status === "Approved" || s.status === "Rejected"}
                         onApprove={() => setReviewStatus("single", s.id, "Approved")}
                         onReject={(reason) => setReviewStatus("single", s.id, "Rejected", reason)}
+                        onUnderReview={() => setReviewStatus("single", s.id, "Under Review")}
                       />
                       <button
                         onClick={() => del(s.id, s.title)}

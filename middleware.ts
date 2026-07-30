@@ -6,8 +6,14 @@ import { SESSION_COOKIE_NAME, getAuthSecret } from "@/lib/session";
 // layout guards remain for UX, but this stops unauthenticated visitors from
 // even receiving the page shell (and removes the flash-then-redirect).
 
+// Guarded member-portal sections. `config.matcher` below must mirror this
+// list ("<path>/:path*" per entry, plus "/admin/:path*") — Next.js requires
+// the matcher to be statically analyzable, so it can't be derived from this
+// array. Keep the two lists adjacent and in sync.
 const MEMBER_PATHS = [
   "/dashboard",
+  "/application",
+  "/documents",
   "/works",
   "/submit",
   "/uploads",
@@ -65,6 +71,8 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/dashboard/:path*",
+    "/application/:path*",
+    "/documents/:path*",
     "/works/:path*",
     "/submit/:path*",
     "/uploads/:path*",

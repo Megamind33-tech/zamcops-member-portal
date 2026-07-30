@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/format";
-import { Check, X } from "lucide-react";
+import { Check, Eye, X } from "lucide-react";
 
 export function AdminStat({
   icon,
@@ -128,14 +128,17 @@ export function StatusBadge({ status, className }: { status: string; className?:
 }
 
 // Approve / reject controls for a review queue row. Rejections ask for a
-// reason, which is stored on the record and sent to the member.
+// reason, which is stored on the record and sent to the member. Pass
+// onUnderReview to also offer marking the item "Under Review".
 export function ReviewActions({
   onApprove,
   onReject,
+  onUnderReview,
   disabled,
 }: {
   onApprove: () => void;
   onReject: (reason: string) => void;
+  onUnderReview?: () => void;
   disabled?: boolean;
 }) {
   const reject = () => {
@@ -146,6 +149,16 @@ export function ReviewActions({
 
   return (
     <div className="flex justify-end gap-2">
+      {onUnderReview && (
+        <button
+          onClick={onUnderReview}
+          disabled={disabled}
+          title="Mark as Under Review"
+          className="inline-flex items-center gap-1 rounded-lg bg-zam-blue/10 px-2.5 py-1.5 text-xs font-semibold text-zam-blue transition hover:bg-zam-blue/20 disabled:opacity-40"
+        >
+          <Eye size={14} /> Review
+        </button>
+      )}
       <button
         onClick={onApprove}
         disabled={disabled}

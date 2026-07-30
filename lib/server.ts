@@ -16,6 +16,12 @@ export function markHasData<T extends { id: string }>(
   return rows.map((r) => ({ ...r, hasData: set.has(r.id) }));
 }
 
+// Canonical phone form used for storage and lookups: trimmed, with spaces,
+// dashes and parentheses removed (e.g. "+260 97 000-0000" → "+260970000000").
+export function normalizePhone(raw: unknown): string {
+  return String(raw ?? "").trim().replace(/[\s()-]/g, "");
+}
+
 export function genMemberNumber(): string {
   const year = new Date().getFullYear();
   const n = Math.floor(10000 + Math.random() * 89999);
