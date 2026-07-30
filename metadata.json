@@ -1,6 +1,6 @@
 {
   "name": "ZAMCOPS Member Portal",
-  "description": "Mobile-first ZAMCOPS Artist Membership Portal (PWA) for musicians, composers, producers, publishers and rightsholders in Zambia, plus a staff admin dashboard.",
+  "description": "ZAMCOPS Member Portal for composers, authors and publishers in Zambia — membership applications, work declarations, royalties and licensing — plus a staff admin dashboard.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

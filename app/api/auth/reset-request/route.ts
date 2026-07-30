@@ -4,7 +4,8 @@ import { rateLimit, clientIp } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
-// Signed-out password-reset request. No email service is configured yet, so
+// Signed-out password-reset request. Deliberately staff-mediated rather than
+// a self-service email link (email via Resend does exist — see lib/notify.ts):
 // this files a "Password reset" ticket into the staff Support Inbox; staff
 // verify the member and issue a temporary password from the member's detail
 // page. Always responds ok so account existence can't be probed.

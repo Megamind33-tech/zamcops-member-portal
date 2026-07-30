@@ -38,7 +38,7 @@ model AuditLog {
   @@index([createdAt])
 }
 
-// Members of the society — artists, composers, producers, publishers, labels.
+// Members of the society — composers, authors and publishers (ZAMCOPS' mandate).
 model Member {
   id           String @id @default(cuid())
   memberNumber String @unique

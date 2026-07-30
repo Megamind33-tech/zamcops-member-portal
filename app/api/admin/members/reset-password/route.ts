@@ -15,9 +15,10 @@ function tempPassword(length = 10): string {
   return Array.from(bytes, (x) => ALPHABET[x % ALPHABET.length]).join("");
 }
 
-// Staff-assisted password reset (no email service yet): sets a one-time
-// temporary password on the member's account and returns it ONCE so staff can
-// pass it to the verified member. The member should change it after signing in.
+// Staff-assisted password reset: sets a one-time temporary password on the
+// member's account and returns it ONCE so staff can pass it to the verified
+// member (the member is also notified via lib/notify.ts — email/SMS when
+// configured). The member should change it after signing in.
 export async function POST(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
