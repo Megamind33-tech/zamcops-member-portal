@@ -2,6 +2,7 @@ import { del } from "@vercel/blob";
 import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
+import { isR2Url, r2Configured, r2Delete, r2Key } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -22,10 +23,18 @@ export async function POST(req: Request) {
   const session = await requireMember();
   if (!session) return bad("Not authenticated.", 401);
 
-  // Blob-backed upload: the client already pushed the file to Vercel Blob.
+  // Remote-backed upload: the client already pushed the file to R2 or Blob.
   if (req.headers.get("content-type")?.includes("application/json")) {
     const b = await req.json().catch(() => null);
-    if (!b?.url) return bad("Missing blob url.");
+    if (!b?.url) return bad("Missing storage url.");
+    // Only accept locations this member could have uploaded to: their own R2
+    // namespace or a Vercel Blob public URL. Anything else is rejected so the
+    // staff download proxy never fetches an attacker-chosen URL.
+    const storedUrl = String(b.url);
+    const ownsUrl =
+      storedUrl.startsWith(`r2://uploads/${session.sub}/`) ||
+      /^https:\/\/[\w-]+\.public\.blob\.vercel-storage\.com\//.test(storedUrl);
+    if (!ownsUrl) return bad("Invalid storage url.");
     const fileType = asUploadType(b.fileType);
     const upload = await prisma.uploadFile.create({
       data: {
@@ -36,7 +45,7 @@ export async function POST(req: Request) {
         status: statusFor(fileType),
         mimeType: b.mimeType || "",
         fileSize: Number(b.fileSize) || 0,
-        url: String(b.url),
+        url: storedUrl,
       },
     });
     return json({ id: upload.id, fileName: upload.fileName, fileType: upload.fileType, fileSize: upload.fileSize }, 201);
@@ -81,8 +90,12 @@ export async function DELETE(req: Request) {
   const row = await prisma.uploadFile.findUnique({ where: { id } });
   if (!row || row.ownerId !== session.sub) return bad("Upload not found.", 404);
 
-  if (row.url && process.env.BLOB_READ_WRITE_TOKEN) {
-    await del(row.url).catch(() => {});
+  if (row.url) {
+    if (isR2Url(row.url)) {
+      if (r2Configured()) await r2Delete(r2Key(row.url)).catch(() => {});
+    } else if (process.env.BLOB_READ_WRITE_TOKEN) {
+      await del(row.url).catch(() => {});
+    }
   }
   await prisma.uploadFile.delete({ where: { id } });
   return json({ ok: true });

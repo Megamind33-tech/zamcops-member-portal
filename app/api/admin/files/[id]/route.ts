@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { bad } from "@/lib/server";
+import { isR2Url, r2Configured, r2Key, r2PresignGet } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -22,10 +23,17 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   const disposition = `${download ? "attachment" : "inline"}; filename="${encodeURIComponent(file.fileName)}"`;
   const contentType = file.mimeType || "application/octet-stream";
 
-  // Blob-backed (large) file: proxy it, forwarding the Range header.
+  // Remote-backed (large) file — R2 or Vercel Blob: proxy it, forwarding the
+  // Range header. R2 rows store "r2://<key>", signed into a real URL here so
+  // the bucket stays private and links are never exposed to the client.
   if (file.url) {
+    let target = file.url;
+    if (isR2Url(file.url)) {
+      if (!r2Configured()) return bad("File storage is not configured.", 502);
+      target = await r2PresignGet(r2Key(file.url));
+    }
     const range = req.headers.get("range") || undefined;
-    const upstream = await fetch(file.url, { headers: range ? { range } : undefined });
+    const upstream = await fetch(target, { headers: range ? { range } : undefined });
     if (!upstream.ok && upstream.status !== 206) return bad("File unavailable.", 502);
 
     const headers = new Headers();

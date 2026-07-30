@@ -33,13 +33,13 @@ export function AudioUpload({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [uploadId, setUploadId] = useState<string>("");
 
-  // Record an already-uploaded Blob file on an UploadFile row.
-  const recordBlob = async (file: File, blobUrl: string): Promise<string> => {
+  // Record an already-uploaded remote file (R2 or Blob) on an UploadFile row.
+  const recordRemote = async (file: File, storedUrl: string): Promise<string> => {
     const res = await fetch("/api/member/upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        url: blobUrl,
+        url: storedUrl,
         fileName: file.name,
         fileType: "Audio",
         fileSize: file.size,
@@ -50,6 +50,30 @@ export function AudioUpload({
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || "Could not save the upload.");
     return data.id as string;
+  };
+
+  // Preferred: direct-to-R2 upload via a presigned URL (free tier, no size
+  // limit up to 300MB). Returns null when R2 isn't configured on the server.
+  const r2Upload = async (file: File): Promise<string | null> => {
+    const pres = await fetch("/api/storage/presign", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fileName: file.name,
+        contentType: file.type || "application/octet-stream",
+        fileSize: file.size,
+      }),
+    });
+    if (pres.status === 501) return null; // R2 not configured → next fallback
+    const data = await pres.json().catch(() => ({}));
+    if (!pres.ok) throw new Error(data.error || "Could not start the upload.");
+    const put = await fetch(data.uploadUrl, {
+      method: "PUT",
+      body: file,
+      headers: { "Content-Type": file.type || "application/octet-stream" },
+    });
+    if (!put.ok) throw new Error("Uploading to storage failed — please try again.");
+    return data.url as string;
   };
 
   // Inline fallback for small files when no Blob store is connected.
@@ -75,17 +99,22 @@ export function AudioUpload({
     setBusy(true);
     try {
       let id: string;
-      try {
-        // Preferred: direct-to-Blob upload (no size limit).
-        const blob = await upload(file.name, file, {
-          access: "public",
-          handleUploadUrl: "/api/blob/upload",
-          contentType: file.type,
-        });
-        id = await recordBlob(file, blob.url);
-      } catch {
-        // Blob store not connected (or upload blocked) → inline fallback.
-        id = await inlineUpload(file);
+      const r2Url = await r2Upload(file).catch(() => null);
+      if (r2Url) {
+        id = await recordRemote(file, r2Url);
+      } else {
+        try {
+          // Second choice: direct-to-Blob upload (needs a connected Blob store).
+          const blob = await upload(file.name, file, {
+            access: "public",
+            handleUploadUrl: "/api/blob/upload",
+            contentType: file.type,
+          });
+          id = await recordRemote(file, blob.url);
+        } catch {
+          // No remote store connected (or upload blocked) → inline fallback.
+          id = await inlineUpload(file);
+        }
       }
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setPreviewUrl(URL.createObjectURL(file));

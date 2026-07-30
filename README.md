@@ -25,8 +25,9 @@ The app has two clearly-separated areas:
 - **Prisma + PostgreSQL** (hosted on Neon; pooled + direct connection URLs)
 - **Auth:** hashed passwords (bcryptjs) + signed JWT in an httpOnly cookie
   (jose), enforced both in route handlers and in `middleware.ts`
-- **File storage:** Vercel Blob for large files (audio), with an inline
-  base64 fallback in the database for small files (≤4MB) and the
+- **File storage:** Cloudflare R2 (preferred — private bucket, presigned
+  uploads up to 300MB) or Vercel Blob for large files (audio), with an
+  inline base64 fallback in the database for small files (≤4MB) and the
   system-generated PDFs
 - **Notifications:** email via Resend and SMS via Africa's Talking, both
   optional (`lib/notify.ts`); registration email verification uses OTP codes
@@ -63,8 +64,11 @@ See `.env.example` for the full annotated list:
 - `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` — the staff account,
   created on first admin sign-in. **Required in production** — the default
   `admin123` account is only seeded in development.
-- `BLOB_READ_WRITE_TOKEN` — Vercel Blob token for large-file uploads
-  (small files fall back to inline storage without it).
+- `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` /
+  `R2_BUCKET` — Cloudflare R2 for large-file uploads (preferred; see
+  `.env.example` for bucket + CORS setup).
+- `BLOB_READ_WRITE_TOKEN` — Vercel Blob, used when R2 is not configured
+  (small files fall back to inline storage without either).
 - `RESEND_API_KEY` / `EMAIL_FROM` — email channel (OTP codes, notifications).
 - `AT_USERNAME` / `AT_API_KEY` / `AT_SENDER_ID` — SMS via Africa's Talking.
 
