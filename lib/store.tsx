@@ -188,17 +188,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [refresh]
   );
 
-  const makeDelete = (url: string) =>
-    async (id: string): Promise<Result> => {
-      const { res, data } = await postJSON(url, { id }, "DELETE");
-      if (!res.ok) return { ok: false, error: data.error || "Could not delete this submission." };
-      await refresh();
-      return { ok: true };
-    };
+  const makeDelete = useCallback(
+    (url: string) =>
+      async (id: string): Promise<Result> => {
+        const { res, data } = await postJSON(url, { id }, "DELETE");
+        if (!res.ok) return { ok: false, error: data.error || "Could not delete this submission." };
+        await refresh();
+        return { ok: true };
+      },
+    [refresh]
+  );
 
-  const deleteWork = useCallback<AppContextValue["deleteWork"]>((id) => makeDelete("/api/member/works")(id), [refresh]);
-  const deleteSingle = useCallback<AppContextValue["deleteSingle"]>((id) => makeDelete("/api/member/singles")(id), [refresh]);
-  const deleteAlbum = useCallback<AppContextValue["deleteAlbum"]>((id) => makeDelete("/api/member/albums")(id), [refresh]);
+  const deleteWork = useCallback<AppContextValue["deleteWork"]>((id) => makeDelete("/api/member/works")(id), [makeDelete]);
+  const deleteSingle = useCallback<AppContextValue["deleteSingle"]>((id) => makeDelete("/api/member/singles")(id), [makeDelete]);
+  const deleteAlbum = useCallback<AppContextValue["deleteAlbum"]>((id) => makeDelete("/api/member/albums")(id), [makeDelete]);
 
   const markNotificationRead = useCallback(async (id: string) => {
     setState((s) => ({

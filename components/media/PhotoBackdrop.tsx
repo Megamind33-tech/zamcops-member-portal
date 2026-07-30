@@ -35,6 +35,8 @@ export function PhotoBackdrop({
   };
   return (
     <div className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)} aria-hidden>
+      {/* Decorative pre-sized local .webp backdrop — next/image adds nothing here. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`/img/${photo}.webp`}
         alt=""
