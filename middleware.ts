@@ -1,11 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { SESSION_COOKIE_NAME, getAuthSecret } from "@/lib/session";
 
 // Server-side guard for the member portal and staff console. The client-side
 // layout guards remain for UX, but this stops unauthenticated visitors from
 // even receiving the page shell (and removes the flash-then-redirect).
-
-const COOKIE_NAME = "zamcops_session";
 
 const MEMBER_PATHS = [
   "/dashboard",
@@ -21,15 +20,13 @@ const MEMBER_PATHS = [
   "/licensing",
 ];
 
-function secret(): Uint8Array {
-  return new TextEncoder().encode(process.env.AUTH_SECRET || "dev-zamcops-secret-change-in-production");
-}
-
 async function sessionRole(req: NextRequest): Promise<string | null> {
-  const token = req.cookies.get(COOKIE_NAME)?.value;
+  const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret());
+    // getAuthSecret throws in production when AUTH_SECRET is unset — the
+    // catch treats that as "no valid session", so we fail closed.
+    const { payload } = await jwtVerify(token, getAuthSecret());
     return (payload.role as string) ?? null;
   } catch {
     return null;

@@ -6,16 +6,21 @@ import { rateLimit, clientIp } from "@/lib/rateLimit";
 export const runtime = "nodejs";
 
 // Ensures the staff account configured via env exists, then signs in.
-async function ensureSeedAdmin() {
+// Returns an error message when seeding is refused (default password in
+// production), null otherwise.
+async function ensureSeedAdmin(): Promise<string | null> {
   const email = (process.env.ADMIN_EMAIL || "admin@zamcops.org.zm").toLowerCase();
-  const password = process.env.ADMIN_PASSWORD || "admin123";
+  const password = process.env.ADMIN_PASSWORD;
   const name = process.env.ADMIN_NAME || "ZAMCOPS Staff";
   const existing = await prisma.adminUser.findUnique({ where: { email } });
-  if (!existing) {
-    await prisma.adminUser.create({
-      data: { email, name, passwordHash: await hashPassword(password) },
-    });
+  if (existing) return null;
+  if (!password && process.env.NODE_ENV === "production") {
+    return "No staff account exists and ADMIN_PASSWORD is not configured — refusing to create one with the default password in production. Set ADMIN_EMAIL/ADMIN_PASSWORD and try again.";
   }
+  await prisma.adminUser.create({
+    data: { email, name, passwordHash: await hashPassword(password || "admin123") },
+  });
+  return null;
 }
 
 export async function POST(req: Request) {
@@ -28,7 +33,8 @@ export async function POST(req: Request) {
   const { email, password } = body;
   if (!email || !password) return bad("Enter your staff email and password.");
 
-  await ensureSeedAdmin();
+  const seedError = await ensureSeedAdmin();
+  if (seedError) return bad(seedError, 503);
 
   const admin = await prisma.adminUser.findUnique({
     where: { email: String(email).trim().toLowerCase() },

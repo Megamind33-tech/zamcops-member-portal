@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { SESSION_COOKIE_NAME, getAuthSecret } from "@/lib/session";
 
-const COOKIE_NAME = "zamcops_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export type SessionRole = "member" | "admin";
@@ -10,17 +10,6 @@ export interface Session {
   sub: string; // member id or admin id
   role: SessionRole;
   email: string;
-}
-
-let warnedMissingSecret = false;
-
-function secret(): Uint8Array {
-  const s = process.env.AUTH_SECRET;
-  if (!s && process.env.NODE_ENV === "production" && !warnedMissingSecret) {
-    warnedMissingSecret = true;
-    console.warn("[auth] AUTH_SECRET is not set — sessions are signed with the built-in dev secret. Set AUTH_SECRET in production.");
-  }
-  return new TextEncoder().encode(s || "dev-zamcops-secret-change-in-production");
 }
 
 export async function hashPassword(plain: string): Promise<string> {
@@ -37,13 +26,13 @@ export async function createSessionToken(session: Session): Promise<string> {
     .setSubject(session.sub)
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
-    .sign(secret());
+    .sign(getAuthSecret());
 }
 
 export async function setSessionCookie(session: Session): Promise<void> {
   const token = await createSessionToken(session);
   const store = await cookies();
-  store.set(COOKIE_NAME, token, {
+  store.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -54,15 +43,15 @@ export async function setSessionCookie(session: Session): Promise<void> {
 
 export async function clearSessionCookie(): Promise<void> {
   const store = await cookies();
-  store.delete(COOKIE_NAME);
+  store.delete(SESSION_COOKIE_NAME);
 }
 
 export async function getSession(): Promise<Session | null> {
   const store = await cookies();
-  const token = store.get(COOKIE_NAME)?.value;
+  const token = store.get(SESSION_COOKIE_NAME)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret());
+    const { payload } = await jwtVerify(token, getAuthSecret());
     return {
       sub: payload.sub as string,
       role: payload.role as SessionRole,
