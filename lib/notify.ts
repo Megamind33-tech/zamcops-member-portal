@@ -61,7 +61,16 @@ export async function sendTransactionalEmail(to: string, subject: string, body: 
 async function sendEmail(to: string, subject: string, body: string): Promise<void> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || "ZAMCOPS <onboarding@resend.dev>";
-  if (!key || !to) return;
+  if (!to) return;
+  if (!key) {
+    console.warn(`[notify] RESEND_API_KEY is not set — email "${subject}" to ${to} was skipped`);
+    return;
+  }
+  if (!process.env.EMAIL_FROM) {
+    console.warn(
+      "[notify] EMAIL_FROM is not set — sending from Resend's shared onboarding sender, which only delivers to the Resend account owner's own inbox (test mode). Verify a domain in Resend and set EMAIL_FROM for real delivery.",
+    );
+  }
 
   const html = `
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#1a1d21">
@@ -84,7 +93,9 @@ async function sendEmail(to: string, subject: string, body: string): Promise<voi
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({ from, to, subject: `ZAMCOPS — ${subject}`, html }),
   });
-  if (!res.ok) console.error("[notify] email failed:", res.status, await res.text().catch(() => ""));
+  if (!res.ok) {
+    console.error(`[notify] email to ${to} (from ${from}) failed:`, res.status, await res.text().catch(() => ""));
+  }
 }
 
 async function sendSMS(phone: string, text: string): Promise<void> {
