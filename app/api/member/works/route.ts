@@ -51,9 +51,8 @@ export async function POST(req: Request) {
   if (splitsTotal(splits) !== 100) return bad("Ownership splits must total exactly 100%.");
 
   const composers = listOf(b.composers);
-  const authors = listOf(b.authors);
-  const subAuthors = listOf(b.subAuthors);
-  const subArrangers = listOf(b.subArrangers);
+  const authors = [...listOf(b.authors), ...listOf(b.subAuthors)];
+  const arrangers = listOf(b.arrangers).length ? listOf(b.arrangers) : listOf(b.subArrangers);
 
   const result = await prisma.$transaction(async (tx) => {
     const work = await tx.workDeclaration.create({
@@ -67,8 +66,8 @@ export async function POST(req: Request) {
         duration: b.duration ?? "",
         composers: JSON.stringify(composers),
         authors: JSON.stringify(authors),
-        subAuthors: JSON.stringify(subAuthors),
-        subArrangers: JSON.stringify(subArrangers),
+        subAuthors: JSON.stringify([]),
+        subArrangers: JSON.stringify(arrangers),
         producers: JSON.stringify([]),
         publisher: b.publisher ?? "",
         publisherIpi: b.publisherIpi ?? "",
@@ -116,6 +115,7 @@ export async function POST(req: Request) {
     title: "Work received for registration",
     body: `“${result.work.title}” (song and artwork) has been received and is queued for review.`,
     type: "info",
+    href: "/works",
   });
 
   return json({ work: workDTO(result.work), single: singleDTO(result.song) }, 201);

@@ -10,6 +10,7 @@ import {
 import { Input, Select } from "./Input";
 import { Button } from "./Button";
 import { Progress } from "./Misc";
+import { MandateNote } from "@/components/zam/MandateNote";
 import { CONTRIBUTOR_ROLES, normalizeContributorRole, type ContributorRole } from "@/lib/roles";
 
 export interface OwnershipSplit {
@@ -83,8 +84,9 @@ export function SplitsEditor({
       </div>
 
       <Button type="button" variant="ghost" size="sm" icon={<PlusIcon className="h-4 w-4" />} onClick={add}>
-        Add a composer, author or publisher
+        Add a composer, author, arranger or publisher
       </Button>
+      <MandateNote />
 
       <div
         className={`rounded-xl border p-3 ${valid ? "border-zam-green/30 bg-zam-green-soft" : "border-zam-amber/40 bg-zam-amber-soft"}`}

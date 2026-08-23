@@ -224,6 +224,7 @@ model Notification {
   title     String
   body      String
   type      String   @default("info")
+  href      String   @default("") // in-app path the member should open, e.g. /support
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
@@ -344,6 +345,7 @@ model SupportTicket {
   message    String    @db.Text
   status     String    @default("Open") // Open | Resolved
   reply      String    @default("")
+  thread     String    @default("[]") // JSON ThreadMessage[] — conversation after the opening query
   createdAt  DateTime  @default(now())
   resolvedAt DateTime?
 

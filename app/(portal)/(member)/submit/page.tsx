@@ -18,7 +18,7 @@ export default function SubmitHubScreen() {
           src="/img/auth-mic.webp"
           alt="Vocalist at a microphone"
           title="Register a work"
-          body="Send one song and its artwork together. Credit composers, authors, sub-authors, sub-arrangers and publishers."
+          body="Send one song and its artwork together. Credit composers, authors, arrangers and publishers."
         />
         <PhotoTile
           href="/submit/album"

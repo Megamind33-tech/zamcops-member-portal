@@ -50,6 +50,7 @@ export async function PATCH(req: Request) {
           body: `Your confirmed payout for ${distribution.periodLabel} is now available to view in the member portal.`,
           type: "success",
           category: "royalty",
+          href: "/royalties",
           sms: `Your confirmed royalty payout for ${distribution.periodLabel} is now available in the ZAMCOPS member portal.`,
         })
       )

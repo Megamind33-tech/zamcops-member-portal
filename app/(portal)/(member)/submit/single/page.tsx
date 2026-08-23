@@ -37,8 +37,7 @@ export default function RegisterWorkScreen() {
     duration: "",
     composers: currentMember?.fullName ?? "",
     authors: "",
-    subAuthors: "",
-    subArrangers: "",
+    arrangers: "",
     publisher: "",
     publisherIpi: "",
     performedBy: owner,
@@ -77,8 +76,7 @@ export default function RegisterWorkScreen() {
       duration: form.duration,
       composers: list(form.composers),
       authors: list(form.authors),
-      subAuthors: list(form.subAuthors),
-      subArrangers: list(form.subArrangers),
+      arrangers: list(form.arrangers),
       publisher: form.publisher,
       publisherIpi: form.publisherIpi,
       performedBy: form.performedBy,
@@ -115,7 +113,7 @@ export default function RegisterWorkScreen() {
       <div className="mt-4">
         <PageHeader
           title="Register a work"
-          subtitle="Send the song and its artwork together. Credit composers, authors, sub-authors, sub-arrangers and publishers."
+          subtitle="Send the song and its artwork together. Credit composers, authors, arrangers and publishers. Related rights are not registered here."
         />
       </div>
 
@@ -162,7 +160,7 @@ export default function RegisterWorkScreen() {
                 <Field label="Date created">
                   <Input type="date" value={form.dateCreated} onChange={set("dateCreated")} />
                 </Field>
-                <Field label="Performed by" hint="As fixed on the recording">
+                <Field label="Recording credit" hint="How the recording is credited — not a related-rights claim">
                   <Input value={form.performedBy} onChange={set("performedBy")} />
                 </Field>
               </div>
@@ -171,8 +169,8 @@ export default function RegisterWorkScreen() {
 
           <Card>
             <CardHeader
-              title="Composers, authors and publishers"
-              description="Separate multiple names with commas. Sub-authors and sub-arrangers are recorded where they apply."
+              title="Composers, authors, arrangers and publishers"
+              description="Separate multiple names with commas. Arrangers receive a share. Performers and producers are not rights holders in this register."
             />
             <div className="p-5 space-y-4">
               <Field label="Composer(s)" required>
@@ -181,14 +179,9 @@ export default function RegisterWorkScreen() {
               <Field label="Author(s)">
                 <Input placeholder="Name 1, Name 2" value={form.authors} onChange={set("authors")} />
               </Field>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Sub-author(s)">
-                  <Input placeholder="Name 1, Name 2" value={form.subAuthors} onChange={set("subAuthors")} />
-                </Field>
-                <Field label="Sub-arranger(s)">
-                  <Input placeholder="Name 1, Name 2" value={form.subArrangers} onChange={set("subArrangers")} />
-                </Field>
-              </div>
+              <Field label="Arranger(s)">
+                <Input placeholder="Name 1, Name 2" value={form.arrangers} onChange={set("arrangers")} />
+              </Field>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="Publisher">
                   <Input value={form.publisher} onChange={set("publisher")} />
@@ -236,7 +229,7 @@ export default function RegisterWorkScreen() {
 
         <div className="lg:sticky lg:top-6 space-y-4">
           <Card>
-            <CardHeader title="Ownership splits" description="Must total 100% across composers, authors, sub-authors, sub-arrangers and publishers." />
+            <CardHeader title="Ownership splits" description="Must total 100% across composers, authors, arrangers and publishers." />
             <div className="p-5">
               <SplitsEditor splits={splits} onChange={(s) => setSplits(s as OwnershipSplit[])} />
             </div>

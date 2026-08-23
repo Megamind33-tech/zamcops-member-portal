@@ -48,6 +48,7 @@ export async function PATCH(req: Request) {
           ? `Your ${label.toLowerCase()} “${title}” was rejected${reason ? `: ${reason}` : "."}`
           : `Your ${label.toLowerCase()} “${title}” has been ${status.toLowerCase()}.`,
       type: status === "Approved" ? "success" : "warning",
+      href: "/works",
     });
   }
 

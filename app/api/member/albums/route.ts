@@ -56,6 +56,7 @@ export async function POST(req: Request) {
     title: "Album submission received",
     body: `“${album.title}” (${tracks.length} tracks) is now pending review.`,
     type: "info",
+    href: "/works",
   });
 
   return json({ album: albumDTO(album) }, 201);

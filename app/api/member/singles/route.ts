@@ -59,6 +59,7 @@ export async function POST(req: Request) {
     title: "Single submission received",
     body: `“${song.title}” is now pending review.`,
     type: "info",
+    href: "/works",
   });
 
   return json({ single: singleDTO(song) }, 201);

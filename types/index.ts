@@ -1,8 +1,8 @@
 // ZAMCOPS Member Portal — domain models shared by the member portal and staff dashboard.
 //
 // ZAMCOPS registers composers, authors and publishers of musical works
-// (its mandate and CISAC affiliation). Work declarations credit composers,
-// authors, sub-authors, arrangers, sub-arrangers and publishers.
+// (authors' rights). Arrangers receive a share on a work. Related rights
+// (performers, producers) are not administered.
 
 export type { MemberRole, ContributorRole } from "@/lib/roles";
 import type { MemberRole, ContributorRole } from "@/lib/roles";
@@ -124,6 +124,7 @@ export interface WorkDeclaration {
   authors: string[];
   subAuthors: string[];
   subArrangers: string[];
+  arrangers?: string[];
   publisher?: string;
   coverArt?: string;
   publisherIpi?: string; // Publisher's IPI / CAE number, for cross-society registration
@@ -220,6 +221,7 @@ export interface AppNotification {
   title: string;
   body: string;
   type: "info" | "success" | "warning" | "action";
+  href?: string;
   createdAt: string;
   read: boolean;
 }
@@ -257,6 +259,12 @@ export interface MemberDocument {
 
 export type SupportTicketStatus = "Open" | "Resolved";
 
+export interface SupportThreadMessage {
+  author: "member" | "staff";
+  body: string;
+  at: string;
+}
+
 // A help-desk query — filed by a signed-in member, or by a signed-out visitor
 // requesting a password reset (ownerId empty, contact carries the identifier).
 export interface SupportTicket {
@@ -267,6 +275,7 @@ export interface SupportTicket {
   message: string;
   status: SupportTicketStatus;
   reply?: string;
+  thread: SupportThreadMessage[];
   createdAt: string;
   resolvedAt?: string;
 }

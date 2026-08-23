@@ -1,28 +1,27 @@
-// ZAMCOPS mandate language — the single source of truth for who the society
-// registers and which roles appear on a work declaration.
+// ZAMCOPS mandate — the single source of truth for who the society registers
+// and who may take a share on a work.
 //
-// Membership (who may join): composers, authors and publishers.
-// Declaration (who is credited on a work): composers, authors, sub-authors,
-// arrangers, sub-arrangers and publishers. No other categories.
+// Membership (who may join): composers, authors and publishers of musical
+// works. ZAMCOPS administers authors' rights (performing and mechanical),
+// not related rights (performers, producers, featured artists).
+//
+// Shares on a work: composers, authors, publishers, and arrangers. An
+// arranger is not a membership class; they receive a share where they
+// contributed to the work.
 
 export const MEMBER_ROLES = ["Composer", "Author", "Publisher"] as const;
 export type MemberRole = (typeof MEMBER_ROLES)[number];
 
-export const CONTRIBUTOR_ROLES = [
-  "Composer",
-  "Author",
-  "Sub-author",
-  "Arranger",
-  "Sub-arranger",
-  "Publisher",
-] as const;
+export const CONTRIBUTOR_ROLES = ["Composer", "Author", "Arranger", "Publisher"] as const;
 export type ContributorRole = (typeof CONTRIBUTOR_ROLES)[number];
 
 const LEGACY_ROLE: Record<string, ContributorRole> = {
   "Author/Lyricist": "Author",
   Lyricist: "Author",
-  "Sub-Author": "Sub-author",
-  "Sub-Arranger": "Sub-arranger",
+  "Sub-author": "Author",
+  "Sub-Author": "Author",
+  "Sub-arranger": "Arranger",
+  "Sub-Arranger": "Arranger",
   Producer: "Composer",
   Performer: "Composer",
 };
@@ -39,3 +38,6 @@ export function normalizeContributorRole(role: string): ContributorRole {
   if (isContributorRole(role)) return role;
   return LEGACY_ROLE[role] ?? "Composer";
 }
+
+export const MANDATE_LINE =
+  "ZAMCOPS registers composers, authors and publishers. Arrangers receive a share. Related rights are not administered here.";

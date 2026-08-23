@@ -20,7 +20,7 @@ const slides = [
     alt: "Piano",
     kicker: "02 — Registration",
     title: "Register songs and artwork together",
-    body: "Send each work with its recording and artwork in one submission. Declarations credit composers, authors, sub-authors, sub-arrangers and publishers.",
+    body: "Send each work with its recording and artwork in one submission. Credit composers, authors, arrangers and publishers. Related rights (performers, producers) are not administered.",
   },
   {
     photo: "/img/splash-stage.webp",

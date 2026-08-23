@@ -107,7 +107,7 @@ export default function AlbumSubmissionScreen() {
             <Field label="Album title" required>
               <Input placeholder="e.g. Kalulu Tales" value={title} onChange={(e) => setTitle(e.target.value)} />
             </Field>
-            <Field label="Performed by">
+            <Field label="Recording credit" hint="How the release is credited — not a related-rights claim">
               <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
             </Field>
             <Field label="Release date">

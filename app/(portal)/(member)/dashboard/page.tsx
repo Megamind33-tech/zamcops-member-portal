@@ -233,7 +233,7 @@ export default function DashboardScreen() {
               const meta = notifIcon[n.type];
               const Icon = meta.icon;
               return (
-                <Link key={n.id} href="/notifications" className="flex items-start gap-3 px-5 py-4 transition-colors hover:bg-zam-canvas">
+                <Link key={n.id} href={n.href || "/notifications"} className="flex items-start gap-3 px-5 py-4 transition-colors hover:bg-zam-canvas">
                   <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${meta.tile}`}>
                     <Icon size={18} />
                   </span>

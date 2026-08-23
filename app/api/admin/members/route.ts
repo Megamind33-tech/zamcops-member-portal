@@ -55,6 +55,7 @@ export async function PATCH(req: Request) {
       title: notice.title,
       body: notice.body,
       type: notice.type as "success" | "warning",
+      href: "/application",
     });
   }
 
