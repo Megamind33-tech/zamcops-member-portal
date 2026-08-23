@@ -135,9 +135,25 @@ export function safeNoticeHref(raw?: string): string {
 // not fail the admin action that triggered the notice.
 export async function notifyMember(memberId: string, input: NotifyInput): Promise<void> {
   const type = input.type ?? "info";
-  await prisma.notification.create({
-    data: { ownerId: memberId, title: input.title, body: input.body, type, href: safeNoticeHref(input.href) },
-  });
+  const href = safeNoticeHref(input.href);
+  try {
+    await prisma.notification.create({
+      data: href
+        ? { ownerId: memberId, title: input.title, body: input.body, type, href }
+        : { ownerId: memberId, title: input.title, body: input.body, type },
+    });
+  } catch (err) {
+    // A missing href column (before prisma db push) must not fail the action
+    // that triggered the notice — e.g. work registration.
+    console.error("[notify] in-app write failed, retrying without href:", err);
+    try {
+      await prisma.notification.create({
+        data: { ownerId: memberId, title: input.title, body: input.body, type },
+      });
+    } catch (err2) {
+      console.error("[notify] in-app write failed:", err2);
+    }
+  }
 
   try {
     const member = await prisma.member.findUnique({ where: { id: memberId } });

@@ -3,12 +3,10 @@ import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { singleDTO } from "@/lib/serialize";
 import { notifyMember } from "@/lib/notify";
+import { splitsTotalOk } from "@/lib/works";
 import type { OwnershipSplit } from "@/types";
 
 export const runtime = "nodejs";
-
-const splitsTotal = (s: OwnershipSplit[]) =>
-  s.reduce((sum, x) => sum + (Number(x.percentage) || 0), 0);
 
 export async function POST(req: Request) {
   const session = await requireMember();
@@ -19,7 +17,7 @@ export async function POST(req: Request) {
   if (!b.title?.trim()) return bad("Song title is required.");
   if (!b.audioFile) return bad("An audio file is required.");
   const splits: OwnershipSplit[] = Array.isArray(b.ownershipSplits) ? b.ownershipSplits : [];
-  if (splitsTotal(splits) !== 100) return bad("Ownership splits must total exactly 100%.");
+  if (!splitsTotalOk(splits)) return bad("Ownership splits must total 100%.");
 
   const song = await prisma.songSubmission.create({
     data: {
@@ -45,22 +43,24 @@ export async function POST(req: Request) {
     uploads.push({ ownerId: session.sub, fileName: song.coverArt, fileType: "Cover Art", linkedTo: song.title, status: "Pending" });
   if (song.lyricsFile)
     uploads.push({ ownerId: session.sub, fileName: song.lyricsFile, fileType: "Lyrics", linkedTo: song.title, status: "Pending" });
-  if (uploads.length) await prisma.uploadFile.createMany({ data: uploads });
+  if (uploads.length) await prisma.uploadFile.createMany({ data: uploads }).catch(() => {});
 
-  await prisma.statement.create({
-    data: {
-      ownerId: session.sub,
-      type: "Submission Receipt",
-      title: `Single — ${song.title}`,
-      reference: `SR-S-${song.id.slice(-5).toUpperCase()}`,
-    },
-  });
+  await prisma.statement
+    .create({
+      data: {
+        ownerId: session.sub,
+        type: "Submission Receipt",
+        title: `Single — ${song.title}`,
+        reference: `SR-S-${song.id.slice(-5).toUpperCase()}`,
+      },
+    })
+    .catch(() => {});
   await notifyMember(session.sub, {
     title: "Single submission received",
     body: `“${song.title}” is now pending review.`,
     type: "info",
     href: "/works",
-  });
+  }).catch((err) => console.error("[singles] notify failed:", err));
 
   return json({ single: singleDTO(song) }, 201);
 }

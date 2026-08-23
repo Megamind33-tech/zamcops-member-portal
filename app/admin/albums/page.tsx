@@ -28,6 +28,7 @@ export default function AdminAlbumsPage() {
                 <Th>Album</Th>
                 <Th>Performed by</Th>
                 <Th>Tracks</Th>
+                <Th>Studio</Th>
                 <Th>Release</Th>
                 <Th>Submitted</Th>
                 <Th>Status</Th>
@@ -55,6 +56,7 @@ export default function AdminAlbumsPage() {
                   </Td>
                   <Td>{a.artistName}</Td>
                   <Td>{a.tracks.length}</Td>
+                  <Td className="text-xs text-night-300">{a.studioReceipt || "—"}</Td>
                   <Td className="text-night-300">{a.releaseDate ? formatDate(a.releaseDate) : "—"}</Td>
                   <Td className="text-night-300">{formatDate(a.submittedAt)}</Td>
                   <Td>

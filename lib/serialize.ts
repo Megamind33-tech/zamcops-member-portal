@@ -20,6 +20,7 @@ import type {
   MembershipApplication,
 } from "@/types";
 import { parseThread } from "@/lib/support";
+import { normalizeWorkType } from "@/lib/works";
 
 const iso = (d: Date | string): string => (d instanceof Date ? d.toISOString() : d);
 const parse = <T,>(s: string, fallback: T): T => {
@@ -79,13 +80,20 @@ export function applicationDTO(a: any): MembershipApplication {
   };
 }
 
+function studioFrom(w: any): string | undefined {
+  if (w.studioReceipt) return w.studioReceipt;
+  const producers = parse<string[]>(w.producers, []);
+  const tagged = producers.find((p) => p.startsWith("studioReceipt:"));
+  return tagged ? tagged.slice("studioReceipt:".length) : undefined;
+}
+
 export function workDTO(w: any): WorkDeclaration {
   return {
     id: w.id,
     ownerId: w.ownerId,
     title: w.title,
     alternativeTitle: w.alternativeTitle,
-    workType: w.workType,
+    workType: normalizeWorkType(w.workType),
     language: w.language,
     genre: w.genre,
     duration: w.duration,
@@ -101,6 +109,7 @@ export function workDTO(w: any): WorkDeclaration {
     iswc: w.iswc,
     audioFile: w.audioFile,
     coverArt: w.coverArt || undefined,
+    studioReceipt: studioFrom(w),
     dateCreated: w.dateCreated,
     status: w.status,
     rejectionReason: w.rejectionReason || undefined,
@@ -139,6 +148,7 @@ export function albumDTO(a: any): AlbumSubmission {
     coverArt: a.coverArt,
     backCover: a.backCover,
     tracks: parse<Track[]>(a.tracks, []),
+    studioReceipt: a.studioReceipt || undefined,
     status: a.status,
     rejectionReason: a.rejectionReason || undefined,
     submittedAt: iso(a.submittedAt),

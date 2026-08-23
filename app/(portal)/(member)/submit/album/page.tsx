@@ -11,23 +11,32 @@ import { Field, Input, Select } from "@/components/zam/Input";
 import { SplitsEditor } from "@/components/zam/SplitsEditor";
 import { AudioUpload } from "@/components/zam/AudioUpload";
 import { CoverUpload } from "@/components/zam/CoverUpload";
+import { DocumentUpload } from "@/components/zam/DocumentUpload";
 import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES } from "@/data/reference";
 import { uid } from "@/lib/format";
+import { contributorGaps, splitsTotalOk } from "@/lib/works";
 import type { OwnershipSplit, Track } from "@/types";
 
-const splitsValid = (splits: OwnershipSplit[]) =>
-  splits.length > 0 && splits.reduce((sum, s) => sum + (Number(s.percentage) || 0), 0) === 100;
-
-function newTrack(owner: string): Track {
+function newTrack(owner: string, ownerMemberNumber?: string, ownerId?: string): Track {
   return {
     id: uid("trk"),
     title: "",
     duration: "",
     genre: "Afro-Pop",
     contributors: [],
-    ownershipSplits: [{ id: uid("split"), party: owner, role: "Composer", percentage: 100 }],
+    ownershipSplits: [
+      {
+        id: uid("split"),
+        party: owner,
+        role: "Composer",
+        percentage: 100,
+        knownMember: true,
+        memberId: ownerId,
+        memberNumber: ownerMemberNumber,
+      },
+    ],
     isrc: "",
     audioFile: "",
   };
@@ -35,45 +44,56 @@ function newTrack(owner: string): Track {
 
 export default function AlbumSubmissionScreen() {
   const { addAlbum, currentMember } = useApp();
-  const owner = currentMember?.stageName || currentMember?.fullName || "";
+  const ownerName = currentMember?.fullName ?? "";
+  const ownerMemberNumber = currentMember?.memberNumber ?? "";
+  const recordingCredit = currentMember?.stageName || ownerName;
+  const owner = { fullName: ownerName, memberNumber: ownerMemberNumber };
   const [done, setDone] = useState<{ ref: string; title: string } | null>(null);
   const [error, setError] = useState("");
   const [title, setTitle] = useState("");
-  const [artistName, setArtistName] = useState(owner);
+  const [artistName, setArtistName] = useState(recordingCredit);
   const [releaseDate, setReleaseDate] = useState("");
   const [coverArt, setCoverArt] = useState("");
   const [backCover, setBackCover] = useState("");
-  const [tracks, setTracks] = useState<Track[]>([newTrack(owner)]);
+  const [studioReceipt, setStudioReceipt] = useState("");
+  const [tracks, setTracks] = useState<Track[]>([newTrack(ownerName, ownerMemberNumber, currentMember?.id)]);
   const [open, setOpen] = useState<string | null>(tracks[0]?.id ?? null);
+  const [busy, setBusy] = useState(false);
 
   const updateTrack = (id: string, patch: Partial<Track>) =>
     setTracks((ts) => ts.map((t) => (t.id === id ? { ...t, ...patch } : t)));
   const addTrack = () => {
-    const t = newTrack(owner);
+    const t = newTrack(ownerName, ownerMemberNumber, currentMember?.id);
     setTracks((ts) => [...ts, t]);
     setOpen(t.id);
   };
   const removeTrack = (id: string) => setTracks((ts) => ts.filter((t) => t.id !== id));
-  const [busy, setBusy] = useState(false);
 
-  const valid =
-    title.trim() !== "" &&
-    !!coverArt &&
-    tracks.length > 0 &&
-    tracks.every((t) => t.title.trim() !== "" && !!t.audioFile && splitsValid(t.ownershipSplits));
+  const trackReady = (t: Track) =>
+    t.title.trim() !== "" &&
+    !!t.audioFile &&
+    splitsTotalOk(t.ownershipSplits) &&
+    contributorGaps(t.ownershipSplits, owner).length === 0;
+
+  const valid = title.trim() !== "" && !!coverArt && !!studioReceipt && tracks.length > 0 && tracks.every(trackReady);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!title.trim()) return setError("Album title is required.");
     if (!coverArt) return setError("Please attach the front artwork.");
+    if (!studioReceipt) return setError("Upload the studio letter or receipt — required for every album.");
     if (tracks.length === 0) return setError("Add at least one track.");
     if (tracks.some((t) => !t.title.trim())) return setError("Every track needs a title.");
     if (tracks.some((t) => !t.audioFile)) return setError("Every track needs its audio file.");
-    if (tracks.some((t) => !splitsValid(t.ownershipSplits)))
+    if (tracks.some((t) => !splitsTotalOk(t.ownershipSplits)))
       return setError("Each track's ownership splits must total 100%.");
+    for (const t of tracks) {
+      const gaps = contributorGaps(t.ownershipSplits, owner);
+      if (gaps.length) return setError(`On “${t.title || "a track"}”: ${gaps[0]}`);
+    }
     setBusy(true);
-    const res = await addAlbum({ title, artistName, releaseDate, coverArt, backCover, tracks });
+    const res = await addAlbum({ title, artistName, releaseDate, coverArt, backCover, studioReceipt, tracks });
     setBusy(false);
     if (res.ok && res.item) {
       toast.success("Album submitted");
@@ -97,7 +117,10 @@ export default function AlbumSubmissionScreen() {
       </Link>
 
       <div className="mt-4">
-        <PageHeader title="Register an album" subtitle="Send the tracks with front and back artwork in one submission." />
+        <PageHeader
+          title="Register an album"
+          subtitle="Tracks, artwork, and the studio letter or receipt in one submission. Creators are listed once per track."
+        />
       </div>
 
       <form onSubmit={submit} className="space-y-6">
@@ -117,6 +140,13 @@ export default function AlbumSubmissionScreen() {
               <CoverUpload label="Front artwork" hint="Min. 1400×1400px" value={coverArt} onChange={setCoverArt} />
               <CoverUpload label="Back artwork" hint="Tracklist / sleeve" value={backCover} onChange={setBackCover} />
             </div>
+            <DocumentUpload
+              label="Studio letter or receipt"
+              hint="Required for an album — letter or payment receipt from the studio"
+              value={studioReceipt}
+              onChange={setStudioReceipt}
+              linkedTo={`${title || "Album"} — studio receipt`}
+            />
           </div>
         </Card>
 
@@ -132,13 +162,13 @@ export default function AlbumSubmissionScreen() {
           <div className="p-5 space-y-3">
             {tracks.map((t, idx) => {
               const isOpen = open === t.id;
-              const trackValid = t.title.trim() !== "" && splitsValid(t.ownershipSplits);
+              const ok = trackReady(t);
               return (
                 <div key={t.id} className="rounded-2xl border border-zam-line overflow-hidden">
                   <div className="flex items-center gap-3 bg-zam-canvas px-4 py-3">
                     <span
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
-                        trackValid ? "bg-zam-green text-white" : "bg-white text-zam-muted border border-zam-line"
+                        ok ? "bg-zam-green text-white" : "bg-white text-zam-muted border border-zam-line"
                       }`}
                     >
                       {idx + 1}
@@ -206,10 +236,13 @@ export default function AlbumSubmissionScreen() {
                         linkedTo={`${title || "Album"} · ${t.title || `Track ${idx + 1}`}`}
                       />
                       <div>
-                        <span className="block text-sm font-semibold text-zam-ink mb-1.5">Ownership splits</span>
+                        <span className="block text-sm font-semibold text-zam-ink mb-1.5">Creators and ownership</span>
                         <SplitsEditor
                           splits={t.ownershipSplits}
                           onChange={(next) => updateTrack(t.id, { ownershipSplits: next as OwnershipSplit[] })}
+                          ownerName={ownerName}
+                          ownerMemberNumber={ownerMemberNumber}
+                          workTitle={t.title || `Track ${idx + 1}`}
                         />
                       </div>
                     </div>

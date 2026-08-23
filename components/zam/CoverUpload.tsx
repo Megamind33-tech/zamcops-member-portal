@@ -33,22 +33,46 @@ function resizeToCanvas(file: File, max = 1200, quality = 0.85): Promise<{ canva
   });
 }
 
-// Returns a usable <img src>: a Vercel Blob URL when a store is connected,
-// otherwise a compact inline JPEG data URL. Cover art is public artwork, so the
-// Blob URL is fine to embed directly.
+async function r2Upload(blob: Blob, fileName: string): Promise<string | null> {
+  const pres = await fetch("/api/storage/presign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName,
+      contentType: "image/jpeg",
+      fileSize: blob.size,
+    }),
+  });
+  if (pres.status === 501) return null;
+  const data = await pres.json().catch(() => ({}));
+  if (!pres.ok) return null;
+  const put = await fetch(data.uploadUrl, {
+    method: "PUT",
+    body: blob,
+    headers: { "Content-Type": "image/jpeg" },
+  });
+  if (!put.ok) return null;
+  return data.url as string;
+}
+
+// Prefer R2, then Vercel Blob, then a compact inline JPEG so the work POST
+// body stays small enough for Vercel.
 async function processCover(file: File): Promise<string> {
   const { canvas, quality } = await resizeToCanvas(file);
   const blob: Blob | null = await new Promise((res) => canvas.toBlob((b) => res(b), "image/jpeg", quality));
   if (blob) {
+    const name = `cover-${Date.now()}.jpg`;
+    const r2 = await r2Upload(blob, name).catch(() => null);
+    if (r2) return r2;
     try {
-      const result = await upload(`album-cover-${Date.now()}.jpg`, blob, {
+      const result = await upload(name, blob, {
         access: "public",
         handleUploadUrl: "/api/blob/upload",
         contentType: "image/jpeg",
       });
       return result.url;
     } catch {
-      /* no Blob store connected → inline fallback */
+      /* no remote store connected → inline fallback */
     }
   }
   return canvas.toDataURL("image/jpeg", quality);

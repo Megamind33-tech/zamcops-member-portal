@@ -18,25 +18,34 @@ import {
 
 export const runtime = "nodejs";
 
+async function listed<T>(label: string, fn: () => Promise<T[]>): Promise<T[]> {
+  try {
+    return await fn();
+  } catch (err) {
+    console.error(`[admin overview] ${label} failed:`, err);
+    return [];
+  }
+}
+
 export async function GET() {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
 
   const [members, works, singles, albums, uploads, uploadsWithData, royalty, distributions, licensableWorks, licenseRequests, memberDocuments, memberDocumentsWithData, supportTickets] =
     await Promise.all([
-      prisma.member.findMany({ orderBy: { joinedAt: "desc" } }),
-      prisma.workDeclaration.findMany({ orderBy: { submittedAt: "desc" } }),
-      prisma.songSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
-      prisma.albumSubmission.findMany({ orderBy: { submittedAt: "desc" } }),
-      prisma.uploadFile.findMany({ orderBy: { uploadedAt: "desc" }, omit: { data: true } }),
-      prisma.uploadFile.findMany({ where: { NOT: { data: "" } }, select: { id: true } }),
-      prisma.royaltySummary.findMany(),
-      prisma.distribution.findMany({ include: { entries: true }, orderBy: { createdAt: "desc" } }),
-      prisma.licensableWork.findMany({ orderBy: { createdAt: "desc" } }),
-      prisma.licenseRequest.findMany({ orderBy: { createdAt: "desc" } }),
-      prisma.memberDocument.findMany({ orderBy: { uploadedAt: "desc" }, omit: { data: true } }),
-      prisma.memberDocument.findMany({ where: { NOT: { data: "" } }, select: { id: true } }),
-      prisma.supportTicket.findMany({ orderBy: { createdAt: "desc" } }),
+      listed("members", () => prisma.member.findMany({ orderBy: { joinedAt: "desc" } })),
+      listed("works", () => prisma.workDeclaration.findMany({ orderBy: { submittedAt: "desc" } })),
+      listed("singles", () => prisma.songSubmission.findMany({ orderBy: { submittedAt: "desc" } })),
+      listed("albums", () => prisma.albumSubmission.findMany({ orderBy: { submittedAt: "desc" } })),
+      listed("uploads", () => prisma.uploadFile.findMany({ orderBy: { uploadedAt: "desc" }, omit: { data: true } })),
+      listed("uploadsWithData", () => prisma.uploadFile.findMany({ where: { NOT: { data: "" } }, select: { id: true } })),
+      listed("royalty", () => prisma.royaltySummary.findMany()),
+      listed("distributions", () => prisma.distribution.findMany({ include: { entries: true }, orderBy: { createdAt: "desc" } })),
+      listed("licensableWorks", () => prisma.licensableWork.findMany({ orderBy: { createdAt: "desc" } })),
+      listed("licenseRequests", () => prisma.licenseRequest.findMany({ orderBy: { createdAt: "desc" } })),
+      listed("memberDocuments", () => prisma.memberDocument.findMany({ orderBy: { uploadedAt: "desc" }, omit: { data: true } })),
+      listed("memberDocumentsWithData", () => prisma.memberDocument.findMany({ where: { NOT: { data: "" } }, select: { id: true } })),
+      listed("supportTickets", () => prisma.supportTicket.findMany({ orderBy: { createdAt: "desc" } })),
     ]);
 
   return json({

@@ -152,6 +152,7 @@ model WorkDeclaration {
   iswc             String   @default("")
   audioFile        String   @default("") // reference recording — file name
   coverArt         String   @default("") // sleeve / cover artwork (data URL or storage URL)
+  studioReceipt    String   @default("") // studio letter or payment receipt
   dateCreated      String   @default("")
   status           String   @default("Pending")
   rejectionReason  String   @default("")
@@ -192,6 +193,7 @@ model AlbumSubmission {
   coverArt        String   @default("") // front cover — image data URL
   backCover       String   @default("") // back cover — image data URL
   tracks          String   @default("[]") // JSON Track[]
+  studioReceipt   String   @default("") // studio letter or payment receipt
   status          String   @default("Pending")
   rejectionReason String   @default("")
   submittedAt     DateTime @default(now())
