@@ -18,14 +18,14 @@ export default function SubmitHubScreen() {
           src="/img/auth-mic.webp"
           alt="Vocalist at a microphone"
           title="Register a work"
-          body="Send one song and its artwork together. Credit composers, authors, arrangers and publishers."
+          body="Song, instrumental or arrangement — with artwork, studio receipt, and every creator listed once."
         />
         <PhotoTile
           href="/submit/album"
           src="/img/mpc.webp"
           alt="Studio production"
           title="Register an album"
-          body="Send several tracks with front and back artwork in one submission."
+          body="Tracks, artwork, and the studio letter or receipt. Creators are listed once per track."
         />
       </div>
     </div>

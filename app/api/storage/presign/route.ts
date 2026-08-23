@@ -6,7 +6,13 @@ import { r2Configured, r2PresignPut, r2Url } from "@/lib/r2";
 export const runtime = "nodejs";
 
 const MAX_BYTES = 300 * 1024 * 1024; // matches the Blob route's ceiling
-const ALLOWED_TYPES = [/^audio\//, /^image\//, /^application\/pdf$/];
+const ALLOWED_TYPES = [
+  /^audio\//,
+  /^image\//,
+  /^application\/pdf$/,
+  /^application\/msword$/,
+  /^application\/vnd\./,
+];
 
 // Issues a short-lived presigned PUT URL so members can upload large files
 // directly to Cloudflare R2, bypassing the serverless body limit. Returns 501

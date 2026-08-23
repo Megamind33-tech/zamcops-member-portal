@@ -31,6 +31,7 @@ export default function AdminWorksPage() {
                 <Th>Type</Th>
                 <Th>Declared by</Th>
                 <Th>Splits</Th>
+                <Th>Evidence</Th>
                 <Th>Submitted</Th>
                 <Th>Status</Th>
                 <Th className="text-right">Actions</Th>
@@ -56,6 +57,17 @@ export default function AdminWorksPage() {
                     {w.ownershipSplits
                       .map((s) => `${s.party} ${s.percentage}%${s.ipiNumber ? ` · IPI ${s.ipiNumber}` : ""}`)
                       .join(", ")}
+                  </Td>
+                  <Td className="text-xs text-night-300">
+                    <span className="block">{w.studioReceipt ? `Studio: ${w.studioReceipt}` : "No studio receipt"}</span>
+                    {w.ownershipSplits.map((s) => (
+                      <span key={s.id || s.party} className="block">
+                        {s.party}:{" "}
+                        {s.knownMember || s.memberNumber
+                          ? s.memberNumber || "member on file"
+                          : [s.nrc ? `NRC ${s.nrc}` : "NRC missing", s.affirmationLetter ? "letter" : "letter missing"].join(" · ")}
+                      </span>
+                    ))}
                   </Td>
                   <Td className="text-night-300">{formatDate(w.submittedAt)}</Td>
                   <Td>

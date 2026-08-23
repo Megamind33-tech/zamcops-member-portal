@@ -21,7 +21,13 @@ export async function POST(req: Request): Promise<Response> {
       body,
       request: req,
       onBeforeGenerateToken: async () => ({
-        allowedContentTypes: ["audio/*", "image/*", "application/pdf"],
+        allowedContentTypes: [
+          "audio/*",
+          "image/*",
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ],
         maximumSizeInBytes: 300 * 1024 * 1024, // 300MB
         addRandomSuffix: true,
         tokenPayload: JSON.stringify({ sub: session.sub }),

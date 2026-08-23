@@ -11,7 +11,7 @@ export type MembershipStatus = "Pending" | "Active" | "Suspended" | "Lapsed" | "
 
 export type ReviewStatus = "Pending" | "Approved" | "Rejected" | "Under Review";
 
-export type WorkType = "Song" | "Instrumental" | "Composition" | "Arrangement";
+export type WorkType = "Song" | "Instrumental" | "Arrangement";
 
 export type UploadStatus = "Pending" | "Processing" | "Approved" | "Rejected";
 
@@ -40,6 +40,12 @@ export interface OwnershipSplit {
   percentage: number;
   ipiNumber?: string; // Interested Party Information number, for reciprocal-society registration
   rightsType?: RightsType; // which royalty stream this share applies to
+  // Identity — members already on file skip NRC + affirmation letter.
+  memberId?: string;
+  memberNumber?: string;
+  knownMember?: boolean;
+  nrc?: string; // required when the creator is not a ZAMCOPS member
+  affirmationLetter?: string; // letter that they took part in creating the work
 }
 
 export interface Member {
@@ -132,6 +138,7 @@ export interface WorkDeclaration {
   isrc?: string;
   iswc?: string;
   audioFile?: string; // reference recording — file name
+  studioReceipt?: string; // studio letter or receipt — required
   dateCreated: string;
   status: ReviewStatus;
   rejectionReason?: string;
@@ -177,6 +184,7 @@ export interface AlbumSubmission {
   coverArt?: string; // front cover — image data URL
   backCover?: string; // back cover — image data URL
   tracks: Track[];
+  studioReceipt?: string;
   status: ReviewStatus;
   rejectionReason?: string;
   submittedAt: string;
