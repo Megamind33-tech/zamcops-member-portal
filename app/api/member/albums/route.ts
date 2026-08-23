@@ -3,7 +3,8 @@ import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { albumDTO } from "@/lib/serialize";
 import { notifyMember } from "@/lib/notify";
-import { contributorGaps, splitsTotalOk } from "@/lib/works";
+import { applyKnownMembers, contributorGaps, splitsTotalOk } from "@/lib/works";
+import { fetchRegisterHits } from "@/lib/registerHits";
 import type { Track } from "@/types";
 
 export const runtime = "nodejs";
@@ -28,7 +29,10 @@ export async function POST(req: Request) {
   });
 
   for (const t of tracks) {
-    const splits = t.ownershipSplits || [];
+    const raw = t.ownershipSplits || [];
+    const register = await fetchRegisterHits(raw);
+    const splits = applyKnownMembers(raw, owner ?? undefined, register);
+    t.ownershipSplits = splits;
     if (!splitsTotalOk(splits)) return bad(`Splits on “${t.title}” must add up to 100%.`);
     const gaps = contributorGaps(splits, owner ?? undefined);
     if (gaps.length) return bad(`On “${t.title}”: ${gaps[0]}`);

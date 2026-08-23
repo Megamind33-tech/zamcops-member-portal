@@ -5,11 +5,13 @@ import { workDTO } from "@/lib/serialize";
 import { notifyMember } from "@/lib/notify";
 import { normalizeContributorRole } from "@/lib/roles";
 import {
+  applyKnownMembers,
   contributorGaps,
   namesFromSplits,
   normalizeWorkType,
   splitsTotalOk,
 } from "@/lib/works";
+import { fetchRegisterHits } from "@/lib/registerHits";
 import type { OwnershipSplit } from "@/types";
 
 export const runtime = "nodejs";
@@ -38,12 +40,14 @@ export async function POST(req: Request) {
     select: { fullName: true, memberNumber: true },
   });
 
-  const splits: OwnershipSplit[] = Array.isArray(b.ownershipSplits)
+  const rawSplits: OwnershipSplit[] = Array.isArray(b.ownershipSplits)
     ? b.ownershipSplits.map((s: OwnershipSplit) => ({
         ...s,
         role: normalizeContributorRole(String(s.role || "Composer")),
       }))
     : [];
+  const register = await fetchRegisterHits(rawSplits);
+  const splits = applyKnownMembers(rawSplits, owner ?? undefined, register);
   if (!splitsTotalOk(splits)) return bad("Ownership splits must total 100%.");
   const gaps = contributorGaps(splits, owner ?? undefined);
   if (gaps.length) return bad(gaps[0]);

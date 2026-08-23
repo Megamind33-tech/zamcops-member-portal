@@ -61,3 +61,35 @@ export function namesFromSplits(splits: OwnershipSplit[]) {
     publisher: of("Publisher")[0] || "",
   };
 }
+
+export type RegisterHit = { id: string; fullName: string; memberNumber: string };
+
+/** Trust the register, not the browser — a typed-in member number or name only counts if it matches a row. */
+export function applyKnownMembers(
+  splits: OwnershipSplit[],
+  owner: { fullName?: string; memberNumber?: string } | undefined,
+  register: RegisterHit[],
+): OwnershipSplit[] {
+  const byId = new Map(register.map((m) => [m.id, m]));
+  const byNum = new Map(register.map((m) => [m.memberNumber.trim().toLowerCase(), m]));
+  const byName = new Map(register.map((m) => [m.fullName.trim().toLowerCase(), m]));
+
+  return splits.map((s) => {
+    const ownerMatch = !!(owner?.fullName && namesMatch(s.party, owner.fullName));
+    const hit =
+      (s.memberId && byId.get(s.memberId)) ||
+      (s.memberNumber && byNum.get(s.memberNumber.trim().toLowerCase())) ||
+      (s.party && byName.get(s.party.trim().toLowerCase())) ||
+      undefined;
+
+    if (ownerMatch || hit) {
+      return {
+        ...s,
+        knownMember: true,
+        memberId: hit?.id,
+        memberNumber: hit?.memberNumber || owner?.memberNumber,
+      };
+    }
+    return { ...s, knownMember: false, memberId: undefined, memberNumber: "" };
+  });
+}
