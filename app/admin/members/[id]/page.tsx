@@ -6,14 +6,15 @@ import { useParams } from "next/navigation";
 import {
   ArrowLeft, Check, X, Ban, RotateCcw, Music2, FileText, Disc3,
   Paperclip, Trash2, IdCard, MapPin, Wallet, Users, FilePlus2,
-  KeyRound, Copy,
+  KeyRound, Copy, Bell,
 } from "lucide-react";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
-import { Field, TextInput, Select, FilePicker } from "@/components/ui/Field";
+import { Field, TextInput, Select, FilePicker, TextArea } from "@/components/ui/Field";
 import { ApplicationPanel, AdminDocDownload } from "@/components/admin/ApplicationPanel";
 import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
 import { Avatar } from "@/components/zam/Misc";
+import { toast } from "sonner";
 import type { MemberDocType } from "@/types";
 
 const DOC_TYPES: MemberDocType[] = ["Clearance Letter", "Deed of Assignment", "Contract", "ID Document", "Other"];
@@ -22,7 +23,7 @@ export default function AdminMemberDetailPage() {
   const { id } = useParams<{ id: string }>();
   const {
     members, singles, works, albums, uploads, memberDocuments,
-    setMemberStatus, attachDocument, removeDocument, resetMemberPassword, loading, reload,
+    setMemberStatus, attachDocument, removeDocument, resetMemberPassword, sendNotice, loading, reload,
   } = useAdminData();
 
   const member = members.find((m) => m.id === id);
@@ -133,12 +134,12 @@ export default function AdminMemberDetailPage() {
         </div>
       )}
 
-      {/* Profile / KYC */}
-      <Panel title="Profile & KYC">
+      {/* Profile */}
+      <Panel title="Profile">
         <div className="grid gap-x-8 gap-y-1 p-5 sm:grid-cols-2 lg:grid-cols-3">
           <Group icon={<IdCard size={14} />} title="Identity">
             <Row label="Full name" value={member.fullName} />
-            <Row label="Stage name" value={member.stageName} />
+            <Row label="Pseudonym" value={member.stageName} />
             <Row label="NRC / passport" value={member.nrcOrPassport} />
             <Row label="Date of birth" value={member.dateOfBirth} />
             <Row label="Gender" value={member.gender} />
@@ -166,10 +167,12 @@ export default function AdminMemberDetailPage() {
       {/* Official membership application — review, internal fields, approval */}
       <ApplicationPanel ownerId={id} onDecided={reload} />
 
+      <MemberNoticePanel memberId={id} memberName={member.fullName} sendNotice={sendNotice} />
+
       {/* Songs / Works / Albums */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ListPanel title="Submitted Songs" icon={<Music2 size={15} />} count={mSingles.length}
-          rows={mSingles.map((x) => ({ id: x.id, main: x.title, sub: `${x.genre}${x.featuredArtists ? ` · ft. ${x.featuredArtists}` : ""}`, status: x.status }))} />
+          rows={mSingles.map((x) => ({ id: x.id, main: x.title, sub: x.genre, status: x.status }))} />
         <ListPanel title="Work Declarations" icon={<FileText size={15} />} count={mWorks.length}
           rows={mWorks.map((x) => ({ id: x.id, main: x.title, sub: `${x.workType} · ${x.genre}`, status: x.status }))} />
         <ListPanel title="Albums" icon={<Disc3 size={15} />} count={mAlbums.length}
@@ -185,6 +188,76 @@ export default function AdminMemberDetailPage() {
         onRemove={removeDocument}
       />
     </div>
+  );
+}
+
+function MemberNoticePanel({
+  memberId,
+  memberName,
+  sendNotice,
+}: {
+  memberId: string;
+  memberName: string;
+  sendNotice: (payload: {
+    title: string;
+    message: string;
+    href?: string;
+    audience: "one" | "active" | "all";
+    memberId?: string;
+  }) => Promise<{ ok: true; sent: number } | { ok: false; error: string }>;
+}) {
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [href, setHref] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const res = await sendNotice({ title, message, href, audience: "one", memberId });
+    setBusy(false);
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success(`Notice sent to ${memberName}.`);
+    setTitle("");
+    setMessage("");
+    setHref("");
+  };
+
+  return (
+    <Panel title="Send an in-app notice">
+      <form onSubmit={submit} className="space-y-3 p-5">
+        <p className="flex items-center gap-1.5 text-sm text-night-300">
+          <Bell size={14} /> Lands in {memberName}&apos;s Notifications (email/SMS follow their preferences).
+        </p>
+        <Field label="Title" required>
+          <TextInput placeholder="Short subject" value={title} onChange={(e) => setTitle(e.target.value)} />
+        </Field>
+        <Field label="Message" required>
+          <TextArea rows={3} placeholder="What should they know?" value={message} onChange={(e) => setMessage(e.target.value)} />
+        </Field>
+        <Field label="Open this page when tapped">
+          <Select value={href} onChange={(e) => setHref(e.target.value)}>
+            <option value="">No link</option>
+            <option value="/support">Support</option>
+            <option value="/works">Works</option>
+            <option value="/documents">Documents</option>
+            <option value="/royalties">Royalties</option>
+            <option value="/application">Membership application</option>
+            <option value="/settings">Settings</option>
+          </Select>
+        </Field>
+        <button
+          type="submit"
+          disabled={busy || title.trim().length < 3 || message.trim().length < 8}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 transition hover:bg-accent-400 disabled:opacity-40"
+        >
+          <Bell size={14} /> {busy ? "Sending…" : "Send notice"}
+        </button>
+      </form>
+    </Panel>
   );
 }
 

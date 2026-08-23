@@ -36,6 +36,7 @@ export async function POST(req: Request) {
     title: "Added to licensing pool",
     body: `“${work.workTitle}” is now visible to ZAMCOPS' licensing desk for sync & direct licensing enquiries.`,
     type: "success",
+    href: "/notifications",
   });
 
   return json({ work: licensableWorkDTO(work) }, 201);

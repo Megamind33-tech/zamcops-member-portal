@@ -30,7 +30,7 @@ export function MemberTopbar({ breadcrumb, onMenu }: { breadcrumb: string; onMen
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-zam-line bg-white/90 px-4 backdrop-blur lg:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-zam-line bg-[#FBF7F0]/90 px-4 backdrop-blur lg:px-6">
       <button onClick={onMenu} className="p-1 text-zam-muted lg:hidden" aria-label="Open menu">
         <Menu className="h-6 w-6" />
       </button>
@@ -81,7 +81,7 @@ export function MemberTopbar({ breadcrumb, onMenu }: { breadcrumb: string; onMen
               }}
               className="flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-sm font-medium text-zam-ink hover:bg-zam-canvas"
             >
-              <User className="h-4 w-4 text-zam-muted" /> Profile & KYC
+              <User className="h-4 w-4 text-zam-muted" /> Profile
             </button>
             <button
               onClick={() => {

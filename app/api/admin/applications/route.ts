@@ -79,6 +79,7 @@ export async function POST(req: Request) {
         ? `Your ZAMCOPS membership application was not approved: ${reason}. You can update and resubmit it from the Membership page.`
         : "Your ZAMCOPS membership application was not approved. You can update and resubmit it from the Membership page.",
       type: "warning",
+    href: "/application",
     });
     await logAudit(session.sub, "application.rejected", {
       targetType: "MembershipApplication",
@@ -126,12 +127,14 @@ export async function POST(req: Request) {
       title: "Membership approved",
       body: `Congratulations — you have been admitted as a ${membershipClass.toUpperCase()} member of ZAMCOPS. Your signed application, Deed of Assignment and admission letter are ready to download under My Documents.`,
       type: "success",
+      href: "/documents",
     });
   } else {
     await notifyMember(ownerId, {
       title: "Your documents were re-issued",
       body: "ZAMCOPS re-issued your official membership documents. The latest copies are available under My Documents.",
       type: "info",
+      href: "/documents",
     });
   }
 

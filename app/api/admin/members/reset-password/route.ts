@@ -41,6 +41,7 @@ export async function POST(req: Request) {
     type: "warning",
     category: "security",
     sms: "A temporary password was issued for your ZAMCOPS account. If you did not request this, contact us immediately.",
+    href: "/settings",
   });
 
   await logAudit(session.sub, "member.password-reset", {

@@ -19,6 +19,7 @@ import type {
   SupportTicket,
   MembershipApplication,
 } from "@/types";
+import { parseThread } from "@/lib/support";
 
 const iso = (d: Date | string): string => (d instanceof Date ? d.toISOString() : d);
 const parse = <T,>(s: string, fallback: T): T => {
@@ -90,13 +91,16 @@ export function workDTO(w: any): WorkDeclaration {
     duration: w.duration,
     composers: parse<string[]>(w.composers, []),
     authors: parse<string[]>(w.authors, []),
-    producers: parse<string[]>(w.producers, []),
+    subAuthors: parse<string[]>(w.subAuthors, []),
+    subArrangers: parse<string[]>(w.subArrangers, []),
+    arrangers: parse<string[]>(w.subArrangers, []),
     publisher: w.publisher,
     publisherIpi: w.publisherIpi,
     ownershipSplits: parse<OwnershipSplit[]>(w.ownershipSplits, []),
     isrc: w.isrc,
     iswc: w.iswc,
     audioFile: w.audioFile,
+    coverArt: w.coverArt || undefined,
     dateCreated: w.dateCreated,
     status: w.status,
     rejectionReason: w.rejectionReason || undefined,
@@ -166,6 +170,7 @@ export function notificationDTO(n: any): AppNotification {
     title: n.title,
     body: n.body,
     type: n.type,
+    href: n.href || undefined,
     createdAt: iso(n.createdAt),
     read: n.read,
   };
@@ -285,6 +290,8 @@ export function memberDocumentDTO(d: any) {
 }
 
 export function supportTicketDTO(t: any): SupportTicket {
+  const createdAt = iso(t.createdAt);
+  const resolvedAt = t.resolvedAt ? iso(t.resolvedAt) : undefined;
   return {
     id: t.id,
     ownerId: t.ownerId || undefined,
@@ -293,7 +300,13 @@ export function supportTicketDTO(t: any): SupportTicket {
     message: t.message,
     status: t.status,
     reply: t.reply || undefined,
-    createdAt: iso(t.createdAt),
-    resolvedAt: t.resolvedAt ? iso(t.resolvedAt) : undefined,
+    thread: parseThread(t.thread, {
+      message: t.message,
+      reply: t.reply,
+      createdAt,
+      resolvedAt,
+    }),
+    createdAt,
+    resolvedAt,
   };
 }

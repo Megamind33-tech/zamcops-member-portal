@@ -36,6 +36,7 @@ export async function seedMemberDefaults(memberId: string, memberNumber: string)
     title: "Welcome to ZAMCOPS",
     body: "Your membership application has been received. Complete your profile to speed up verification.",
     type: "info",
+    href: "/application",
   });
   await prisma.statement.create({
     data: {

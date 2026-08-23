@@ -39,8 +39,8 @@ export default function ProfileScreen() {
   return (
     <form onSubmit={save}>
       <PageHeader
-        title="Profile & KYC"
-        subtitle="Keep your details up to date so ZAMCOPS can pay you correctly."
+        title="Profile"
+        subtitle="Contact, payout and identity details used for membership and royalty payments."
         action={
           <Button type="submit" loading={busy}>
             Save changes
@@ -84,7 +84,7 @@ export default function ProfileScreen() {
               <Input value={form.fullName} onChange={set("fullName")} />
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Stage name">
+              <Field label="Pseudonym">
                 <Input value={form.stageName} onChange={set("stageName")} />
               </Field>
               <Field label="NRC / Passport">
@@ -197,7 +197,7 @@ export default function ProfileScreen() {
                 <FileUp className="h-4 w-4 text-zam-orange" /> Document uploads
               </span>
             }
-            description="Required for KYC verification"
+            description="Used to confirm your membership application"
           />
           <div className="p-5">
             <FilePicker

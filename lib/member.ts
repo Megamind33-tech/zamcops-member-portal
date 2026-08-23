@@ -1,6 +1,6 @@
 import type { Member } from "@/types";
 
-// Fields that make up a "complete" KYC profile. Used for the completion meter
+// Fields that make up a complete membership profile. Used for the completion meter
 // on the dashboard and profile screens.
 const PROFILE_FIELDS: (keyof Member)[] = [
   "fullName",

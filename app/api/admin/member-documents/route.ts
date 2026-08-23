@@ -46,6 +46,7 @@ export async function POST(req: Request) {
     title: "Document added to your file",
     body: `ZAMCOPS attached a ${doc.docType} (“${doc.fileName}”) to your membership record.`,
     type: "info",
+    href: "/documents",
   });
 
   await logAudit(session.sub, "document.attached", {

@@ -182,6 +182,22 @@ export function useAdminData() {
     [load]
   );
 
+  // Staff-composed in-app notice to one member or a broadcast audience.
+  const sendNotice = useCallback(
+    async (payload: {
+      title: string;
+      message: string;
+      href?: string;
+      audience: "one" | "active" | "all";
+      memberId?: string;
+    }) => {
+      const { res, data: d } = await postJSON("/api/admin/notices", payload);
+      if (!res.ok) return { ok: false as const, error: (d.error as string) || "Could not send notice." };
+      return { ok: true as const, sent: d.sent as number };
+    },
+    [],
+  );
+
   // Logs an inbound licensing enquiry from a business against a listed work.
   const logLicenseEnquiry = useCallback(
     async (payload: {
@@ -226,6 +242,7 @@ export function useAdminData() {
     setLicenseRequestStatus,
     resetMemberPassword,
     setTicketStatus,
+    sendNotice,
     logLicenseEnquiry,
     reload: load,
   };

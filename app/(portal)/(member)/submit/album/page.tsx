@@ -58,15 +58,18 @@ export default function AlbumSubmissionScreen() {
 
   const valid =
     title.trim() !== "" &&
+    !!coverArt &&
     tracks.length > 0 &&
-    tracks.every((t) => t.title.trim() !== "" && splitsValid(t.ownershipSplits));
+    tracks.every((t) => t.title.trim() !== "" && !!t.audioFile && splitsValid(t.ownershipSplits));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!title.trim()) return setError("Album title is required.");
+    if (!coverArt) return setError("Please attach the front artwork.");
     if (tracks.length === 0) return setError("Add at least one track.");
     if (tracks.some((t) => !t.title.trim())) return setError("Every track needs a title.");
+    if (tracks.some((t) => !t.audioFile)) return setError("Every track needs its audio file.");
     if (tracks.some((t) => !splitsValid(t.ownershipSplits)))
       return setError("Each track's ownership splits must total 100%.");
     setBusy(true);
@@ -90,11 +93,11 @@ export default function AlbumSubmissionScreen() {
         href="/submit"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
       >
-        <ArrowLeft className="h-4 w-4" /> Back to Submit
+        <ArrowLeft className="h-4 w-4" /> Back
       </Link>
 
       <div className="mt-4">
-        <PageHeader title="Submit an Album" subtitle="Create an album and add each of its tracks." />
+        <PageHeader title="Register an album" subtitle="Send the tracks with front and back artwork in one submission." />
       </div>
 
       <form onSubmit={submit} className="space-y-6">
@@ -104,15 +107,15 @@ export default function AlbumSubmissionScreen() {
             <Field label="Album title" required>
               <Input placeholder="e.g. Kalulu Tales" value={title} onChange={(e) => setTitle(e.target.value)} />
             </Field>
-            <Field label="Artist name" required>
+            <Field label="Recording credit" hint="How the release is credited — not a related-rights claim">
               <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
             </Field>
             <Field label="Release date">
               <Input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} />
             </Field>
             <div className="grid gap-5 sm:grid-cols-2">
-              <CoverUpload label="Front cover" hint="Min. 1400×1400px" value={coverArt} onChange={setCoverArt} />
-              <CoverUpload label="Back cover" hint="Tracklist / sleeve art" value={backCover} onChange={setBackCover} />
+              <CoverUpload label="Front artwork" hint="Min. 1400×1400px" value={coverArt} onChange={setCoverArt} />
+              <CoverUpload label="Back artwork" hint="Tracklist / sleeve" value={backCover} onChange={setBackCover} />
             </div>
           </div>
         </Card>
@@ -196,8 +199,8 @@ export default function AlbumSubmissionScreen() {
                         />
                       </Field>
                       <AudioUpload
-                        label="Upload track audio"
-                        hint="WAV or MP3"
+                        label="Track audio"
+                        hint="WAV or MP3 — required"
                         value={t.audioFile}
                         onChange={(name) => updateTrack(t.id, { audioFile: name })}
                         linkedTo={`${title || "Album"} · ${t.title || `Track ${idx + 1}`}`}
@@ -231,7 +234,7 @@ export default function AlbumSubmissionScreen() {
           disabled={busy || !valid}
           icon={<Send className="h-5 w-5" />}
         >
-          {busy ? "Submitting…" : "Submit album"}
+          {busy ? "Submitting…" : "Register album"}
         </Button>
       </form>
     </div>

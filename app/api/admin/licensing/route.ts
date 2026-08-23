@@ -44,6 +44,7 @@ export async function POST(req: Request) {
     title: "New licensing enquiry",
     body: `${row.requesterCompany || row.requesterName} enquired about licensing “${work.workTitle}” (${row.usageType}). ZAMCOPS is handling the negotiation.`,
     type: "info",
+    href: "/notifications",
   });
 
   await logAudit(session.sub, "licensing.enquiry-logged", {
@@ -78,6 +79,7 @@ export async function PATCH(req: Request) {
     title: "Licensing enquiry update",
     body: `An enquiry for “${row.work.workTitle}” from ${row.requesterCompany || row.requesterName} is now “${row.status}”.`,
     type: row.status === "Accepted" ? "success" : row.status === "Declined" ? "warning" : "info",
+    href: "/notifications",
   });
 
   await logAudit(session.sub, "licensing.status", {

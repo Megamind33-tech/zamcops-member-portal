@@ -10,7 +10,6 @@ export default function SplashScreen() {
   const { ready, currentMember } = useApp();
   const [tick, setTick] = useState(false);
 
-  // Brief branded splash, then route based on session / onboarding state.
   useEffect(() => {
     const t = setTimeout(() => setTick(true), 1500);
     return () => clearTimeout(t);
@@ -28,18 +27,18 @@ export default function SplashScreen() {
   }, [tick, ready, currentMember, router]);
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center bg-zam-canvas">
-      <div className="bg-white rounded-2xl px-5 py-4 inline-flex shadow-card-lg">
-        <Logo size={46} onDark={false} />
+    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center bg-[#1a1612]">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/img/splash-stage.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/30" />
+
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="inline-flex rounded-2xl bg-white px-5 py-4 shadow-card-lg">
+          <Logo size={46} onDark={false} />
+        </div>
+        <p className="mt-6 text-xs font-bold uppercase tracking-[0.26em] text-white/80">Member Portal</p>
+        <div className="mt-8 h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-zam-orange" />
       </div>
-
-      <div className="zam-flagline w-24 mt-6" />
-
-      <p className="mt-5 text-xs font-bold uppercase tracking-[0.26em] text-zam-muted">
-        Member Portal
-      </p>
-
-      <div className="mt-8 h-6 w-6 animate-spin rounded-full border-2 border-zam-line border-t-zam-orange" />
     </div>
   );
 }

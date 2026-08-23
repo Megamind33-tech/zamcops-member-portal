@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { UserCog, Lock, Bell, LogOut, Handshake, FileText, LifeBuoy } from "lucide-react";
+import { UserCog, Lock, Bell, LogOut, FileText, LifeBuoy } from "lucide-react";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
 import { Card, CardHeader } from "@/components/zam/Card";
 import { Field, Input } from "@/components/zam/Input";
@@ -190,7 +190,6 @@ export default function SettingsScreen() {
           <CardHeader title="More" />
           <div className="divide-y divide-zam-line">
             {[
-              { href: "/licensing", icon: Handshake, label: "Licensing & sync", sub: "Open works to brand & sync deals" },
               { href: "/statements", icon: FileText, label: "Statements & receipts", sub: "Official receipts and royalty statements" },
               { href: "/support", icon: LifeBuoy, label: "Help & support", sub: "Reach the ZAMCOPS team" },
             ].map((r) => (

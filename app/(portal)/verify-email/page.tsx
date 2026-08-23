@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MailCheck, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/zam/Button";
-import { Logo } from "@/components/ui/Logo";
+import { AuthPhotoShell } from "@/components/brand/AuthPhotoShell";
 import { useApp } from "@/lib/store";
 
 const RESEND_COOLDOWN = 60; // seconds
@@ -79,61 +79,56 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-zam-canvas p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-6 flex justify-center">
-          <div className="inline-flex rounded-2xl bg-white px-4 py-3 shadow-card">
-            <Logo size={30} onDark={false} />
-          </div>
-        </div>
+    <AuthPhotoShell
+      src="/img/hero-concert.webp"
+      alt="Live concert"
+      headline="Confirm your inbox to register works."
+      body="A verified email is required before your membership application can be submitted."
+    >
+      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-zam-orange-soft text-zam-orange">
+        <MailCheck size={22} />
+      </span>
+      <h1 className="mt-4 font-display text-2xl font-semibold text-zam-ink">Verify your email</h1>
+      <p className="mt-1 text-sm text-zam-muted">
+        We sent a 6-digit code to <strong className="text-zam-ink">{currentMember.email}</strong>. Enter it below to
+        confirm your address.
+      </p>
 
-        <div className="rounded-3xl border border-zam-line bg-white p-6 shadow-card sm:p-8">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-zam-orange-soft text-zam-orange">
-            <MailCheck size={22} />
-          </span>
-          <h1 className="mt-4 font-display text-2xl font-bold text-zam-ink">Verify your email</h1>
-          <p className="mt-1 text-sm text-zam-muted">
-            We sent a 6-digit code to <strong className="text-zam-ink">{currentMember.email}</strong>. Enter it below
-            to confirm your address.
-          </p>
+      <form onSubmit={verify} className="mt-6 space-y-4">
+        <input
+          ref={inputRef}
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          placeholder="••••••"
+          className="h-14 w-full rounded-xl border border-zam-line bg-white text-center font-mono text-2xl tracking-[0.5em] text-zam-ink focus:border-zam-orange focus:outline-none focus:ring-2 focus:ring-zam-orange/20"
+        />
+        {error && <p className="text-sm font-medium text-zam-red">{error}</p>}
+        {notice && <p className="text-sm font-medium text-zam-green">{notice}</p>}
+        <Button type="submit" loading={busy} disabled={code.length !== 6} className="w-full">
+          Verify email
+        </Button>
+      </form>
 
-          <form onSubmit={verify} className="mt-6 space-y-4">
-            <input
-              ref={inputRef}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="••••••"
-              className="h-14 w-full rounded-xl border border-zam-line bg-white text-center font-mono text-2xl tracking-[0.5em] text-zam-ink focus:border-zam-orange focus:outline-none focus:ring-2 focus:ring-zam-orange/20"
-            />
-            {error && <p className="text-sm font-medium text-zam-red">{error}</p>}
-            {notice && <p className="text-sm font-medium text-zam-green">{notice}</p>}
-            <Button type="submit" loading={busy} disabled={code.length !== 6} className="w-full">
-              Verify email
-            </Button>
-          </form>
-
-          <div className="mt-5 flex items-center justify-between text-sm">
-            <button
-              onClick={resend}
-              disabled={cooldown > 0 || resending}
-              className="inline-flex items-center gap-1.5 font-semibold text-zam-orange disabled:text-zam-muted"
-            >
-              <RefreshCcw size={14} className={resending ? "animate-spin" : undefined} />
-              {cooldown > 0 ? `Resend code (${cooldown}s)` : "Resend code"}
-            </button>
-            <button onClick={() => router.push("/dashboard")} className="font-semibold text-zam-muted hover:text-zam-ink">
-              Do this later
-            </button>
-          </div>
-        </div>
-
-        <p className="mt-4 text-center text-xs text-zam-muted">
-          You can browse the portal without verifying, but your membership application can only be submitted from a
-          verified email address.
-        </p>
+      <div className="mt-5 flex items-center justify-between text-sm">
+        <button
+          onClick={resend}
+          disabled={cooldown > 0 || resending}
+          className="inline-flex items-center gap-1.5 font-semibold text-zam-orange disabled:text-zam-muted"
+        >
+          <RefreshCcw size={14} className={resending ? "animate-spin" : undefined} />
+          {cooldown > 0 ? `Resend code (${cooldown}s)` : "Resend code"}
+        </button>
+        <button onClick={() => router.push("/dashboard")} className="font-semibold text-zam-muted hover:text-zam-ink">
+          Do this later
+        </button>
       </div>
-    </div>
+
+      <p className="mt-5 text-center text-xs text-zam-muted">
+        You can browse the portal without verifying, but your membership application can only be submitted from a
+        verified email address.
+      </p>
+    </AuthPhotoShell>
   );
 }

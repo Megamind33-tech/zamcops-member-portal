@@ -10,15 +10,14 @@ import {
 import { Input, Select } from "./Input";
 import { Button } from "./Button";
 import { Progress } from "./Misc";
+import { MandateNote } from "@/components/zam/MandateNote";
+import { CONTRIBUTOR_ROLES, normalizeContributorRole, type ContributorRole } from "@/lib/roles";
 
 export interface OwnershipSplit {
   party: string;
-  role: string;
+  role: ContributorRole | string;
   percentage: number;
 }
-
-// Rights-holder roles ZAMCOPS administers: composers, authors, arrangers, publishers.
-const ROLES = ["Composer", "Author", "Arranger", "Publisher"];
 
 export function SplitsEditor({
   splits,
@@ -43,47 +42,51 @@ export function SplitsEditor({
   return (
     <div className="space-y-3">
       <div className="space-y-2">
-        {splits.map((s, i) => (
-          <div key={i} className="grid grid-cols-12 gap-2 items-center">
-            <Input
-              className="col-span-5"
-              placeholder="Party name"
-              value={s.party}
-              onChange={(e) => update(i, { party: e.target.value })}
-            />
-            <Select className="col-span-4" value={s.role} onChange={(e) => update(i, { role: e.target.value })}>
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </Select>
-            <div className="col-span-2 relative">
+        {splits.map((s, i) => {
+          const role = normalizeContributorRole(String(s.role || "Composer"));
+          return (
+            <div key={i} className="grid grid-cols-12 gap-2 items-center">
               <Input
-                type="number"
-                min={0}
-                max={100}
-                className="pr-7 text-right"
-                value={s.percentage}
-                onChange={(e) => update(i, { percentage: Number(e.target.value) })}
+                className="col-span-5"
+                placeholder="Name"
+                value={s.party}
+                onChange={(e) => update(i, { party: e.target.value })}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zam-muted">%</span>
+              <Select className="col-span-4" value={role} onChange={(e) => update(i, { role: e.target.value })}>
+                {CONTRIBUTOR_ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </Select>
+              <div className="col-span-2 relative">
+                <Input
+                  type="number"
+                  min={0}
+                  max={100}
+                  className="pr-7 text-right"
+                  value={s.percentage}
+                  onChange={(e) => update(i, { percentage: Number(e.target.value) })}
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zam-muted">%</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                className="col-span-1 inline-flex items-center justify-center h-11 text-zam-muted hover:text-zam-red rounded-xl hover:bg-red-50"
+                aria-label="Remove split"
+              >
+                <Trash2Icon className="h-4 w-4" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => remove(i)}
-              className="col-span-1 inline-flex items-center justify-center h-11 text-zam-muted hover:text-zam-red rounded-xl hover:bg-red-50"
-              aria-label="Remove split"
-            >
-              <Trash2Icon className="h-4 w-4" />
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <Button type="button" variant="ghost" size="sm" icon={<PlusIcon className="h-4 w-4" />} onClick={add}>
-        Add contributor
+        Add a composer, author, arranger or publisher
       </Button>
+      <MandateNote />
 
       <div
         className={`rounded-xl border p-3 ${valid ? "border-zam-green/30 bg-zam-green-soft" : "border-zam-amber/40 bg-zam-amber-soft"}`}

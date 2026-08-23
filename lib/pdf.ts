@@ -59,7 +59,7 @@ export function downloadStatementPDF(statement: Statement, member: Member) {
     ["Member", `${member.fullName} (${member.memberNumber})`],
     ["Role", member.role],
   ];
-  if (member.stageName) rows.splice(3, 0, ["Stage name", member.stageName]);
+  if (member.stageName) rows.splice(3, 0, ["Pseudonym", member.stageName]);
 
   let y = 74;
   doc.setFontSize(10);

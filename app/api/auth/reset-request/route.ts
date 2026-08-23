@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { json, bad } from "@/lib/server";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
+import { appendThread, serializeThread } from "@/lib/support";
 
 export const runtime = "nodejs";
 
@@ -22,12 +23,14 @@ export async function POST(req: Request) {
     where: { OR: [{ email: identifier.toLowerCase() }, { phone: identifier }] },
   });
 
+  const message = `Password reset requested from the sign-in screen for “${identifier}”.`;
   await prisma.supportTicket.create({
     data: {
       ownerId: member?.id ?? null,
       contact: identifier.slice(0, 200),
       topic: "Password reset",
-      message: `Password reset requested from the sign-in screen for “${identifier}”.`,
+      message,
+      thread: serializeThread(appendThread([], "member", message)),
     },
   });
 

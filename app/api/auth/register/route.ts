@@ -5,11 +5,9 @@ import { json, bad, genMemberNumber, normalizePhone, seedMemberDefaults } from "
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { memberDTO } from "@/lib/serialize";
 import { issueEmailOtp } from "@/lib/otp";
+import { isMemberRole } from "@/lib/roles";
 
 export const runtime = "nodejs";
-
-// ZAMCOPS membership is open to composers, authors and publishers.
-const ROLES = ["Composer", "Author", "Publisher"];
 
 export async function POST(req: Request) {
   if (!rateLimit(`register:${clientIp(req)}`, 5, 15 * 60_000)) {
@@ -22,7 +20,7 @@ export async function POST(req: Request) {
   const { fullName, stageName, nrcOrPassport, phone, email, role, password } = body;
   if (!fullName || !phone || !email || !password) return bad("Please complete all required fields.");
   if (String(password).length < 6) return bad("Password must be at least 6 characters.");
-  if (role && !ROLES.includes(role)) return bad("Invalid role.");
+  if (role && !isMemberRole(role)) return bad("Invalid role.");
 
   const normalizedPhone = normalizePhone(phone);
   const existing = await prisma.member.findFirst({
@@ -45,7 +43,7 @@ export async function POST(req: Request) {
           fullName,
           stageName: stageName ?? "",
           nrcOrPassport: nrcOrPassport ?? "",
-          role: role ?? "Composer",
+          role: isMemberRole(role) ? role : "Composer",
         },
       });
     } catch (e) {

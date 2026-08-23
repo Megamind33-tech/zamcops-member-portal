@@ -19,14 +19,14 @@ export default function AdminSongsPage() {
 
   return (
     <div>
-      <AdminHeader title="Song Submissions Review" subtitle={`${singles.length} singles`} />
+      <AdminHeader title="Song registrations" subtitle={`${singles.length} songs with artwork`} />
       <Panel title="Singles">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px]">
             <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Title</Th>
-                <Th>Artist</Th>
+                <Th>Performed by</Th>
                 <Th>Genre</Th>
                 <Th>Files</Th>
                 <Th>Submitted</Th>
@@ -39,15 +39,12 @@ export default function AdminSongsPage() {
                 <tr key={s.id} className="hover:bg-white/[0.03]">
                   <Td className="font-semibold text-white">
                     <div className="flex items-center gap-3">
-                      <CoverArt seed={s.title} size={40} rounded="rounded-lg" />
+                      <CoverArt src={s.coverArt} seed={s.title} size={40} rounded="rounded-lg" />
                       <span>{s.title}</span>
                     </div>
                   </Td>
                   <Td>
-                    {s.artistName}
-                    {s.featuredArtists ? (
-                      <span className="block text-xs text-night-400">ft. {s.featuredArtists}</span>
-                    ) : null}
+                    {s.artistName || "—"}
                   </Td>
                   <Td>{s.genre}</Td>
                   <Td className="text-xs text-night-300">

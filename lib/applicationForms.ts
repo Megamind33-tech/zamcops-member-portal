@@ -70,7 +70,7 @@ export const INDIVIDUAL_FORM: ApplicationFormDef = {
         { key: "surname", label: "Surname", type: "text", required: true },
         { key: "firstName", label: "First name", type: "text", required: true },
         { key: "maidenName", label: "Maiden name", type: "text" },
-        { key: "pseudonyms", label: "Pseudonyms", type: "text", hint: "Stage names you perform or publish under" },
+        { key: "pseudonyms", label: "Pseudonyms", type: "text", hint: "Names you compose, write or publish under" },
         { key: "differentSpelling", label: "Different spelling of your name", type: "text" },
         { key: "sex", label: "Sex", type: "select", options: ["Male", "Female"], required: true },
         { key: "dateOfBirth", label: "Date of birth", type: "date", required: true },
@@ -155,12 +155,14 @@ export const INDIVIDUAL_FORM: ApplicationFormDef = {
     {
       id: "capacity",
       title: "Capacity",
+      description:
+        "ZAMCOPS membership is for composers, authors and publishers. Arrangers are credited on each work and receive a share; they are not a membership class. Related rights (performers, producers) are not administered.",
       fields: [
         {
           key: "capacities",
           label: "Tick as appropriate",
           type: "checkboxes",
-          options: ["Author", "Arranger", "Publisher"],
+          options: ["Composer", "Author", "Publisher"],
           required: true,
         },
       ],
@@ -273,7 +275,7 @@ export const GROUP_FORM: ApplicationFormDef = {
       fields: [
         { key: "regionOrCity", label: "Region or city (residence)", type: "text" },
         { key: "categoryOfWorks", label: "Category of works", type: "text", hint: "e.g. Popular music, Gospel, Traditional" },
-        { key: "rightHolderRole", label: "Type of right holder (role)", type: "text", hint: "e.g. Performer, Composer group" },
+        { key: "rightHolderRole", label: "Type of right holder (role)", type: "text", hint: "e.g. Composer, Author, Publisher" },
         { key: "managedRights", label: "Managed or transferred rights", type: "text", hint: "e.g. Performing, Mechanical" },
         { key: "territories", label: "Territories", type: "text", hint: "e.g. Worldwide" },
       ],

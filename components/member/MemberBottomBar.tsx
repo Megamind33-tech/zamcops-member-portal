@@ -9,7 +9,7 @@ import { cn } from "@/lib/format";
 const items = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard, exact: true },
   { to: "/works", label: "Works", icon: Music },
-  { to: "/submit", label: "Submit", icon: Plus, primary: true },
+  { to: "/submit", label: "Register", icon: Plus, primary: true },
   { to: "/royalties", label: "Royalties", icon: Coins },
   { to: "/profile", label: "Profile", icon: User },
 ];
@@ -20,7 +20,7 @@ export function MemberBottomBar() {
     exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-stretch border-t border-zam-line bg-white px-2 pb-[env(safe-area-inset-bottom)] lg:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-stretch border-t border-zam-line bg-[#FBF7F0] px-2 pb-[env(safe-area-inset-bottom)] lg:hidden">
       {items.map((item) => {
         const on = active(item.to, item.exact);
         if (item.primary) {

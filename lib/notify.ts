@@ -22,6 +22,7 @@ export interface NotifyInput {
   type?: "info" | "success" | "warning" | "action";
   category?: NotifyCategory; // default "general"
   sms?: string; // shorter text for SMS; falls back to body
+  href?: string; // in-app path, e.g. /support
 }
 
 interface Prefs {
@@ -122,12 +123,20 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// In-app deep links only — reject protocol-relative and off-site URLs.
+export function safeNoticeHref(raw?: string): string {
+  if (!raw) return "";
+  const h = raw.trim();
+  if (h.startsWith("/") && !h.startsWith("//") && !h.startsWith("/\\")) return h.slice(0, 240);
+  return "";
+}
+
 // Notify one member across all channels. Never throws — a provider outage must
 // not fail the admin action that triggered the notice.
 export async function notifyMember(memberId: string, input: NotifyInput): Promise<void> {
   const type = input.type ?? "info";
   await prisma.notification.create({
-    data: { ownerId: memberId, title: input.title, body: input.body, type },
+    data: { ownerId: memberId, title: input.title, body: input.body, type, href: safeNoticeHref(input.href) },
   });
 
   try {

@@ -34,6 +34,7 @@ export async function PATCH(req: Request) {
           ? `Your file “${file.fileName}” was rejected: ${reason}`
           : `Your file “${file.fileName}” has been approved.`,
       type: status === "Approved" ? "success" : "warning",
+      href: "/documents",
     });
   }
 
