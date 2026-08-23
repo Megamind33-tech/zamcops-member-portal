@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata, Viewport } from "next";
-import { Manrope, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Manrope, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { AppProvider } from "@/lib/store";
@@ -12,10 +12,9 @@ const manrope = Manrope({
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -53,7 +52,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${manrope.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full`}>
+    <html lang="en" className={`${manrope.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full`}>
       <body className="h-full bg-zam-canvas font-sans text-zam-ink antialiased">
         <AppProvider>{children}</AppProvider>
         <Toaster

@@ -91,7 +91,7 @@ export function CoverUpload({
         <button
           type="button"
           onClick={() => ref.current?.click()}
-          className="group relative grid h-28 w-28 shrink-0 place-items-center overflow-hidden rounded-xl border-2 border-dashed border-zam-line bg-zam-canvas text-zam-muted transition hover:border-zam-orange/60 hover:bg-zam-orange-soft/40"
+          className="group relative grid h-40 w-40 shrink-0 place-items-center overflow-hidden rounded-xl border-2 border-dashed border-zam-line bg-[#2c241c] text-white/70 transition hover:border-zam-orange/60"
         >
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element

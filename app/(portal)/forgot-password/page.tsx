@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MailCheck, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/zam/Button";
 import { Field, Input } from "@/components/zam/Input";
-import { Logo } from "@/components/ui/Logo";
+import { AuthPhotoShell } from "@/components/brand/AuthPhotoShell";
 
 export default function ForgotPasswordScreen() {
   const [sent, setSent] = useState(false);
@@ -37,67 +37,62 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zam-canvas p-6">
-      <div className="w-full max-w-sm">
-        <div className="flex justify-center mb-6">
-          <div className="bg-white rounded-2xl px-4 py-3 inline-flex shadow-card">
-            <Logo size={30} onDark={false} />
+    <AuthPhotoShell
+      src="/img/hands.webp"
+      alt="Musician's hands"
+      headline="We'll help you back into your catalogue."
+      body="The ZAMCOPS team verifies identity before issuing a temporary password."
+    >
+      {sent ? (
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zam-green-soft text-zam-green">
+            <MailCheck size={26} />
           </div>
+          <h1 className="mt-5 font-display text-2xl font-semibold text-zam-ink">Request received</h1>
+          <p className="mt-2 text-sm text-zam-muted">
+            If an account exists for <span className="font-semibold text-zam-ink">{contact}</span>, the ZAMCOPS team
+            will verify your identity and contact you with a temporary password — usually within one working day. You
+            can also call <span className="font-semibold text-zam-ink">+260 211 250 082</span>.
+          </p>
+          <Link
+            href="/login"
+            className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
+          >
+            <ArrowLeft size={16} /> Back to sign in
+          </Link>
         </div>
+      ) : (
+        <>
+          <h1 className="font-display text-2xl font-semibold text-zam-ink">Reset your password</h1>
+          <p className="mt-1 text-sm text-zam-muted">
+            Enter the phone or email linked to your membership. The ZAMCOPS team will verify your identity and issue
+            you a temporary password.
+          </p>
 
-        <div className="bg-white border border-zam-line rounded-3xl shadow-card p-7">
-          {sent ? (
-            <div className="text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zam-green-soft text-zam-green">
-                <MailCheck size={26} />
-              </div>
-              <h1 className="mt-5 font-display font-bold text-2xl text-zam-ink">Request received</h1>
-              <p className="mt-2 text-sm text-zam-muted">
-                If an account exists for <span className="font-semibold text-zam-ink">{contact}</span>, the ZAMCOPS
-                team will verify your identity and contact you with a temporary password — usually within one working
-                day. You can also call <span className="font-semibold text-zam-ink">+260 211 250 082</span>.
-              </p>
-              <Link
-                href="/login"
-                className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
-              >
-                <ArrowLeft size={16} /> Back to sign in
-              </Link>
-            </div>
-          ) : (
-            <>
-              <h1 className="font-display font-bold text-2xl text-zam-ink">Reset your password</h1>
-              <p className="mt-1 text-sm text-zam-muted">
-                Enter the phone or email linked to your membership. The ZAMCOPS team will verify your identity and
-                issue you a temporary password.
-              </p>
+          <form onSubmit={submit} className="mt-6 space-y-4">
+            <Field label="Phone or email" required>
+              <Input
+                placeholder="you@email.com or +260…"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+              />
+            </Field>
 
-              <form onSubmit={submit} className="mt-6 space-y-4">
-                <Field label="Phone or email" required>
-                  <Input
-                    placeholder="you@email.com or +260…"
-                    value={contact}
-                    onChange={(e) => setContact(e.target.value)}
-                  />
-                </Field>
+            {error && <p className="text-sm text-zam-red">{error}</p>}
 
-                {error && <p className="text-sm text-zam-red">{error}</p>}
+            <Button type="submit" className="w-full" disabled={!contact || busy}>
+              {busy ? "Submitting…" : "Request reset"}
+            </Button>
+          </form>
 
-                <Button type="submit" className="w-full" disabled={!contact || busy}>
-                  {busy ? "Submitting…" : "Request reset"}
-                </Button>
-              </form>
-
-              <Link
-                href="/login"
-                className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
-              >
-                <ArrowLeft size={16} /> Back to sign in
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+          <Link
+            href="/login"
+            className="mt-6 flex items-center justify-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink"
+          >
+            <ArrowLeft size={16} /> Back to sign in
+          </Link>
+        </>
+      )}
+    </AuthPhotoShell>
   );
 }

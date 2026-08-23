@@ -13,7 +13,6 @@ import {
   ReceiptText,
   Bell,
   User,
-  Handshake,
   LifeBuoy,
   Settings,
   X,
@@ -23,14 +22,13 @@ import { useApp } from "@/lib/store";
 import { cn } from "@/lib/format";
 
 const nav = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/application", label: "Membership", icon: ClipboardList },
-  { to: "/documents", label: "Documents", icon: FileText },
+  { to: "/dashboard", label: "Home", icon: LayoutDashboard, exact: true },
+  { to: "/works", label: "My catalogue", icon: Music },
   { to: "/submit", label: "Register a work", icon: Upload },
-  { to: "/works", label: "My works", icon: Music },
   { to: "/royalties", label: "Royalties", icon: Coins },
   { to: "/statements", label: "Statements", icon: ReceiptText },
-  { to: "/licensing", label: "Licensing", icon: Handshake },
+  { to: "/application", label: "Membership", icon: ClipboardList },
+  { to: "/documents", label: "Documents", icon: FileText },
   { to: "/notifications", label: "Notifications", icon: Bell },
   { to: "/profile", label: "Profile", icon: User },
   { to: "/support", label: "Support", icon: LifeBuoy },
@@ -49,7 +47,7 @@ export function MemberSidebar({ open, onClose }: { open: boolean; onClose: () =>
       {open && <div className="fixed inset-0 z-40 bg-zam-ink/40 lg:hidden" onClick={onClose} />}
       <aside
         className={cn(
-          "fixed top-0 z-50 flex h-[100dvh] w-64 shrink-0 flex-col border-r border-zam-line bg-white transition-transform lg:sticky lg:z-auto lg:translate-x-0",
+          "fixed top-0 z-50 flex h-[100dvh] w-64 shrink-0 flex-col border-r border-zam-line bg-[#FBF7F0] transition-transform lg:sticky lg:z-auto lg:translate-x-0",
           open ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         )}
       >
@@ -71,7 +69,7 @@ export function MemberSidebar({ open, onClose }: { open: boolean; onClose: () =>
                 onClick={onClose}
                 className={cn(
                   "flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors",
-                  on ? "bg-zam-orange-soft text-zam-orange-dark" : "text-zam-muted hover:bg-zam-canvas hover:text-zam-ink"
+                  on ? "bg-zam-orange-soft text-zam-orange-dark" : "text-zam-muted hover:bg-white hover:text-zam-ink"
                 )}
               >
                 <item.icon className={cn("h-[18px] w-[18px]", on && "text-zam-orange")} />
@@ -87,9 +85,13 @@ export function MemberSidebar({ open, onClose }: { open: boolean; onClose: () =>
         </nav>
 
         <div className="border-t border-zam-line p-3">
-          <div className="rounded-xl bg-zam-canvas p-3">
-            <p className="text-xs font-semibold text-zam-ink">Composers, authors, publishers</p>
-            <p className="mt-0.5 text-xs text-zam-muted">ZAMCOPS collects and distributes royalties on your works.</p>
+          <div className="overflow-hidden rounded-xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/img/piano.webp" alt="" className="h-20 w-full object-cover" />
+            <div className="bg-white p-3">
+              <p className="text-xs font-semibold text-zam-ink">Composers, authors, publishers</p>
+              <p className="mt-0.5 text-xs text-zam-muted">Register works with artwork. Follow royalties as they are distributed.</p>
+            </div>
           </div>
         </div>
       </aside>

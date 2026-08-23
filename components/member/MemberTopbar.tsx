@@ -30,7 +30,7 @@ export function MemberTopbar({ breadcrumb, onMenu }: { breadcrumb: string; onMen
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-zam-line bg-white/90 px-4 backdrop-blur lg:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-zam-line bg-[#FBF7F0]/90 px-4 backdrop-blur lg:px-6">
       <button onClick={onMenu} className="p-1 text-zam-muted lg:hidden" aria-label="Open menu">
         <Menu className="h-6 w-6" />
       </button>

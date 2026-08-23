@@ -1,10 +1,15 @@
 import React from "react";
-import { Music2 } from "lucide-react";
 import { cn } from "@/lib/format";
 
 function isImageSrc(src?: string) {
   if (!src) return false;
-  return src.startsWith("data:image") || src.startsWith("http://") || src.startsWith("https://");
+  return (
+    src.startsWith("data:image") ||
+    src.startsWith("http://") ||
+    src.startsWith("https://") ||
+    src.startsWith("blob:") ||
+    src.startsWith("/")
+  );
 }
 
 export function CoverArt({
@@ -12,6 +17,7 @@ export function CoverArt({
   rounded = "rounded-2xl",
   className,
   src,
+  fill,
 }: {
   seed?: string;
   src?: string;
@@ -19,30 +25,35 @@ export function CoverArt({
   rounded?: string;
   className?: string;
   motif?: boolean;
+  /** Stretch to the parent box (catalogue sleeves). */
+  fill?: boolean;
 }) {
+  const dim = fill ? undefined : { width: size, height: size };
+  const box = fill ? "h-full w-full" : "shrink-0";
+
   if (isImageSrc(src)) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={src}
         alt=""
-        className={cn("shrink-0 object-cover", rounded, className)}
-        style={{ width: size, height: size }}
+        className={cn(box, "object-cover", rounded, className)}
+        style={dim}
       />
     );
   }
 
+  // Empty sleeve — a vinyl disc on kraft board, not a generic icon tile.
   return (
     <span
-      className={cn(
-        "inline-grid shrink-0 place-items-center bg-zam-orange-soft text-zam-orange",
-        rounded,
-        className
-      )}
-      style={{ width: size, height: size }}
+      className={cn(box, "relative inline-grid place-items-center overflow-hidden", rounded, className)}
+      style={dim}
       aria-hidden
     >
-      <Music2 size={Math.round(size * 0.5)} />
+      <span className="absolute inset-0 bg-[#2c241c]" />
+      <span className="absolute inset-[14%] rounded-full border-[9px] border-black/55 bg-[#16110d] shadow-inner" />
+      <span className="absolute inset-[40%] rounded-full bg-[#c4a35a]" />
+      <span className="absolute inset-[46%] rounded-full bg-[#1a1510]" />
     </span>
   );
 }
