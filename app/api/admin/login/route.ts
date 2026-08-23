@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/db";
-import { hashPassword, verifyPassword, setSessionCookie } from "@/lib/auth";
-import { json, bad } from "@/lib/server";
+import { hashPassword, verifyPassword, jsonWithSession } from "@/lib/auth";
+import { bad } from "@/lib/server";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // Ensures the staff account configured via env exists, then signs in.
 // Returns an error message when seeding is refused (default password in
@@ -43,6 +44,8 @@ export async function POST(req: Request) {
     return bad("Invalid staff credentials.", 401);
   }
 
-  await setSessionCookie({ sub: admin.id, role: "admin", email: admin.email });
-  return json({ admin: { id: admin.id, email: admin.email, name: admin.name } });
+  return jsonWithSession(
+    { admin: { id: admin.id, email: admin.email, name: admin.name } },
+    { sub: admin.id, role: "admin", email: admin.email },
+  );
 }

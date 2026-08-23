@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { notifyMember } from "@/lib/notify";
 
-export const json = (data: unknown, status = 200) => NextResponse.json(data, { status });
-export const bad = (message: string, status = 400) => NextResponse.json({ error: message }, { status });
+const NO_STORE = { "Cache-Control": "no-store, max-age=0" };
+
+export const json = (data: unknown, status = 200) => NextResponse.json(data, { status, headers: NO_STORE });
+export const bad = (message: string, status = 400) => NextResponse.json({ error: message }, { status, headers: NO_STORE });
 
 // List queries omit `data` to keep payloads small, so DTOs can't see inline
 // bytes. Attach `hasData` from a companion id-only query (rows with data != "")

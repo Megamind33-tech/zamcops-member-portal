@@ -1,13 +1,14 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { hashPassword, setSessionCookie } from "@/lib/auth";
-import { json, bad, genMemberNumber, normalizePhone, seedMemberDefaults } from "@/lib/server";
+import { hashPassword, jsonWithSession } from "@/lib/auth";
+import { bad, genMemberNumber, normalizePhone, seedMemberDefaults } from "@/lib/server";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { memberDTO } from "@/lib/serialize";
 import { issueEmailOtp } from "@/lib/otp";
 import { isMemberRole } from "@/lib/roles";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   if (!rateLimit(`register:${clientIp(req)}`, 5, 15 * 60_000)) {
@@ -59,7 +60,6 @@ export async function POST(req: Request) {
 
   await seedMemberDefaults(member.id, member.memberNumber);
   await issueEmailOtp(member.id); // emails the 6-digit verification code
-  await setSessionCookie({ sub: member.id, role: "member", email: member.email });
 
-  return json({ member: memberDTO(member) }, 201);
+  return jsonWithSession({ member: memberDTO(member) }, { sub: member.id, role: "member", email: member.email }, 201);
 }

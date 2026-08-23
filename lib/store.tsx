@@ -48,7 +48,7 @@ const empty: MemberState = {
 interface AppContextValue extends MemberState {
   ready: boolean;
   currentMember: Member | null;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<boolean>;
   login: (identifier: string, password: string) => Promise<Result>;
   register: (data: Partial<Member> & { password: string }) => Promise<Result>;
   logout: () => Promise<void>;
@@ -71,6 +71,8 @@ const AppContext = createContext<AppContextValue | null>(null);
 async function postJSON(url: string, body?: unknown, method = "POST") {
   const res = await fetch(url, {
     method,
+    credentials: "same-origin",
+    cache: "no-store",
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
   });
@@ -81,50 +83,72 @@ async function postJSON(url: string, body?: unknown, method = "POST") {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<MemberState>(empty);
   const [ready, setReady] = useState(false);
+  const bootGen = React.useRef(0);
 
   const refresh = useCallback(async () => {
-    const res = await fetch("/api/member/bootstrap");
-    if (!res.ok) {
+    try {
+      const res = await fetch("/api/member/bootstrap", { credentials: "same-origin", cache: "no-store" });
+      if (!res.ok) {
+        setState(empty);
+        return false;
+      }
+      const data = await res.json();
+      if (!data.member) {
+        setState(empty);
+        return false;
+      }
+      setState({
+        member: data.member,
+        works: data.works ?? [],
+        singles: data.singles ?? [],
+        albums: data.albums ?? [],
+        uploads: data.uploads ?? [],
+        notifications: data.notifications ?? [],
+        statements: data.statements ?? [],
+        royalty: data.royalty ?? null,
+        distributions: data.distributions ?? [],
+        licensableWorks: data.licensableWorks ?? [],
+        licenseRequests: data.licenseRequests ?? [],
+      });
+      return true;
+    } catch {
       setState(empty);
-      return;
+      return false;
     }
-    const data = await res.json();
-    setState({
-      member: data.member,
-      works: data.works,
-      singles: data.singles,
-      albums: data.albums,
-      uploads: data.uploads,
-      notifications: data.notifications,
-      statements: data.statements,
-      royalty: data.royalty,
-      distributions: data.distributions ?? [],
-      licensableWorks: data.licensableWorks ?? [],
-      licenseRequests: data.licenseRequests ?? [],
-    });
   }, []);
 
-  // Bootstrap session on mount.
+  // Bootstrap session on mount. A generation counter drops stale /me results
+  // so they cannot wipe a login that completed while the first check was in flight.
   useEffect(() => {
+    const gen = ++bootGen.current;
     (async () => {
       try {
-        const me = await fetch("/api/auth/me").then((r) => r.json());
+        const me = await fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" }).then((r) => r.json());
+        if (gen !== bootGen.current) return;
         if (me.authenticated && me.role === "member") {
           await refresh();
         }
       } catch {
         /* ignore */
       } finally {
-        setReady(true);
+        if (gen === bootGen.current) setReady(true);
       }
     })();
   }, [refresh]);
 
   const login = useCallback<AppContextValue["login"]>(
     async (identifier, password) => {
+      bootGen.current += 1;
       const { res, data } = await postJSON("/api/auth/login", { identifier, password });
       if (!res.ok) return { ok: false, error: data.error || "Sign in failed." };
-      await refresh();
+      const loaded = await refresh();
+      setReady(true);
+      if (!loaded) {
+        return {
+          ok: false,
+          error: "Signed in, but the portal could not load your account. Please try again.",
+        };
+      }
       return { ok: true };
     },
     [refresh]
@@ -132,9 +156,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback<AppContextValue["register"]>(
     async (payload) => {
+      bootGen.current += 1;
       const { res, data } = await postJSON("/api/auth/register", payload);
       if (!res.ok) return { ok: false, error: data.error || "Registration failed." };
-      await refresh();
+      const loaded = await refresh();
+      setReady(true);
+      if (!loaded) return { ok: false, error: "Account created, but the portal could not load. Please sign in." };
       return { ok: true };
     },
     [refresh]

@@ -40,6 +40,8 @@ export default function VerifyEmailPage() {
   const post = async (body: Record<string, unknown>) => {
     const res = await fetch("/api/auth/otp", {
       method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });

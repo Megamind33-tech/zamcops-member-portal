@@ -114,9 +114,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex h-16 items-center justify-between px-5">
-          <span className="inline-flex rounded-xl bg-white px-3 py-2 shadow-sm">
-            <Logo size={26} onDark={false} />
-          </span>
+          <Logo size={26} onDark />
           <button
             onClick={() => setOpen(false)}
             className="grid h-9 w-9 place-items-center rounded-lg text-white/70 hover:bg-white/10 lg:hidden"
