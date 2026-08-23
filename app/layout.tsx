@@ -28,7 +28,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "ZAMCOPS Member Portal",
   description:
-    "ZAMCOPS Member Portal for composers, authors and publishers - register works, submit songs and albums, track royalties and manage your membership with the Zambian Music Copyright Protection Society.",
+    "ZAMCOPS Member Portal for composers, authors and publishers — register songs and artwork, download official documents, and follow royalty receiving and distribution.",
   manifest: "/manifest.webmanifest",
   applicationName: "ZAMCOPS",
   appleWebApp: {

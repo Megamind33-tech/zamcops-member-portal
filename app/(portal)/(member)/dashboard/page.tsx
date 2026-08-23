@@ -6,7 +6,7 @@ import {
   Bell,
   Music2,
   FilePlus2,
-  Disc3,
+  FileText,
   UserCog,
   Wallet,
   ArrowRight,
@@ -33,44 +33,39 @@ const notifIcon = {
 
 export default function DashboardScreen() {
   const { currentMember } = useApp();
-  const { works, singles, albums, notifications, distributions, royalty } = useMemberData();
+  const { works, singles, albums, notifications, distributions, royalty, statements } = useMemberData();
   const member = currentMember!;
   const completion = profileCompletion(member);
 
   const lifetimeDistributed = distributions.reduce((s, d) => s + d.amount, 0);
   const hour = new Date().getHours();
   const greeting =
-    hour < 5 ? "Still up" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Late session";
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   const pending =
-    works.filter((w) => w.status === "Pending").length +
+    works.filter((w) => w.status === "Pending" || w.status === "Under Review").length +
     singles.filter((s) => s.status === "Pending" || s.status === "Under Review").length +
-    albums.filter((a) => a.status === "Pending").length;
+    albums.filter((a) => a.status === "Pending" || a.status === "Under Review").length;
   const unread = notifications.filter((n) => !n.read).length;
   const latest = notifications.slice(0, 4);
 
-  const totalEstimated = royalty?.totalEstimated ?? 0;
   const royaltyPending = royalty?.pending ?? 0;
   const royaltyPaid = royalty?.paid ?? lifetimeDistributed;
+  const lastDistribution = distributions[0] ?? null;
 
   const stats = [
-    { label: "Works declared", value: works.length, href: "/works", icon: FilePlus2 },
+    { label: "Works registered", value: works.length, href: "/works", icon: Music2 },
     { label: "In review", value: pending, href: "/works", icon: Clock },
-    { label: "Notifications", value: unread, href: "/notifications", icon: Bell },
-  ];
-
-  const quickActions = [
-    { href: "/submit/single", label: "Submit song", hint: "Capture a new release", icon: Music2 },
-    { href: "/works/new", label: "Declare work", hint: "Record ownership details", icon: FilePlus2 },
-    { href: "/submit/album", label: "Upload album", hint: "Package tracks together", icon: Disc3 },
-    { href: "/profile", label: "Update profile", hint: "Keep KYC current", icon: UserCog },
+    { label: "Documents", value: statements.length, href: "/documents", icon: FileText },
   ];
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Dashboard" subtitle="Your studio for declarations, submissions and royalties." />
+      <PageHeader
+        title="Dashboard"
+        subtitle="Membership, work registration, documents and royalty distributions."
+      />
 
-      {/* Welcome */}
       <Card className="overflow-hidden">
         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-4">
@@ -87,8 +82,8 @@ export default function DashboardScreen() {
               </p>
             </div>
           </div>
-          <Link href="/submit" className="shrink-0">
-            <Button icon={<FilePlus2 size={16} />}>New submission</Button>
+          <Link href="/submit/single" className="shrink-0">
+            <Button icon={<FilePlus2 size={16} />}>Register a work</Button>
           </Link>
         </div>
 
@@ -100,13 +95,12 @@ export default function DashboardScreen() {
             </div>
             <Progress value={completion} />
             <Link href="/profile" className="mt-2.5 inline-flex items-center gap-1 text-sm font-semibold text-zam-orange hover:underline">
-              Finish KYC <ArrowRight size={14} />
+              Complete your profile <ArrowRight size={14} />
             </Link>
           </div>
         )}
       </Card>
 
-      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((s) => (
           <Link key={s.label} href={s.href}>
@@ -125,57 +119,59 @@ export default function DashboardScreen() {
         ))}
       </div>
 
-      {/* Royalty summary */}
       <Card>
         <CardHeader
-          title="Royalties"
+          title="Royalty receiving and distribution"
           action={
             <Link href="/royalties" className="inline-flex items-center gap-1 text-sm font-semibold text-zam-orange hover:underline">
-              View all <ArrowRight size={14} />
+              View metrics <ArrowRight size={14} />
             </Link>
           }
         />
         <div className="grid gap-4 p-5 sm:grid-cols-3">
           <div className="rounded-2xl bg-zam-ink p-5 text-white">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-white/70">
-              <Wallet size={14} /> Total estimated
+              <Wallet size={14} /> Distributed to you
             </p>
-            <p className="mt-2 font-display text-2xl font-bold">{formatKwacha(totalEstimated)}</p>
+            <p className="mt-2 font-display text-2xl font-bold">{formatKwacha(royaltyPaid)}</p>
+            {lastDistribution && (
+              <p className="mt-1 text-xs text-white/60">Latest: {lastDistribution.periodLabel}</p>
+            )}
           </div>
           <div className="rounded-xl border border-zam-line p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Pending</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Pending distribution</p>
             <p className="mt-2 font-display text-2xl font-bold text-zam-amber">{formatKwacha(royaltyPending)}</p>
           </div>
           <div className="rounded-xl border border-zam-line p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Paid</p>
-            <p className="mt-2 font-display text-2xl font-bold text-zam-green">{formatKwacha(royaltyPaid)}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Unread notices</p>
+            <p className="mt-2 font-display text-2xl font-bold text-zam-ink">{unread}</p>
           </div>
         </div>
       </Card>
 
-      {/* Quick actions */}
-      <Card>
-        <CardHeader title="Quick actions" />
-        <div className="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((a) => (
-            <Link
-              key={a.href}
-              href={a.href}
-              className="group flex flex-col gap-3 rounded-2xl border border-zam-line p-4 transition-colors hover:border-zam-orange hover:bg-zam-orange-soft/40"
-            >
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-zam-orange-soft text-zam-orange">
-                <a.icon size={20} />
-              </span>
-              <div>
-                <p className="font-semibold text-zam-ink">{a.label}</p>
-                <p className="mt-0.5 text-sm text-zam-muted">{a.hint}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Card>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { href: "/submit/single", label: "Register a work", hint: "Song and artwork together", icon: Music2 },
+          { href: "/application", label: "Membership form", hint: "Individual, group or publisher", icon: FilePlus2 },
+          { href: "/documents", label: "Documents", hint: "PDFs issued by ZAMCOPS", icon: FileText },
+          { href: "/profile", label: "Profile", hint: "Payout and contact details", icon: UserCog },
+        ].map((a) => (
+          <Link
+            key={a.href}
+            href={a.href}
+            className="group flex flex-col gap-3 rounded-2xl border border-zam-line bg-white p-4 transition-colors hover:border-zam-orange hover:bg-zam-orange-soft/40"
+          >
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-zam-orange-soft text-zam-orange">
+              <a.icon size={20} />
+            </span>
+            <div>
+              <p className="font-semibold text-zam-ink">{a.label}</p>
+              <p className="mt-0.5 text-sm text-zam-muted">{a.hint}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
 
-      {/* Latest notifications */}
       <Card>
         <CardHeader
           title="Latest notifications"

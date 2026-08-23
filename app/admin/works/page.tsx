@@ -41,7 +41,7 @@ export default function AdminWorksPage() {
                 <tr key={w.id} className="hover:bg-white/[0.03]">
                   <Td className="font-semibold text-white">
                     <div className="flex items-center gap-3">
-                      <CoverArt seed={w.title} size={40} rounded="rounded-lg" />
+                      <CoverArt src={w.coverArt} seed={w.title} size={40} rounded="rounded-lg" />
                       <div className="min-w-0">
                         {w.title}
                         <span className="block text-xs font-normal text-night-400">

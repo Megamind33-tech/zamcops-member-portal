@@ -34,7 +34,7 @@ export default function AdminReportsPage() {
   const reports = [
     {
       title: "Membership Register",
-      desc: `${members.length} members — full contact, KYC and status columns`,
+      desc: `${members.length} members — full contact and status columns`,
       ref: `RPT-MEM-${year}`,
       run: () => downloadMembers(members, "csv"),
     },

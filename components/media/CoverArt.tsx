@@ -2,21 +2,36 @@ import React from "react";
 import { Music2 } from "lucide-react";
 import { cn } from "@/lib/format";
 
-// A clean, real-icon thumbnail used wherever a track / work / file needs a
-// visual marker. Replaces the previous generated gradient "album art" — the app
-// uses real icons rather than drawn artwork.
+function isImageSrc(src?: string) {
+  if (!src) return false;
+  return src.startsWith("data:image") || src.startsWith("http://") || src.startsWith("https://");
+}
+
 export function CoverArt({
   size = 56,
   rounded = "rounded-2xl",
   className,
+  src,
 }: {
-  // `seed` is accepted for call-site compatibility but no longer used.
   seed?: string;
+  src?: string;
   size?: number;
   rounded?: string;
   className?: string;
   motif?: boolean;
 }) {
+  if (isImageSrc(src)) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt=""
+        className={cn("shrink-0 object-cover", rounded, className)}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+
   return (
     <span
       className={cn(

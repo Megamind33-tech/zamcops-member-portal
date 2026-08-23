@@ -133,12 +133,12 @@ export default function AdminMemberDetailPage() {
         </div>
       )}
 
-      {/* Profile / KYC */}
-      <Panel title="Profile & KYC">
+      {/* Profile */}
+      <Panel title="Profile">
         <div className="grid gap-x-8 gap-y-1 p-5 sm:grid-cols-2 lg:grid-cols-3">
           <Group icon={<IdCard size={14} />} title="Identity">
             <Row label="Full name" value={member.fullName} />
-            <Row label="Stage name" value={member.stageName} />
+            <Row label="Pseudonym" value={member.stageName} />
             <Row label="NRC / passport" value={member.nrcOrPassport} />
             <Row label="Date of birth" value={member.dateOfBirth} />
             <Row label="Gender" value={member.gender} />
@@ -169,7 +169,7 @@ export default function AdminMemberDetailPage() {
       {/* Songs / Works / Albums */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ListPanel title="Submitted Songs" icon={<Music2 size={15} />} count={mSingles.length}
-          rows={mSingles.map((x) => ({ id: x.id, main: x.title, sub: `${x.genre}${x.featuredArtists ? ` · ft. ${x.featuredArtists}` : ""}`, status: x.status }))} />
+          rows={mSingles.map((x) => ({ id: x.id, main: x.title, sub: x.genre, status: x.status }))} />
         <ListPanel title="Work Declarations" icon={<FileText size={15} />} count={mWorks.length}
           rows={mWorks.map((x) => ({ id: x.id, main: x.title, sub: `${x.workType} · ${x.genre}`, status: x.status }))} />
         <ListPanel title="Albums" icon={<Disc3 size={15} />} count={mAlbums.length}

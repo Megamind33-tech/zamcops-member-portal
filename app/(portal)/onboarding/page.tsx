@@ -9,24 +9,24 @@ import { Logo } from "@/components/ui/Logo";
 
 const slides = [
   {
-    kicker: "01 — Register",
-    title: "Your music, protected",
-    body: "Declare your songs, compositions, beats and lyrics so your copyright ownership is recorded and protected.",
+    kicker: "01 — Membership",
+    title: "Composers, authors and publishers",
+    body: "ZAMCOPS membership is open to composers and authors of musical works fixed in a tangible form, and to music publishers.",
   },
   {
-    kicker: "02 — Track",
-    title: "Follow every submission",
-    body: "Track every single, album and work declaration from submission through to review and approval.",
+    kicker: "02 — Registration",
+    title: "Register songs and artwork together",
+    body: "Send each work with its recording and artwork in one submission. Declarations credit composers, authors, sub-authors, sub-arrangers and publishers.",
   },
   {
-    kicker: "03 — Earn",
-    title: "See your royalties",
-    body: "Estimated, pending and paid royalties from radio and broadcast usage of your music across Zambia.",
+    kicker: "03 — Royalties",
+    title: "Collection and distribution",
+    body: "ZAMCOPS licenses users of copyrighted music and distributes royalties to the composers, authors and publishers who own the works.",
   },
   {
-    kicker: "04 — Belong",
-    title: "Manage your membership",
-    body: "Keep your profile, KYC and payout details up to date and access receipts and statements anytime.",
+    kicker: "04 — Documents",
+    title: "Your official file",
+    body: "Download the membership application, Deed of Assignment and admission letter once staff have issued them.",
   },
 ];
 

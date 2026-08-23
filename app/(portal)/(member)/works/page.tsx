@@ -13,6 +13,7 @@ import { FilterChips } from "@/components/zam/FilterChips";
 import { SearchInput, EmptyState } from "@/components/zam/Misc";
 import { TableShell, Th, Td, Tr } from "@/components/zam/Table";
 import { formatDate } from "@/lib/format";
+import { CoverArt } from "@/components/media/CoverArt";
 import type { ReviewStatus } from "@/types";
 
 const filters: ("All" | ReviewStatus)[] = ["All", "Pending", "Under Review", "Approved", "Rejected"];
@@ -57,11 +58,11 @@ export default function WorksScreen() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="My Works"
-        subtitle={`${works.length} declared`}
+        title="My works"
+        subtitle={`${works.length} registered`}
         action={
-          <Link href="/works/new">
-            <Button icon={<FilePlus2 size={16} />}>Declare a work</Button>
+          <Link href="/submit/single">
+            <Button icon={<FilePlus2 size={16} />}>Register a work</Button>
           </Link>
         }
       />
@@ -91,12 +92,12 @@ export default function WorksScreen() {
         <Card>
           <EmptyState
             icon={<Music size={28} />}
-            title="No work declarations"
-            description="Declare a musical work to record its copyright ownership and splits."
+            title="No works yet"
+            description="Register a musical work by sending the song and its artwork together."
             action={
-              <Link href="/works/new">
+              <Link href="/submit/single">
                 <Button size="sm" icon={<FilePlus2 size={16} />}>
-                  Declare a work
+                  Register a work
                 </Button>
               </Link>
             }
@@ -122,7 +123,12 @@ export default function WorksScreen() {
               <tbody>
                 {shown.map((w) => (
                   <Tr key={w.id}>
-                    <Td className="font-semibold text-zam-ink">{w.title}</Td>
+                    <Td className="font-semibold text-zam-ink">
+                      <div className="flex items-center gap-3">
+                        <CoverArt src={w.coverArt} seed={w.title} size={40} rounded="rounded-lg" />
+                        <span>{w.title}</span>
+                      </div>
+                    </Td>
                     <Td className="text-zam-muted">{w.workType}</Td>
                     <Td className="text-zam-muted">{w.genre}</Td>
                     <Td className="text-zam-muted">{w.ownershipSplits.length}</Td>
@@ -157,11 +163,14 @@ export default function WorksScreen() {
             {shown.map((w) => (
               <Card key={w.id} className="p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-zam-ink">{w.title}</p>
-                    <p className="mt-0.5 truncate text-sm text-zam-muted">
-                      {w.workType} · {w.genre} · {w.language}
-                    </p>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <CoverArt src={w.coverArt} seed={w.title} size={44} rounded="rounded-lg" />
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-zam-ink">{w.title}</p>
+                      <p className="mt-0.5 truncate text-sm text-zam-muted">
+                        {w.workType} · {w.genre} · {w.language}
+                      </p>
+                    </div>
                   </div>
                   <StatusBadge status={w.status} />
                 </div>

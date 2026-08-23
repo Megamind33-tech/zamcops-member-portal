@@ -1,29 +1,17 @@
-// ZAMCOPS Artist Membership Portal — Domain Models
-// Shared across the artist mobile app and the admin dashboard.
+// ZAMCOPS Member Portal — domain models shared by the member portal and staff dashboard.
+//
+// ZAMCOPS registers composers, authors and publishers of musical works
+// (its mandate and CISAC affiliation). Work declarations credit composers,
+// authors, sub-authors, arrangers, sub-arrangers and publishers.
 
-// ZAMCOPS is an authors' society: it represents composers, authors and
-// publishers of musical works (per its mandate and CISAC affiliation).
-export type MemberRole = "Composer" | "Author" | "Publisher";
+export type { MemberRole, ContributorRole } from "@/lib/roles";
+import type { MemberRole, ContributorRole } from "@/lib/roles";
 
 export type MembershipStatus = "Pending" | "Active" | "Suspended" | "Lapsed" | "Rejected";
 
 export type ReviewStatus = "Pending" | "Approved" | "Rejected" | "Under Review";
 
-export type WorkType =
-  | "Song"
-  | "Instrumental"
-  | "Beat"
-  | "Composition"
-  | "Lyric"
-  | "Arrangement";
-
-// Rights-holder roles on a work, per the official application form
-// (Author / Arranger / Publisher) plus Composer.
-export type ContributorRole =
-  | "Composer"
-  | "Author/Lyricist"
-  | "Arranger"
-  | "Publisher";
+export type WorkType = "Song" | "Instrumental" | "Composition" | "Arrangement";
 
 export type UploadStatus = "Pending" | "Processing" | "Approved" | "Rejected";
 
@@ -134,8 +122,10 @@ export interface WorkDeclaration {
   duration: string; // mm:ss
   composers: string[];
   authors: string[];
-  producers: string[];
+  subAuthors: string[];
+  subArrangers: string[];
   publisher?: string;
+  coverArt?: string;
   publisherIpi?: string; // Publisher's IPI / CAE number, for cross-society registration
   ownershipSplits: OwnershipSplit[];
   isrc?: string;

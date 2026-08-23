@@ -9,7 +9,6 @@ import {
   FileText,
   Music,
   Upload,
-  FolderUp,
   Coins,
   ReceiptText,
   Bell,
@@ -26,10 +25,9 @@ import { cn } from "@/lib/format";
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/application", label: "Membership", icon: ClipboardList },
-  { to: "/documents", label: "My Documents", icon: FileText },
-  { to: "/works", label: "My Works", icon: Music },
-  { to: "/submit", label: "Submit", icon: Upload },
-  { to: "/uploads", label: "Music Uploads", icon: FolderUp },
+  { to: "/documents", label: "Documents", icon: FileText },
+  { to: "/submit", label: "Register a work", icon: Upload },
+  { to: "/works", label: "My works", icon: Music },
   { to: "/royalties", label: "Royalties", icon: Coins },
   { to: "/statements", label: "Statements", icon: ReceiptText },
   { to: "/licensing", label: "Licensing", icon: Handshake },
@@ -90,8 +88,8 @@ export function MemberSidebar({ open, onClose }: { open: boolean; onClose: () =>
 
         <div className="border-t border-zam-line p-3">
           <div className="rounded-xl bg-zam-canvas p-3">
-            <p className="text-xs font-semibold text-zam-ink">ZAMCOPS member</p>
-            <p className="mt-0.5 text-xs text-zam-muted">Protecting your music rights across Zambia.</p>
+            <p className="text-xs font-semibold text-zam-ink">Composers, authors, publishers</p>
+            <p className="mt-0.5 text-xs text-zam-muted">ZAMCOPS collects and distributes royalties on your works.</p>
           </div>
         </div>
       </aside>

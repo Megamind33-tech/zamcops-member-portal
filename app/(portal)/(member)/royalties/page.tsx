@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Download, Radio, Info } from "lucide-react";
+import { Download, Radio, Info, Wallet } from "lucide-react";
 import { useMemberData } from "@/lib/store";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
 import { Card, CardHeader } from "@/components/zam/Card";
@@ -11,37 +11,40 @@ import { Progress, EmptyState } from "@/components/zam/Misc";
 import { TableShell, Th, Td, Tr } from "@/components/zam/Table";
 import { formatKwacha, formatDate } from "@/lib/format";
 
-const periods = ["All time", "Q1 2026", "2025"];
-
 export default function RoyaltiesScreen() {
   const { royalty, distributions } = useMemberData();
-  const [period, setPeriod] = useState("All time");
+  const [period, setPeriod] = useState("All");
 
   const lastDistribution = distributions[0] ?? null;
   const lifetimeDistributed = distributions.reduce((s, d) => s + d.amount, 0);
   const hasDetectedActivity = !!royalty && (royalty.usageLogs.length > 0 || royalty.topSongs.length > 0);
+  const periodOptions = ["All", ...Array.from(new Set(distributions.map((d) => d.periodLabel)))];
 
   if (!lastDistribution && !hasDetectedActivity) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Royalties" subtitle="Confirmed payouts & detected usage" />
+        <PageHeader
+          title="Royalties"
+          subtitle="Confirmed distributions paid to you, and usage detected on your registered works."
+        />
         <Card>
           <EmptyState
             icon={<Radio size={28} />}
             title="No royalty activity yet"
-            description="Once your registered works are detected on radio and broadcast — and ZAMCOPS publishes its next distribution — your confirmed payouts will appear here."
+            description="When ZAMCOPS publishes a distribution, the amount paid to you appears here together with usage detected on radio, television and other licensed users."
           />
         </Card>
       </div>
     );
   }
 
+  const shownDistributions =
+    period === "All" ? distributions : distributions.filter((d) => d.periodLabel === period);
   const logs =
-    period === "All time"
+    period === "All"
       ? royalty?.usageLogs ?? []
       : (royalty?.usageLogs ?? []).filter((l) => l.period === period);
 
-  const totalEstimated = royalty?.totalEstimated ?? lastDistribution?.amount ?? 0;
   const pending = royalty?.pending ?? 0;
   const paid = royalty?.paid ?? lifetimeDistributed;
   const currency = royalty?.currency ?? lastDistribution?.currency ?? "ZMW";
@@ -51,7 +54,7 @@ export default function RoyaltiesScreen() {
     <div className="space-y-6">
       <PageHeader
         title="Royalties"
-        subtitle="Confirmed payouts & detected usage"
+        subtitle="Receiving (amounts paid to you) and distribution (each published period)."
         action={
           <div className="flex items-center gap-2">
             <select
@@ -59,15 +62,15 @@ export default function RoyaltiesScreen() {
               onChange={(e) => setPeriod(e.target.value)}
               className="h-11 rounded-xl border border-zam-line bg-white px-3 text-sm text-zam-ink focus:border-zam-orange focus:outline-none focus:ring-2 focus:ring-zam-orange/20"
             >
-              {periods.map((p) => (
+              {periodOptions.map((p) => (
                 <option key={p} value={p}>
-                  {p}
+                  {p === "All" ? "All periods" : p}
                 </option>
               ))}
             </select>
             <Link href="/statements">
               <Button variant="secondary" icon={<Download size={16} />}>
-                Download statement
+                Statements
               </Button>
             </Link>
           </div>
@@ -78,17 +81,18 @@ export default function RoyaltiesScreen() {
         <div className="flex items-start gap-2.5 text-sm text-zam-ink">
           <Info size={16} className="mt-0.5 shrink-0 text-zam-blue" />
           <span>
-            Detected-usage figures are indicative estimates only — they show what ZAMCOPS is tracking, not a promised payout.
-            Your confirmed earnings are the published distribution amounts.
+            Confirmed earnings are the published distribution amounts. Detected-usage figures show what ZAMCOPS is
+            tracking — they are not a promised payout.
           </span>
         </div>
       </div>
 
-      {/* Hero tiles */}
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="bg-zam-ink p-6 text-white">
-          <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Total estimated</p>
-          <p className="mt-2 font-display text-3xl font-bold">{formatKwacha(totalEstimated, currency)}</p>
+          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-white/70">
+            <Wallet size={14} /> Received (distributed)
+          </p>
+          <p className="mt-2 font-display text-3xl font-bold">{formatKwacha(paid, currency)}</p>
           {lastDistribution && (
             <p className="mt-1 text-xs text-white/60">
               {lastDistribution.periodLabel} · published {formatDate(lastDistribution.publishedAt ?? lastDistribution.createdAt)}
@@ -96,26 +100,59 @@ export default function RoyaltiesScreen() {
           )}
         </Card>
         <Card className="p-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Pending</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Pending the next distribution</p>
           <p className="mt-2 font-display text-3xl font-bold text-zam-amber">{formatKwacha(pending, currency)}</p>
         </Card>
         <Card className="p-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Paid</p>
-          <p className="mt-2 font-display text-3xl font-bold text-zam-green">{formatKwacha(paid, currency)}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zam-muted">Distributions published</p>
+          <p className="mt-2 font-display text-3xl font-bold text-zam-ink">{distributions.length}</p>
         </Card>
       </div>
 
-      {/* Usage logs */}
       <Card>
-        <CardHeader title="Radio & TV usage logs" description="Detected plays of your registered works." />
-        {logs.length === 0 ? (
-          <p className="px-5 py-8 text-center text-sm text-zam-muted">No usage logs for {period}.</p>
+        <CardHeader title="Distribution history" description="Each published period and the amount paid to you." />
+        {shownDistributions.length === 0 ? (
+          <p className="px-5 py-8 text-center text-sm text-zam-muted">No published distributions yet.</p>
         ) : (
           <div className="p-4">
             <TableShell>
               <thead>
                 <Tr>
-                  <Th>Song</Th>
+                  <Th>Period</Th>
+                  <Th>Published</Th>
+                  <Th>Works in this period</Th>
+                  <Th className="text-right">Amount received</Th>
+                </Tr>
+              </thead>
+              <tbody>
+                {shownDistributions.map((d) => (
+                  <Tr key={d.id}>
+                    <Td className="font-semibold text-zam-ink">{d.periodLabel}</Td>
+                    <Td className="text-zam-muted">{formatDate(d.publishedAt ?? d.createdAt)}</Td>
+                    <Td className="text-zam-muted">
+                      {d.topSongs.length
+                        ? d.topSongs.map((s) => s.title).join(", ")
+                        : "—"}
+                    </Td>
+                    <Td className="text-right font-semibold text-zam-ink">{formatKwacha(d.amount, d.currency)}</Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </TableShell>
+          </div>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader title="Detected usage" description="Plays recorded from radio, television and other licensed users." />
+        {logs.length === 0 ? (
+          <p className="px-5 py-8 text-center text-sm text-zam-muted">No usage logs for this period.</p>
+        ) : (
+          <div className="p-4">
+            <TableShell>
+              <thead>
+                <Tr>
+                  <Th>Work</Th>
                   <Th>Source</Th>
                   <Th>Plays</Th>
                   <Th>Period</Th>
@@ -138,10 +175,9 @@ export default function RoyaltiesScreen() {
         )}
       </Card>
 
-      {/* Top songs */}
       {royalty && royalty.topSongs.length > 0 && (
         <Card>
-          <CardHeader title="Top detected songs" />
+          <CardHeader title="Most detected works" />
           <div className="divide-y divide-zam-line">
             {royalty.topSongs.map((s, i) => (
               <div key={s.title} className="px-5 py-4">

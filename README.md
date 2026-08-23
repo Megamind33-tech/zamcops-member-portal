@@ -3,9 +3,9 @@
 A web portal for the **Zambian Music Copyright Protection Society (ZAMCOPS)**.
 Membership is restricted to ZAMCOPS' actual mandate — **composers, authors and
 publishers** — who can apply for membership (the digitised official application
-forms and Deed of Assignment), declare their musical works, submit singles and
-albums, track royalty distributions, opt works into direct/sync licensing and
-manage their membership.
+forms and Deed of Assignment), register a musical work by sending the **song and
+its artwork together**, download PDFs issued by staff, and follow royalty
+receiving and distribution.
 
 It also includes a separate, wider **staff / admin dashboard** for reviewing
 applications, works, submissions and files, issuing the generated membership
@@ -110,5 +110,6 @@ public/                  # manifest, icon, service worker
 - Generated member documents (application form, Deed of Assignment,
   admission letter) are issued by staff at approval and stored inline in the
   database; members can download them once their membership is Active.
-- Royalty figures under "royalties" are detected-activity estimates; members
-  only see confirmed amounts once staff publish a Distribution.
+- Royalty figures under "Royalties" separate **receiving** (amounts
+  actually distributed to the member) from **detected usage**. Confirmed
+  amounts appear only once staff publish a Distribution.

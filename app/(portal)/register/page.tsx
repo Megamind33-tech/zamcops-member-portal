@@ -8,10 +8,10 @@ import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { Logo } from "@/components/ui/Logo";
 import { useApp } from "@/lib/store";
+import { MEMBER_ROLES } from "@/lib/roles";
 import type { MemberRole } from "@/types";
 
-// ZAMCOPS represents composers, authors and publishers of musical works.
-const roles: MemberRole[] = ["Composer", "Author", "Publisher"];
+const roles: MemberRole[] = [...MEMBER_ROLES];
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -72,20 +72,22 @@ export default function RegisterScreen() {
 
         <div className="bg-white border border-zam-line rounded-3xl shadow-card p-6 sm:p-8">
           <h1 className="font-display font-bold text-2xl text-zam-ink">Create your account</h1>
-          <p className="mt-1 text-sm text-zam-muted">Register as a ZAMCOPS member — it only takes a minute.</p>
+          <p className="mt-1 text-sm text-zam-muted">
+            Membership is open to composers, authors and publishers of musical works.
+          </p>
 
           <form onSubmit={submit} className="mt-6">
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Full legal name" required>
                 <Input placeholder="Full legal name" value={form.fullName} onChange={set("fullName")} />
               </Field>
-              <Field label="Stage name">
-                <Input placeholder="Stage name" value={form.stageName} onChange={set("stageName")} />
+              <Field label="Pseudonym">
+                <Input placeholder="Pseudonym" value={form.stageName} onChange={set("stageName")} />
               </Field>
               <Field label="NRC / passport number">
                 <Input placeholder="NRC / passport number" value={form.nrcOrPassport} onChange={set("nrcOrPassport")} />
               </Field>
-              <Field label="Role">
+              <Field label="You are joining as">
                 <Select value={form.role} onChange={set("role")}>
                   {roles.map((r) => (
                     <option key={r} value={r}>
@@ -110,7 +112,7 @@ export default function RegisterScreen() {
 
             <div className="mt-4 flex items-start gap-2 rounded-xl bg-zam-orange-soft/50 border border-zam-orange/20 p-3.5 text-xs leading-relaxed text-zam-ink">
               <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-zam-orange" />
-              By registering you agree to assign collection of public performance and mechanical royalties to ZAMCOPS under the Copyright Act of Zambia.
+              By registering you agree that, if admitted, collection of performing and mechanical royalties is assigned to ZAMCOPS under the Copyright and Performance Rights Act.
             </div>
 
             {error && <p className="mt-3 text-sm text-zam-red">{error}</p>}

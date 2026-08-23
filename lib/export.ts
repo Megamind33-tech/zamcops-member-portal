@@ -76,7 +76,7 @@ export function downloadRepertoire(
   ];
   downloadCSV(
     `zamcops-repertoire-${stamp}.csv`,
-    ["Kind", "Title", "Member", "Artist/Type", "Genre/Tracks", "ISRC", "Status", "Submitted"],
+    ["Kind", "Title", "Member", "Performed by / type", "Genre/Tracks", "ISRC", "Status", "Submitted"],
     rows
   );
 }

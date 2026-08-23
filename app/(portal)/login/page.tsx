@@ -31,7 +31,6 @@ export default function LoginScreen() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-zam-canvas">
-      {/* Brand panel */}
       <div className="hidden lg:flex flex-col justify-between bg-zam-ink text-white p-12 relative overflow-hidden">
         <div className="relative z-10">
           <div className="bg-white rounded-2xl px-4 py-3 inline-flex shadow-card-lg">
@@ -40,11 +39,13 @@ export default function LoginScreen() {
         </div>
 
         <div className="relative z-10 max-w-md">
-          <h2 className="font-display font-bold text-3xl leading-tight">
-            Protecting Zambian music, one work at a time.
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-zam-orange">Member portal</p>
+          <h2 className="mt-3 font-display font-bold text-3xl leading-tight">
+            For composers, authors and publishers of musical works.
           </h2>
           <p className="mt-4 text-white/70 leading-relaxed">
-            Your home for declarations, submissions and royalties as a ZAMCOPS member.
+            ZAMCOPS is the collecting society that licenses the use of copyrighted music in Zambia and distributes
+            royalties to its members.
           </p>
 
           <div className="mt-8 space-y-4">
@@ -52,29 +53,28 @@ export default function LoginScreen() {
               <span className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-zam-orange">
                 <ShieldCheck size={20} />
               </span>
-              <span className="text-sm text-white/85">Official copyright registration &amp; protection</span>
+              <span className="text-sm text-white/85">Individual, group and publisher membership</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-zam-orange">
                 <Music size={20} />
               </span>
-              <span className="text-sm text-white/85">Declare works, singles and albums</span>
+              <span className="text-sm text-white/85">Register songs and artwork together</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-zam-orange">
                 <Coins size={20} />
               </span>
-              <span className="text-sm text-white/85">Track royalties from radio &amp; TV across Zambia</span>
+              <span className="text-sm text-white/85">Follow royalty receiving and distribution</span>
             </div>
           </div>
         </div>
 
         <p className="relative z-10 text-xs text-white/50">
-          © 2026 Zambian Music Copyright Protection Society
+          © 2026 Zambia Music Copyright Protection Society
         </p>
       </div>
 
-      {/* Form panel */}
       <div className="flex items-center justify-center p-6 sm:p-12">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -88,8 +88,8 @@ export default function LoginScreen() {
             </div>
           </div>
 
-          <h1 className="font-display font-bold text-2xl text-zam-ink">Welcome back</h1>
-          <p className="mt-1 text-sm text-zam-muted">Sign in to your member portal.</p>
+          <h1 className="font-display font-bold text-2xl text-zam-ink">Sign in</h1>
+          <p className="mt-1 text-sm text-zam-muted">Member portal — composers, authors and publishers.</p>
 
           <form onSubmit={submit} className="mt-7 space-y-4">
             <Field label="Phone or email" required>
@@ -140,7 +140,7 @@ export default function LoginScreen() {
           </form>
 
           <p className="mt-6 text-center text-sm text-zam-muted">
-            New to ZAMCOPS?{" "}
+            Not a member yet?{" "}
             <Link href="/register" className="font-semibold text-zam-orange hover:underline">
               Create an account
             </Link>

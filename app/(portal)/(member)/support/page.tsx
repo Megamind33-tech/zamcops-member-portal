@@ -13,24 +13,24 @@ import type { SupportTicket } from "@/types";
 
 const faqs = [
   {
-    q: "What is the difference between a work declaration and a song submission?",
-    a: "A work declaration records the copyright ownership of the underlying musical work (composition, lyrics, beat). A song submission registers a specific release (single or album) and its files. You typically do both.",
+    q: "Who can join ZAMCOPS?",
+    a: "Composers and authors of musical works that have been fixed in a tangible form, and music publishers. Membership is Individual, Group or Publisher — matching the official application forms.",
   },
   {
-    q: "How are royalties calculated?",
-    a: "Royalties are estimated from detected usage of your registered works on radio, TV and broadcast platforms. Final distributions are confirmed after reconciliation each quarter.",
+    q: "How do I register a song?",
+    a: "Open Register a work and send the audio and the artwork in the same submission. Credit composers, authors, sub-authors, sub-arrangers and publishers, with splits totalling 100%.",
   },
   {
-    q: "Why is my submission still pending?",
-    a: "Submissions are reviewed by ZAMCOPS staff to verify ownership and file quality. You'll receive a notification once the status changes.",
+    q: "How are royalties paid?",
+    a: "ZAMCOPS licenses users of copyrighted music, then publishes a distribution. Confirmed amounts appear under Royalties once a distribution is published. Detected usage is indicative only.",
   },
   {
-    q: "How do I update my payout details?",
-    a: "Go to Profile & KYC, update your bank or mobile money details under Payout details, and save.",
+    q: "Where are my official PDFs?",
+    a: "After membership is approved, your application form, Deed of Assignment and admission letter are on Documents. Staff may also add further PDFs to your file.",
   },
 ];
 
-const topics = ["Membership", "Work declarations", "Submissions & uploads", "Royalties & payouts", "Account & login"];
+const topics = ["Membership", "Work registration", "Royalties & distributions", "Documents", "Account"];
 
 export default function SupportScreen() {
   const [open, setOpen] = useState<number | null>(0);

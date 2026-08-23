@@ -81,7 +81,7 @@ export function MemberTopbar({ breadcrumb, onMenu }: { breadcrumb: string; onMen
               }}
               className="flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-sm font-medium text-zam-ink hover:bg-zam-canvas"
             >
-              <User className="h-4 w-4 text-zam-muted" /> Profile & KYC
+              <User className="h-4 w-4 text-zam-muted" /> Profile
             </button>
             <button
               onClick={() => {

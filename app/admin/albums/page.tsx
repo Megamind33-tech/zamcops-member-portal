@@ -26,7 +26,7 @@ export default function AdminAlbumsPage() {
             <thead className="bg-white/[0.03]">
               <tr>
                 <Th>Album</Th>
-                <Th>Artist</Th>
+                <Th>Performed by</Th>
                 <Th>Tracks</Th>
                 <Th>Release</Th>
                 <Th>Submitted</Th>
@@ -43,7 +43,7 @@ export default function AdminAlbumsPage() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={a.coverArt} alt={`${a.title} cover`} className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-zam-line" />
                       ) : (
-                        <CoverArt seed={a.title} size={40} rounded="rounded-lg" />
+                        <CoverArt src={a.coverArt} seed={a.title} size={40} rounded="rounded-lg" />
                       )}
                       <div className="min-w-0">
                         {a.title}

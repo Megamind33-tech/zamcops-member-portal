@@ -9,7 +9,7 @@ import { cn } from "@/lib/format";
 const items = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard, exact: true },
   { to: "/works", label: "Works", icon: Music },
-  { to: "/submit", label: "Submit", icon: Plus, primary: true },
+  { to: "/submit", label: "Register", icon: Plus, primary: true },
   { to: "/royalties", label: "Royalties", icon: Coins },
   { to: "/profile", label: "Profile", icon: User },
 ];

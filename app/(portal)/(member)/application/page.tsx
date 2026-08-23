@@ -27,9 +27,9 @@ import type { MembershipApplication, Member } from "@/types";
 type Payload = Record<string, unknown>;
 
 const TYPE_META: Record<ApplicationFormType, { icon: React.ReactNode; blurb: string }> = {
-  Individual: { icon: <User size={20} />, blurb: "Composers, authors and arrangers — individual creators of musical works." },
-  Group: { icon: <Users size={20} />, blurb: "Groups of composers/authors applying together, with a representative." },
-  Publisher: { icon: <Building2 size={20} />, blurb: "Music publishing companies." },
+  Individual: { icon: <User size={20} />, blurb: "Composers and authors of musical works who are not applying as a group." },
+  Group: { icon: <Users size={20} />, blurb: "A group of composers and authors applying together, with a representative." },
+  Publisher: { icon: <Building2 size={20} />, blurb: "An individual or company that publishes musical works." },
 };
 
 // Sensible starting answers taken from the member's account profile.

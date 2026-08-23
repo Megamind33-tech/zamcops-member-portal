@@ -142,13 +142,16 @@ model WorkDeclaration {
   duration         String   @default("")
   composers        String   @default("[]") // JSON string[]
   authors          String   @default("[]")
-  producers        String   @default("[]")
+  subAuthors       String   @default("[]")
+  subArrangers     String   @default("[]")
+  producers        String   @default("[]") // retained for existing rows; no longer collected
   publisher        String   @default("")
   publisherIpi     String   @default("") // Publisher's IPI / CAE number, for cross-society registration
   ownershipSplits  String   @default("[]") // JSON OwnershipSplit[] — each entry now also carries ipiNumber + rightsType
   isrc             String   @default("")
   iswc             String   @default("")
   audioFile        String   @default("") // reference recording — file name
+  coverArt         String   @default("") // sleeve / cover artwork (data URL or storage URL)
   dateCreated      String   @default("")
   status           String   @default("Pending")
   rejectionReason  String   @default("")

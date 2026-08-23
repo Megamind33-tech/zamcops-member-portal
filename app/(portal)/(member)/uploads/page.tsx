@@ -41,7 +41,7 @@ export default function UploadsScreen() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Music Uploads" subtitle={`${uploads.length} files`} />
+      <PageHeader title="Files" subtitle={`${uploads.length} files attached to your registrations`} />
 
       <FilterChips chips={chips} active={filter} onChange={(v) => setFilter(v as (typeof filters)[number])} />
 
@@ -61,7 +61,7 @@ export default function UploadsScreen() {
           <EmptyState
             icon={<FolderUp size={28} />}
             title="No uploads yet"
-            description="Files you attach to singles and albums appear here with their processing status."
+            description="Files attached to registered works appear here with their review status."
             action={
               <Link href="/submit">
                 <Button size="sm">Submit music</Button>
