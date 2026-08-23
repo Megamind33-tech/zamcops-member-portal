@@ -50,21 +50,26 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] bg-[#1a1612]">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        key={slide.photo}
-        src={slide.photo}
-        alt={slide.alt}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+    <div className="relative min-h-[100dvh] overflow-hidden bg-[#2a1f18]">
+      {slides.map((s) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={s.photo}
+          src={s.photo}
+          alt={s.photo === slide.photo ? s.alt : ""}
+          fetchPriority={s.photo === slides[0].photo ? "high" : "low"}
+          decoding="async"
+          className={
+            "absolute inset-0 h-full w-full object-cover transition-opacity duration-500 " +
+            (s.photo === slide.photo ? "opacity-100" : "opacity-0")
+          }
+        />
+      ))}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/25" />
 
       <div className="relative z-10 flex min-h-[100dvh] flex-col">
         <header className="flex items-center justify-between p-6">
-          <div className="inline-flex rounded-2xl bg-white px-4 py-3 shadow-card">
-            <Logo size={30} onDark={false} />
-          </div>
+          <Logo size={32} onDark />
           <button onClick={finish} className="text-sm font-semibold text-white/80 transition hover:text-white">
             Skip
           </button>

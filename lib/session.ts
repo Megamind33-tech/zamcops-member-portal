@@ -11,7 +11,7 @@ const DEV_SECRET = "dev-zamcops-secret-change-in-production";
 // committed dev fallback. Callers that verify tokens catch the throw and
 // treat the session as invalid.
 export function getAuthSecret(): Uint8Array {
-  const s = process.env.AUTH_SECRET;
+  const s = (process.env.AUTH_SECRET || "").trim();
   if (!s) {
     if (process.env.NODE_ENV === "production") {
       throw new Error(

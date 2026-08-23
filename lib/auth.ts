@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME, getAuthSecret } from "@/lib/session";
 
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -29,16 +30,41 @@ export async function createSessionToken(session: Session): Promise<string> {
     .sign(getAuthSecret());
 }
 
+function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    // Secure on HTTPS (Vercel). Also honour an explicit override so preview
+    // deployments never drop the cookie if NODE_ENV is mis-set.
+    secure: process.env.NODE_ENV === "production" || process.env.VERCEL === "1",
+    path: "/",
+    maxAge: MAX_AGE,
+  };
+}
+
+export async function attachSessionCookie(res: NextResponse, session: Session): Promise<NextResponse> {
+  const token = await createSessionToken(session);
+  res.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions());
+  return res;
+}
+
+export async function attachClearedSessionCookie(res: NextResponse): Promise<NextResponse> {
+  res.cookies.set(SESSION_COOKIE_NAME, "", { ...sessionCookieOptions(), maxAge: 0 });
+  return res;
+}
+
+export async function jsonWithSession(data: unknown, session: Session, status = 200): Promise<NextResponse> {
+  const res = NextResponse.json(data, {
+    status,
+    headers: { "Cache-Control": "no-store, max-age=0" },
+  });
+  return attachSessionCookie(res, session);
+}
+
 export async function setSessionCookie(session: Session): Promise<void> {
   const token = await createSessionToken(session);
   const store = await cookies();
-  store.set(SESSION_COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: MAX_AGE,
-  });
+  store.set(SESSION_COOKIE_NAME, token, sessionCookieOptions());
 }
 
 export async function clearSessionCookie(): Promise<void> {

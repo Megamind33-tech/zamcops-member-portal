@@ -1,10 +1,6 @@
 import React from "react";
 
-// The official ZAMCOPS logo, served from a trimmed, transparent-background
-// cut of the artwork so it fills its box and sits directly on any light
-// surface. Call sites that place it on a dark surface get a compact white
-// chip behind it (set `onDark`) so the tagline stays legible.
-// `subtitle` (e.g. "Staff Console") renders alongside for the admin console.
+// Official ZAMCOPS wordmark — transparent PNG, no chip or card behind it.
 export function Logo({
   size = 34,
   onDark = true,
@@ -18,23 +14,19 @@ export function Logo({
   subtitle?: string;
   tagline?: boolean;
 }) {
-  const img = (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/brand/zamcops-logo-mark.png"
-      alt="ZAMCOPS — Zambian Music Copyright Protection Society"
-      style={{ height: size, width: "auto" }}
-      draggable={false}
-    />
-  );
-
   return (
     <div className="flex items-center gap-2.5">
-      {onDark ? (
-        <span className="inline-flex items-center rounded-lg bg-white px-2 py-1.5 shadow-sm">{img}</span>
-      ) : (
-        img
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/brand/zamcops-logo-mark.png"
+        alt="ZAMCOPS — Zambian Music Copyright Protection Society"
+        width={Math.round(size * (488 / 122))}
+        height={size}
+        style={{ height: size, width: "auto" }}
+        className={onDark ? "drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]" : undefined}
+        draggable={false}
+        decoding="async"
+      />
       {subtitle !== undefined && (
         <span
           className="flex flex-col justify-center self-stretch border-l pl-2.5 text-[10px] font-bold uppercase leading-tight tracking-[0.16em]"

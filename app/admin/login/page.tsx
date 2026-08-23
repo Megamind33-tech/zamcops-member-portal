@@ -29,9 +29,7 @@ export default function AdminLoginScreen() {
     <div className="relative grid min-h-[100dvh] place-items-center overflow-hidden bg-zam-ink px-4">
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-6 flex justify-center">
-          <span className="inline-flex rounded-2xl bg-white px-4 py-3 shadow-lg">
-            <Logo size={34} onDark={false} />
-          </span>
+          <Logo size={36} onDark />
         </div>
         <div className="card-lite relative overflow-hidden p-7">
           <div className="zam-flagline absolute inset-x-0 top-0 rounded-none" />

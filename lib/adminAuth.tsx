@@ -28,7 +28,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const recheck = useCallback(async () => {
     try {
-      const me = await fetch("/api/auth/me").then((r) => r.json());
+      const me = await fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" }).then((r) => r.json());
       const ok = me.authenticated && me.role === "admin";
       setAuthed(ok);
       setAdmin(ok ? me.admin ?? null : null);
@@ -45,6 +45,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const res = await fetch("/api/admin/login", {
       method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
@@ -58,7 +60,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin", cache: "no-store" });
     setAuthed(false);
     setAdmin(null);
   }, []);
