@@ -66,11 +66,46 @@ See `.env.example` for the full annotated list:
   `admin123` account is only seeded in development.
 - `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` /
   `R2_BUCKET` — Cloudflare R2 for large-file uploads (preferred; see
-  `.env.example` for bucket + CORS setup).
+  "File storage" below and `.env.example` for bucket + CORS setup).
 - `BLOB_READ_WRITE_TOKEN` — Vercel Blob, used when R2 is not configured
   (small files fall back to inline storage without either).
 - `RESEND_API_KEY` / `EMAIL_FROM` — email channel (OTP codes, notifications).
 - `AT_USERNAME` / `AT_API_KEY` / `AT_SENDER_ID` — SMS via Africa's Talking.
+
+## File storage (Cloudflare R2)
+
+Without R2, uploads are capped at **4MB** and stored as base64 **inside the
+PostgreSQL database** — which fills a Neon free tier quickly and makes every
+query heavier. Setting the four `R2_*` vars moves audio masters, artwork and
+documents to a private R2 bucket instead (10GB free, no egress fees), lifting
+the per-file limit to 300MB. This is a configuration change only; the code
+path already exists and needs no edits.
+
+1. Cloudflare dashboard → **R2** → create a bucket. Keep it **private** —
+   members' files must never be publicly readable.
+2. **R2 → Manage API Tokens** → create a token with **Object Read & Write**
+   scoped to that bucket. Copy the Access Key ID and Secret; the Account ID is
+   on the R2 overview page.
+3. On the bucket → **Settings → CORS policy**, allow the browser's direct
+   upload (see `.env.example` for the exact JSON).
+4. Set `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and
+   `R2_BUCKET` — locally in `.env`, and on the host as environment variables.
+   All four must be present; if any is missing the app silently falls back to
+   Vercel Blob and then to inline storage.
+5. Verify end to end:
+
+   ```bash
+   npm run check:r2                          # uses the portal's own origin
+   npm run check:r2 -- https://staging.example.org   # or check another origin
+   ```
+
+   This uploads a small object through a presigned PUT, reads it back through
+   a presigned GET, confirms the bucket rejects unsigned reads, probes the
+   CORS rule that only browsers exercise, and deletes the object. It exits
+   non-zero and names the fix if any step fails.
+
+Existing files already stored inline stay where they are — R2 applies to
+uploads made after it is configured.
 
 ## Accounts
 
