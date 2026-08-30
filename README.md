@@ -92,20 +92,68 @@ path already exists and needs no edits.
    `R2_BUCKET` — locally in `.env`, and on the host as environment variables.
    All four must be present; if any is missing the app silently falls back to
    Vercel Blob and then to inline storage.
-5. Verify end to end:
-
-   ```bash
-   npm run check:r2                          # uses the portal's own origin
-   npm run check:r2 -- https://staging.example.org   # or check another origin
-   ```
-
-   This uploads a small object through a presigned PUT, reads it back through
-   a presigned GET, confirms the bucket rejects unsigned reads, probes the
-   CORS rule that only browsers exercise, and deletes the object. It exits
-   non-zero and names the fix if any step fails.
+5. Verify end to end with `npm run check:r2` (see "Deploying on free
+   tiers" below). It uploads a small object through a presigned PUT, reads it
+   back through a presigned GET, confirms the bucket rejects unsigned reads,
+   probes the CORS rule that only browsers exercise, and deletes the object.
 
 Existing files already stored inline stay where they are — R2 applies to
 uploads made after it is configured.
+
+## Deploying on free tiers
+
+Every service the portal needs has a free plan that covers it, with one
+exception (SMS). Run `npm run preflight` before deploying — it talks to each
+real service with the real credentials and reports what would break.
+
+| Need | Service | Free allowance |
+| :--- | :--- | :--- |
+| Hosting | Vercel Hobby | non-commercial use only — see the caveat below |
+| Database | Neon | 0.5 GB per branch |
+| File storage | Cloudflare R2 | 10 GB, no egress fees |
+| Email / OTP | Resend | 3,000 per month, 100 per day |
+| SMS | Africa's Talking | **none** — billed per message |
+
+SMS is the only piece with no free tier. Leave `AT_*` unset and the app skips
+it: every notice still reaches members in-app and by email. Nothing else
+degrades.
+
+### Preflight
+
+```bash
+npm run preflight                 # every section
+npm run preflight -- email        # core | db | storage | email | sms
+npm run preflight -- --origin https://staging.example.org
+npm run check:r2                  # alias for the storage section
+```
+
+It exits non-zero on a **blocker** — something that breaks a member-facing
+flow — and zero on advisories. Checks, per section:
+
+- **core** — `AUTH_SECRET` present and long enough (production refuses to sign
+  sessions without it, so every login fails); `ADMIN_PASSWORD` set and not
+  the `admin123` placeholder (no staff account can be created otherwise).
+- **db** — the database is reachable, how much of Neon's 0.5 GB is used, and
+  how much of that is files kept inline as base64 rather than in R2.
+- **storage** — the real upload path: presigned PUT, read back, the bucket
+  refuses unsigned reads, the CORS rule browsers need, then cleanup.
+- **email** — `EMAIL_FROM` parses, the Resend key is accepted, and its domain
+  is actually *verified* on that account. This one matters most: registration
+  issues a 6-digit code by email, and a member cannot submit a membership
+  application until it is verified (`app/api/member/application/route.ts`).
+  If mail does not deliver, nobody can complete the flow the portal exists
+  for — and the failure is silent server-side.
+- **sms** — reports whether SMS is off (fine), in sandbox (simulator only), or
+  live and billing.
+
+### Two caveats worth knowing
+
+- **Vercel's Hobby plan is for non-commercial use.** A collecting society
+  running member operations on it is a licensing risk, not a technical one.
+  Nothing in the code depends on the plan.
+- **Neon's free branch is 0.5 GB**, and without R2 every upload is base64'd
+  into it at up to 4 MB each. `npm run preflight -- db` shows exactly how much
+  of the database that accounts for.
 
 ## Accounts
 
