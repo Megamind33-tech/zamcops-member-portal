@@ -97,8 +97,27 @@ path already exists and needs no edits.
    back through a presigned GET, confirms the bucket rejects unsigned reads,
    probes the CORS rule that only browsers exercise, and deletes the object.
 
-Existing files already stored inline stay where they are — R2 applies to
-uploads made after it is configured.
+### Moving existing files out of the database
+
+R2 only catches new uploads. Anything uploaded before it was configured is
+still base64 in Postgres, taking up the Neon free branch. `npm run preflight
+-- db` reports how much. To move it:
+
+```bash
+npm run backfill:r2                      # dry run — lists what would move
+npm run backfill:r2 -- --apply           # move it
+npm run backfill:r2 -- --apply --limit 1 # or try a single file first
+```
+
+It covers both member uploads and the documents on a member's file, largest
+first. Per file the order is upload → verify the bytes landed → only then
+point the row at R2 and clear `data`, so an interrupted or failed run leaves
+the row untouched with its data intact and re-running simply redoes it. Rows
+that already live in R2 are skipped. Only one file is held in memory at a
+time, so a large backlog does not need a large machine.
+
+Postgres does not release the freed pages until it vacuums; run
+`npm run preflight -- db` afterwards to see the result.
 
 ## Deploying on free tiers
 

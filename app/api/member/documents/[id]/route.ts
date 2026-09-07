@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
 import { bad } from "@/lib/server";
+import { storedFileResponse } from "@/lib/fileResponse";
 
 export const runtime = "nodejs";
 
@@ -23,16 +24,5 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return bad("Documents become available for download once your membership is approved.", 403);
   }
 
-  if (doc.url) return Response.redirect(doc.url, 302);
-  if (!doc.data) return bad("This document has no downloadable file.", 404);
-
-  const bytes = Buffer.from(doc.data, "base64");
-  return new Response(new Uint8Array(bytes), {
-    headers: {
-      "Content-Type": doc.mimeType || "application/pdf",
-      "Content-Length": String(bytes.length),
-      "Content-Disposition": `attachment; filename="${doc.fileName.replace(/[^\w.\- ]/g, "_")}"`,
-      "Cache-Control": "private, no-store",
-    },
-  });
+  return storedFileResponse(doc, { disposition: "attachment", fallbackType: "application/pdf" });
 }
