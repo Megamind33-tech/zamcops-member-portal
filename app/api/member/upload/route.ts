@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { isR2Url, r2Configured, r2Delete, r2Key } from "@/lib/r2";
+import { isLocalUrl, localConfigured, localDelete, localKey } from "@/lib/localStore";
 
 export const runtime = "nodejs";
 
@@ -32,6 +33,7 @@ export async function POST(req: Request) {
     // staff download proxy never fetches an attacker-chosen URL.
     const storedUrl = String(b.url);
     const ownsUrl =
+      storedUrl.startsWith(`local://uploads/${session.sub}/`) ||
       storedUrl.startsWith(`r2://uploads/${session.sub}/`) ||
       /^https:\/\/[\w-]+\.public\.blob\.vercel-storage\.com\//.test(storedUrl);
     if (!ownsUrl) return bad("Invalid storage url.");
@@ -91,7 +93,9 @@ export async function DELETE(req: Request) {
   if (!row || row.ownerId !== session.sub) return bad("Upload not found.", 404);
 
   if (row.url) {
-    if (isR2Url(row.url)) {
+    if (isLocalUrl(row.url)) {
+      if (localConfigured()) await localDelete(localKey(row.url)).catch(() => {});
+    } else if (isR2Url(row.url)) {
       if (r2Configured()) await r2Delete(r2Key(row.url)).catch(() => {});
     } else if (process.env.BLOB_READ_WRITE_TOKEN) {
       await del(row.url).catch(() => {});

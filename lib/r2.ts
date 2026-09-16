@@ -4,12 +4,18 @@
 // through the authenticated proxy, which signs a GET at fetch time. R2-backed
 // rows store a compact "r2://<key>" marker in `url`, never a signed link.
 //
-// Env vars (all four required to enable R2 — otherwise the app falls back to
-// Vercel Blob, then inline ≤4MB storage):
-//   R2_ACCOUNT_ID        — Cloudflare account id (dashboard → R2 → API)
-//   R2_ACCESS_KEY_ID     — R2 API token key id
-//   R2_SECRET_ACCESS_KEY — R2 API token secret
-//   R2_BUCKET            — bucket name
+// Env vars (credentials + bucket required to enable this driver — otherwise the
+// app falls back to Vercel Blob, then inline ≤4MB storage):
+//   R2_ACCOUNT_ID        — Cloudflare account id (dashboard → R2 → API).
+//                          Not needed when S3_ENDPOINT is set.
+//   R2_ACCESS_KEY_ID     — API token key id    (alias: S3_ACCESS_KEY_ID)
+//   R2_SECRET_ACCESS_KEY — API token secret    (alias: S3_SECRET_ACCESS_KEY)
+//   R2_BUCKET            — bucket name         (alias: S3_BUCKET)
+//   S3_ENDPOINT          — optional. Any S3-compatible endpoint, e.g. a MinIO
+//                          container on your own VPS ("http://minio:9000") or
+//                          another provider. When set it replaces the
+//                          Cloudflare host and R2_ACCOUNT_ID is not read.
+//   S3_REGION            — optional, defaults to "auto" (MinIO: "us-east-1").
 //
 // The bucket needs a CORS rule allowing PUT from the portal's origin so
 // browsers can upload directly (see .env.example).
@@ -18,13 +24,23 @@ import { AwsClient } from "aws4fetch";
 
 const R2_SCHEME = "r2://";
 
+const env = (...names: string[]): string => {
+  for (const n of names) {
+    const v = process.env[n]?.trim();
+    if (v) return v;
+  }
+  return "";
+};
+
+const accessKeyId = () => env("R2_ACCESS_KEY_ID", "S3_ACCESS_KEY_ID");
+const secretAccessKey = () => env("R2_SECRET_ACCESS_KEY", "S3_SECRET_ACCESS_KEY");
+const bucket = () => env("R2_BUCKET", "S3_BUCKET");
+const endpoint = () => env("S3_ENDPOINT", "R2_ENDPOINT");
+
 export function r2Configured(): boolean {
-  return !!(
-    process.env.R2_ACCOUNT_ID &&
-    process.env.R2_ACCESS_KEY_ID &&
-    process.env.R2_SECRET_ACCESS_KEY &&
-    process.env.R2_BUCKET
-  );
+  if (!accessKeyId() || !secretAccessKey() || !bucket()) return false;
+  // A custom endpoint stands in for the Cloudflare account host.
+  return !!(endpoint() || env("R2_ACCOUNT_ID"));
 }
 
 export const isR2Url = (url: string): boolean => url.startsWith(R2_SCHEME);
@@ -33,16 +49,19 @@ export const r2Url = (key: string): string => `${R2_SCHEME}${key}`;
 
 function client(): AwsClient {
   return new AwsClient({
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    accessKeyId: accessKeyId(),
+    secretAccessKey: secretAccessKey(),
     service: "s3",
-    region: "auto",
+    region: env("S3_REGION") || "auto",
   });
 }
 
 function objectEndpoint(key: string): string {
   const path = key.split("/").map(encodeURIComponent).join("/");
-  return `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${process.env.R2_BUCKET}/${path}`;
+  const base = endpoint()
+    ? endpoint().replace(/\/+$/, "")
+    : `https://${env("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`;
+  return `${base}/${bucket()}/${path}`;
 }
 
 async function presign(key: string, method: "GET" | "PUT", expiresSeconds: number): Promise<string> {

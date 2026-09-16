@@ -9,7 +9,8 @@
 // means the thing works — not merely that a variable is non-empty. Hard
 // failures (which break a member-facing flow) exit non-zero; advisories do not.
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, mkdtempSync, writeFileSync, rmSync, statSync, accessSync, constants } from "node:fs";
+import path from "node:path";
 import { AwsClient } from "aws4fetch";
 
 const SECTIONS = ["core", "db", "storage", "email", "sms"];
@@ -127,7 +128,7 @@ async function checkDb() {
     } else {
       const share = total > 0 ? Math.round((inline / total) * 100) : 0;
       warn(`${Number(rows)} file(s) stored inline in Postgres — ${fmtBytes(inline)} (${share}% of the database)`);
-      info("Configure R2 so new uploads go to the bucket instead; see README → File storage.");
+      info("Set LOCAL_STORAGE_DIR (self-hosted) or configure R2 so new uploads go there instead; see README → File storage.");
     }
   } catch (e) {
     warn(`Could not measure database size: ${e instanceof Error ? e.message.split("\n")[0] : e}`);
@@ -160,13 +161,64 @@ async function r2Presign(key, method, expiresSeconds) {
   return signed.url;
 }
 
+// Local disk takes precedence in the app, so preflight checks it the same way:
+// really write, read back and delete a file in the configured directory rather
+// than trusting that the variable is set.
+function checkLocalStorage() {
+  const dir = process.env.LOCAL_STORAGE_DIR?.trim();
+  heading("File storage (local disk on this host)");
+  ok(`LOCAL_STORAGE_DIR is set to ${dir}`);
+
+  const full = path.resolve(dir);
+  try {
+    statSync(full);
+  } catch {
+    fail(`${full} does not exist`);
+    info("Create it and give the user the app runs as ownership of it.");
+    return;
+  }
+  try {
+    accessSync(full, constants.R_OK | constants.W_OK);
+  } catch {
+    fail(`${full} is not readable and writable by this user`);
+    info("In Docker the volume must be owned by the `node` user (uid 1000).");
+    return;
+  }
+
+  let probe;
+  try {
+    probe = mkdtempSync(path.join(full, ".preflight-"));
+    const file = path.join(probe, "probe.txt");
+    const body = `zamcops preflight ${new Date().toISOString()}`;
+    writeFileSync(file, body);
+    if (readFileSync(file, "utf8") !== body) {
+      fail("Wrote a probe file but read back different bytes");
+      return;
+    }
+    ok("Wrote, read back and removed a probe file");
+  } catch (e) {
+    fail(`Could not write into ${full}: ${e.message}`);
+    return;
+  } finally {
+    if (probe) rmSync(probe, { recursive: true, force: true });
+  }
+
+  if (process.env.R2_BUCKET || process.env.S3_BUCKET || process.env.BLOB_READ_WRITE_TOKEN) {
+    warn("R2 / S3 / Blob are also configured — local disk wins, and those are unused");
+  }
+  info("Back this directory up alongside the database; each is useless without the other.");
+}
+
 async function checkStorage(origin) {
+  if (process.env.LOCAL_STORAGE_DIR?.trim()) return checkLocalStorage();
+
   heading("File storage (Cloudflare R2 free tier)");
 
   const missing = R2_VARS.filter((k) => !process.env[k]);
   if (missing.length === R2_VARS.length) {
-    fail("R2 is not configured — uploads are capped at 4MB and stored in the database");
-    info("R2's free tier is 10GB with no egress fees. See README → File storage.");
+    fail("No file storage is configured — uploads are capped at 4MB and stored in the database");
+    info("Self-hosting? Set LOCAL_STORAGE_DIR and uploads go to a directory on this host.");
+    info("On Vercel, R2's free tier is 10GB with no egress fees. See README → File storage.");
     return;
   }
   if (missing.length) {

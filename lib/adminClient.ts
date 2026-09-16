@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { toast } from "sonner";
 import type {
   Member,
   WorkDeclaration,
@@ -78,11 +79,25 @@ export function useAdminData() {
 
   const setReviewStatus = useCallback(
     async (kind: "work" | "single" | "album", id: string, status: string, reason?: string) => {
-      await fetch("/api/admin/review", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, id, status, reason }),
-      });
+      const { res, data } = await postJSON("/api/admin/review", { kind, id, status, reason }, "PATCH");
+      if (!res.ok) toast.error(data.error || "Could not update this submission.");
+      // Approving a work also issues its declaration and certificate. If that
+      // part failed the decision still stands, so staff are told what to fix
+      // rather than left thinking the documents were filed.
+      else if (data.warning) toast.warning(data.warning);
+      await load();
+    },
+    [load]
+  );
+
+  // Re-issue a registered work's declaration and certificate — after the member
+  // adds a missing signature, after a new official signature is uploaded, or
+  // after staff amend the particulars of the work.
+  const reissueWorkDocuments = useCallback(
+    async (id: string) => {
+      const { res, data } = await postJSON("/api/admin/review", { kind: "work", id, action: "reissue" });
+      if (res.ok) toast.success("Declaration and certificate re-issued to the member's documents.");
+      else toast.error(data.error || "Could not re-issue the documents.");
       await load();
     },
     [load]
@@ -231,6 +246,7 @@ export function useAdminData() {
     ...data,
     loading,
     setReviewStatus,
+    reissueWorkDocuments,
     deleteSubmission,
     setFileStatus,
     setMemberStatus,

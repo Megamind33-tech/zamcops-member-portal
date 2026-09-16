@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, FilePlus2, Music, Trash2, Lock, LayoutGrid, List } from "lucide-react";
+import { AlertCircle, FilePlus2, FileText, Music, Trash2, Lock, LayoutGrid, List } from "lucide-react";
 import { toast } from "sonner";
 import { useApp, useMemberData } from "@/lib/store";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
@@ -25,7 +25,37 @@ export default function WorksScreen() {
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
   const [query, setQuery] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [docBusyId, setDocBusyId] = useState<string | null>(null);
   const [view, setView] = useState<"covers" | "list">("covers");
+
+  // The member's signed Declaration of a Musical Work — every particular they
+  // declared, the schedule of shares and the evidence lodged. Rendered on
+  // request, so it is available from the moment a work is submitted rather than
+  // only once it is registered.
+  const downloadDeclaration = async (id: string, title: string) => {
+    setDocBusyId(id);
+    try {
+      const res = await fetch(`/api/member/works/${id}/declaration`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Could not generate the declaration.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Work-Declaration-${title.replace(/[^\w.\- ]/g, "_")}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Could not generate the declaration.");
+    } finally {
+      setDocBusyId(null);
+    }
+  };
 
   const remove = async (id: string, title: string) => {
     if (!window.confirm(`Delete the declaration for “${title}”? This can't be undone.`)) return;
@@ -150,21 +180,30 @@ export default function WorksScreen() {
                 coverSrc={w.coverArt}
                 status={w.status}
                 footer={
-                  <div className="mt-2 flex items-center justify-between text-xs text-zam-muted">
-                    <span>{formatDate(w.submittedAt)}</span>
-                    {w.status === "Approved" ? (
-                      <span className="inline-flex items-center gap-1 italic">
-                        <Lock size={12} /> Registered
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => remove(w.id, w.title)}
-                        disabled={busyId === w.id}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 font-semibold transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
-                      >
-                        <Trash2 size={12} /> {busyId === w.id ? "Deleting…" : "Delete"}
-                      </button>
-                    )}
+                  <div className="mt-2 space-y-1.5 text-xs text-zam-muted">
+                    <div className="flex items-center justify-between">
+                      <span>{formatDate(w.submittedAt)}</span>
+                      {w.status === "Approved" ? (
+                        <span className="inline-flex items-center gap-1 italic">
+                          <Lock size={12} /> Registered
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => remove(w.id, w.title)}
+                          disabled={busyId === w.id}
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 font-semibold transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                        >
+                          <Trash2 size={12} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => downloadDeclaration(w.id, w.title)}
+                      disabled={docBusyId === w.id}
+                      className="flex w-full items-center justify-center gap-1 rounded-lg border border-zam-line py-1.5 font-semibold text-zam-ink transition hover:border-zam-orange/50 hover:bg-zam-orange-soft/40 disabled:opacity-40"
+                    >
+                      <FileText size={12} /> {docBusyId === w.id ? "Preparing…" : "Declaration"}
+                    </button>
                   </div>
                 }
               />
@@ -203,19 +242,28 @@ export default function WorksScreen() {
                     <StatusBadge status={w.status} />
                   </Td>
                   <Td className="text-right">
-                    {w.status === "Approved" ? (
-                      <span className="inline-flex items-center gap-1 text-xs italic text-zam-muted">
-                        <Lock size={12} /> Registered
-                      </span>
-                    ) : (
+                    <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => remove(w.id, w.title)}
-                        disabled={busyId === w.id}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                        onClick={() => downloadDeclaration(w.id, w.title)}
+                        disabled={docBusyId === w.id}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-zam-orange-soft/60 hover:text-zam-orange disabled:opacity-40"
                       >
-                        <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                        <FileText size={14} /> {docBusyId === w.id ? "Preparing…" : "Declaration"}
                       </button>
-                    )}
+                      {w.status === "Approved" ? (
+                        <span className="inline-flex items-center gap-1 text-xs italic text-zam-muted">
+                          <Lock size={12} /> Registered
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => remove(w.id, w.title)}
+                          disabled={busyId === w.id}
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-zam-muted transition hover:bg-red-50 hover:text-zam-red disabled:opacity-40"
+                        >
+                          <Trash2 size={14} /> {busyId === w.id ? "Deleting…" : "Delete"}
+                        </button>
+                      )}
+                    </div>
                   </Td>
                 </Tr>
               ))}

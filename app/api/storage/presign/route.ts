@@ -2,6 +2,7 @@ import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { r2Configured, r2PresignPut, r2Url } from "@/lib/r2";
+import { localConfigured, localUrl } from "@/lib/localStore";
 
 export const runtime = "nodejs";
 
@@ -14,12 +15,19 @@ const ALLOWED_TYPES = [
   /^application\/vnd\./,
 ];
 
-// Issues a short-lived presigned PUT URL so members can upload large files
-// directly to Cloudflare R2, bypassing the serverless body limit. Returns 501
-// when R2 is not configured so the client can fall back to Vercel Blob or the
-// inline (≤4MB) path.
+// Issues an upload target so the browser can push a large file straight at
+// storage, bypassing any request-body limit in front of the app:
+//
+//   local disk (LOCAL_STORAGE_DIR) → a same-origin PUT to /api/storage/put,
+//                                    streamed to the mounted volume
+//   Cloudflare R2 / S3             → a short-lived presigned PUT URL
+//
+// Returns 501 when neither is configured, so the client falls back to Vercel
+// Blob and then to the inline (≤4MB) path. Both branches answer with the same
+// { uploadUrl, url } shape — the browser PUTs the file either way.
 export async function POST(req: Request) {
-  if (!r2Configured()) return bad("External storage is not configured.", 501);
+  const local = localConfigured();
+  if (!local && !r2Configured()) return bad("External storage is not configured.", 501);
 
   const session = await requireMember();
   if (!session) return bad("Not authenticated.", 401);
@@ -43,5 +51,8 @@ export async function POST(req: Request) {
   const safeName = fileName.replace(/[^\w.-]+/g, "_").slice(-100);
   const key = `uploads/${session.sub}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
 
+  if (local) {
+    return json({ uploadUrl: `/api/storage/put?key=${encodeURIComponent(key)}`, url: localUrl(key) });
+  }
   return json({ uploadUrl: await r2PresignPut(key), url: r2Url(key) });
 }

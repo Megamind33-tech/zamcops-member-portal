@@ -1,0 +1,85 @@
+# ZAMCOPS Member Portal — self-hosted stack for a single VPS.
+#
+#   cp .env.example .env     # fill in AUTH_SECRET, POSTGRES_PASSWORD, ADMIN_*, PORTAL_DOMAIN
+#   docker compose up -d --build
+#
+# Three containers: the portal, PostgreSQL, and Caddy for HTTPS (Caddy obtains
+# and renews a Let's Encrypt certificate on its own). Member uploads and the
+# database both live on named volumes — back those two up and you have backed up
+# the portal.
+#
+# To run without Caddy (behind an existing nginx, or to try it on localhost),
+# start just the two services:  docker compose up -d app db
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zamcops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-zamcops}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zamcops} -d ${POSTGRES_DB:-zamcops}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # Not published: the database is reachable only from the compose network.
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Both point at the same server — there is no pooler in front of a local
+      # Postgres, so the runtime and migration URLs are identical.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zamcops}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-zamcops}
+      DIRECT_URL: postgresql://${POSTGRES_USER:-zamcops}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-zamcops}
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      ADMIN_NAME: ${ADMIN_NAME:-ZAMCOPS Staff}
+      # Uploads land on the volume mounted below, not in the database.
+      LOCAL_STORAGE_DIR: /data/uploads
+      # Optional channels — left empty, each one simply stays switched off.
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      AT_USERNAME: ${AT_USERNAME:-}
+      AT_API_KEY: ${AT_API_KEY:-}
+      AT_SENDER_ID: ${AT_SENDER_ID:-}
+    volumes:
+      - uploads:/data/uploads
+    # Published on loopback only: Caddy terminates TLS and proxies to it. Drop
+    # the 127.0.0.1 prefix if you are not using the caddy service.
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      PORTAL_DOMAIN: ${PORTAL_DOMAIN:?set PORTAL_DOMAIN in .env}
+      # Let's Encrypt uses this to warn you before a certificate expires.
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+
+volumes:
+  db-data:
+  uploads:
+  caddy-data:
+  caddy-config:

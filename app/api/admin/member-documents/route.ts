@@ -14,6 +14,8 @@ const DOC_TYPES = [
   "ID Document",
   "Membership Application",
   "Admission Letter",
+  "Work Declaration",
+  "Certificate of Registration",
   "Other",
 ];
 
