@@ -1,0 +1,17 @@
+# Build context — keep it to the sources the image actually needs.
+node_modules
+.next
+.git
+.github
+.cursor
+coverage
+*.log
+.env
+.env.*
+!.env.example
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+README.md
+tsconfig.tsbuildinfo
+data

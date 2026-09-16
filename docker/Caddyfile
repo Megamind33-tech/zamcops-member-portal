@@ -1,0 +1,38 @@
+# Caddy fronts the portal: it obtains and renews a Let's Encrypt certificate for
+# PORTAL_DOMAIN automatically, and proxies everything through to the app.
+#
+# Uploads go straight through this proxy (the local-disk driver has the browser
+# PUT to /api/storage/put), so the request body limit has to clear the portal's
+# own 300MB ceiling — Caddy does not impose one by default, which is what we
+# want here.
+
+{
+	email {$ACME_EMAIL}
+}
+
+{$PORTAL_DOMAIN} {
+	encode zstd gzip
+
+	# A 300MB master can take a while on a Zambian connection; give the
+	# transfer room rather than cutting it off mid-upload.
+	reverse_proxy app:3000 {
+		transport http {
+			read_timeout 30m
+			write_timeout 30m
+		}
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}

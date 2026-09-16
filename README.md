@@ -8,9 +8,13 @@ its artwork together**, download PDFs issued by staff, and follow royalty
 receiving and distribution.
 
 It also includes a separate, wider **staff / admin dashboard** for reviewing
-applications, works, submissions and files, issuing the generated membership
-documents (application PDF, signed Deed, admission letter), publishing royalty
+applications, works, submissions and files, issuing the generated documents
+(application PDF, signed Deed of Assignment, admission letter, work
+declarations and certificates of registration), publishing royalty
 distributions and answering support tickets.
+
+It runs on Vercel or on **your own VPS** — see "Self-hosting on a VPS" below
+for the Docker Compose stack (portal + PostgreSQL + HTTPS, uploads on disk).
 
 The app has two clearly-separated areas:
 
@@ -25,10 +29,10 @@ The app has two clearly-separated areas:
 - **Prisma + PostgreSQL** (hosted on Neon; pooled + direct connection URLs)
 - **Auth:** hashed passwords (bcryptjs) + signed JWT in an httpOnly cookie
   (jose), enforced both in route handlers and in `middleware.ts`
-- **File storage:** Cloudflare R2 (preferred — private bucket, presigned
-  uploads up to 300MB) or Vercel Blob for large files (audio), with an
-  inline base64 fallback in the database for small files (≤4MB) and the
-  system-generated PDFs
+- **File storage:** a directory on the host (`LOCAL_STORAGE_DIR` — the default
+  when self-hosting), Cloudflare R2 or any S3-compatible bucket, or Vercel
+  Blob, with an inline base64 fallback in the database for small files (≤4MB)
+  and the system-generated PDFs
 - **Notifications:** email via Resend and SMS via Africa's Talking, both
   optional (`lib/notify.ts`); registration email verification uses OTP codes
 - **API:** Next.js Route Handlers under `app/api/`
@@ -119,6 +123,126 @@ time, so a large backlog does not need a large machine.
 Postgres does not release the freed pages until it vacuums; run
 `npm run preflight -- db` afterwards to see the result.
 
+## Self-hosting on a VPS
+
+`docker compose up -d --build` brings up the whole portal on one machine: the
+Next.js server, PostgreSQL, and Caddy terminating HTTPS with a certificate it
+obtains and renews by itself. No Vercel, no Neon, no Cloudflare account.
+
+```bash
+git clone <this repo> && cd zamcops-member-portal
+cp .env.example .env         # fill in the VPS block — see below
+docker compose up -d --build
+docker compose logs -f app   # watch the first schema sync
+```
+
+Fill in these before the first `up`:
+
+| Variable | What it is |
+| :--- | :--- |
+| `PORTAL_DOMAIN` | the domain Caddy requests a certificate for. **Point its DNS at the VPS first** — the certificate request fails otherwise. |
+| `ACME_EMAIL` | where Let's Encrypt sends expiry warnings. |
+| `POSTGRES_PASSWORD` | required, no default. A long random string. |
+| `AUTH_SECRET` | signs session cookies. A long random string — `openssl rand -base64 48`. Changing it signs everyone out. |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | the staff account, created on first sign-in at `/admin`. Not `admin123`. |
+
+`DATABASE_URL` and `DIRECT_URL` are built for you from the `POSTGRES_*` values;
+leave them as they are. `RESEND_API_KEY` and the `AT_*` SMS variables stay
+optional — leave them empty and those channels simply stay off (but note that
+**registration needs email**: without it nobody can verify an address and
+complete a membership application).
+
+### What runs where
+
+- **app** — the portal, published on `127.0.0.1:3000` only. Caddy reaches it
+  over the compose network; nothing else can.
+- **db** — PostgreSQL 16, not published at all.
+- **caddy** — ports 80/443. Drop this service (`docker compose up -d app db`)
+  if you already run nginx on the box, and proxy to `127.0.0.1:3000` yourself.
+
+Uploads go to the `uploads` volume (`/data/uploads` in the container) rather
+than into PostgreSQL, so a 300MB master costs the database nothing. Nothing
+under that directory is served statically — every download goes through an
+authenticated route, exactly as with R2.
+
+### Operating it
+
+```bash
+docker compose ps                       # what is up
+docker compose logs -f app              # portal logs
+docker compose pull && docker compose up -d --build   # deploy a new version
+docker compose exec app node scripts/preflight.mjs    # check the live config
+curl -fsS https://$PORTAL_DOMAIN/api/health           # {"status":"ok"}
+```
+
+**Back up two things, together:** the `db-data` volume and the `uploads`
+volume. Either one alone is useless — the database holds the rows that name
+the files, the volume holds the bytes.
+
+```bash
+docker compose exec -T db pg_dump -U zamcops zamcops | gzip > zamcops-$(date +%F).sql.gz
+docker run --rm -v zamcops-member-portal_uploads:/data -v "$PWD":/backup alpine \
+  tar czf /backup/uploads-$(date +%F).tar.gz -C /data .
+```
+
+The container syncs the schema with `prisma db push` on every start. It is
+idempotent, and it deliberately runs *without* `--accept-data-loss`: a schema
+change that would drop a column stops the deploy instead of quietly discarding
+members' records. Work through one by hand with `SKIP_DB_PUSH=1` set.
+
+### Sizing
+
+Two vCPU and 4GB of RAM is comfortable for a society of this size. Disk is the
+part that grows: audio masters at 30–100MB each add up far faster than the
+database does, so size the volume for the catalogue rather than for the rows.
+
+### Using S3 instead of the local disk
+
+Set `S3_ENDPOINT` together with `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` /
+`S3_BUCKET` (or the `R2_*` equivalents) and uploads are signed against that
+endpoint instead — MinIO in a container beside the portal, Cloudflare R2, or
+another provider. Leave `LOCAL_STORAGE_DIR` empty when you do; it takes
+precedence over everything else.
+
+## Generated documents
+
+Every official document the society issues is rendered server-side with jsPDF
+on the same letterhead (`lib/pdfKit.ts`), so the stationery can only change in
+one place. Official signature images are drawn on the server and never reach
+the client — members receive the rendered PDF, not the signature.
+
+**On approval of a membership application** (`lib/issueDocuments.ts` →
+`issueMemberDocuments`), filed under the member's documents:
+
+1. **Membership application** — the completed Individual / Group / Publisher
+   form, field for field, with the applicant's signature under the declaration.
+2. **Deed of Assignment** (incl. Mechanical) — the full legal text
+   (`lib/deedText.ts`), signed by the Assignor and counter-signed by the Board
+   Secretary.
+3. **Admission letter** — signed by the General Manager.
+
+**On approval of a work** (`issueWorkDocuments`), filed the same way:
+
+4. **Declaration of a Musical Work** — every particular declared (titles, type,
+   language, genre, duration, ISWC/ISRC, date created), composers, authors,
+   arrangers and publisher with IPI numbers, the full **schedule of interested
+   parties** (capacity, rights stream, IPI/CAE, how each party is identified,
+   share, and a total that is flagged on the face of the document when it does
+   not reach 100%), the evidence lodged, and the member's signature under the
+   seven declaration clauses (`lib/workDeedText.ts`).
+5. **Certificate of Registration** — the same particulars, certified and
+   counter-signed by the Board Secretary.
+
+Members can download the declaration for any of their works **before** approval
+from *My catalogue → Declaration*; it is rendered per request
+(`app/api/member/works/[id]/declaration`), so it always reflects the current
+particulars. The certificate exists only once the work is in the register.
+
+Both require the member's stored signature and the Board Secretary's official
+signature (*Admin → Official Signatures*). If either is missing, the work is
+still approved and staff are told what is missing; **Admin → Work Declarations
+→ Re-issue** generates the pair once it is fixed, and after any later amendment.
+
 ## Deploying on free tiers
 
 Every service the portal needs has a free plan that covers it, with one
@@ -127,7 +251,7 @@ real service with the real credentials and reports what would break.
 
 | Need | Service | Free allowance |
 | :--- | :--- | :--- |
-| Hosting | Vercel Hobby | non-commercial use only — see the caveat below |
+| Hosting | Vercel Hobby | non-commercial use only — see the caveat below (or self-host, above) |
 | Database | Neon | 0.5 GB per branch |
 | File storage | Cloudflare R2 | 10 GB, no egress fees |
 | Email / OTP | Resend | 3,000 per month, 100 per day |
@@ -203,6 +327,9 @@ lib/                     # db client, auth/session, PDFs, notify, helpers
 prisma/                  # schema (PostgreSQL)
 types/                   # domain models
 public/                  # manifest, icon, service worker
+docker/                  # entrypoint + Caddyfile for self-hosting
+Dockerfile               # production image (Next.js standalone)
+docker-compose.yml       # portal + PostgreSQL + Caddy, for one VPS
 ```
 
 ## Notes
@@ -210,8 +337,9 @@ public/                  # manifest, icon, service worker
 - `prisma db push` runs automatically on install when the database is
   reachable; run `npm run db:push` manually after schema changes.
 - Generated member documents (application form, Deed of Assignment,
-  admission letter) are issued by staff at approval and stored inline in the
-  database; members can download them once their membership is Active.
+  admission letter, work declarations and certificates of registration) are
+  issued by staff at approval and stored inline in the database; members can
+  download them once their membership is Active. See "Generated documents".
 - Royalty figures under "Royalties" separate **receiving** (amounts
   actually distributed to the member) from **detected usage**. Confirmed
   amounts appear only once staff publish a Distribution.

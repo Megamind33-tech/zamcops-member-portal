@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Trash2 } from "lucide-react";
+import { FileText, Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
@@ -10,7 +10,7 @@ import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
 export default function AdminWorksPage() {
-  const { works, members, setReviewStatus, deleteSubmission } = useAdminData();
+  const { works, members, setReviewStatus, reissueWorkDocuments, deleteSubmission } = useAdminData();
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
 
   const del = async (id: string, title: string) => {
@@ -81,6 +81,15 @@ export default function AdminWorksPage() {
                         onReject={(reason) => setReviewStatus("work", w.id, "Rejected", reason)}
                         onUnderReview={() => setReviewStatus("work", w.id, "Under Review")}
                       />
+                      {w.status === "Approved" && (
+                        <button
+                          onClick={() => reissueWorkDocuments(w.id)}
+                          title="Re-issue the declaration and certificate of registration"
+                          className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs font-semibold text-night-200 transition hover:bg-white/10"
+                        >
+                          <FileText size={14} /> Re-issue
+                        </button>
+                      )}
                       <button
                         onClick={() => del(w.id, w.title)}
                         title="Delete declaration"
