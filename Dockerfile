@@ -39,8 +39,14 @@ RUN npx prisma generate && npm run build
 # ── Stage 3: the Prisma CLI, on its own ────────────────────────────────────
 FROM node:22-bookworm-slim AS prisma-cli
 WORKDIR /opt/prisma
+# The app's manifest is copied under a name npm will not mistake for this
+# stage's own package.json. It is read with an explicit JSON.parse rather than
+# require(): require() picks its parser from the file extension, and on
+# anything that is not .json it treats the contents as JavaScript, where a JSON
+# object is a syntax error.
 COPY package.json ./package.json.app
-RUN VERSION="$(node -p "require('./package.json.app').devDependencies.prisma")" \
+RUN VERSION="$(node -p "JSON.parse(require('fs').readFileSync('./package.json.app','utf8')).devDependencies.prisma")" \
+    && test -n "$VERSION" \
     && rm package.json.app \
     && npm init -y > /dev/null \
     && npm install --no-audit --no-fund --omit=dev "prisma@${VERSION}"
