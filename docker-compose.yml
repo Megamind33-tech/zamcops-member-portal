@@ -85,10 +85,12 @@ services:
       AT_SENDER_ID: ${AT_SENDER_ID:-}
     volumes:
       - uploads:/data/uploads
-    # Published on loopback only: Caddy terminates TLS and proxies to it. Drop
-    # the 127.0.0.1 prefix if you are not using the caddy service.
+    # Published on loopback only: whatever terminates TLS (the caddy service
+    # below, or an nginx already on the box) proxies to it; nothing reaches it
+    # from outside. Set APP_HOST_PORT when 3000 is already in use on the host —
+    # only the host side moves, the container still listens on 3000.
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:${APP_HOST_PORT:-3000}:3000"
 
   caddy:
     image: caddy:2-alpine

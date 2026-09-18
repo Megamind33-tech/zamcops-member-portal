@@ -53,9 +53,25 @@ two apps offline.
 - **B — nothing serves 80/443 yet.** Use the bundled Caddy as documented.
 
 Also check `127.0.0.1:3000` itself is free — one of the existing apps may
-already be on 3000. If so, change the host side only: `"127.0.0.1:3100:3000"`.
+already be on 3000. If so, set `APP_HOST_PORT` in `.env`; only the host side
+moves, the container still listens on 3000.
 
 **Check first:** `sudo ss -tlnp | grep -E ':(80|443|3000)\s'`
+
+### Measured on the target box (`vmi3566248`, 79.143.177.140)
+
+```
+LISTEN 0 511   0.0.0.0:80     backlog 511  → nginx
+LISTEN 0 511   0.0.0.0:443    backlog 511  → nginx
+LISTEN 0 4096  0.0.0.0:3000   backlog 4096 → an existing Node app
+Mem: 7.8Gi total, 4.7Gi available · Swap: 4.0Gi (1.6Gi used)
+Docker 29.8.0 · Compose v5.5.1
+```
+
+**Path A applies, with a port move.** All three default ports are taken, so:
+`docker compose up -d --build app db` (no Caddy) **and** `APP_HOST_PORT=3100`
+in `.env`. Memory and swap are ample for an on-box build. Both Docker versions
+support `name:` and `deploy.resources.limits`.
 
 ## 2. Copying `.env.example` verbatim ships `admin123` to production — BLOCKER · FIXED
 
