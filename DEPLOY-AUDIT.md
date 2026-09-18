@@ -14,6 +14,11 @@ and a first successful deploy **on a box that already hosts two other apps**.
 Severity: **BLOCKER** = deploy fails or is unsafe to run · **FIX** = fix before
 go-live · **ADVISORY** = do it soon.
 
+> **Status.** §2, §3, §4, §5 and the volume-name half of §7 are **fixed in this
+> branch** (see "Fixed" tags below). §1 (port collision) is an operational
+> decision that depends on the box; §6, §8 and the rest of §7 are actions for
+> whoever runs the deploy. Nothing here has been applied to a server.
+
 ---
 
 ## 1. Port 80/443 will collide with the two apps already on the box — BLOCKER
@@ -52,7 +57,7 @@ already be on 3000. If so, change the host side only: `"127.0.0.1:3100:3000"`.
 
 **Check first:** `sudo ss -tlnp | grep -E ':(80|443|3000)\s'`
 
-## 2. Copying `.env.example` verbatim ships `admin123` to production — BLOCKER
+## 2. Copying `.env.example` verbatim ships `admin123` to production — BLOCKER · FIXED
 
 `.env.example` line: `ADMIN_PASSWORD="admin123"`. The production guard in
 `app/api/admin/login/route.ts` only refuses to seed when `ADMIN_PASSWORD` is
@@ -72,7 +77,7 @@ if (process.env.NODE_ENV === "production" && (!password || password === "admin12
 }
 ```
 
-## 3. A `/` or `#` in `POSTGRES_PASSWORD` silently breaks the DB URL — FIX
+## 3. A `/` or `#` in `POSTGRES_PASSWORD` silently breaks the DB URL — FIXED
 
 Compose interpolates the password straight into a connection string:
 `postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}`.
@@ -94,7 +99,7 @@ connection error at first boot, not as "bad password".
 `openssl rand -hex 32` or `openssl rand -base64 48 | tr -d '/+='` — and say so
 in `.env.example`. (`AUTH_SECRET` is unaffected; it is never put in a URL.)
 
-## 4. Container logs are uncapped — will fill the disk — FIX
+## 4. Container logs are uncapped — will fill the disk — FIXED
 
 Caddy's own access log rotates (`roll_size 10MiB`, `roll_keep 5`), but the
 `app` and `db` containers use Docker's default `json-file` driver with **no
@@ -108,7 +113,7 @@ too, not just the portal.
       options: { max-size: "10m", max-file: "5" }
 ```
 
-## 5. No resource limits on a shared box — FIX
+## 5. No resource limits on a shared box — FIXED
 
 Nothing caps the portal's memory or CPU, so a runaway request or a large PDF
 generation can starve the other two apps — and Postgres, which is the thing you
