@@ -103,7 +103,12 @@ services:
       app:
         condition: service_healthy
     environment:
-      PORTAL_DOMAIN: ${PORTAL_DOMAIN:?set PORTAL_DOMAIN in .env}
+      # Deliberately NOT ${PORTAL_DOMAIN:?...}. Compose interpolates every
+      # service in the file before it filters to the ones you named, so a
+      # required variable here would break `docker compose up -d app db` —
+      # the documented way to run behind an nginx that already owns 80/443.
+      # Caddy is only started explicitly, and it needs this set when it is.
+      PORTAL_DOMAIN: ${PORTAL_DOMAIN:-}
       # Let's Encrypt uses this to warn you before a certificate expires.
       ACME_EMAIL: ${ACME_EMAIL:-}
     volumes:
