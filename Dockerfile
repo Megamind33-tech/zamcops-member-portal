@@ -65,7 +65,14 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     LOCAL_STORAGE_DIR=/data/uploads
 
-COPY --from=prisma-cli /opt/prisma/node_modules /opt/prisma/node_modules
+# --chown here, not a later `chown -R`: the Prisma CLI writes a checksum/lock
+# file into @prisma/engines when it resolves the engine binary, and it does
+# that as the unprivileged `node` user below. Left root-owned (the default for
+# COPY), every schema sync fails with "Can't write to
+# .../@prisma/engines ... make sure you install prisma with the right
+# permissions" — which looks like a database problem in the entrypoint's
+# retry loop, but is a filesystem permission problem that never clears.
+COPY --chown=node:node --from=prisma-cli /opt/prisma/node_modules /opt/prisma/node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
