@@ -110,7 +110,7 @@ HEALTHY=""
 for i in $(seq 1 60); do
   if curl -fsS "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null 2>&1; then HEALTHY=1; break; fi
   sleep 3
-  [ $((i % 10)) -eq 0 ] && echo "    still waiting… (${i}0s)"
+  [ $((i % 10)) -eq 0 ] && echo "    still waiting… ($((i * 3))s elapsed, giving up at 180s)"
 done
 
 echo
