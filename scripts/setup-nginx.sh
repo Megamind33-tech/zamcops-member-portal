@@ -23,6 +23,10 @@ DOMAIN="${1:-}"
 cd "$(dirname "$0")/.." || die "cannot find the repository root"
 APP_PORT=$(grep '^APP_HOST_PORT=' .env 2>/dev/null | cut -d= -f2- | tr -dc '0-9')
 APP_PORT=${APP_PORT:-3100}
+# Let's Encrypt certificates last 90 days. Registered against an address, the
+# CA warns before one expires; registered anonymously, a renewal that quietly
+# stops working is discovered when the portal goes dark.
+ACME_EMAIL=$(grep '^ACME_EMAIL=' .env 2>/dev/null | cut -d= -f2- | tr -d '"'"'"'' | tr -d "'")
 
 AVAIL="/etc/nginx/sites-available/zamcops"
 ENABLED="/etc/nginx/sites-enabled/zamcops"
@@ -105,7 +109,16 @@ ok "nginx reloaded (other sites unaffected)"
 step "4. HTTPS"
 if command -v certbot >/dev/null; then
   echo "  Requesting a certificate for ${DOMAIN}…"
-  if certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email --redirect; then
+  if [ -n "$ACME_EMAIL" ]; then
+    REGISTRATION="--email $ACME_EMAIL"
+    ok "expiry warnings will go to ${ACME_EMAIL}"
+  else
+    REGISTRATION="--register-unsafely-without-email"
+    warn "ACME_EMAIL is not set in .env — no warning before this certificate expires"
+    warn "set it and re-run certbot to register an address"
+  fi
+  # shellcheck disable=SC2086 # REGISTRATION is two words by design
+  if certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos $REGISTRATION --redirect; then
     ok "certificate installed; HTTP now redirects to HTTPS"
   else
     warn "certbot failed — the site still works on http://${DOMAIN}. Fix DNS, then: sudo certbot --nginx -d ${DOMAIN}"
