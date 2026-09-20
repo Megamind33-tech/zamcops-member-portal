@@ -12,6 +12,11 @@
 export const WORK_DECLARATION_TITLE = "DECLARATION OF A MUSICAL WORK";
 export const WORK_CERTIFICATE_TITLE = "CERTIFICATE OF REGISTRATION OF A MUSICAL WORK";
 
+// The certificate a member receives for a submission. One submission, one
+// certificate, however many works it carried — a single is a certificate for
+// one work, an album of ten is one certificate listing ten.
+export const CLEARANCE_CERTIFICATE_TITLE = "CERTIFICATE OF REGISTRATION";
+
 // Printed above the declarant's signature on the declaration.
 export const WORK_DECLARATION_CLAUSES: string[] = [
   "I, the undersigned member of the Zambia Music Copyright Protection Society, declare that the particulars of the musical work set out in this document are true and complete to the best of my knowledge and belief.",
@@ -24,6 +29,13 @@ export const WORK_DECLARATION_CLAUSES: string[] = [
 ];
 
 // Printed on the certificate, under the Society's counter-signature.
+export const CLEARANCE_CERTIFICATE_CLAUSES: string[] = [
+  "This is to certify that the musical work or works described in this certificate have been entered in the register of works maintained by the Zambia Music Copyright Protection Society, on the declaration of the member named above and on the evidence lodged with the Society.",
+  "The rights in those works are administered by the Society in accordance with the Deed of Assignment executed by the member, the Memorandum and Articles of Association of the Society and the rules and regulations made thereunder.",
+  "Registration records the particulars declared to the Society. It is not an adjudication of authorship or of ownership, and it does not by itself create, transfer or confirm copyright in a work. The Society may amend or cancel an entry where the particulars are shown to be incorrect or where a dispute is upheld.",
+  "Any person disputing the particulars shown in this certificate may lodge a claim with the Society in writing, stating the grounds of the dispute and supplying the evidence relied upon.",
+];
+
 export const WORK_CERTIFICATE_CLAUSES: string[] = [
   "This is to certify that the musical work described in this certificate has been entered in the register of works maintained by the Zambia Music Copyright Protection Society, on the declaration of the member named above and on the evidence lodged with the Society.",
   "The rights in the work are administered by the Society in accordance with the Deed of Assignment executed by the member, the Memorandum and Articles of Association of the Society and the rules and regulations made thereunder.",

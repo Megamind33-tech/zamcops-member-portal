@@ -55,7 +55,7 @@ export const SOCIETY_TAGLINE =
 export const SOCIETY_ADDRESS =
   "Anchor House, 3rd Floor. P.O. Box 51259, LUSAKA, Zambia";
 export const SOCIETY_CONTACT =
-  "Telefax: +260-1-229270 · E-mail: info@zamcops.org · Website: www.zamcops.org.zm";
+  "Telefax: +260-1-229270 · E-mail: zamcops1@gmail.com · Website: www.zamcops.org.zm";
 
 const YESNO = ["Yes", "No"];
 

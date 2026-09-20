@@ -34,7 +34,7 @@ export function downloadStatementPDF(statement: Statement, member: Member) {
   doc.text("Zambian Music Copyright Protection Society", M, 21);
   doc.setFontSize(8);
   doc.setTextColor(200, 200, 200);
-  doc.text("ZAMCOPS House, Lusaka, Zambia · info@zamcops.org.zm · +260 211 250 082", M, 27);
+  doc.text("ZAMCOPS House, Lusaka, Zambia · zamcops1@gmail.com · +260 211 250 082", M, 27);
 
   // Zambian flagline under the header
   const flagW = (W - M * 2) / 4;

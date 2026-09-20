@@ -6,7 +6,7 @@
 // (counter-sign & issue the document set), reject, or re-issue documents.
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Check, X, FileDown, RefreshCcw, Save, ScrollText } from "lucide-react";
+import { X, FileDown, RefreshCcw, Save, ScrollText } from "lucide-react";
 import { Panel, StatusBadge } from "@/components/admin/widgets";
 import { formatDate } from "@/lib/format";
 import { FORM_DEFS, ADMIN_FIELDS, type ApplicationFormType } from "@/lib/applicationForms";
@@ -61,16 +61,13 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
     setTimeout(() => setNotice(""), 2500);
   };
 
-  const decide = async (action: "approve" | "reject" | "regenerate") => {
+  const decide = async (action: "reject" | "regenerate") => {
     let reason: string | undefined;
     if (action === "reject") {
       const answer = window.prompt("Why is this application being rejected? The member will see this explanation.", "");
       if (answer === null) return;
       reason = answer.trim();
     }
-    if (action === "approve" && !window.confirm(
-      `Approve this application as a ${membershipClass} member?\n\nThis counter-signs the Deed of Assignment, issues the official document set and activates the membership.`
-    )) return;
 
     setBusy(true);
     setError("");
@@ -213,13 +210,6 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
                 member
               </label>
               <button
-                onClick={() => decide("approve")}
-                disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-400/15 px-4 py-2 text-sm font-semibold text-zam-green transition hover:bg-emerald-400/25 disabled:opacity-40"
-              >
-                <Check size={15} /> Approve & issue documents
-              </button>
-              <button
                 onClick={() => decide("reject")}
                 disabled={busy}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-red-400/15 px-4 py-2 text-sm font-semibold text-zam-red transition hover:bg-red-400/25 disabled:opacity-40"
@@ -227,9 +217,12 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
                 <X size={15} /> Reject
               </button>
               <p className="w-full text-xs text-zam-muted">
-                Approving generates the completed application form, the Deed of Assignment (counter-signed by the Board
-                Secretary) and the admission letter (signed by the General Manager), and makes them downloadable to the
-                member. Both official signatures must be on file under Official Signatures.
+                There is no approval to give here. The applicant is admitted when the society accepts their first work,
+                so approving a submission under <strong className="font-semibold text-zam-ink">Work Declarations</strong>{" "}
+                is what approves this application — and it issues the completed application form, the Deed of Assignment
+                counter-signed by the Board Secretary, the admission letter signed by the General Manager, and the
+                clearance certificate for that submission. Both official signatures must be on file first. The class
+                chosen above is the one the admission letter will carry.
               </p>
             </>
           )}

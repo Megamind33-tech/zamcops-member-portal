@@ -1,13 +1,15 @@
-// Server-side generation of the work-registration document set:
-//   1. the Declaration of a Musical Work — every particular the member
-//      declared, the full schedule of interested parties and their shares, the
-//      evidence lodged, and the member's signature under the declaration
-//   2. the Certificate of Registration — issued when staff approve the work,
-//      counter-signed by the Board Secretary's stored official signature
+// Server-side generation of the work-registration documents:
+//   1. the Declaration of a Musical Work — the society's own form, filled from
+//      what the member declared and signed by them. Downloaded on demand from
+//      the work's page rather than filed automatically.
+//   2. the clearance certificate — one per submission, listing every work in it
+//      that reached the register, counter-signed by the Board Secretary's
+//      stored official signature. Issued when the society accepts the work.
 //
-// Both are rendered on the same stationery as the membership documents
-// (lib/pdfKit.ts). Runs only on the server, so official signature images never
-// reach the client raw — members only ever receive the rendered PDFs.
+// The certificate is drawn on the same stationery as the membership documents
+// (lib/pdfKit.ts) because the society has no printed certificate to fill in.
+// Runs only on the server, so official signature images never reach the client
+// raw — members only ever receive the rendered PDFs.
 
 import { jsPDF } from "jspdf";
 import {
@@ -24,12 +26,13 @@ import {
   letterhead,
   output,
   paragraph,
+  repeatTable,
   sectionHeading,
   signatureBlock,
 } from "@/lib/pdfKit";
 import {
-  WORK_CERTIFICATE_CLAUSES,
-  WORK_CERTIFICATE_TITLE,
+  CLEARANCE_CERTIFICATE_CLAUSES,
+  CLEARANCE_CERTIFICATE_TITLE,
   WORK_DECLARATION_CLAUSES,
   WORK_DECLARATION_TITLE,
   WORK_EVIDENCE_NOTE,
@@ -319,37 +322,71 @@ export async function generateWorkDeclarationPdf(opts: {
   });
 }
 
-// ── 2. The Certificate of Registration ─────────────────────────────────────
+// ── 2. The clearance certificate ───────────────────────────────────────────
 
-export function generateWorkCertificatePdf(opts: {
+/**
+ * One certificate per submission, listing every work in it that reached the
+ * register.
+ *
+ * A submission is what the member sent in one go: a single is one work, an
+ * album is all of its tracks. The office issues one certificate for that
+ * submission rather than one per song, so a ten-track album produces a
+ * certificate naming ten works and not ten certificates.
+ */
+export function generateClearanceCertificatePdf(opts: {
   member: MemberLike;
-  work: WorkLike;
+  works: WorkLike[];
+  submissionRef: string;
   registeredAt: Date | null;
   boardSecretary: OfficialSigner;
   reference: string;
 }): GeneratedPdf {
-  const { member, work } = opts;
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const p = letterhead(doc, WORK_CERTIFICATE_TITLE, `Entered in the ZAMCOPS register of works on the declaration of ${member.fullName}`);
+  const { member, works } = opts;
   const registered = opts.registeredAt ?? new Date();
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const many = works.length !== 1;
+  const p = letterhead(
+    doc,
+    CLEARANCE_CERTIFICATE_TITLE,
+    many
+      ? `${works.length} works entered in the ZAMCOPS register on the declaration of ${member.fullName}`
+      : `Entered in the ZAMCOPS register of works on the declaration of ${member.fullName}`,
+  );
 
   calloutRow(
     p,
     [
       { label: "Certificate reference", value: opts.reference },
-      { label: "Work reference", value: workRef(work) },
+      { label: "Submission", value: opts.submissionRef },
       { label: "Registered on", value: fmtDate(registered) },
       { label: "Registered to", value: member.memberNumber },
     ],
     "green",
   );
 
-  workParticulars(p, work);
-  splitsSection(p, work);
+  sectionHeading(p, many ? `Works registered (${works.length})` : "Work registered");
+  repeatTable(
+    p,
+    [
+      { key: "no", label: "No." },
+      { key: "title", label: "Title" },
+      { key: "type", label: "Type" },
+      { key: "duration", label: "Duration" },
+      { key: "ref", label: "Work reference" },
+    ],
+    works.map((w, i) => ({
+      no: String(i + 1),
+      title: w.title,
+      type: w.workType || "—",
+      duration: w.duration || "—",
+      ref: workRef(w),
+    })),
+  );
+
   registeringMember(p, member);
 
   sectionHeading(p, "Certification");
-  WORK_CERTIFICATE_CLAUSES.forEach((clause, i) =>
+  CLEARANCE_CERTIFICATE_CLAUSES.forEach((clause, i) =>
     paragraph(p, `${i + 1}.  ${clause}`, { size: 8.5, gap: 2.5 }),
   );
 
@@ -364,7 +401,7 @@ export function generateWorkCertificatePdf(opts: {
     name: member.fullName,
     role: `Member ${member.memberNumber}`,
     image: member.signature || undefined,
-    date: fmtDate(work.submittedAt ?? registered),
+    date: fmtDate(works[0]?.submittedAt ?? registered),
   });
   p.y = startY;
   signatureBlock(p, {
@@ -388,5 +425,5 @@ export function generateWorkCertificatePdf(opts: {
     { align: "center" },
   );
 
-  return output(doc, `Certificate-of-Registration-${workRef(work)}-${member.memberNumber}.pdf`, opts.reference);
+  return output(doc, `Certificate-of-Registration-${opts.submissionRef}-${member.memberNumber}.pdf`, opts.reference);
 }

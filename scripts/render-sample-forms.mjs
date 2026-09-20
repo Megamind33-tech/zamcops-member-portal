@@ -86,7 +86,7 @@ const { stampForm } = await import(
 const { generateDeedPdf, generateAdmissionLetterPdf } = await import(
   pathToFileURL(path.join(build, "lib", "documents.js")).href
 );
-const { generateWorkDeclarationPdf } = await import(
+const { generateWorkDeclarationPdf, generateClearanceCertificatePdf } = await import(
   pathToFileURL(path.join(build, "lib", "workDocuments.js")).href
 );
 
@@ -157,6 +157,32 @@ const EXTRAS = [
         generalManager: OFFICER("Mirrias Siamutundo", "GENERAL MANAGER"),
         reference: "ADM-2026-00417",
       }),
+  },
+  {
+    // One submission, three works — the shape an album produces.
+    name: "clearance",
+    make: async () => {
+      const track = (n, title, duration) => ({
+        ...WORK,
+        id: `ckzz0001a${"bcd"[n - 1]}${n}f${n}9`,
+        title,
+        duration,
+        workNo: String(n),
+        submittedAt: new Date("2026-09-02T00:00:00Z"),
+      });
+      return generateClearanceCertificatePdf({
+        member: SPECIMEN_MEMBER,
+        works: [
+          track(1, "Mutima Wandi", "03:47"),
+          track(2, "Kopala Sunrise", "04:12"),
+          track(3, "Twalumba", "03:05"),
+        ],
+        submissionRef: "A1B2C3",
+        registeredAt: new Date("2026-09-20T00:00:00Z"),
+        boardSecretary: OFFICER("Towera Nyirongo Mukubu", "BOARD SECRETARY"),
+        reference: "COR-A1B2C3-2026-00417",
+      });
+    },
   },
   {
     name: "workdecl",
