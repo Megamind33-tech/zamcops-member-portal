@@ -5,67 +5,65 @@
 // sheet has a Performance/Broadcast column and a Recording/Rights column, side
 // by side, on each of seven role rows. A single figure could not fill it.
 //
-// Positions are read out of the template. The export still carries a specimen
-// name on three of the role rows, so those are painted over before the real
-// parties are written; everything else is blank.
+// Positions are read out of the template, and re-read whenever it is replaced:
+// a fresh export of the same sheet moved every row by about 40pt and widened
+// the percentage columns by 25. Nothing here is estimated, and nothing is
+// covered — the template is blank, verified by `npm run check:forms`.
 
 import type { Stamp } from "@/lib/formOverlay";
 import { ROLE_CODE, type ContributorRole } from "@/lib/roles";
 
 // Baseline y of each role row, in the order the form prints them.
 const ROLE_ROW: Record<ContributorRole, number> = {
-  Composer: 547,
-  Author: 523,
-  Arranger: 497,
-  Publisher: 471,
-  "Sub-author": 447,
-  "Sub-arranger": 421,
-  "Sub-publisher": 397,
+  Composer: 587,
+  Author: 561,
+  Arranger: 534,
+  Publisher: 507,
+  "Sub-author": 482,
+  "Sub-arranger": 455,
+  "Sub-publisher": 429,
 };
 
 const COL = {
-  party: 110, // where a name is written on a role row
-  // The "%" glyphs are printed at x=449 and x=511; a figure is written to the
-  // left of each so it reads "45 %" the way a pen would fill it.
-  performanceRight: 446,
-  recordingRight: 508,
+  party: 115, // where a name is written on a role row
+  // The "%" glyphs are printed at x=471 and x=537; a figure is centred just
+  // left of each so the row reads "45 %" the way a pen would fill it.
+  performanceRight: 464,
+  recordingRight: 530,
 } as const;
 
-// Rows the specimen left a name on.
-const SPECIMEN_ROWS = [547, 511, 485];
-
 const HEAD = {
-  title: { x: 110, y: 680 },
-  workNo: { x: 430, y: 680 },
-  yearComposed: { x: 390, y: 668 },
-  duration: { x: 360, y: 655 },
-  dateOfRegistration: { x: 470, y: 656 },
-  instruments: { x: 110, y: 643 },
-  fileNo: { x: 360, y: 643 },
-  genre: { x: 20, y: 632 },
-  factor: { x: 430, y: 632 },
+  title: { x: 115, y: 727 },
+  workNo: { x: 450, y: 727 },
+  yearComposed: { x: 410, y: 714 },
+  duration: { x: 378, y: 701 },
+  dateOfRegistration: { x: 496, y: 702 },
+  instruments: { x: 115, y: 688 },
+  fileNo: { x: 378, y: 688 },
+  genre: { x: 20, y: 676 },
+  factor: { x: 440, y: 676 },
 } as const;
 
 const FOOT = {
-  soundCarrier: { x: 110, y: 373 },
-  financeYes: { x: 276, y: 361 }, // just right of "YES"
-  financeNo: { x: 354, y: 361 }, // just right of "NO"
-  agreementDate: { x: 130, y: 300 },
-  validity: { x: 360, y: 300 },
-  territory: { x: 130, y: 288 },
-  otherDocuments: { x: 130, y: 203 },
-  declarantName: { x: 58, y: 70 },
-  signature: { x: 350, y: 76 },
-  declaredOn: { x: 424, y: 70 },
+  soundCarrier: { x: 115, y: 403 },
+  financeYes: { x: 289, y: 391 }, // just right of "YES"
+  financeNo: { x: 373, y: 391 }, // just right of "NO"
+  agreementDate: { x: 135, y: 327 },
+  validity: { x: 378, y: 327 },
+  territory: { x: 135, y: 314 },
+  otherDocuments: { x: 135, y: 225 },
+  declarantName: { x: 62, y: 85 },
+  signature: { x: 370, y: 91 },
+  declaredOn: { x: 445, y: 85 },
 } as const;
 
 // A tick placed just before each enclosure's printed label.
 const ENCLOSURE_TICK: Record<string, { x: number; y: number }> = {
-  Lyrics: { x: 24, y: 252 },
-  "Musical score": { x: 228, y: 252 },
-  Online: { x: 326, y: 252 },
-  CD: { x: 30, y: 240 },
-  Contract: { x: 230, y: 240 },
+  Lyrics: { x: 24, y: 276 },
+  "Musical score": { x: 240, y: 276 },
+  Online: { x: 342, y: 276 },
+  CD: { x: 30, y: 264 },
+  Contract: { x: 242, y: 264 },
 };
 
 export interface WorkDeclarationParty {
@@ -106,11 +104,6 @@ const pct = (n: number): string => {
 
 export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
   const stamps: Stamp[] = [];
-
-  // Clear the specimen's name off the role rows it was left on.
-  for (const y of SPECIMEN_ROWS) {
-    stamps.push({ kind: "cover", page: 1, x: COL.party - 4, y: y - 4, width: 180, height: 14 });
-  }
 
   const put = (at: { x: number; y: number }, text: string, maxWidth: number, size = 9) => {
     if (text && text.trim()) stamps.push({ page: 1, x: at.x, y: at.y, text: text.trim(), size, maxWidth });
