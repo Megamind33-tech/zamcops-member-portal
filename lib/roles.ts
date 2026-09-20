@@ -5,23 +5,46 @@
 // works. ZAMCOPS administers authors' rights (performing and mechanical),
 // not related rights (performers, producers, featured artists).
 //
-// Shares on a work: composers, authors, publishers, and arrangers. An
-// arranger is not a membership class; they receive a share where they
-// contributed to the work.
+// Shares on a work: the seven roles on the society's WORK DECLARATION —
+// composer, author, arranger, publisher and their sub- counterparts. Only
+// composers, authors and publishers may join; the others receive a share
+// where they contributed, without being a membership class.
 
 export const MEMBER_ROLES = ["Composer", "Author", "Publisher"] as const;
 export type MemberRole = (typeof MEMBER_ROLES)[number];
 
-export const CONTRIBUTOR_ROLES = ["Composer", "Author", "Arranger", "Publisher"] as const;
+// The roles printed on the society's WORK DECLARATION, in the order and under
+// the codes the form itself uses. Each one is a separate row on the
+// distribution key, so a sub-author is not an author here: collapsing the two
+// would put a share on the wrong line of the official document.
+export const CONTRIBUTOR_ROLES = [
+  "Composer",
+  "Author",
+  "Arranger",
+  "Publisher",
+  "Sub-author",
+  "Sub-arranger",
+  "Sub-publisher",
+] as const;
 export type ContributorRole = (typeof CONTRIBUTOR_ROLES)[number];
+
+// The code beside each row on the paper form.
+export const ROLE_CODE: Record<ContributorRole, string> = {
+  Composer: "C",
+  Author: "A",
+  Arranger: "AR",
+  Publisher: "E",
+  "Sub-author": "SA",
+  "Sub-arranger": "SR",
+  "Sub-publisher": "SE",
+};
 
 const LEGACY_ROLE: Record<string, ContributorRole> = {
   "Author/Lyricist": "Author",
   Lyricist: "Author",
-  "Sub-author": "Author",
-  "Sub-Author": "Author",
-  "Sub-arranger": "Arranger",
-  "Sub-Arranger": "Arranger",
+  "Sub-Author": "Sub-author",
+  "Sub-Arranger": "Sub-arranger",
+  "Sub-Publisher": "Sub-publisher",
   Producer: "Composer",
   Performer: "Composer",
 };

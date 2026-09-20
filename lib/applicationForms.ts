@@ -59,6 +59,10 @@ export const SOCIETY_CONTACT =
 
 const YESNO = ["Yes", "No"];
 
+// How the society can be paid. Mobile money is how most Zambian members are
+// actually paid, so it stands beside the bank rather than under "other".
+export const PAYMENT_METHODS = ["Bank transfer", "Mobile money", "Cheque", "Cash", "Other"];
+
 export const INDIVIDUAL_FORM: ApplicationFormDef = {
   type: "Individual",
   title: "APPLICATION FOR INDIVIDUAL MEMBERSHIP",
@@ -76,7 +80,8 @@ export const INDIVIDUAL_FORM: ApplicationFormDef = {
         { key: "dateOfBirth", label: "Date of birth", type: "date", required: true },
         { key: "placeOfBirth", label: "Place of birth (country)", type: "text", required: true },
         { key: "nationality", label: "Nationality", type: "text", required: true },
-        { key: "passportNo", label: "NRC / Passport number", type: "text", required: true },
+        { key: "nrcNumber", label: "NRC number", type: "text", required: true },
+        { key: "passportNo", label: "Passport number", type: "text", hint: "Only if you hold one" },
         { key: "language", label: "Language", type: "text" },
         {
           key: "maritalStatus",
@@ -90,7 +95,8 @@ export const INDIVIDUAL_FORM: ApplicationFormDef = {
     {
       id: "ipi",
       title: "IPI identification",
-      description: "Leave blank if you have not been assigned IPI numbers yet — ZAMCOPS registers these for you.",
+      description:
+        "Leave blank if you have not been assigned IPI numbers yet — ZAMCOPS registers these for you. The IPI boxes on the printed form are filled by the office once your numbers have been checked against the CISAC database.",
       fields: [
         { key: "ipiNameNumber", label: "IPI name number", type: "text" },
         { key: "ipiBaseNumber", label: "IPI base number", type: "text" },
@@ -102,6 +108,9 @@ export const INDIVIDUAL_FORM: ApplicationFormDef = {
       fields: [
         { key: "resAddress", label: "Contact address (residential)", type: "textarea", required: true },
         { key: "postalAddress", label: "Postal address", type: "textarea" },
+        { key: "cell", label: "Cell", type: "text" },
+        { key: "fax", label: "Fax", type: "text" },
+        { key: "email", label: "E-mail", type: "text" },
         { key: "website", label: "Website", type: "text" },
       ],
     },
@@ -113,10 +122,23 @@ export const INDIVIDUAL_FORM: ApplicationFormDef = {
           key: "paymentMethod",
           label: "Payment method",
           type: "select",
-          options: ["Bank transfer", "Mobile money", "Cheque", "Cash"],
+          options: PAYMENT_METHODS,
         },
         { key: "bankAddress", label: "Bank name & branch address", type: "textarea" },
         { key: "accountNumber", label: "Account number", type: "text" },
+        {
+          key: "mobileMoneyNumber",
+          label: "Mobile money number & provider",
+          type: "text",
+          hint: "e.g. 0977 123456 (MTN)",
+          showIf: { key: "paymentMethod", value: "Mobile money" },
+        },
+        {
+          key: "otherPaymentDetails",
+          label: "Payment details",
+          type: "textarea",
+          showIf: { key: "paymentMethod", value: "Other" },
+        },
       ],
     },
     {
@@ -162,7 +184,7 @@ export const INDIVIDUAL_FORM: ApplicationFormDef = {
           key: "capacities",
           label: "Tick as appropriate",
           type: "checkboxes",
-          options: ["Composer", "Author", "Publisher"],
+          options: ["Composer", "Author", "Arranger", "Publisher"],
           required: true,
         },
       ],
@@ -236,6 +258,7 @@ export const GROUP_FORM: ApplicationFormDef = {
         { key: "homeWebsite", label: "Website (home)", type: "text" },
         { key: "correspondenceAddress", label: "Correspondence address", type: "textarea" },
         { key: "cell", label: "Cell", type: "text", required: true },
+        { key: "fax", label: "Fax", type: "text" },
         { key: "corrEmail", label: "Email (correspondence)", type: "text" },
         { key: "corrWebsite", label: "Website (correspondence)", type: "text" },
       ],
@@ -250,9 +273,22 @@ export const GROUP_FORM: ApplicationFormDef = {
           key: "paymentMethod",
           label: "Method",
           type: "select",
-          options: ["Bank transfer", "Mobile money", "Cheque", "Cash"],
+          options: PAYMENT_METHODS,
         },
         { key: "bankAccount", label: "Bank account", type: "text" },
+        {
+          key: "mobileMoneyNumber",
+          label: "Mobile money number & provider",
+          type: "text",
+          hint: "e.g. 0977 123456 (MTN)",
+          showIf: { key: "paymentMethod", value: "Mobile money" },
+        },
+        {
+          key: "otherPaymentDetails",
+          label: "Payment details",
+          type: "textarea",
+          showIf: { key: "paymentMethod", value: "Other" },
+        },
       ],
     },
     {
@@ -321,6 +357,7 @@ export const PUBLISHER_FORM: ApplicationFormDef = {
         { key: "hqWebsite", label: "Website (headquarters)", type: "text" },
         { key: "correspondenceAddress", label: "Correspondence address", type: "textarea" },
         { key: "cell", label: "Cell", type: "text", required: true },
+        { key: "fax", label: "Fax", type: "text" },
         { key: "corrEmail", label: "Email (correspondence)", type: "text" },
         { key: "corrWebsite", label: "Website (correspondence)", type: "text" },
       ],
@@ -333,9 +370,22 @@ export const PUBLISHER_FORM: ApplicationFormDef = {
           key: "paymentMethod",
           label: "Method",
           type: "select",
-          options: ["Bank transfer", "Mobile money", "Cheque", "Cash"],
+          options: PAYMENT_METHODS,
         },
         { key: "bankAccount", label: "Bank account", type: "text" },
+        {
+          key: "mobileMoneyNumber",
+          label: "Mobile money number & provider",
+          type: "text",
+          hint: "e.g. 0977 123456 (MTN)",
+          showIf: { key: "paymentMethod", value: "Mobile money" },
+        },
+        {
+          key: "otherPaymentDetails",
+          label: "Payment details",
+          type: "textarea",
+          showIf: { key: "paymentMethod", value: "Other" },
+        },
       ],
     },
     {
@@ -386,6 +436,12 @@ export const FORM_TYPES: ApplicationFormType[] = ["Individual", "Group", "Publis
 // margins; in the portal they live on the admin member view.
 export const ADMIN_FIELDS: { key: string; label: string; type: "text" | "date" }[] = [
   { key: "internalNumber", label: "Internal number", type: "text" },
+  // IPI numbers are issued through CISAC, not claimed by an applicant, so the
+  // printed forms only ever carry what the office has allocated. An applicant
+  // who already holds one still types it in the IPI section; the office copies
+  // it here once it has been checked against the CISAC database.
+  { key: "ipiNameNumber", label: "IPI name number", type: "text" },
+  { key: "ipiBaseNumber", label: "IPI base number", type: "text" },
   { key: "circleOfOccupation", label: "Circle of occupation", type: "text" },
   { key: "fileRef", label: "File", type: "text" },
   { key: "subscription", label: "Subscription", type: "text" },

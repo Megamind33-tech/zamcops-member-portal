@@ -194,6 +194,24 @@ Nothing else in the stack competes for host ports: PostgreSQL is not published
 at all, and the app is bound to loopback. Docker volumes are namespaced by the
 project directory, so they will not clash with another stack's.
 
+### Backfilling album tracks
+
+An album used to be stored as one row with its tracks serialised into a JSON
+column, so a ten-track album produced no work declarations: ten registrable
+works existed only inside that string, absent from the register and from
+review. New submissions declare each track; this fills the gap behind them.
+
+```bash
+npm run backfill:album-works                 # dry run — reports what is missing
+npm run backfill:album-works -- --apply      # create the declarations
+npm run backfill:album-works -- --apply --limit 1
+```
+
+It only ever inserts. Declarations are matched to a batch by the album's id and
+to a track by its number within it, so an album whose tracks are all declared is
+left alone and re-running creates nothing twice. A track of an already-approved
+album inherits that decision rather than being sent back through review.
+
 ### Checking a deployment
 
 `scripts/vps-status.sh` is a read-only report — host, Docker, which commit is

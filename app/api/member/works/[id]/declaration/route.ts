@@ -32,7 +32,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const workLike = toWorkLike(work);
   const reference = `WD-${work.id.slice(-6).toUpperCase()}-${member.memberNumber.replace(/^ZAM-/, "")}`;
-  const pdf = generateWorkDeclarationPdf({ member, work: workLike, reference });
+  const pdf = await generateWorkDeclarationPdf({ member, work: workLike, reference });
   const bytes = Buffer.from(pdf.base64, "base64");
 
   return new Response(new Uint8Array(bytes), {
