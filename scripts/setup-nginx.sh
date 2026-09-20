@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # ZAMCOPS Member Portal — put the portal behind the nginx already on this box.
 #
-#   sudo bash scripts/setup-nginx.sh portal.example.org
+#   sudo bash scripts/setup-nginx.sh example.org www.example.org
+#
+# Every name given is served by the one vhost and covered by one certificate,
+# which is what an apex plus its www alias needs.
 #
 # This machine serves other sites. The script therefore only ever ADDS a vhost:
 # it refuses to overwrite an existing config, refuses if another vhost already
@@ -16,8 +19,11 @@ warn() { echo "  ${YEL}!${RST} $*"; }
 die()  { echo "  ${RED}✗${RST} $*" >&2; exit 1; }
 step() { echo; echo "${BLD}$*${RST}"; }
 
-DOMAIN="${1:-}"
-[ -n "$DOMAIN" ] || die "usage: sudo bash scripts/setup-nginx.sh <domain>"
+[ "$#" -ge 1 ] || die "usage: sudo bash scripts/setup-nginx.sh <domain> [more domains…]"
+DOMAINS="$*"
+DOMAIN="$1"            # the primary name, used in messages and by certbot
+CERTBOT_ARGS=""
+for d in $DOMAINS; do CERTBOT_ARGS="$CERTBOT_ARGS -d $d"; done
 [ "$(id -u)" -eq 0 ] || die "run with sudo — this writes to /etc/nginx"
 
 cd "$(dirname "$0")/.." || die "cannot find the repository root"
@@ -44,22 +50,33 @@ ok "portal healthy on 127.0.0.1:${APP_PORT}"
 [ -e "$AVAIL" ] && die "$AVAIL already exists — inspect it yourself rather than letting this script overwrite it"
 
 # Never fight another vhost for the same hostname.
-if grep -rlE "^\s*server_name\s+.*\b${DOMAIN//./\\.}\b" /etc/nginx/sites-enabled/ 2>/dev/null | grep -q .; then
-  grep -rlE "^\s*server_name\s+.*\b${DOMAIN//./\\.}\b" /etc/nginx/sites-enabled/ 2>/dev/null | sed 's/^/      /'
-  die "another enabled vhost already serves ${DOMAIN} (listed above)"
-fi
-ok "no other vhost claims ${DOMAIN}"
+for d in $DOMAINS; do
+  if grep -rlE "^\s*server_name\s+.*\b${d//./\\.}\b" /etc/nginx/sites-enabled/ 2>/dev/null | grep -q .; then
+    grep -rlE "^\s*server_name\s+.*\b${d//./\\.}\b" /etc/nginx/sites-enabled/ 2>/dev/null | sed 's/^/      /'
+    die "another enabled vhost already serves ${d} (listed above)"
+  fi
+done
+ok "no other vhost claims: ${DOMAINS}"
 
 # DNS must already point here, or certbot's challenge fails.
 SERVER_IP=$(curl -fsS --max-time 10 https://api.ipify.org 2>/dev/null || echo "")
-RESOLVED=$(getent hosts "$DOMAIN" 2>/dev/null | awk '{print $1}' | head -1)
-if [ -z "$RESOLVED" ]; then
-  warn "${DOMAIN} does not resolve yet — add an A record pointing at ${SERVER_IP:-this server} before requesting a certificate"
-elif [ -n "$SERVER_IP" ] && [ "$RESOLVED" != "$SERVER_IP" ]; then
-  warn "${DOMAIN} resolves to ${RESOLVED}, but this server is ${SERVER_IP} — the certificate request will fail until that matches"
-else
-  ok "${DOMAIN} resolves to this server (${RESOLVED})"
-fi
+DNS_OK=1
+for d in $DOMAINS; do
+  RESOLVED=$(getent hosts "$d" 2>/dev/null | awk '{print $1}' | head -1)
+  if [ -z "$RESOLVED" ]; then
+    warn "${d} does not resolve — add an A record pointing at ${SERVER_IP:-this server}"
+    DNS_OK=0
+  elif [ -n "$SERVER_IP" ] && [ "$RESOLVED" != "$SERVER_IP" ]; then
+    warn "${d} resolves to ${RESOLVED}, but this server is ${SERVER_IP}"
+    DNS_OK=0
+  else
+    ok "${d} resolves to this server (${RESOLVED})"
+  fi
+done
+# A certificate request against a name that does not resolve here cannot
+# succeed, and Let's Encrypt counts the failure against an hourly limit. The
+# vhost is still worth writing — it just serves plain HTTP until DNS is right.
+[ "$DNS_OK" -eq 1 ] || warn "certificate request will be skipped until DNS is correct"
 
 step "2. Writing ${AVAIL}"
 
@@ -68,7 +85,7 @@ cat > "$AVAIL" <<NGINX
 server {
     listen 80;
     listen [::]:80;
-    server_name ${DOMAIN};
+    server_name ${DOMAINS};
 
     # Audio masters are up to 300MB; nginx defaults to 1MB and would reject them.
     client_max_body_size 300M;
@@ -107,7 +124,10 @@ systemctl reload nginx || die "reload failed"
 ok "nginx reloaded (other sites unaffected)"
 
 step "4. HTTPS"
-if command -v certbot >/dev/null; then
+if [ "$DNS_OK" -ne 1 ]; then
+  warn "skipping the certificate: DNS does not point here yet"
+  warn "once it does:  sudo certbot --nginx${CERTBOT_ARGS}"
+elif command -v certbot >/dev/null; then
   echo "  Requesting a certificate for ${DOMAIN}…"
   if [ -n "$ACME_EMAIL" ]; then
     REGISTRATION="--email $ACME_EMAIL"
@@ -118,10 +138,11 @@ if command -v certbot >/dev/null; then
     warn "set it and re-run certbot to register an address"
   fi
   # shellcheck disable=SC2086 # REGISTRATION is two words by design
-  if certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos $REGISTRATION --redirect; then
+  # shellcheck disable=SC2086 # both are intentionally word-split
+  if certbot --nginx $CERTBOT_ARGS --non-interactive --agree-tos $REGISTRATION --redirect; then
     ok "certificate installed; HTTP now redirects to HTTPS"
   else
-    warn "certbot failed — the site still works on http://${DOMAIN}. Fix DNS, then: sudo certbot --nginx -d ${DOMAIN}"
+    warn "certbot failed — the site still works on http://${DOMAIN}. Fix DNS, then: sudo certbot --nginx${CERTBOT_ARGS}"
   fi
 else
   warn "certbot not installed. To enable HTTPS:"
