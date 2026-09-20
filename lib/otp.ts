@@ -26,11 +26,19 @@ export async function issueEmailOtp(memberId: string): Promise<void> {
   });
 
   try {
-    await sendTransactionalEmail(
-      member.email,
-      "Your verification code",
-      `Your ZAMCOPS email verification code is ${code}. It expires in 10 minutes. If you did not request this, you can ignore this email.`
-    );
+    // The code is the whole message, so it is set as a code — large, spaced
+    // and on its own — rather than buried mid-sentence where it has to be
+    // picked out character by character.
+    await sendTransactionalEmail(member.email, {
+      subject: `${code} is your ZAMCOPS verification code`,
+      preheader: `The code expires in ${OTP_TTL_MS / 60_000} minutes.`,
+      heading: "Confirm your email address",
+      greeting: member.fullName ? `Hello ${member.fullName.split(" ")[0]},` : undefined,
+      paragraphs: ["Enter this code in the portal to finish setting up your ZAMCOPS membership account."],
+      code: { value: code, caption: `Expires in ${OTP_TTL_MS / 60_000} minutes` },
+      footnote:
+        "If you did not ask for this code, you can ignore this email — nobody can use it without access to your inbox.",
+    });
   } catch (err) {
     console.error("[otp] send failed:", err);
   }
