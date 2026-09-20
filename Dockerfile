@@ -73,6 +73,10 @@ ENV NODE_ENV=production \
 # permissions" — which looks like a database problem in the entrypoint's
 # retry loop, but is a filesystem permission problem that never clears.
 COPY --chown=node:node --from=prisma-cli /opt/prisma/node_modules /opt/prisma/node_modules
+# The society's official forms, stamped at runtime to produce a member's
+# documents. They are not under public/ — one carries a specimen letter with a
+# real name on it, and none of them should be downloadable without a session.
+COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
