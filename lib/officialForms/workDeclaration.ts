@@ -5,6 +5,10 @@
 // sheet has a Performance/Broadcast column and a Recording/Rights column, side
 // by side, on each of seven role rows. A single figure could not fill it.
 //
+// Positions on this sheet are tight and its columns are not always where a
+// label suggests: the YEAR COMPOSED value sits beneath the "Work No" label
+// without belonging to it, which reads as an error and is not one.
+//
 // The sheet is filled in two hands. A member declares the work, its creators
 // and what was lodged; the office completes the distribution key, the work and
 // file numbers and the factor when the work is entered on the register. A
@@ -41,7 +45,7 @@ const COL = {
 
 const HEAD = {
   title: { x: 115, y: 727 },
-  workNo: { x: 450, y: 727 },
+  workNo: { x: 452, y: 727 },
   yearComposed: { x: 410, y: 714 },
   duration: { x: 378, y: 701 },
   dateOfRegistration: { x: 496, y: 702 },
@@ -103,7 +107,11 @@ export interface WorkDeclarationValues {
   // "office" additionally prints the distribution key and the boxes the
   // society completes. A member's copy omits all of them.
   copy?: "member" | "office";
+  // The work's position in the batch the member is submitting — 1 of 5, 2 of 5.
+  // It comes from the member's own list, not from the society, so it is printed
+  // on their copy alongside everything else they declared.
   workNo?: string;
+  // Assigned by the society when the work goes on the register.
   fileNo?: string;
   factor?: string;
   dateOfRegistration?: string; // dd/mm/yyyy
@@ -138,36 +146,39 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
   put(HEAD.instruments, v.instruments, 195);
   put(HEAD.genre, v.genre, 85);
 
-  // The society's own boxes, left empty on a member's copy.
+  // Numbered by the member's own submission, so it belongs on their copy.
+  put(HEAD.workNo, v.workNo ?? "", 60);
+
+  // The society's boxes, left empty until it fills them.
   if (office) {
-    put(HEAD.workNo, v.workNo ?? "", 90);
     put(HEAD.fileNo, v.fileNo ?? "", 26);
     put(HEAD.factor, v.factor ?? "", 90);
     put(HEAD.dateOfRegistration, v.dateOfRegistration ?? "", 70);
   }
 
-  // One line per declared party, on the row its role owns. Two parties in the
-  // same role would land on the same line, so only the first of each is placed
-  // and the rest are carried on the "other documents" line rather than
-  // overprinting the form.
-  const used = new Set<ContributorRole>();
-  const overflow: string[] = [];
+  // The sheet prints one row per role, and a work often has two composers. Both
+  // names go on that single row, separated by a comma and shrunk to fit, which
+  // is how the form is filled by hand. The row's figures are then the role's
+  // combined share, since the key has one pair of boxes per role and not per
+  // person.
+  const byRole = new Map<ContributorRole, WorkDeclarationParty[]>();
   for (const p of v.parties) {
-    const y = ROLE_ROW[p.role];
-    if (y === undefined) continue;
-    if (used.has(p.role)) {
-      overflow.push(
-        office
-          ? `${ROLE_CODE[p.role]} ${p.party} ${pct(p.performancePct)}%/${pct(p.recordingPct)}%`
-          : `${ROLE_CODE[p.role]} ${p.party}`,
-      );
-      continue;
-    }
-    used.add(p.role);
-    stamps.push({ page: 1, x: COL.party, y, text: p.party, size: 9, maxWidth: 190 });
+    if (ROLE_ROW[p.role] === undefined) continue;
+    const list = byRole.get(p.role);
+    if (list) list.push(p);
+    else byRole.set(p.role, [p]);
+  }
+
+  for (const [role, parties] of byRole) {
+    const y = ROLE_ROW[role];
+    const names = parties.map((p) => p.party.trim()).filter(Boolean).join(", ");
+    if (names) stamps.push({ page: 1, x: COL.party, y, text: names, size: 9, maxWidth: 190 });
     if (!office) continue; // the distribution key is the society's to complete
-    const perf = pct(p.performancePct);
-    const rec = pct(p.recordingPct);
+
+    const sum = (k: "performancePct" | "recordingPct") =>
+      parties.reduce((t, p) => t + (Number(p[k]) || 0), 0);
+    const perf = pct(sum("performancePct"));
+    const rec = pct(sum("recordingPct"));
     // Centred just left of the printed "%" so the row reads "45 %".
     if (perf) stamps.push({ page: 1, x: COL.performanceRight, y, text: perf, size: 9, align: "center" });
     if (rec) stamps.push({ page: 1, x: COL.recordingRight, y, text: rec, size: 9, align: "center" });
@@ -194,8 +205,7 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
     if (at) stamps.push({ page: 1, x: at.x, y: at.y, text: "X", size: 9, bold: true });
   }
 
-  const other = [v.otherDocuments, ...overflow].filter((x) => x && x.trim()).join("; ");
-  put(FOOT.otherDocuments, other, 420, 8);
+  put(FOOT.otherDocuments, v.otherDocuments, 420, 8);
 
   put(FOOT.declarantName, v.declarantName, 270, 9);
   put(FOOT.declaredOn, v.declaredOn, 80, 8);
