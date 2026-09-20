@@ -11,7 +11,11 @@ import tsParser from "@typescript-eslint/parser";
 
 export default defineConfig([
   {
-    ignores: [".next/**", "node_modules/**", "next-env.d.ts", "*.tsbuildinfo"],
+    // tmp/ holds throwaway build output — scripts/render-sample-forms.mjs
+    // compiles the form modules there to run them outside Next. Linting a
+    // compiled copy of code that is already linted at source only ever
+    // reports the same thing twice, in JavaScript that nobody edits.
+    ignores: [".next/**", "node_modules/**", "tmp/**", "next-env.d.ts", "*.tsbuildinfo"],
   },
   {
     files: ["**/*.{js,mjs,cjs,ts,tsx}"],
