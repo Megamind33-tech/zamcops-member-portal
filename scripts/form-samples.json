@@ -1,0 +1,186 @@
+[
+  {
+    "formType": "Individual",
+    "applicantName": "Bwalya Mwansa Chileshe",
+    "signedOn": "20/09/2026",
+    "payload": {
+      "surname": "Chileshe",
+      "firstName": "Bwalya Mwansa",
+      "maidenName": "Mulenga",
+      "pseudonyms": "BM Kopala",
+      "differentSpelling": "Chileshe / Cileshe",
+      "sex": "Female",
+      "dateOfBirth": "1991-04-17",
+      "placeOfBirth": "Ndola, Zambia",
+      "nationality": "Zambian",
+      "nrcNumber": "284619/61/1",
+      "passportNo": "ZN0483927",
+      "language": "Bemba and English",
+      "maritalStatus": "Married",
+      "spouse": "Kelvin Chileshe",
+      "ipiNameNumber": "00000000000",
+      "resAddress": "Plot 4417 Kabulonga Road, Kabulonga, Lusaka",
+      "postalAddress": "P.O. Box 320142, Woodlands, Lusaka",
+      "cell": "+260 977 401 882",
+      "fax": "+260 211 262 004",
+      "email": "bwalya.chileshe@example.zm",
+      "website": "bwalyamusic.zm",
+      "paymentMethod": "Mobile money",
+      "mobileMoneyNumber": "0977 401882 (MTN)",
+      "fullTimeEmployment": "Yes",
+      "employerDetails": "Zambia National Broadcasting Corporation, Mass Media Complex, Alick Nkhata Road, P.O. Box 50015, Lusaka",
+      "otherSociety": "Yes",
+      "otherSocietyDetails": "Member of SAMRO (South Africa) since 2018 for performing rights in the SADC region; membership number 41772, no mechanical rights assigned.",
+      "capacities": [
+        "Composer",
+        "Author",
+        "Publisher"
+      ],
+      "worksProduced": [
+        {
+          "title": "Mutima Wandi",
+          "performedBy": "Mampi",
+          "date": "2019"
+        },
+        {
+          "title": "Kopala Sunrise",
+          "performedBy": "ZNBC Radio 4",
+          "date": "2021"
+        },
+        {
+          "title": "Twalumba",
+          "performedBy": "Zambia Army Band",
+          "date": "2023"
+        }
+      ],
+      "otherInfo": "Three of the works above were adapted for the national independence celebrations in 2024 and broadcast on ZNBC TV1.",
+      "successorName": "Kelvin Chileshe",
+      "successorAddress": "Plot 4417 Kabulonga Road, Kabulonga, Lusaka, Zambia"
+    },
+    "adminFields": {
+      "internalNumber": "IND-0417",
+      "ipiNameNumber": "00512883471",
+      "ipiBaseNumber": "I-000512883-4",
+      "circleOfOccupation": "Composer / Author",
+      "fileRef": "ZAM/IND/0417"
+    },
+    "applicantSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAAA8CAYAAAANHtQDAAABw0lEQVR42u3dQXLCQAxEUR+C4+T+10r2SRXBYGtamver2BqN3A09thHHAQAAAAAAAAAAAAAAAAAAduHx+Pr+/dIV4GaTPXvpGFBgNMbDv+LRmffM9qohdZJoiOPNnvlQgygUmAL0lWj+nHTGu9ckehp0QtNEs7vp7lo304WcUFFovtmq3wNFzb7DJLsIpHKdTMdsWwtkxfoYbpjZfCrni5/phuwLRKE+omc6ZtvGdAnrsJ9jti1EkrQGprOnGi2SxNqZjtnG7j9S62Y6ZhtnuvR6Ge4DI0zat00QiTp9s4lCamQ6Zpsl6I57I/u5ILOlNj+1TldTr6lh6UGZrYe43S8M7N0VvxkjmLyapz4R0/6JojMHZ7YetU/bA437+dArb8JsPaPQlAsO4+7znp37QTCbRaHhPV3Su9UTrUQhvVuxzqW9WzXBShTSu081uuo4MQsimKFRqLnp4qaziZE9emqG5rk0Fjl/tLIoUcgYv+prD1F9qyxQFLo2Dh2b026UfeVtAYI5Zzyj2HNT2mVFVsYhwvBnI1uf/MorQzrfMA6hxnBnv66JZmAUgjgEMB2jAWvMpzsAAAAAAAAAAAAAAADh/AAzk62UN9jStAAAAABJRU5ErkJggg=="
+  },
+  {
+    "formType": "Group",
+    "applicantName": "Amayenge Cultural Ensemble",
+    "signedOn": "20/09/2026",
+    "payload": {
+      "groupName": "Amayenge Cultural Ensemble",
+      "differentSpellings": "Amayenge",
+      "groupType": "Band",
+      "dateOfFoundation": "1978-06-02",
+      "placeOfFoundation": "Lusaka, Zambia",
+      "country": "Zambia",
+      "language": "Nyanja and English",
+      "passportOrIdNumber": "PACRA 119278/2004",
+      "repName": "Chris Lungu, Bandleader",
+      "homeAddress": "Plot 2110 Lumumba Road, Light Industrial Area, Lusaka",
+      "homeEmail": "office@amayenge.zm",
+      "homeWebsite": "www.amayenge.zm",
+      "correspondenceAddress": "P.O. Box 31644, Lusaka 10101, Zambia",
+      "cell": "+260 966 220 118",
+      "fax": "+260 211 287 331",
+      "corrEmail": "bookings@amayenge.zm",
+      "corrWebsite": "www.amayenge.zm",
+      "payee": "Amayenge Cultural Ensemble",
+      "rate": "100%",
+      "paymentMethod": "Bank transfer",
+      "bankAccount": "Zanaco, Cairo Road Branch, account 0123456789012",
+      "groupMembers": [
+        {
+          "surname": "Lungu",
+          "firstName": "Chris",
+          "ipiNameNumber": ""
+        },
+        {
+          "surname": "Banda",
+          "firstName": "Mathews",
+          "ipiNameNumber": ""
+        },
+        {
+          "surname": "Phiri",
+          "firstName": "Justina",
+          "ipiNameNumber": ""
+        }
+      ],
+      "regionOrCity": "Lusaka",
+      "categoryOfWorks": "Traditional and Kalindula",
+      "rightHolderRole": "Composer and Performer",
+      "managedRights": "Performing and Mechanical",
+      "territories": "Worldwide"
+    },
+    "adminFields": {
+      "internalNumber": "GRP-0042",
+      "ipiNameNumber": "00298441027",
+      "membershipPosition": "Full member",
+      "admissionDate": "20/09/2026",
+      "circleOfOccupation": "Performing group",
+      "fileRef": "ZAM/GRP/0042",
+      "subscription": "Paid"
+    },
+    "applicantSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAAA8CAYAAAANHtQDAAABw0lEQVR42u3dQXLCQAxEUR+C4+T+10r2SRXBYGtamver2BqN3A09thHHAQAAAAAAAAAAAAAAAAAAduHx+Pr+/dIV4GaTPXvpGFBgNMbDv+LRmffM9qohdZJoiOPNnvlQgygUmAL0lWj+nHTGu9ckehp0QtNEs7vp7lo304WcUFFovtmq3wNFzb7DJLsIpHKdTMdsWwtkxfoYbpjZfCrni5/phuwLRKE+omc6ZtvGdAnrsJ9jti1EkrQGprOnGi2SxNqZjtnG7j9S62Y6ZhtnuvR6Ge4DI0zat00QiTp9s4lCamQ6Zpsl6I57I/u5ILOlNj+1TldTr6lh6UGZrYe43S8M7N0VvxkjmLyapz4R0/6JojMHZ7YetU/bA437+dArb8JsPaPQlAsO4+7znp37QTCbRaHhPV3Su9UTrUQhvVuxzqW9WzXBShTSu081uuo4MQsimKFRqLnp4qaziZE9emqG5rk0Fjl/tLIoUcgYv+prD1F9qyxQFLo2Dh2b026UfeVtAYI5Zzyj2HNT2mVFVsYhwvBnI1uf/MorQzrfMA6hxnBnv66JZmAUgjgEMB2jAWvMpzsAAAAAAAAAAAAAAADh/AAzk62UN9jStAAAAABJRU5ErkJggg=="
+  },
+  {
+    "formType": "Publisher",
+    "applicantName": "Kalahari Music Publishing Limited",
+    "signedOn": "20/09/2026",
+    "payload": {
+      "corporateName": "Kalahari Music Publishing Limited",
+      "spellingsMarks": "Kalahari Music",
+      "companyType": "Ltd",
+      "foundationDate": "2011-03-09",
+      "foundationPlace": "Lusaka, Zambia",
+      "country": "Zambia",
+      "language": "English",
+      "commercialRegistrationDate": "2011-03-22",
+      "commercialRegistrationNumber": "PACRA 88120/2011",
+      "dateOfCopy": "2026-08-30",
+      "legalForm": "Private company limited by shares",
+      "headquartersAddress": "Suite 12, Arcades Business Park, Great East Road, Lusaka",
+      "hqEmail": "admin@kalaharimusic.zm",
+      "hqWebsite": "www.kalaharimusic.zm",
+      "correspondenceAddress": "P.O. Box 37291, Lusaka 10101, Zambia",
+      "cell": "+260 955 773 210",
+      "fax": "+260 211 256 770",
+      "corrEmail": "royalties@kalaharimusic.zm",
+      "corrWebsite": "www.kalaharimusic.zm",
+      "paymentMethod": "Other",
+      "otherPaymentDetails": "Quarterly settlement against invoice, paid into the company's FNB Zambia account on presentation of the distribution statement.",
+      "managers": [
+        {
+          "name": "Nchimunya Hamweemba",
+          "position": "Managing Director"
+        },
+        {
+          "name": "Grace Tembo",
+          "position": "Head of Licensing"
+        }
+      ],
+      "biography": "Founded in 2011, Kalahari Music Publishing represents forty Zambian writers across gospel, hip hop and traditional repertoire, and administers sub-publishing for two Southern African catalogues.",
+      "regionOrCity": "Lusaka",
+      "categoryOfWorks": "Gospel, Hip hop, Traditional",
+      "rightHolderRole": "Original publisher",
+      "managedRights": "Performing, Mechanical and Synchronisation",
+      "territories": "Zambia, Malawi and Zimbabwe",
+      "successorName": "Nchimunya Hamweemba",
+      "successorAddress": "Suite 12, Arcades Business Park, Great East Road, Lusaka"
+    },
+    "adminFields": {
+      "internalNumber": "PUB-0113",
+      "ipiNameNumber": "00701224558",
+      "ipiBaseNumber": "I-000701224-5",
+      "membershipPosition": "Associate publisher",
+      "admissionDate": "20/09/2026",
+      "circleOfOccupation": "Publisher",
+      "fileRef": "ZAM/PUB/0113",
+      "subscription": "Paid"
+    },
+    "applicantSignature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAAA8CAYAAAANHtQDAAABw0lEQVR42u3dQXLCQAxEUR+C4+T+10r2SRXBYGtamver2BqN3A09thHHAQAAAAAAAAAAAAAAAAAAduHx+Pr+/dIV4GaTPXvpGFBgNMbDv+LRmffM9qohdZJoiOPNnvlQgygUmAL0lWj+nHTGu9ckehp0QtNEs7vp7lo304WcUFFovtmq3wNFzb7DJLsIpHKdTMdsWwtkxfoYbpjZfCrni5/phuwLRKE+omc6ZtvGdAnrsJ9jti1EkrQGprOnGi2SxNqZjtnG7j9S62Y6ZhtnuvR6Ge4DI0zat00QiTp9s4lCamQ6Zpsl6I57I/u5ILOlNj+1TldTr6lh6UGZrYe43S8M7N0VvxkjmLyapz4R0/6JojMHZ7YetU/bA437+dArb8JsPaPQlAsO4+7znp37QTCbRaHhPV3Su9UTrUQhvVuxzqW9WzXBShTSu081uuo4MQsimKFRqLnp4qaziZE9emqG5rk0Fjl/tLIoUcgYv+prD1F9qyxQFLo2Dh2b026UfeVtAYI5Zzyj2HNT2mVFVsYhwvBnI1uf/MorQzrfMA6hxnBnv66JZmAUgjgEMB2jAWvMpzsAAAAAAAAAAAAAAADh/AAzk62UN9jStAAAAABJRU5ErkJggg=="
+  }
+]

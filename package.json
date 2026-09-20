@@ -15,7 +15,9 @@
     "backfill:r2": "node scripts/backfill-r2.mjs",
     "check:forms": "node scripts/check-form-templates.mjs",
     "backfill:album-works": "node scripts/backfill-album-works.mjs",
-    "map:forms": "node scripts/map-form-anchors.mjs"
+    "map:forms": "python3 scripts/map-form-slots.py",
+    "render:forms": "node scripts/render-sample-forms.mjs tmp/forms",
+    "verify:forms": "node scripts/render-sample-forms.mjs tmp/forms && python3 scripts/verify-form-fill.py tmp/forms"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

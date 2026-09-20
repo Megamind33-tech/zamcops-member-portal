@@ -1,0 +1,6297 @@
+{
+ "admission": {
+  "anchors": {
+   "p1.169.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Yours faithfully,",
+    "x": 36.0,
+    "x1": 117.0,
+    "y": 169.1
+   },
+   "p1.210.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Find enclosed a copy of a duly signed \u201cDEED OF ASSIGNMENT\u201d for your record.",
+    "x": 36.0,
+    "x1": 443.6,
+    "y": 210.5
+   },
+   "p1.252.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "I\u2019m pleased to inform you that you have been admitted as a CANDIDATE member of ZAMCOPS.",
+    "x": 36.0,
+    "x1": 513.6,
+    "y": 251.9
+   },
+   "p1.280.36": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 36.0,
+    "x1": 45.0,
+    "y": 279.5
+   },
+   "p1.335.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Reference is made to your application for membership dated",
+    "x": 36.0,
+    "x1": 332.6,
+    "y": 334.7
+   },
+   "p1.362.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "RE:\u200b",
+    "x": 36.0,
+    "x1": 59.7,
+    "y": 362.3
+   },
+   "p1.362.72": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "MEMBERSHIP TO ZAMCOPS",
+    "x": 72.0,
+    "x1": 241.5,
+    "y": 362.3
+   },
+   "p1.390.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Dear Sir / Madam,",
+    "x": 36.0,
+    "x1": 128.3,
+    "y": 389.9
+   },
+   "p1.445.36": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 36.0,
+    "x1": 240.0,
+    "y": 445.1
+   },
+   "p1.473.36": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 36.0,
+    "x1": 240.0,
+    "y": 472.7
+   },
+   "p1.500.36": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 36.0,
+    "x1": 240.0,
+    "y": 500.3
+   },
+   "p1.528.36": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 36.0,
+    "x1": 228.0,
+    "y": 527.9
+   },
+   "p1.59.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "GENERAL MANAGER\u200b",
+    "x": 36.0,
+    "x1": 164.7,
+    "y": 58.7
+   },
+   "p1.595.88": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Telefax: +260-1-229270, E-mail: info@zamcops.org Website: www.zamcops.org.zm",
+    "x": 88.2,
+    "x1": 464.3,
+    "y": 595.1
+   },
+   "p1.610.140": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Anchor House, 3rd Floor. P.O. Box 51259, LUSAKA, Zambia",
+    "x": 139.6,
+    "x1": 412.9,
+    "y": 609.6
+   },
+   "p1.628.80": {
+    "k": "text",
+    "p": 1,
+    "s": 9.0,
+    "text": "(Nonprofit Making, Affiliated to International Confederation of Societies of Authors & Composers-CISAC)",
+    "x": 80.2,
+    "x1": 471.8,
+    "y": 628.3
+   },
+   "p1.642.104": {
+    "k": "text",
+    "p": 1,
+    "s": 18.0,
+    "text": "ZAMBIAN MUSIC COPYRIGHT PROTECTION SOCIETY",
+    "x": 103.5,
+    "x1": 450.3,
+    "y": 642.0
+   },
+   "p1.72.36": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Mirrias Siamutundo",
+    "x": 36.0,
+    "x1": 135.3,
+    "y": 72.5
+   }
+  },
+  "pages": [
+   [
+    612.0,
+    792.0
+   ]
+  ]
+ },
+ "deed": {
+  "anchors": {
+   "p1.108.101": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "(c) The word \u201cballet\u201d shall mean a choreographic work having a story, plot or abstract",
+    "x": 101.0,
+    "x1": 521.6,
+    "y": 107.8
+   },
+   "p1.137.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "expressly therefore, but shall not include a cinematograph film.",
+    "x": 119.0,
+    "x1": 422.6,
+    "y": 136.7
+   },
+   "p1.151.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "play, revue, pantomime or sketch, in so far as it consists of words and music written",
+    "x": 119.0,
+    "x1": 524.9,
+    "y": 151.2
+   },
+   "p1.166.101": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "(b) The expression \u201cdramatic-musical work\u201d shall mean an opera, operetta, musical",
+    "x": 101.0,
+    "x1": 514.7,
+    "y": 165.6
+   },
+   "p1.194.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "of such work, words, music or accompaniment as aforesaid.",
+    "x": 119.0,
+    "x1": 406.4,
+    "y": 194.5
+   },
+   "p1.209.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "accompaniment, the musical accompaniment of any non- musical play, and any part",
+    "x": 119.0,
+    "x1": 525.2,
+    "y": 209.0
+   },
+   "p1.223.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "words and/or music of any monologue having a musical introduction and/or",
+    "x": 119.0,
+    "x1": 486.3,
+    "y": 223.4
+   },
+   "p1.238.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "song, choral work, the vocal and instrumental music in any cinematograph film, the",
+    "x": 119.0,
+    "x1": 523.2,
+    "y": 237.9
+   },
+   "p1.252.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "include (without prejudice to the generality of the expression \u201cmusical work\u201d) any",
+    "x": 119.0,
+    "x1": 517.2,
+    "y": 252.3
+   },
+   "p1.267.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "or hereafter composed and such words (if any) as are associated therewith, and shall",
+    "x": 119.0,
+    "x1": 525.5,
+    "y": 266.8
+   },
+   "p1.281.101": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "(a) The expression \u201cmusical work\u201d shall mean any musical work whether now existing",
+    "x": 101.0,
+    "x1": 526.7,
+    "y": 281.2
+   },
+   "p1.309.101": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "In this Deed:-",
+    "x": 101.0,
+    "x1": 166.9,
+    "y": 309.2
+   },
+   "p1.309.62": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "1.",
+    "x": 61.6,
+    "x1": 70.6,
+    "y": 309.2
+   },
+   "p1.351.62": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "The parties agree as follows:",
+    "x": 61.6,
+    "x1": 199.4,
+    "y": 350.6
+   },
+   "p1.38.529": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "1",
+    "x": 529.0,
+    "x1": 535.0,
+    "y": 38.5
+   },
+   "p1.392.192": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "(hereinafter referred to as \u201cthe Society)",
+    "x": 191.5,
+    "x1": 379.5,
+    "y": 392.0
+   },
+   "p1.406.124": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "with its registered office at 3rd Floor, Anchor Hse, Cairo rd, Lusaka",
+    "x": 124.4,
+    "x1": 446.7,
+    "y": 405.8
+   },
+   "p1.433.231": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "(limited by Guarantee)",
+    "x": 230.9,
+    "x1": 340.1,
+    "y": 433.4
+   },
+   "p1.447.131": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "ZAMBIA MUSIC COPYRIGHT PROTECTION SOCIETY",
+    "x": 130.6,
+    "x1": 440.4,
+    "y": 447.2
+   },
+   "p1.475.257": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "and the said",
+    "x": 257.0,
+    "x1": 314.2,
+    "y": 474.8
+   },
+   "p1.502.124": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "being a member of the Zambia Music Copyright Protection Society",
+    "x": 123.8,
+    "x1": 447.1,
+    "y": 502.4
+   },
+   "p1.516.186": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "(Hereinafter referred to as \u201cthe Assignor\u201d",
+    "x": 185.9,
+    "x1": 385.2,
+    "y": 516.2
+   },
+   "p1.544.104": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 104.1,
+    "x1": 467.1,
+    "y": 543.8
+   },
+   "p1.571.266": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "between",
+    "x": 265.6,
+    "x1": 305.5,
+    "y": 571.4
+   },
+   "p1.599.292": {
+    "k": "blank",
+    "left": "By this DEED OF ASSIGNMENT made on the",
+    "p": 1,
+    "right": "day of",
+    "s": 12.0,
+    "x": 292.1,
+    "x1": 349.1,
+    "y": 599.0
+   },
+   "p1.599.349": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "day of",
+    "x": 349.1,
+    "x1": 385.4,
+    "y": 599.0
+   },
+   "p1.599.385": {
+    "k": "blank",
+    "left": "day of",
+    "p": 1,
+    "right": "20",
+    "s": 12.0,
+    "x": 385.4,
+    "x1": 475.4,
+    "y": 599.0
+   },
+   "p1.599.475": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "20",
+    "x": 475.4,
+    "x1": 496.4,
+    "y": 599.0
+   },
+   "p1.599.496": {
+    "k": "blank",
+    "left": "20",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 496.4,
+    "x1": 508.4,
+    "y": 599.0
+   },
+   "p1.599.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "By this DEED OF ASSIGNMENT made on the",
+    "x": 62.6,
+    "x1": 292.1,
+    "y": 599.0
+   },
+   "p1.630.143": {
+    "k": "text",
+    "p": 1,
+    "s": 25.0,
+    "text": "DEED OF ASSIGNMENT",
+    "x": 143.2,
+    "x1": 427.8,
+    "y": 630.5
+   },
+   "p1.64.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "sequences.",
+    "x": 119.0,
+    "x1": 170.6,
+    "y": 64.5
+   },
+   "p1.675.192": {
+    "k": "text",
+    "p": 1,
+    "s": 18.0,
+    "text": "LIMITED (ZAMCOPS)",
+    "x": 192.4,
+    "x1": 378.7,
+    "y": 675.0
+   },
+   "p1.698.47": {
+    "k": "text",
+    "p": 1,
+    "s": 26.0,
+    "text": "zAMBIAN MUSIC COPYRIGHT PROTECTION SOCIETY",
+    "x": 46.8,
+    "x1": 528.9,
+    "y": 697.5
+   },
+   "p1.79.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "shall not include country or folk dancing, nor tap dancing, nor precision dance",
+    "x": 119.0,
+    "x1": 497.6,
+    "y": 78.9
+   },
+   "p1.93.119": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "idea, devised or used for the purpose of interpretation by dancing and/or miming, but",
+    "x": 119.0,
+    "x1": 529.9,
+    "y": 93.4
+   },
+   "p2.120.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "and the right to authorise such act;",
+    "x": 75.8,
+    "x1": 240.9,
+    "y": 120.0
+   },
+   "p2.134.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "or cause to be made in all parts of the world a record or records embodying the musical work,",
+    "x": 75.8,
+    "x1": 527.9,
+    "y": 134.5
+   },
+   "p2.149.36": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(g)",
+    "x": 36.1,
+    "x1": 50.1,
+    "y": 148.9
+   },
+   "p2.149.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "The expression \u2018mechanical right\u2019 shall mean in respect of any musical work the right to make",
+    "x": 75.8,
+    "x1": 537.0,
+    "y": 148.9
+   },
+   "p2.178.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "\u2018film synchronising\u2019 shall have a corresponding meaning.",
+    "x": 75.8,
+    "x1": 352.5,
+    "y": 177.8
+   },
+   "p2.192.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "all parts of the world on the soundtrack of a cinematograph film or films; and the expression",
+    "x": 75.8,
+    "x1": 521.6,
+    "y": 192.3
+   },
+   "p2.207.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "shall mean the right to reproduce such musical work, or authorise the reproduction thereof in",
+    "x": 75.8,
+    "x1": 523.9,
+    "y": 206.7
+   },
+   "p2.221.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "production of which was contemplated at the time of the commissioning of the musical work,",
+    "x": 75.8,
+    "x1": 527.3,
+    "y": 221.2
+   },
+   "p2.236.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "primarily for inclusion in the soundtrack of a specific cinematograph film or films, adverts, the",
+    "x": 75.8,
+    "x1": 533.6,
+    "y": 235.6
+   },
+   "p2.250.36": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(g)",
+    "x": 36.1,
+    "x1": 50.1,
+    "y": 250.1
+   },
+   "p2.250.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "the expression \u2018synchronising right\u2019 in respect of a musical work composed or written",
+    "x": 75.8,
+    "x1": 495.9,
+    "y": 250.1
+   },
+   "p2.279.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "provided by material substance and is intended for reception by specific members of the public",
+    "x": 75.8,
+    "x1": 531.3,
+    "y": 279.0
+   },
+   "p2.293.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "consisting of sounds, images, signs or signals, which takes place over wires or other paths",
+    "x": 75.8,
+    "x1": 512.8,
+    "y": 293.4
+   },
+   "p2.308.36": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(f)",
+    "x": 36.1,
+    "x1": 48.1,
+    "y": 307.9
+   },
+   "p2.308.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "The expression \u2018diffusion service\u2019 shall mean a telecommunication service of transmissions",
+    "x": 75.8,
+    "x1": 520.4,
+    "y": 307.9
+   },
+   "p2.337.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "\u201cperform\u201d and \u201cperforming\u201d shall be construed accordingly.",
+    "x": 75.8,
+    "x1": 365.1,
+    "y": 336.8
+   },
+   "p2.351.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "cinematograph film, or by the use of a record or tape, or by any other means, and references to",
+    "x": 75.8,
+    "x1": 531.9,
+    "y": 351.2
+   },
+   "p2.366.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "work to be transmitted to subscribers to a diffusion service or by the exhibition of a",
+    "x": 75.8,
+    "x1": 478.7,
+    "y": 365.7
+   },
+   "p2.38.529": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "2",
+    "x": 529.0,
+    "x1": 535.0,
+    "y": 38.5
+   },
+   "p2.380.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "presentation, including any such presentation by means of broadcasting or the causing of a",
+    "x": 75.8,
+    "x1": 513.0,
+    "y": 380.1
+   },
+   "p2.395.36": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(e)",
+    "x": 36.1,
+    "x1": 49.4,
+    "y": 394.6
+   },
+   "p2.395.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "The word \u2018performance\u2019 shall include, unless otherwise stated, any mode of acoustic",
+    "x": 75.8,
+    "x1": 490.7,
+    "y": 394.6
+   },
+   "p2.423.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "minutes in total duration or fifty per cent (50%) of the total length of the ballet.",
+    "x": 144.1,
+    "x1": 527.0,
+    "y": 422.8
+   },
+   "p2.437.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "accompanied by a visual representation of such ballet exceeding fifteen (15)",
+    "x": 144.1,
+    "x1": 512.6,
+    "y": 437.3
+   },
+   "p2.452.122": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(iv) the music and any words associated therewith composed or used for a ballet, if",
+    "x": 121.6,
+    "x1": 524.7,
+    "y": 451.7
+   },
+   "p2.481.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "work and does not interrupt the dramatic action;",
+    "x": 144.1,
+    "x1": 374.8,
+    "y": 480.6
+   },
+   "p2.495.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "a consecutive sequence which preserves all the essential elements of the original",
+    "x": 144.1,
+    "x1": 532.9,
+    "y": 495.1
+   },
+   "p2.510.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "complete act and not exceeding the durations mentioned in this paragraph, form",
+    "x": 144.1,
+    "x1": 530.0,
+    "y": 509.5
+   },
+   "p2.524.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "performed otherwise than broadcasting, and excerpts which, not consisting of a",
+    "x": 144.1,
+    "x1": 527.4,
+    "y": 524.0
+   },
+   "p2.538.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "television, or twenty-five (25) minutes when broadcast by sound radio or",
+    "x": 144.1,
+    "x1": 497.1,
+    "y": 538.4
+   },
+   "p2.553.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "have a total duration exceeding twenty (20) minutes when broadcast by",
+    "x": 144.1,
+    "x1": 489.4,
+    "y": 552.9
+   },
+   "p2.567.122": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(iii) excepts from dramatico-musical works which, not consisting of a complete act,",
+    "x": 121.6,
+    "x1": 527.3,
+    "y": 567.3
+   },
+   "p2.596.122": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(ii) excepts from dramatico-musical works consisting of a complete act;",
+    "x": 121.6,
+    "x1": 471.0,
+    "y": 596.2
+   },
+   "p2.62.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "automatically reproduced or performed therefrom;",
+    "x": 75.8,
+    "x1": 317.4,
+    "y": 62.2
+   },
+   "p2.625.122": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(i)",
+    "x": 121.6,
+    "x1": 132.9,
+    "y": 625.1
+   },
+   "p2.625.144": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "dramatico-musical works in their entirety;",
+    "x": 144.1,
+    "x1": 345.8,
+    "y": 625.1
+   },
+   "p2.653.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "cinematograph films:",
+    "x": 119.0,
+    "x1": 221.2,
+    "y": 653.4
+   },
+   "p2.668.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "any of the following classes of works unless such acts are done by means of",
+    "x": 119.0,
+    "x1": 486.3,
+    "y": 667.8
+   },
+   "p2.682.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "transmitted to subscribers to a diffusion service or of authorising any of the said acts,",
+    "x": 119.0,
+    "x1": 529.9,
+    "y": 682.3
+   },
+   "p2.697.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "shall not include the right of performing in public, broadcasting, causing to be",
+    "x": 119.0,
+    "x1": 496.3,
+    "y": 696.7
+   },
+   "p2.711.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "any of the said acts; but unless the following or any of them expressly authorised,",
+    "x": 119.0,
+    "x1": 513.3,
+    "y": 711.2
+   },
+   "p2.726.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "means and in any manner whatsoever, all musical works, and the right of authorising",
+    "x": 119.0,
+    "x1": 529.2,
+    "y": 725.6
+   },
+   "p2.740.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "transmitted to the subscribers to a diffusion service, in all parts of the world, by any",
+    "x": 119.0,
+    "x1": 523.2,
+    "y": 740.1
+   },
+   "p2.754.119": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "set out below, the right of performing in public, broadcasting and causing to be",
+    "x": 119.0,
+    "x1": 501.3,
+    "y": 754.5
+   },
+   "p2.769.101": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(d) The expression \u201cperforming right\u201d shall mean and include, subject to the exceptions",
+    "x": 101.0,
+    "x1": 533.0,
+    "y": 769.0
+   },
+   "p2.77.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "or signals representing sounds, are embodied or represented so as to be capable of being",
+    "x": 75.8,
+    "x1": 501.3,
+    "y": 76.7
+   },
+   "p2.91.36": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "(h)",
+    "x": 36.1,
+    "x1": 50.1,
+    "y": 91.1
+   },
+   "p2.91.76": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "the word record shall mean any disc, perforated roll or device in or on which sounds, or data",
+    "x": 75.8,
+    "x1": 525.3,
+    "y": 91.1
+   },
+   "p3.160.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 159.8
+   },
+   "p3.174.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 173.9
+   },
+   "p3.174.300": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "BOARD SECRETARY",
+    "x": 299.9,
+    "x1": 420.1,
+    "y": 173.9
+   },
+   "p3.175.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "The Society",
+    "x": 36.1,
+    "x1": 93.7,
+    "y": 174.6
+   },
+   "p3.188.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 188.1
+   },
+   "p3.188.210": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 210.0,
+    "x1": 510.0,
+    "y": 188.1
+   },
+   "p3.188.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "On behalf of",
+    "x": 36.1,
+    "x1": 99.8,
+    "y": 188.5
+   },
+   "p3.202.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 202.2
+   },
+   "p3.202.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Signed for and",
+    "x": 36.1,
+    "x1": 106.7,
+    "y": 202.3
+   },
+   "p3.271.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 270.9
+   },
+   "p3.285.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 285.1
+   },
+   "p3.285.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "The Assignor",
+    "x": 36.1,
+    "x1": 101.1,
+    "y": 285.1
+   },
+   "p3.299.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 299.2
+   },
+   "p3.299.210": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 210.0,
+    "x1": 510.0,
+    "y": 299.2
+   },
+   "p3.299.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "on behalf of",
+    "x": 36.1,
+    "x1": 97.1,
+    "y": 299.2
+   },
+   "p3.313.186": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": ")",
+    "x": 185.5,
+    "x1": 189.5,
+    "y": 313.4
+   },
+   "p3.313.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Signed by or for and",
+    "x": 36.1,
+    "x1": 137.8,
+    "y": 313.4
+   },
+   "p3.38.529": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "3",
+    "x": 529.0,
+    "x1": 535.0,
+    "y": 38.5
+   },
+   "p3.397.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "time to time reasonably require.",
+    "x": 76.6,
+    "x1": 229.4,
+    "y": 396.9
+   },
+   "p3.411.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "enabling the Society to enforce the rights assigned or any part thereof, as the Society may from",
+    "x": 76.6,
+    "x1": 535.8,
+    "y": 411.0
+   },
+   "p3.425.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "the further, better or more satisfactory assigning or assuring to or vesting in the Society or",
+    "x": 76.6,
+    "x1": 511.2,
+    "y": 425.2
+   },
+   "p3.439.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "do, execute and make all such acts, deeds, power of attorney, assignments, and assurances for",
+    "x": 76.6,
+    "x1": 528.8,
+    "y": 439.3
+   },
+   "p3.454.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Assignor shall and will so long as the Assignor shall continue to be a member of the Society",
+    "x": 76.6,
+    "x1": 522.2,
+    "y": 453.5
+   },
+   "p3.468.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "any of the rights assigned which are hereby assigned or purported to be assigned, and that the",
+    "x": 76.6,
+    "x1": 527.5,
+    "y": 467.6
+   },
+   "p3.482.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "and expenses which the Society may suffer or incur in respect of the exercise by the Society of",
+    "x": 76.6,
+    "x1": 534.1,
+    "y": 481.8
+   },
+   "p3.496.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "hereafter keep the Society harmless and indemnified against all loss, damage, costs, charges",
+    "x": 76.6,
+    "x1": 520.7,
+    "y": 495.9
+   },
+   "p3.510.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "rights assigned in the manner aforesaid to the Society, and that the Assignor will at all times",
+    "x": 76.6,
+    "x1": 521.4,
+    "y": 510.1
+   },
+   "p3.524.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "4.",
+    "x": 36.1,
+    "x1": 45.1,
+    "y": 524.2
+   },
+   "p3.524.77": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "The Assignor hereby Warrants that the Assignor has good right and full power to assign the",
+    "x": 76.6,
+    "x1": 519.5,
+    "y": 524.2
+   },
+   "p3.552.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "time being in force.",
+    "x": 75.8,
+    "x1": 169.6,
+    "y": 552.2
+   },
+   "p3.567.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "the Assignor shall be entitled to receive in accordance with the Rules of the Society for the",
+    "x": 75.8,
+    "x1": 514.2,
+    "y": 566.7
+   },
+   "p3.581.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "collected by the Society in respect of the public performance of the works of its members as",
+    "x": 75.8,
+    "x1": 520.2,
+    "y": 581.1
+   },
+   "p3.596.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "3.",
+    "x": 36.1,
+    "x1": 45.1,
+    "y": 595.6
+   },
+   "p3.596.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "The Society will from time to time pay the Assignor such sums of money out of the monies",
+    "x": 75.8,
+    "x1": 517.3,
+    "y": 595.6
+   },
+   "p3.624.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "remain vested in or controlled by the Society.",
+    "x": 75.8,
+    "x1": 294.2,
+    "y": 624.5
+   },
+   "p3.639.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "the provisions of the Articles of Society of the Society for the time being in force) the rights",
+    "x": 75.8,
+    "x1": 519.9,
+    "y": 638.9
+   },
+   "p3.653.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "which the rights assigned shall respectively subsist, or during such time as (in accordance with",
+    "x": 75.8,
+    "x1": 532.6,
+    "y": 653.4
+   },
+   "p3.668.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "HOLD the same unto the Society for its exclusive benefit during the residue of the terms for",
+    "x": 75.8,
+    "x1": 520.9,
+    "y": 667.8
+   },
+   "p3.682.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "intended to be assigned are hereinafter collectively referred to as \u201cthe rights assigned\u201d), TO",
+    "x": 75.8,
+    "x1": 517.5,
+    "y": 682.3
+   },
+   "p3.697.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "or be or become vested in the Assignor (all which premises hereby assigned or expressed or",
+    "x": 75.8,
+    "x1": 519.3,
+    "y": 696.7
+   },
+   "p3.711.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "wise) of and all such interests in, any performing right as so belong to or shall be acquired by",
+    "x": 75.8,
+    "x1": 526.0,
+    "y": 711.2
+   },
+   "p3.726.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "and all such parts or shares (whether limited as to time, place, mode of enjoyment or other",
+    "x": 75.8,
+    "x1": 511.6,
+    "y": 725.6
+   },
+   "p3.740.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "vested in the Assignor during the continuance of the Assignor\u2019s membership of the Society,",
+    "x": 75.8,
+    "x1": 519.0,
+    "y": 740.1
+   },
+   "p3.754.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Mechanical Rights which now belong to or shall hereafter be acquired by or be or become",
+    "x": 75.8,
+    "x1": 514.8,
+    "y": 754.5
+   },
+   "p3.769.36": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "2.",
+    "x": 36.1,
+    "x1": 45.1,
+    "y": 769.0
+   },
+   "p3.769.76": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "The Assignor hereby assigns to the Society All Performing rights, Synchronising Rights and",
+    "x": 75.8,
+    "x1": 534.3,
+    "y": 769.0
+   }
+  },
+  "pages": [
+   [
+    595.3,
+    840.0
+   ],
+   [
+    595.3,
+    840.0
+   ],
+   [
+    595.3,
+    840.0
+   ]
+  ]
+ },
+ "group": {
+  "anchors": {
+   "p1.127.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 279.1,
+    "y": 126.8
+   },
+   "p1.127.387": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Cell :",
+    "x": 387.1,
+    "x1": 413.4,
+    "y": 126.8
+   },
+   "p1.127.413": {
+    "k": "blank",
+    "left": "Cell :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 413.4,
+    "x1": 500.4,
+    "y": 126.8
+   },
+   "p1.127.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Home :",
+    "x": 63.1,
+    "x1": 101.8,
+    "y": 126.8
+   },
+   "p1.182.134": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 133.9,
+    "x1": 415.9,
+    "y": 182.0
+   },
+   "p1.210.135": {
+    "k": "blank",
+    "left": "Name or title:",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 417.1,
+    "y": 209.6
+   },
+   "p1.210.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Name or title:",
+    "x": 63.1,
+    "x1": 132.7,
+    "y": 209.6
+   },
+   "p1.237.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Representative and addresses",
+    "x": 63.1,
+    "x1": 207.6,
+    "y": 237.2
+   },
+   "p1.279.229": {
+    "k": "blank",
+    "left": "Passport or identity card number :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 229.1,
+    "x1": 415.1,
+    "y": 278.6
+   },
+   "p1.279.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Passport or identity card number :",
+    "x": 63.1,
+    "x1": 229.1,
+    "y": 278.6
+   },
+   "p1.306.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 414.1,
+    "y": 306.2
+   },
+   "p1.306.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Language",
+    "x": 63.1,
+    "x1": 110.4,
+    "y": 306.2
+   },
+   "p1.334.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 414.1,
+    "y": 333.8
+   },
+   "p1.334.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Country",
+    "x": 63.1,
+    "x1": 102.4,
+    "y": 333.8
+   },
+   "p1.361.171": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 414.1,
+    "y": 361.4
+   },
+   "p1.361.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Place of foundation",
+    "x": 63.1,
+    "x1": 157.0,
+    "y": 361.4
+   },
+   "p1.38.561": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "1",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p1.389.171": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 231.1,
+    "y": 389.0
+   },
+   "p1.389.231": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 231.1,
+    "x1": 234.4,
+    "y": 389.0
+   },
+   "p1.389.234": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 234.4,
+    "x1": 309.4,
+    "y": 389.0
+   },
+   "p1.389.309": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 309.4,
+    "x1": 312.7,
+    "y": 389.0
+   },
+   "p1.389.313": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 312.7,
+    "x1": 414.7,
+    "y": 389.0
+   },
+   "p1.389.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Date of foundation",
+    "x": 63.1,
+    "x1": 153.7,
+    "y": 389.0
+   },
+   "p1.417.171": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 231.1,
+    "y": 416.6
+   },
+   "p1.417.315": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 315.1,
+    "x1": 381.1,
+    "y": 416.6
+   },
+   "p1.417.423": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "\u2026\u2026",
+    "x": 423.1,
+    "x1": 447.1,
+    "y": 416.6
+   },
+   "p1.417.459": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 459.1,
+    "x1": 540.1,
+    "y": 416.6
+   },
+   "p1.417.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "IPI base number",
+    "x": 63.1,
+    "x1": 141.7,
+    "y": 416.6
+   },
+   "p1.444.146": {
+    "k": "blank",
+    "left": "IPI name number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 146.4,
+    "x1": 242.4,
+    "y": 444.2
+   },
+   "p1.444.315": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "\u2026\u2026:",
+    "x": 315.1,
+    "x1": 342.4,
+    "y": 444.2
+   },
+   "p1.444.342": {
+    "k": "blank",
+    "left": "\u2026\u2026:",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 342.4,
+    "x1": 381.4,
+    "y": 444.2
+   },
+   "p1.444.423": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "\u2026\u2026",
+    "x": 423.1,
+    "x1": 447.1,
+    "y": 444.2
+   },
+   "p1.444.459": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 459.1,
+    "x1": 540.1,
+    "y": 444.2
+   },
+   "p1.444.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "IPI name number",
+    "x": 63.1,
+    "x1": 146.4,
+    "y": 444.2
+   },
+   "p1.472.306": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": ":",
+    "x": 306.1,
+    "x1": 318.4,
+    "y": 471.8
+   },
+   "p1.472.318": {
+    "k": "blank",
+    "left": ":",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 318.4,
+    "x1": 381.4,
+    "y": 471.8
+   },
+   "p1.472.423": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "\u2026\u2026",
+    "x": 423.1,
+    "x1": 447.1,
+    "y": 471.8
+   },
+   "p1.472.459": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 459.1,
+    "x1": 540.1,
+    "y": 471.8
+   },
+   "p1.472.99": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": ":",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 306.1,
+    "y": 471.8
+   },
+   "p1.499.306": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Different spellings",
+    "x": 306.1,
+    "x1": 407.7,
+    "y": 499.4
+   },
+   "p1.499.423": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Type",
+    "x": 423.1,
+    "x1": 447.7,
+    "y": 499.4
+   },
+   "p1.499.459": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "IPI name number",
+    "x": 459.1,
+    "x1": 542.4,
+    "y": 499.4
+   },
+   "p1.499.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Name",
+    "x": 63.1,
+    "x1": 99.1,
+    "y": 499.4
+   },
+   "p1.499.99": {
+    "k": "blank",
+    "left": "Name",
+    "p": 1,
+    "right": "Different spellings",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 306.1,
+    "y": 499.4
+   },
+   "p1.527.207": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Internal number :",
+    "x": 207.1,
+    "x1": 290.4,
+    "y": 527.0
+   },
+   "p1.527.290": {
+    "k": "blank",
+    "left": "Internal number :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 290.4,
+    "x1": 350.4,
+    "y": 527.0
+   },
+   "p1.557.166": {
+    "k": "text",
+    "p": 1,
+    "s": 14.0,
+    "text": "GROUP MEMBERSHIP APPLICATION FORM",
+    "x": 165.6,
+    "x1": 464.4,
+    "y": 557.3
+   },
+   "p1.600.158": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Telefax: +260-1-229270, E-mail:",
+    "x": 157.6,
+    "x1": 312.2,
+    "y": 600.5
+   },
+   "p1.600.312": {
+    "k": "text",
+    "p": 1,
+    "s": 10.0,
+    "text": "zamcops1@gmail.com",
+    "x": 312.3,
+    "x1": 413.6,
+    "y": 600.5
+   },
+   "p1.600.414": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": ". Website: www.zamcops.org.zm",
+    "x": 413.9,
+    "x1": 559.7,
+    "y": 600.5
+   },
+   "p1.613.221": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Anchor House, 3rd Floor. P.O. Box 51259, LUSAKA, Zambia",
+    "x": 220.6,
+    "x1": 496.7,
+    "y": 613.2
+   },
+   "p1.625.162": {
+    "k": "text",
+    "p": 1,
+    "s": 9.0,
+    "text": "(Nonprofit Making, Affiliated To International Confederation Of Societies of Authors & Composers-CISAC)",
+    "x": 161.6,
+    "x1": 555.6,
+    "y": 625.3
+   },
+   "p1.639.323": {
+    "k": "text",
+    "p": 1,
+    "s": 18.0,
+    "text": "SOCIETY",
+    "x": 323.0,
+    "x1": 394.6,
+    "y": 639.0
+   },
+   "p1.664.184": {
+    "k": "text",
+    "p": 1,
+    "s": 18.0,
+    "text": "ZAMBIA MUSIC COPYRIGHT PROTECTION",
+    "x": 183.8,
+    "x1": 538.4,
+    "y": 663.5
+   },
+   "p1.72.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 279.1,
+    "y": 71.6
+   },
+   "p1.72.387": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Email :",
+    "x": 387.1,
+    "x1": 422.1,
+    "y": 71.6
+   },
+   "p1.72.422": {
+    "k": "blank",
+    "left": "Email :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 422.1,
+    "x1": 533.1,
+    "y": 71.6
+   },
+   "p1.99.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 279.1,
+    "y": 99.2
+   },
+   "p1.99.387": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Fax :",
+    "x": 387.1,
+    "x1": 411.4,
+    "y": 99.2
+   },
+   "p1.99.411": {
+    "k": "blank",
+    "left": "Fax :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 411.4,
+    "x1": 531.4,
+    "y": 99.2
+   },
+   "p2.110.237": {
+    "k": "blank",
+    "left": "Region or City (Residence) :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 237.1,
+    "x1": 423.1,
+    "y": 110.0
+   },
+   "p2.110.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Region or City (Residence) :",
+    "x": 99.1,
+    "x1": 237.1,
+    "y": 110.0
+   },
+   "p2.138.179": {
+    "k": "blank",
+    "left": "Exit date :\u2026/\u2026/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 179.1,
+    "x1": 197.1,
+    "y": 137.6
+   },
+   "p2.138.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Exit date :\u2026/\u2026/",
+    "x": 99.1,
+    "x1": 179.1,
+    "y": 137.6
+   },
+   "p2.165.155": {
+    "k": "blank",
+    "left": "Entry date :",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 155.0,
+    "x1": 287.0,
+    "y": 165.2
+   },
+   "p2.165.287": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 287.0,
+    "x1": 290.3,
+    "y": 165.2
+   },
+   "p2.165.290": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 290.3,
+    "x1": 365.3,
+    "y": 165.2
+   },
+   "p2.165.365": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 365.3,
+    "x1": 368.7,
+    "y": 165.2
+   },
+   "p2.165.369": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 368.7,
+    "x1": 425.7,
+    "y": 165.2
+   },
+   "p2.165.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Entry date :",
+    "x": 99.1,
+    "x1": 155.0,
+    "y": 165.2
+   },
+   "p2.193.241": {
+    "k": "blank",
+    "left": "Membership status(Position):",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 240.6,
+    "x1": 423.6,
+    "y": 192.8
+   },
+   "p2.193.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Membership status(Position):",
+    "x": 99.1,
+    "x1": 240.6,
+    "y": 192.8
+   },
+   "p2.220.176": {
+    "k": "blank",
+    "left": "Exit date:\u2026/\u2026/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 176.0,
+    "x1": 203.0,
+    "y": 220.4
+   },
+   "p2.220.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Exit date:\u2026/\u2026/",
+    "x": 99.1,
+    "x1": 176.0,
+    "y": 220.4
+   },
+   "p2.248.216": {
+    "k": "blank",
+    "left": "Entry or admission date:",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 215.9,
+    "x1": 299.9,
+    "y": 248.0
+   },
+   "p2.248.300": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 299.9,
+    "x1": 303.2,
+    "y": 248.0
+   },
+   "p2.248.303": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 303.2,
+    "x1": 369.2,
+    "y": 248.0
+   },
+   "p2.248.369": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 369.2,
+    "x1": 372.5,
+    "y": 248.0
+   },
+   "p2.248.373": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 372.5,
+    "x1": 426.5,
+    "y": 248.0
+   },
+   "p2.248.98": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Entry or admission date:",
+    "x": 98.3,
+    "x1": 215.9,
+    "y": 248.0
+   },
+   "p2.262.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Copyright",
+    "x": 63.1,
+    "x1": 111.7,
+    "y": 261.8
+   },
+   "p2.289.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Managed rights (Membership)",
+    "x": 63.1,
+    "x1": 214.4,
+    "y": 289.4
+   },
+   "p2.331.207": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 207.1,
+    "x1": 327.1,
+    "y": 330.8
+   },
+   "p2.331.351": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 351.1,
+    "x1": 411.1,
+    "y": 330.8
+   },
+   "p2.331.63": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 159.1,
+    "y": 330.8
+   },
+   "p2.358.207": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": ":",
+    "x": 207.1,
+    "x1": 213.4,
+    "y": 358.4
+   },
+   "p2.358.213": {
+    "k": "blank",
+    "left": ":",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 213.4,
+    "x1": 324.4,
+    "y": 358.4
+   },
+   "p2.358.351": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 351.1,
+    "x1": 411.1,
+    "y": 358.4
+   },
+   "p2.358.63": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 162.1,
+    "y": 358.4
+   },
+   "p2.38.561": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "2",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p2.386.207": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": ":",
+    "x": 207.1,
+    "x1": 213.4,
+    "y": 386.0
+   },
+   "p2.386.213": {
+    "k": "blank",
+    "left": ":",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 213.4,
+    "x1": 324.4,
+    "y": 386.0
+   },
+   "p2.386.351": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 351.1,
+    "x1": 411.1,
+    "y": 386.0
+   },
+   "p2.386.63": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 162.1,
+    "y": 386.0
+   },
+   "p2.400.207": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "First name",
+    "x": 207.1,
+    "x1": 258.0,
+    "y": 399.8
+   },
+   "p2.400.351": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "IPI name number",
+    "x": 351.1,
+    "x1": 434.4,
+    "y": 399.8
+   },
+   "p2.400.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Surname",
+    "x": 63.1,
+    "x1": 105.7,
+    "y": 399.8
+   },
+   "p2.427.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Members of group",
+    "x": 63.1,
+    "x1": 152.4,
+    "y": 427.4
+   },
+   "p2.469.459": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 459.1,
+    "x1": 567.1,
+    "y": 468.8
+   },
+   "p2.469.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 234.1,
+    "y": 468.8
+   },
+   "p2.496.279": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 279.1,
+    "x1": 318.1,
+    "y": 496.4
+   },
+   "p2.496.366": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 366.1,
+    "x1": 429.1,
+    "y": 496.4
+   },
+   "p2.496.459": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 459.1,
+    "x1": 564.1,
+    "y": 496.4
+   },
+   "p2.496.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 237.1,
+    "y": 496.4
+   },
+   "p2.524.279": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Rate",
+    "x": 279.1,
+    "x1": 301.0,
+    "y": 524.0
+   },
+   "p2.524.387": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Method",
+    "x": 387.1,
+    "x1": 424.4,
+    "y": 524.0
+   },
+   "p2.524.495": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Bank account",
+    "x": 495.1,
+    "x1": 560.7,
+    "y": 524.0
+   },
+   "p2.524.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Payee",
+    "x": 99.1,
+    "x1": 127.7,
+    "y": 524.0
+   },
+   "p2.55.121": {
+    "k": "blank",
+    "left": "File:",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 121.1,
+    "x1": 244.1,
+    "y": 54.8
+   },
+   "p2.55.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "File:",
+    "x": 99.1,
+    "x1": 121.1,
+    "y": 54.8
+   },
+   "p2.552.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Copyright",
+    "x": 63.1,
+    "x1": 111.7,
+    "y": 551.6
+   },
+   "p2.579.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Payments",
+    "x": 63.1,
+    "x1": 111.0,
+    "y": 579.2
+   },
+   "p2.621.144": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 144.1,
+    "x1": 303.1,
+    "y": 620.6
+   },
+   "p2.621.387": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Website :",
+    "x": 387.1,
+    "x1": 432.7,
+    "y": 620.6
+   },
+   "p2.621.433": {
+    "k": "blank",
+    "left": "Website :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 432.7,
+    "x1": 534.7,
+    "y": 620.6
+   },
+   "p2.648.148": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 147.7,
+    "x1": 306.7,
+    "y": 648.2
+   },
+   "p2.648.387": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Email :",
+    "x": 387.1,
+    "x1": 422.1,
+    "y": 648.2
+   },
+   "p2.648.422": {
+    "k": "blank",
+    "left": "Email :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 422.1,
+    "x1": 533.1,
+    "y": 648.2
+   },
+   "p2.676.150": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 150.1,
+    "x1": 297.1,
+    "y": 675.8
+   },
+   "p2.676.387": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Fax :",
+    "x": 387.1,
+    "x1": 411.4,
+    "y": 675.8
+   },
+   "p2.676.411": {
+    "k": "blank",
+    "left": "Fax :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 411.4,
+    "x1": 534.4,
+    "y": 675.8
+   },
+   "p2.703.150": {
+    "k": "blank",
+    "left": "Correspondence :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 150.4,
+    "x1": 297.4,
+    "y": 703.4
+   },
+   "p2.703.387": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Cell :",
+    "x": 387.1,
+    "x1": 413.4,
+    "y": 703.4
+   },
+   "p2.703.413": {
+    "k": "blank",
+    "left": "Cell :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 413.4,
+    "x1": 503.4,
+    "y": 703.4
+   },
+   "p2.703.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Correspondence :",
+    "x": 63.1,
+    "x1": 150.4,
+    "y": 703.4
+   },
+   "p2.731.135": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 273.1,
+    "y": 731.0
+   },
+   "p2.731.387": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Website :",
+    "x": 387.1,
+    "x1": 432.7,
+    "y": 731.0
+   },
+   "p2.731.433": {
+    "k": "blank",
+    "left": "Website :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 432.7,
+    "x1": 534.7,
+    "y": 731.0
+   },
+   "p2.82.200": {
+    "k": "blank",
+    "left": "Circle of occupation:",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 200.3,
+    "x1": 425.3,
+    "y": 82.4
+   },
+   "p2.82.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Circle of occupation:",
+    "x": 99.1,
+    "x1": 200.3,
+    "y": 82.4
+   },
+   "p3.370.153": {
+    "k": "text",
+    "p": 3,
+    "s": 14.0,
+    "text": "Signature",
+    "x": 153.1,
+    "x1": 210.2,
+    "y": 370.3
+   },
+   "p3.370.210": {
+    "k": "blank",
+    "left": "Signature",
+    "p": 3,
+    "right": "Date",
+    "s": 14.0,
+    "x": 210.2,
+    "x1": 322.2,
+    "y": 370.3
+   },
+   "p3.370.322": {
+    "k": "text",
+    "p": 3,
+    "s": 14.0,
+    "text": "Date",
+    "x": 322.2,
+    "x1": 359.0,
+    "y": 370.3
+   },
+   "p3.370.359": {
+    "k": "blank",
+    "left": "Date",
+    "p": 3,
+    "right": "",
+    "s": 14.0,
+    "x": 359.0,
+    "x1": 513.0,
+    "y": 370.3
+   },
+   "p3.38.561": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "3",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p3.434.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "thereunder.",
+    "x": 99.1,
+    "x1": 153.4,
+    "y": 434.3
+   },
+   "p3.455.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "governed by the Memorandum and Articles of Association and all rules and regulations made",
+    "x": 99.1,
+    "x1": 551.3,
+    "y": 455.0
+   },
+   "p3.476.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "of Association of the Society and that my rights, obligations and liabilities as a member will be",
+    "x": 99.1,
+    "x1": 557.9,
+    "y": 475.7
+   },
+   "p3.496.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "I understand that, if admitted, my membership will be subject to the Memorandum and Articles",
+    "x": 99.1,
+    "x1": 559.6,
+    "y": 496.4
+   },
+   "p3.524.63": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 561.1,
+    "y": 524.0
+   },
+   "p3.607.153": {
+    "k": "blank",
+    "left": "Territories:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 153.0,
+    "x1": 423.0,
+    "y": 606.8
+   },
+   "p3.607.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Territories:",
+    "x": 99.1,
+    "x1": 153.0,
+    "y": 606.8
+   },
+   "p3.634.245": {
+    "k": "blank",
+    "left": "Managed or transferred rights:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 245.3,
+    "x1": 425.3,
+    "y": 634.4
+   },
+   "p3.634.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Managed or transferred rights:",
+    "x": 99.1,
+    "x1": 245.3,
+    "y": 634.4
+   },
+   "p3.662.236": {
+    "k": "blank",
+    "left": "Type of right holder (Role) :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 236.1,
+    "x1": 419.1,
+    "y": 662.0
+   },
+   "p3.662.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Type of right holder (Role) :",
+    "x": 99.1,
+    "x1": 236.1,
+    "y": 662.0
+   },
+   "p3.690.192": {
+    "k": "blank",
+    "left": "Category of works:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 191.7,
+    "x1": 422.7,
+    "y": 689.6
+   },
+   "p3.690.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Category of works:",
+    "x": 99.1,
+    "x1": 191.7,
+    "y": 689.6
+   },
+   "p3.717.163": {
+    "k": "blank",
+    "left": "Subscription:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 163.0,
+    "x1": 238.0,
+    "y": 717.2
+   },
+   "p3.717.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Subscription:",
+    "x": 99.1,
+    "x1": 163.0,
+    "y": 717.2
+   }
+  },
+  "pages": [
+   [
+    612.0,
+    792.0
+   ],
+   [
+    612.0,
+    792.0
+   ],
+   [
+    612.0,
+    792.0
+   ]
+  ]
+ },
+ "individual": {
+  "anchors": {
+   "p1.112.166": {
+    "k": "blank",
+    "left": "Bank address",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 166.4,
+    "x1": 493.4,
+    "y": 112.0
+   },
+   "p1.112.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "18.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 112.0
+   },
+   "p1.112.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Bank address",
+    "x": 99.1,
+    "x1": 166.4,
+    "y": 112.0
+   },
+   "p1.133.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "17.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 132.8
+   },
+   "p1.133.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Payment method",
+    "x": 99.1,
+    "x1": 183.0,
+    "y": 132.8
+   },
+   "p1.154.119": {
+    "k": "blank",
+    "left": "Cell",
+    "p": 1,
+    "right": "Fax",
+    "s": 12.0,
+    "x": 119.1,
+    "x1": 197.1,
+    "y": 153.5
+   },
+   "p1.154.197": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Fax",
+    "x": 197.1,
+    "x1": 215.0,
+    "y": 153.5
+   },
+   "p1.154.215": {
+    "k": "blank",
+    "left": "Fax",
+    "p": 1,
+    "right": "E-mail",
+    "s": 12.0,
+    "x": 215.0,
+    "x1": 311.0,
+    "y": 153.5
+   },
+   "p1.154.311": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "E-mail",
+    "x": 311.0,
+    "x1": 349.6,
+    "y": 153.5
+   },
+   "p1.154.350": {
+    "k": "blank",
+    "left": "E-mail",
+    "p": 1,
+    "right": "Website",
+    "s": 12.0,
+    "x": 349.6,
+    "x1": 427.6,
+    "y": 153.5
+   },
+   "p1.154.428": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Website",
+    "x": 427.6,
+    "x1": 472.9,
+    "y": 153.5
+   },
+   "p1.154.473": {
+    "k": "blank",
+    "left": "Website",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 472.9,
+    "x1": 520.9,
+    "y": 153.5
+   },
+   "p1.154.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Cell",
+    "x": 99.1,
+    "x1": 119.1,
+    "y": 153.5
+   },
+   "p1.174.139": {
+    "k": "blank",
+    "left": "(Postal)",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 139.4,
+    "x1": 535.4,
+    "y": 174.2
+   },
+   "p1.174.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "(Postal)",
+    "x": 99.1,
+    "x1": 139.4,
+    "y": 174.2
+   },
+   "p1.195.99": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 194.8
+   },
+   "p1.216.207": {
+    "k": "blank",
+    "left": "Contact address (Res)",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 207.3,
+    "x1": 525.3,
+    "y": 215.5
+   },
+   "p1.216.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "16.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 215.5
+   },
+   "p1.216.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Contact address (Res)",
+    "x": 99.1,
+    "x1": 207.3,
+    "y": 215.5
+   },
+   "p1.236.140": {
+    "k": "blank",
+    "left": "Spouse",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 139.8,
+    "x1": 289.8,
+    "y": 236.2
+   },
+   "p1.236.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "15.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 236.2
+   },
+   "p1.236.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Spouse",
+    "x": 99.1,
+    "x1": 139.8,
+    "y": 236.2
+   },
+   "p1.257.171": {
+    "k": "blank",
+    "left": "Marital status",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 170.7,
+    "x1": 302.7,
+    "y": 257.0
+   },
+   "p1.257.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "14.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 257.0
+   },
+   "p1.257.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Marital status",
+    "x": 99.1,
+    "x1": 170.7,
+    "y": 257.0
+   },
+   "p1.278.158": {
+    "k": "blank",
+    "left": "Language",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 158.4,
+    "x1": 302.4,
+    "y": 277.7
+   },
+   "p1.278.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "13.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 277.7
+   },
+   "p1.278.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Language",
+    "x": 99.1,
+    "x1": 158.4,
+    "y": 277.7
+   },
+   "p1.298.161": {
+    "k": "blank",
+    "left": "Passport no:",
+    "p": 1,
+    "right": "NRC NO:",
+    "s": 12.0,
+    "x": 161.1,
+    "x1": 317.1,
+    "y": 298.4
+   },
+   "p1.298.317": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "NRC NO:",
+    "x": 317.1,
+    "x1": 368.4,
+    "y": 298.4
+   },
+   "p1.298.368": {
+    "k": "blank",
+    "left": "NRC NO:",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 368.4,
+    "x1": 500.4,
+    "y": 298.4
+   },
+   "p1.298.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "12.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 298.4
+   },
+   "p1.298.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Passport no:",
+    "x": 99.1,
+    "x1": 161.1,
+    "y": 298.4
+   },
+   "p1.319.156": {
+    "k": "blank",
+    "left": "Nationality",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 156.0,
+    "x1": 543.0,
+    "y": 319.0
+   },
+   "p1.319.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "11.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 319.0
+   },
+   "p1.319.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Nationality",
+    "x": 99.1,
+    "x1": 156.0,
+    "y": 319.0
+   },
+   "p1.340.214": {
+    "k": "blank",
+    "left": "Place of birth (country)",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 214.3,
+    "x1": 541.3,
+    "y": 339.8
+   },
+   "p1.340.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "10.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 339.8
+   },
+   "p1.340.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Place of birth (country)",
+    "x": 99.1,
+    "x1": 214.3,
+    "y": 339.8
+   },
+   "p1.360.163": {
+    "k": "blank",
+    "left": "Date of birth",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 163.4,
+    "x1": 493.4,
+    "y": 360.5
+   },
+   "p1.360.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "9.",
+    "x": 63.1,
+    "x1": 72.1,
+    "y": 360.5
+   },
+   "p1.360.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Date of birth",
+    "x": 99.1,
+    "x1": 163.4,
+    "y": 360.5
+   },
+   "p1.38.561": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "1",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p1.381.129": {
+    "k": "blank",
+    "left": "Sex",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 129.1,
+    "x1": 240.1,
+    "y": 381.1
+   },
+   "p1.381.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "8.",
+    "x": 63.1,
+    "x1": 72.1,
+    "y": 381.1
+   },
+   "p1.381.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Sex",
+    "x": 99.1,
+    "x1": 129.1,
+    "y": 381.1
+   },
+   "p1.402.187": {
+    "k": "blank",
+    "left": "Different spelling",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 187.0,
+    "x1": 493.0,
+    "y": 401.9
+   },
+   "p1.402.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "7.",
+    "x": 63.1,
+    "x1": 75.1,
+    "y": 401.9
+   },
+   "p1.402.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Different spelling",
+    "x": 99.1,
+    "x1": 187.0,
+    "y": 401.9
+   },
+   "p1.422.163": {
+    "k": "blank",
+    "left": "Pseudonyms",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 162.7,
+    "x1": 345.7,
+    "y": 422.5
+   },
+   "p1.422.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "6.",
+    "x": 63.1,
+    "x1": 72.1,
+    "y": 422.5
+   },
+   "p1.422.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Pseudonyms",
+    "x": 99.1,
+    "x1": 162.7,
+    "y": 422.5
+   },
+   "p1.443.153": {
+    "k": "blank",
+    "left": "First name",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 153.0,
+    "x1": 345.0,
+    "y": 443.2
+   },
+   "p1.443.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "5.",
+    "x": 63.1,
+    "x1": 72.1,
+    "y": 443.2
+   },
+   "p1.443.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "First name",
+    "x": 99.1,
+    "x1": 153.0,
+    "y": 443.2
+   },
+   "p1.464.167": {
+    "k": "blank",
+    "left": "3. Maiden Name",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 167.3,
+    "x1": 266.3,
+    "y": 464.0
+   },
+   "p1.464.351": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "4. IPI base number",
+    "x": 351.1,
+    "x1": 447.7,
+    "y": 464.0
+   },
+   "p1.464.448": {
+    "k": "blank",
+    "left": "4. IPI base number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 447.7,
+    "x1": 564.7,
+    "y": 464.0
+   },
+   "p1.464.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "3. Maiden Name",
+    "x": 63.1,
+    "x1": 167.3,
+    "y": 464.0
+   },
+   "p1.485.145": {
+    "k": "blank",
+    "left": "1 Surname",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 144.7,
+    "x1": 264.7,
+    "y": 484.6
+   },
+   "p1.485.351": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "2. IPI name number",
+    "x": 351.1,
+    "x1": 446.4,
+    "y": 484.6
+   },
+   "p1.485.446": {
+    "k": "blank",
+    "left": "2. IPI name number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 446.4,
+    "x1": 566.4,
+    "y": 484.6
+   },
+   "p1.485.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "1 Surname",
+    "x": 63.1,
+    "x1": 144.7,
+    "y": 484.6
+   },
+   "p1.526.326": {
+    "k": "blank",
+    "left": "Internal number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 326.0,
+    "x1": 374.0,
+    "y": 526.0
+   },
+   "p1.526.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Internal number",
+    "x": 63.1,
+    "x1": 326.0,
+    "y": 526.0
+   },
+   "p1.554.131": {
+    "k": "text",
+    "p": 1,
+    "s": 16.0,
+    "text": "APPLICATION FOR INDIVIDUAL MEMBERSHIP",
+    "x": 131.3,
+    "x1": 502.9,
+    "y": 554.5
+   },
+   "p1.57.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "employment with any government department/organisation/company?",
+    "x": 99.1,
+    "x1": 436.0,
+    "y": 56.8
+   },
+   "p1.613.103": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Telefax: +260-1-229270, E-mail:",
+    "x": 103.2,
+    "x1": 252.2,
+    "y": 613.3
+   },
+   "p1.613.252": {
+    "k": "text",
+    "p": 1,
+    "s": 10.0,
+    "text": "zamcops1@gmail.com",
+    "x": 252.4,
+    "x1": 353.6,
+    "y": 613.3
+   },
+   "p1.613.354": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": ". Website: www.zamcops.org.zm",
+    "x": 353.9,
+    "x1": 499.8,
+    "y": 613.3
+   },
+   "p1.626.163": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Anchor House, 3rd Floor. P.O. Box 51259, LUSAKA, Zambia",
+    "x": 163.4,
+    "x1": 439.5,
+    "y": 626.0
+   },
+   "p1.643.104": {
+    "k": "text",
+    "p": 1,
+    "s": 9.0,
+    "text": "(Nonprofit Making, Affiliated To International Confederation Of Societies of Authors & Composers-CISAC)",
+    "x": 104.3,
+    "x1": 498.4,
+    "y": 643.0
+   },
+   "p1.657.88": {
+    "k": "text",
+    "p": 1,
+    "s": 18.0,
+    "text": "ZAMBIA MUSIC COPYRIGHT PROTECTION SOCIETY",
+    "x": 88.4,
+    "x1": 514.7,
+    "y": 656.6
+   },
+   "p1.71.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "20.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 70.7
+   },
+   "p1.71.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Apart from your involvement in artistic and literary works, do you have any full time",
+    "x": 99.1,
+    "x1": 510.7,
+    "y": 70.7
+   },
+   "p1.91.182": {
+    "k": "blank",
+    "left": "Account number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 182.4,
+    "x1": 494.4,
+    "y": 91.3
+   },
+   "p1.91.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "19.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 91.3
+   },
+   "p1.91.99": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Account number",
+    "x": 99.1,
+    "x1": 182.4,
+    "y": 91.3
+   },
+   "p2.112.121": {
+    "k": "blank",
+    "left": "File:",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 121.1,
+    "x1": 244.1,
+    "y": 112.2
+   },
+   "p2.112.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "28.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 112.2
+   },
+   "p2.112.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "File:",
+    "x": 99.1,
+    "x1": 121.1,
+    "y": 112.2
+   },
+   "p2.140.200": {
+    "k": "blank",
+    "left": "Circle of occupation:",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 200.3,
+    "x1": 428.3,
+    "y": 139.8
+   },
+   "p2.140.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "27.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 139.8
+   },
+   "p2.140.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Circle of occupation:",
+    "x": 99.1,
+    "x1": 200.3,
+    "y": 139.8
+   },
+   "p2.174.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 174.3
+   },
+   "p2.195.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 195.0
+   },
+   "p2.216.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 215.8
+   },
+   "p2.243.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "26.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 243.3
+   },
+   "p2.243.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Any other relevant information",
+    "x": 99.1,
+    "x1": 248.6,
+    "y": 243.3
+   },
+   "p2.264.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 264.0
+   },
+   "p2.285.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 284.8
+   },
+   "p2.306.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 305.5
+   },
+   "p2.326.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 326.1
+   },
+   "p2.347.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 346.9
+   },
+   "p2.368.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 367.5
+   },
+   "p2.38.561": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "2",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p2.395.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "whom, giving dates, etc. Please continue on a separate sheet if necessary",
+    "x": 99.1,
+    "x1": 447.3,
+    "y": 395.1
+   },
+   "p2.409.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "25.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 409.0
+   },
+   "p2.409.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Indicate the works you have produced that have been performed/adapted/translated before and by",
+    "x": 99.1,
+    "x1": 569.9,
+    "y": 409.0
+   },
+   "p2.450.243": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Arranger",
+    "x": 243.1,
+    "x1": 286.4,
+    "y": 450.4
+   },
+   "p2.450.423": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Publisher",
+    "x": 423.1,
+    "x1": 468.4,
+    "y": 450.4
+   },
+   "p2.450.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Author",
+    "x": 99.1,
+    "x1": 133.1,
+    "y": 450.4
+   },
+   "p2.476.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "24.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 475.7
+   },
+   "p2.476.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Tick as appropriate?",
+    "x": 99.1,
+    "x1": 196.9,
+    "y": 475.7
+   },
+   "p2.496.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 496.4
+   },
+   "p2.517.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 517.1
+   },
+   "p2.538.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 537.8
+   },
+   "p2.552.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "23.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 551.6
+   },
+   "p2.552.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "If yes, give details",
+    "x": 99.1,
+    "x1": 187.0,
+    "y": 551.6
+   },
+   "p2.593.315": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "No",
+    "x": 315.1,
+    "x1": 329.8,
+    "y": 593.0
+   },
+   "p2.593.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Yes",
+    "x": 99.1,
+    "x1": 117.7,
+    "y": 593.0
+   },
+   "p2.621.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "22.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 620.6
+   },
+   "p2.621.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Are you a member of any other Copyright Society?",
+    "x": 99.1,
+    "x1": 345.5,
+    "y": 620.6
+   },
+   "p2.655.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 655.1
+   },
+   "p2.676.99": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 99.1,
+    "x1": 495.1,
+    "y": 675.8
+   },
+   "p2.703.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "21.",
+    "x": 63.1,
+    "x1": 78.1,
+    "y": 703.4
+   },
+   "p2.703.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "If yes, name and address of the government department/organisation/company",
+    "x": 99.1,
+    "x1": 475.0,
+    "y": 703.4
+   },
+   "p2.731.315": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "No",
+    "x": 315.1,
+    "x1": 329.8,
+    "y": 731.0
+   },
+   "p2.731.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Yes",
+    "x": 99.1,
+    "x1": 117.7,
+    "y": 731.0
+   },
+   "p3.317.102": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Signature",
+    "x": 102.3,
+    "x1": 151.2,
+    "y": 317.0
+   },
+   "p3.317.151": {
+    "k": "blank",
+    "left": "Signature",
+    "p": 3,
+    "right": "Date",
+    "s": 12.0,
+    "x": 151.2,
+    "x1": 400.2,
+    "y": 317.0
+   },
+   "p3.317.400": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Date",
+    "x": 400.2,
+    "x1": 431.9,
+    "y": 317.0
+   },
+   "p3.317.432": {
+    "k": "blank",
+    "left": "Date",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 431.9,
+    "x1": 563.9,
+    "y": 317.0
+   },
+   "p3.379.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "thereunder.",
+    "x": 99.1,
+    "x1": 153.4,
+    "y": 379.1
+   },
+   "p3.38.561": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "3",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p3.400.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "governed by the Memorandum and Articles of Association and all rules and regulations made",
+    "x": 99.1,
+    "x1": 551.3,
+    "y": 399.8
+   },
+   "p3.420.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "of Association of the Society and that my rights, obligations and liabilities as a member will be",
+    "x": 99.1,
+    "x1": 557.9,
+    "y": 420.5
+   },
+   "p3.441.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "I understand that, if admitted, my membership will be subject to the Memorandum and Articles",
+    "x": 99.1,
+    "x1": 559.6,
+    "y": 441.2
+   },
+   "p3.469.63": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 561.1,
+    "y": 468.8
+   },
+   "p3.496.171": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 435.1,
+    "y": 496.4
+   },
+   "p3.524.171": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 435.1,
+    "y": 524.0
+   },
+   "p3.552.171": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 435.1,
+    "y": 551.6
+   },
+   "p3.579.135": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Address :",
+    "x": 135.1,
+    "x1": 180.8,
+    "y": 579.2
+   },
+   "p3.579.181": {
+    "k": "blank",
+    "left": "Address :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 180.8,
+    "x1": 435.8,
+    "y": 579.2
+   },
+   "p3.607.135": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Name :",
+    "x": 135.1,
+    "x1": 170.1,
+    "y": 606.8
+   },
+   "p3.607.170": {
+    "k": "blank",
+    "left": "Name :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 170.1,
+    "x1": 434.1,
+    "y": 606.8
+   },
+   "p3.634.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Successor representative",
+    "x": 99.1,
+    "x1": 217.3,
+    "y": 634.4
+   },
+   "p3.662.128": {
+    "k": "blank",
+    "left": "Date :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 128.1,
+    "x1": 422.1,
+    "y": 662.0
+   },
+   "p3.662.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Date :",
+    "x": 99.1,
+    "x1": 128.1,
+    "y": 662.0
+   },
+   "p3.690.63": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Inheritance information",
+    "x": 63.1,
+    "x1": 183.4,
+    "y": 689.6
+   }
+  },
+  "pages": [
+   [
+    612.0,
+    792.0
+   ],
+   [
+    612.0,
+    792.0
+   ],
+   [
+    612.0,
+    792.0
+   ]
+  ]
+ },
+ "publisher": {
+  "anchors": {
+   "p1.111.171": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 315.1,
+    "y": 111.1
+   },
+   "p1.111.351": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Cell :",
+    "x": 351.1,
+    "x1": 377.4,
+    "y": 111.1
+   },
+   "p1.111.377": {
+    "k": "blank",
+    "left": "Cell :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 377.4,
+    "x1": 464.4,
+    "y": 111.1
+   },
+   "p1.111.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Headquarters :",
+    "x": 63.1,
+    "x1": 136.4,
+    "y": 111.1
+   },
+   "p1.139.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Addresses",
+    "x": 63.1,
+    "x1": 112.4,
+    "y": 138.7
+   },
+   "p1.166.117": {
+    "k": "blank",
+    "left": "Legal form",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 116.7,
+    "x1": 455.7,
+    "y": 166.3
+   },
+   "p1.166.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Legal form",
+    "x": 63.1,
+    "x1": 116.7,
+    "y": 166.3
+   },
+   "p1.194.125": {
+    "k": "blank",
+    "left": "Date of copy",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 125.0,
+    "x1": 215.0,
+    "y": 193.9
+   },
+   "p1.194.215": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 215.0,
+    "x1": 218.4,
+    "y": 193.9
+   },
+   "p1.194.218": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 218.4,
+    "x1": 293.4,
+    "y": 193.9
+   },
+   "p1.194.293": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 293.4,
+    "x1": 296.7,
+    "y": 193.9
+   },
+   "p1.194.297": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 296.7,
+    "x1": 458.7,
+    "y": 193.9
+   },
+   "p1.194.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Date of copy",
+    "x": 63.1,
+    "x1": 125.0,
+    "y": 193.9
+   },
+   "p1.222.220": {
+    "k": "blank",
+    "left": "Commercial registration number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 219.6,
+    "x1": 462.6,
+    "y": 221.5
+   },
+   "p1.222.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Commercial registration number",
+    "x": 63.1,
+    "x1": 219.6,
+    "y": 221.5
+   },
+   "p1.249.206": {
+    "k": "blank",
+    "left": "Commercial registration date",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 205.9,
+    "x1": 328.9,
+    "y": 249.1
+   },
+   "p1.249.329": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 328.9,
+    "x1": 332.2,
+    "y": 249.1
+   },
+   "p1.249.332": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 332.2,
+    "x1": 404.2,
+    "y": 249.1
+   },
+   "p1.249.404": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 404.2,
+    "x1": 407.5,
+    "y": 249.1
+   },
+   "p1.249.408": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 407.5,
+    "x1": 464.5,
+    "y": 249.1
+   },
+   "p1.249.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Commercial registration date",
+    "x": 63.1,
+    "x1": 205.9,
+    "y": 249.1
+   },
+   "p1.277.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 465.1,
+    "y": 276.7
+   },
+   "p1.277.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Language",
+    "x": 63.1,
+    "x1": 110.4,
+    "y": 276.7
+   },
+   "p1.304.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 465.1,
+    "y": 304.3
+   },
+   "p1.304.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Country",
+    "x": 63.1,
+    "x1": 102.4,
+    "y": 304.3
+   },
+   "p1.332.146": {
+    "k": "blank",
+    "left": "Foundation place",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 146.0,
+    "x1": 464.0,
+    "y": 331.9
+   },
+   "p1.332.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Foundation place",
+    "x": 63.1,
+    "x1": 146.0,
+    "y": 331.9
+   },
+   "p1.360.141": {
+    "k": "blank",
+    "left": "Foundation date",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 140.7,
+    "x1": 287.7,
+    "y": 359.5
+   },
+   "p1.360.288": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 287.7,
+    "x1": 291.0,
+    "y": 359.5
+   },
+   "p1.360.291": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "/",
+    "s": 12.0,
+    "x": 291.0,
+    "x1": 399.0,
+    "y": 359.5
+   },
+   "p1.360.399": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "/",
+    "x": 399.0,
+    "x1": 402.3,
+    "y": 359.5
+   },
+   "p1.360.402": {
+    "k": "blank",
+    "left": "/",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 402.3,
+    "x1": 468.3,
+    "y": 359.5
+   },
+   "p1.360.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Foundation date",
+    "x": 63.1,
+    "x1": 140.7,
+    "y": 359.5
+   },
+   "p1.38.561": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "1",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p1.387.142": {
+    "k": "blank",
+    "left": "IPI base number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 141.7,
+    "x1": 228.7,
+    "y": 387.1
+   },
+   "p1.387.279": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 279.1,
+    "x1": 375.1,
+    "y": 387.1
+   },
+   "p1.387.387": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 387.1,
+    "x1": 471.1,
+    "y": 387.1
+   },
+   "p1.387.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "IPI base number",
+    "x": 63.1,
+    "x1": 141.7,
+    "y": 387.1
+   },
+   "p1.415.146": {
+    "k": "blank",
+    "left": "IPI name number",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 146.4,
+    "x1": 233.4,
+    "y": 414.7
+   },
+   "p1.415.279": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "\u2026\u2026:",
+    "x": 279.1,
+    "x1": 306.4,
+    "y": 414.7
+   },
+   "p1.415.306": {
+    "k": "blank",
+    "left": "\u2026\u2026:",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 306.4,
+    "x1": 375.1,
+    "y": 414.7
+   },
+   "p1.415.387": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 387.1,
+    "x1": 471.1,
+    "y": 414.7
+   },
+   "p1.415.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "IPI name number",
+    "x": 63.1,
+    "x1": 146.4,
+    "y": 414.7
+   },
+   "p1.442.246": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": ":",
+    "x": 246.1,
+    "x1": 264.4,
+    "y": 442.3
+   },
+   "p1.442.264": {
+    "k": "blank",
+    "left": ":",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 264.4,
+    "x1": 375.1,
+    "y": 442.3
+   },
+   "p1.442.387": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 387.1,
+    "x1": 471.1,
+    "y": 442.3
+   },
+   "p1.442.63": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": ":",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 246.1,
+    "y": 442.3
+   },
+   "p1.470.140": {
+    "k": "blank",
+    "left": "Corporate name",
+    "p": 1,
+    "right": "Spellings, Marks",
+    "s": 12.0,
+    "x": 140.0,
+    "x1": 248.0,
+    "y": 469.9
+   },
+   "p1.470.248": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Spellings, Marks",
+    "x": 248.0,
+    "x1": 335.3,
+    "y": 469.9
+   },
+   "p1.470.351": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Type IPI name number",
+    "x": 351.1,
+    "x1": 470.4,
+    "y": 469.9
+   },
+   "p1.470.63": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Corporate name",
+    "x": 63.1,
+    "x1": 140.0,
+    "y": 469.9
+   },
+   "p1.498.207": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Internal number :",
+    "x": 207.1,
+    "x1": 290.4,
+    "y": 497.5
+   },
+   "p1.498.290": {
+    "k": "blank",
+    "left": "Internal number :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 290.4,
+    "x1": 350.4,
+    "y": 497.5
+   },
+   "p1.528.150": {
+    "k": "text",
+    "p": 1,
+    "s": 14.0,
+    "text": "PUBLISHER MEMBERSHIP APPLICATION FORM",
+    "x": 150.4,
+    "x1": 479.5,
+    "y": 527.8
+   },
+   "p1.56.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 306.1,
+    "y": 55.9
+   },
+   "p1.56.351": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Email :",
+    "x": 351.1,
+    "x1": 386.1,
+    "y": 55.9
+   },
+   "p1.56.386": {
+    "k": "blank",
+    "left": "Email :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 386.1,
+    "x1": 497.1,
+    "y": 55.9
+   },
+   "p1.571.158": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Telefax: +260-1-229270, E-mail:",
+    "x": 157.6,
+    "x1": 312.2,
+    "y": 571.0
+   },
+   "p1.571.312": {
+    "k": "text",
+    "p": 1,
+    "s": 10.0,
+    "text": "zamcops1@gmail.com",
+    "x": 312.3,
+    "x1": 413.6,
+    "y": 571.0
+   },
+   "p1.571.414": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": ". Website: www.zamcops.org.zm",
+    "x": 413.9,
+    "x1": 559.7,
+    "y": 571.0
+   },
+   "p1.584.221": {
+    "k": "text",
+    "p": 1,
+    "s": 11.0,
+    "text": "Anchor House, 3rd Floor. P.O. Box 51259, LUSAKA, Zambia",
+    "x": 220.6,
+    "x1": 496.7,
+    "y": 583.7
+   },
+   "p1.596.252": {
+    "k": "text",
+    "p": 1,
+    "s": 9.0,
+    "text": "and the Ministry of Information and Broadcastin Services )",
+    "x": 252.3,
+    "x1": 465.1,
+    "y": 595.8
+   },
+   "p1.606.163": {
+    "k": "text",
+    "p": 1,
+    "s": 9.0,
+    "text": "(Nonprofit Making, Affiliated To International Confederation Of Societies of Authors & Composers-CISAC",
+    "x": 163.1,
+    "x1": 556.8,
+    "y": 606.2
+   },
+   "p1.632.155": {
+    "k": "text",
+    "p": 1,
+    "s": 18.0,
+    "text": "SOCIETY",
+    "x": 154.9,
+    "x1": 226.5,
+    "y": 632.1
+   },
+   "p1.657.155": {
+    "k": "text",
+    "p": 1,
+    "s": 18.0,
+    "text": "ZAMBIA MUSIC COPYRIGHT PROTECTION",
+    "x": 154.9,
+    "x1": 509.5,
+    "y": 656.6
+   },
+   "p1.84.135": {
+    "k": "blank",
+    "left": "",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 309.1,
+    "y": 83.5
+   },
+   "p1.84.351": {
+    "k": "text",
+    "p": 1,
+    "s": 12.0,
+    "text": "Fax :",
+    "x": 351.1,
+    "x1": 375.4,
+    "y": 83.5
+   },
+   "p1.84.375": {
+    "k": "blank",
+    "left": "Fax :",
+    "p": 1,
+    "right": "",
+    "s": 12.0,
+    "x": 375.4,
+    "x1": 495.4,
+    "y": 83.5
+   },
+   "p2.110.155": {
+    "k": "blank",
+    "left": "Entry date :",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 155.0,
+    "x1": 266.0,
+    "y": 110.0
+   },
+   "p2.110.266": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 266.0,
+    "x1": 269.3,
+    "y": 110.0
+   },
+   "p2.110.269": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 269.3,
+    "x1": 353.3,
+    "y": 110.0
+   },
+   "p2.110.353": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 353.3,
+    "x1": 356.7,
+    "y": 110.0
+   },
+   "p2.110.357": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 356.7,
+    "x1": 461.7,
+    "y": 110.0
+   },
+   "p2.110.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Entry date :",
+    "x": 99.1,
+    "x1": 155.0,
+    "y": 110.0
+   },
+   "p2.138.241": {
+    "k": "blank",
+    "left": "Membership status(Position):",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 240.6,
+    "x1": 459.6,
+    "y": 137.6
+   },
+   "p2.138.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Membership status(Position):",
+    "x": 99.1,
+    "x1": 240.6,
+    "y": 137.6
+   },
+   "p2.165.145": {
+    "k": "blank",
+    "left": "Exit date:",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 145.3,
+    "x1": 253.3,
+    "y": 165.2
+   },
+   "p2.165.253": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 253.3,
+    "x1": 256.7,
+    "y": 165.2
+   },
+   "p2.165.257": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 256.7,
+    "x1": 331.7,
+    "y": 165.2
+   },
+   "p2.165.332": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 331.7,
+    "x1": 335.0,
+    "y": 165.2
+   },
+   "p2.165.335": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 335.0,
+    "x1": 458.0,
+    "y": 165.2
+   },
+   "p2.165.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Exit date:",
+    "x": 99.1,
+    "x1": 145.3,
+    "y": 165.2
+   },
+   "p2.193.216": {
+    "k": "blank",
+    "left": "Entry or admission date:",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 215.9,
+    "x1": 293.9,
+    "y": 192.8
+   },
+   "p2.193.294": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 293.9,
+    "x1": 297.2,
+    "y": 192.8
+   },
+   "p2.193.297": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 297.2,
+    "x1": 381.2,
+    "y": 192.8
+   },
+   "p2.193.381": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 381.2,
+    "x1": 384.5,
+    "y": 192.8
+   },
+   "p2.193.385": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 384.5,
+    "x1": 456.5,
+    "y": 192.8
+   },
+   "p2.193.98": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Entry or admission date:",
+    "x": 98.3,
+    "x1": 215.9,
+    "y": 192.8
+   },
+   "p2.207.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Copyright",
+    "x": 63.1,
+    "x1": 111.7,
+    "y": 206.6
+   },
+   "p2.234.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Managed rights (Membership)",
+    "x": 63.1,
+    "x1": 214.4,
+    "y": 234.2
+   },
+   "p2.276.98": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 98.5,
+    "x1": 494.5,
+    "y": 275.6
+   },
+   "p2.303.98": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 98.5,
+    "x1": 494.5,
+    "y": 303.2
+   },
+   "p2.331.98": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 98.5,
+    "x1": 494.5,
+    "y": 330.8
+   },
+   "p2.358.110": {
+    "k": "blank",
+    "left": "Managers",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 110.4,
+    "x1": 494.4,
+    "y": 358.4
+   },
+   "p2.358.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Managers",
+    "x": 63.1,
+    "x1": 110.4,
+    "y": 358.4
+   },
+   "p2.38.561": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "2",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p2.386.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Managers and Biography",
+    "x": 63.1,
+    "x1": 189.7,
+    "y": 386.0
+   },
+   "p2.455.171": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 483.1,
+    "y": 455.0
+   },
+   "p2.483.171": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 486.1,
+    "y": 482.6
+   },
+   "p2.510.171": {
+    "k": "blank",
+    "left": "Bank account :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 489.1,
+    "y": 510.2
+   },
+   "p2.510.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Bank account :",
+    "x": 99.1,
+    "x1": 171.1,
+    "y": 510.2
+   },
+   "p2.538.63": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 411.1,
+    "y": 537.8
+   },
+   "p2.55.237": {
+    "k": "blank",
+    "left": "Region or City (Residence) :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 237.1,
+    "x1": 459.1,
+    "y": 54.8
+   },
+   "p2.55.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Region or City (Residence) :",
+    "x": 99.1,
+    "x1": 237.1,
+    "y": 54.8
+   },
+   "p2.552.495": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Method :",
+    "x": 495.1,
+    "x1": 538.8,
+    "y": 551.6
+   },
+   "p2.552.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Publisher",
+    "x": 63.1,
+    "x1": 108.4,
+    "y": 551.6
+   },
+   "p2.579.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Payments",
+    "x": 63.1,
+    "x1": 111.0,
+    "y": 579.2
+   },
+   "p2.607.135": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 306.1,
+    "y": 606.8
+   },
+   "p2.607.351": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Website :",
+    "x": 351.1,
+    "x1": 396.7,
+    "y": 606.8
+   },
+   "p2.607.397": {
+    "k": "blank",
+    "left": "Website :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 396.7,
+    "x1": 498.7,
+    "y": 606.8
+   },
+   "p2.634.135": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 306.1,
+    "y": 634.4
+   },
+   "p2.634.351": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Email :",
+    "x": 351.1,
+    "x1": 386.1,
+    "y": 634.4
+   },
+   "p2.634.386": {
+    "k": "blank",
+    "left": "Email :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 386.1,
+    "x1": 497.1,
+    "y": 634.4
+   },
+   "p2.662.135": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 309.1,
+    "y": 662.0
+   },
+   "p2.662.351": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Fax :",
+    "x": 351.1,
+    "x1": 375.4,
+    "y": 662.0
+   },
+   "p2.662.375": {
+    "k": "blank",
+    "left": "Fax :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 375.4,
+    "x1": 498.4,
+    "y": 662.0
+   },
+   "p2.690.150": {
+    "k": "blank",
+    "left": "Correspondence :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 150.4,
+    "x1": 312.4,
+    "y": 689.6
+   },
+   "p2.690.351": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Cell :",
+    "x": 351.1,
+    "x1": 377.4,
+    "y": 689.6
+   },
+   "p2.690.377": {
+    "k": "blank",
+    "left": "Cell :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 377.4,
+    "x1": 467.4,
+    "y": 689.6
+   },
+   "p2.690.63": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Correspondence :",
+    "x": 63.1,
+    "x1": 150.4,
+    "y": 689.6
+   },
+   "p2.717.135": {
+    "k": "blank",
+    "left": "",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 135.1,
+    "x1": 306.1,
+    "y": 717.2
+   },
+   "p2.717.351": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Website :",
+    "x": 351.1,
+    "x1": 396.7,
+    "y": 717.2
+   },
+   "p2.717.397": {
+    "k": "blank",
+    "left": "Website :",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 396.7,
+    "x1": 498.7,
+    "y": 717.2
+   },
+   "p2.82.148": {
+    "k": "blank",
+    "left": "Exit date :",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 148.4,
+    "x1": 259.4,
+    "y": 82.4
+   },
+   "p2.82.259": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 259.4,
+    "x1": 262.7,
+    "y": 82.4
+   },
+   "p2.82.263": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "/",
+    "s": 12.0,
+    "x": 262.7,
+    "x1": 349.7,
+    "y": 82.4
+   },
+   "p2.82.350": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "/",
+    "x": 349.7,
+    "x1": 353.1,
+    "y": 82.4
+   },
+   "p2.82.353": {
+    "k": "blank",
+    "left": "/",
+    "p": 2,
+    "right": "",
+    "s": 12.0,
+    "x": 353.1,
+    "x1": 461.1,
+    "y": 82.4
+   },
+   "p2.82.99": {
+    "k": "text",
+    "p": 2,
+    "s": 12.0,
+    "text": "Exit date :",
+    "x": 99.1,
+    "x1": 148.4,
+    "y": 82.4
+   },
+   "p3.200.147": {
+    "k": "blank",
+    "left": "Signature",
+    "p": 3,
+    "right": "Date",
+    "s": 12.0,
+    "x": 147.4,
+    "x1": 396.4,
+    "y": 199.7
+   },
+   "p3.200.396": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Date",
+    "x": 396.4,
+    "x1": 428.1,
+    "y": 199.7
+   },
+   "p3.200.428": {
+    "k": "blank",
+    "left": "Date",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 428.1,
+    "x1": 560.1,
+    "y": 199.7
+   },
+   "p3.200.98": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Signature",
+    "x": 98.5,
+    "x1": 147.4,
+    "y": 199.7
+   },
+   "p3.241.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "thereunder.",
+    "x": 99.1,
+    "x1": 153.4,
+    "y": 241.1
+   },
+   "p3.262.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "governed by the Memorandum and Articles of Association and all rules and regulations made",
+    "x": 99.1,
+    "x1": 551.3,
+    "y": 261.8
+   },
+   "p3.282.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "of Association of the Society and that my rights, obligations and liabilities as a member will be",
+    "x": 99.1,
+    "x1": 557.9,
+    "y": 282.5
+   },
+   "p3.303.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "I understand that, if admitted, my membership will be subject to the Memorandum and Articles",
+    "x": 99.1,
+    "x1": 559.6,
+    "y": 303.2
+   },
+   "p3.331.63": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 63.1,
+    "x1": 561.1,
+    "y": 330.8
+   },
+   "p3.372.171": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 447.1,
+    "y": 372.2
+   },
+   "p3.38.561": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "3",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   },
+   "p3.400.171": {
+    "k": "blank",
+    "left": "",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 171.1,
+    "x1": 447.1,
+    "y": 399.8
+   },
+   "p3.427.135": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Address :",
+    "x": 135.1,
+    "x1": 180.8,
+    "y": 427.4
+   },
+   "p3.427.181": {
+    "k": "blank",
+    "left": "Address :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 180.8,
+    "x1": 447.8,
+    "y": 427.4
+   },
+   "p3.455.135": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Name :",
+    "x": 135.1,
+    "x1": 170.1,
+    "y": 455.0
+   },
+   "p3.455.170": {
+    "k": "blank",
+    "left": "Name :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 170.1,
+    "x1": 452.1,
+    "y": 455.0
+   },
+   "p3.483.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Successor representative",
+    "x": 99.1,
+    "x1": 217.3,
+    "y": 482.6
+   },
+   "p3.510.128": {
+    "k": "blank",
+    "left": "Date :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 128.1,
+    "x1": 350.1,
+    "y": 510.2
+   },
+   "p3.510.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Date :",
+    "x": 99.1,
+    "x1": 128.1,
+    "y": 510.2
+   },
+   "p3.538.63": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Liquidation and inheritance",
+    "x": 63.1,
+    "x1": 202.3,
+    "y": 537.8
+   },
+   "p3.565.153": {
+    "k": "blank",
+    "left": "Territories:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 153.0,
+    "x1": 465.0,
+    "y": 565.4
+   },
+   "p3.565.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Territories:",
+    "x": 99.1,
+    "x1": 153.0,
+    "y": 565.4
+   },
+   "p3.593.245": {
+    "k": "blank",
+    "left": "Managed or transferred rights:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 245.3,
+    "x1": 464.3,
+    "y": 593.0
+   },
+   "p3.593.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Managed or transferred rights:",
+    "x": 99.1,
+    "x1": 245.3,
+    "y": 593.0
+   },
+   "p3.621.236": {
+    "k": "blank",
+    "left": "Type of right holder (Role) :",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 236.1,
+    "x1": 464.1,
+    "y": 620.6
+   },
+   "p3.621.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Type of right holder (Role) :",
+    "x": 99.1,
+    "x1": 236.1,
+    "y": 620.6
+   },
+   "p3.648.192": {
+    "k": "blank",
+    "left": "Category of works:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 191.7,
+    "x1": 461.7,
+    "y": 648.2
+   },
+   "p3.648.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Category of works:",
+    "x": 99.1,
+    "x1": 191.7,
+    "y": 648.2
+   },
+   "p3.676.163": {
+    "k": "blank",
+    "left": "Subscription:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 163.0,
+    "x1": 238.0,
+    "y": 675.8
+   },
+   "p3.676.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Subscription:",
+    "x": 99.1,
+    "x1": 163.0,
+    "y": 675.8
+   },
+   "p3.690.121": {
+    "k": "blank",
+    "left": "File:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 121.1,
+    "x1": 244.1,
+    "y": 689.6
+   },
+   "p3.690.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "File:",
+    "x": 99.1,
+    "x1": 121.1,
+    "y": 689.6
+   },
+   "p3.717.200": {
+    "k": "blank",
+    "left": "Circle of occupation:",
+    "p": 3,
+    "right": "",
+    "s": 12.0,
+    "x": 200.3,
+    "x1": 458.3,
+    "y": 717.2
+   },
+   "p3.717.99": {
+    "k": "text",
+    "p": 3,
+    "s": 12.0,
+    "text": "Circle of occupation:",
+    "x": 99.1,
+    "x1": 200.3,
+    "y": 717.2
+   },
+   "p4.38.561": {
+    "k": "text",
+    "p": 4,
+    "s": 12.0,
+    "text": "4",
+    "x": 561.0,
+    "x1": 567.0,
+    "y": 38.5
+   }
+  },
+  "pages": [
+   [
+    612.0,
+    792.0
+   ],
+   [
+    612.0,
+    792.0
+   ],
+   [
+    612.0,
+    792.0
+   ],
+   [
+    612.0,
+    792.0
+   ]
+  ]
+ },
+ "workdecl": {
+  "anchors": {
+   "p1.110.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "I DECLARE",
+    "x": 20.2,
+    "x1": 62.2,
+    "y": 110.2
+   },
+   "p1.136.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "actions relating to my involvement in the works contained in the form of declaration.",
+    "x": 20.2,
+    "x1": 307.5,
+    "y": 135.7
+   },
+   "p1.148.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "ZAMCOPS shall not be held liable for any claims of any kind arising from disputes and",
+    "x": 20.2,
+    "x1": 317.4,
+    "y": 148.4
+   },
+   "p1.161.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "Further, I hereby certify that the information I have given above is true.",
+    "x": 20.2,
+    "x1": 262.4,
+    "y": 161.2
+   },
+   "p1.174.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "\u201cperforming, syncronizing and mechanical rights\u201d in the work (s) declared above in the ZAMCOPS Membership Contract.",
+    "x": 20.2,
+    "x1": 435.7,
+    "y": 173.9
+   },
+   "p1.187.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "I hereby assign to Zambian Music Copyright protection Society (ZAMCOPS).",
+    "x": 20.2,
+    "x1": 284.5,
+    "y": 186.7
+   },
+   "p1.225.20": {
+    "k": "text",
+    "p": 1,
+    "s": 8.8,
+    "text": "OTHER DOCUMENTS",
+    "x": 20.2,
+    "x1": 112.3,
+    "y": 225.1
+   },
+   "p1.264.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "CD",
+    "x": 20.2,
+    "x1": 55.9,
+    "y": 263.6
+   },
+   "p1.264.237": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Contract",
+    "x": 237.0,
+    "x1": 290.0,
+    "y": 263.6
+   },
+   "p1.276.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "Lyrics (if not on sound carrier)",
+    "x": 20.2,
+    "x1": 138.2,
+    "y": 275.9
+   },
+   "p1.276.237": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Musical - score Online",
+    "x": 237.0,
+    "x1": 381.6,
+    "y": 276.3
+   },
+   "p1.289.237": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Enclosure",
+    "x": 237.0,
+    "x1": 280.3,
+    "y": 289.1
+   },
+   "p1.314.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "PUBLISHING TERRITORY",
+    "x": 20.2,
+    "x1": 116.2,
+    "y": 314.2
+   },
+   "p1.327.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "DATE OF AGREEMENT",
+    "x": 20.2,
+    "x1": 104.5,
+    "y": 326.9
+   },
+   "p1.327.334": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "VALIDITY",
+    "x": 334.5,
+    "x1": 369.1,
+    "y": 326.9
+   },
+   "p1.352.115": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "PUBLISHING",
+    "x": 114.8,
+    "x1": 162.8,
+    "y": 352.4
+   },
+   "p1.391.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "Finance by Publisher?",
+    "x": 20.2,
+    "x1": 99.5,
+    "y": 390.7
+   },
+   "p1.391.237": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "YES",
+    "x": 237.0,
+    "x1": 282.7,
+    "y": 390.7
+   },
+   "p1.391.334": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "NO",
+    "x": 334.5,
+    "x1": 367.8,
+    "y": 390.7
+   },
+   "p1.403.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "Sound Carrier",
+    "x": 20.2,
+    "x1": 68.8,
+    "y": 403.4
+   },
+   "p1.429.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "SE Sub-publisher",
+    "x": 20.2,
+    "x1": 101.5,
+    "y": 429.3
+   },
+   "p1.429.471": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 471.3,
+    "x1": 480.0,
+    "y": 429.3
+   },
+   "p1.429.537": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 537.3,
+    "x1": 546.0,
+    "y": 429.3
+   },
+   "p1.455.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "SR Sub-arranger",
+    "x": 20.2,
+    "x1": 102.0,
+    "y": 454.8
+   },
+   "p1.455.471": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 471.3,
+    "x1": 480.0,
+    "y": 454.8
+   },
+   "p1.455.537": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 537.3,
+    "x1": 546.0,
+    "y": 454.8
+   },
+   "p1.482.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "SA Sub-author",
+    "x": 20.2,
+    "x1": 92.5,
+    "y": 481.8
+   },
+   "p1.482.471": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 471.3,
+    "x1": 480.0,
+    "y": 481.8
+   },
+   "p1.482.537": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 537.3,
+    "x1": 546.0,
+    "y": 481.8
+   },
+   "p1.507.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "E Publisher",
+    "x": 20.2,
+    "x1": 80.9,
+    "y": 507.3
+   },
+   "p1.507.471": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 471.3,
+    "x1": 480.0,
+    "y": 507.3
+   },
+   "p1.507.537": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 537.3,
+    "x1": 546.0,
+    "y": 507.3
+   },
+   "p1.534.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "AR Arranger",
+    "x": 20.2,
+    "x1": 82.5,
+    "y": 534.3
+   },
+   "p1.534.471": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 471.3,
+    "x1": 480.0,
+    "y": 534.3
+   },
+   "p1.534.537": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 537.3,
+    "x1": 546.0,
+    "y": 534.3
+   },
+   "p1.561.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "A Author",
+    "x": 20.2,
+    "x1": 71.3,
+    "y": 561.3
+   },
+   "p1.561.471": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 471.3,
+    "x1": 480.0,
+    "y": 561.3
+   },
+   "p1.561.537": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 537.3,
+    "x1": 546.0,
+    "y": 561.3
+   },
+   "p1.587.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "C Composer",
+    "x": 20.2,
+    "x1": 85.8,
+    "y": 586.8
+   },
+   "p1.587.471": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 471.3,
+    "x1": 480.0,
+    "y": 586.8
+   },
+   "p1.587.537": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "%",
+    "x": 537.3,
+    "x1": 546.0,
+    "y": 586.8
+   },
+   "p1.599.407": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "Broadcast",
+    "x": 407.2,
+    "x1": 442.4,
+    "y": 599.2
+   },
+   "p1.600.485": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Rights",
+    "x": 485.2,
+    "x1": 512.9,
+    "y": 599.6
+   },
+   "p1.612.420": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "Performance",
+    "x": 420.0,
+    "x1": 466.8,
+    "y": 611.9
+   },
+   "p1.612.497": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "Recording",
+    "x": 497.2,
+    "x1": 532.8,
+    "y": 611.9
+   },
+   "p1.625.407": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "DISTRIBUTION KEY",
+    "x": 407.2,
+    "x1": 500.7,
+    "y": 625.1
+   },
+   "p1.676.407": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Factor",
+    "x": 407.2,
+    "x1": 434.9,
+    "y": 676.1
+   },
+   "p1.688.334": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "FILE NO",
+    "x": 334.5,
+    "x1": 364.8,
+    "y": 688.4
+   },
+   "p1.701.115": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "INSTRUMENTS",
+    "x": 114.8,
+    "x1": 171.0,
+    "y": 701.2
+   },
+   "p1.701.334": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "DURATION",
+    "x": 334.5,
+    "x1": 376.8,
+    "y": 701.2
+   },
+   "p1.702.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Type of music",
+    "x": 20.2,
+    "x1": 80.4,
+    "y": 701.6
+   },
+   "p1.702.407": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Date of Registration",
+    "x": 407.2,
+    "x1": 496.1,
+    "y": 701.6
+   },
+   "p1.714.334": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "YEAR COMPOSED",
+    "x": 334.5,
+    "x1": 403.3,
+    "y": 713.9
+   },
+   "p1.727.20": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "TITLE OF SONG",
+    "x": 20.2,
+    "x1": 83.9,
+    "y": 726.7
+   },
+   "p1.727.407": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Work No",
+    "x": 407.2,
+    "x1": 447.7,
+    "y": 727.1
+   },
+   "p1.752.237": {
+    "k": "text",
+    "p": 1,
+    "s": 8.8,
+    "text": "WORK DECLARATION",
+    "x": 237.0,
+    "x1": 335.2,
+    "y": 752.4
+   },
+   "p1.779.115": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "ZAMBIA MUSIC COPYRIGHT PROTECTION SOCIETY",
+    "x": 114.8,
+    "x1": 391.4,
+    "y": 778.9
+   },
+   "p1.85.20": {
+    "k": "text",
+    "p": 1,
+    "s": 9.8,
+    "text": "Name:",
+    "x": 20.2,
+    "x1": 49.0,
+    "y": 85.1
+   },
+   "p1.85.334": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "SIGN:",
+    "x": 334.5,
+    "x1": 383.8,
+    "y": 84.7
+   },
+   "p1.85.384": {
+    "k": "blank",
+    "left": "SIGN:",
+    "p": 1,
+    "right": "DATE:",
+    "s": 7.8,
+    "x": 383.8,
+    "x1": 407.2,
+    "y": 84.7
+   },
+   "p1.85.407": {
+    "k": "text",
+    "p": 1,
+    "s": 7.8,
+    "text": "DATE:",
+    "x": 407.2,
+    "x1": 431.8,
+    "y": 84.7
+   },
+   "p1.85.432": {
+    "k": "blank",
+    "left": "DATE:",
+    "p": 1,
+    "right": "",
+    "s": 7.8,
+    "x": 431.8,
+    "x1": 472.9,
+    "y": 84.7
+   },
+   "p1.85.49": {
+    "k": "blank",
+    "left": "Name:",
+    "p": 1,
+    "right": "",
+    "s": 9.8,
+    "x": 49.0,
+    "x1": 283.0,
+    "y": 85.1
+   }
+  },
+  "pages": [
+   [
+    595.0,
+    842.0
+   ]
+  ]
+ }
+}
