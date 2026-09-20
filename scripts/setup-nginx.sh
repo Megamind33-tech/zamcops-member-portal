@@ -30,12 +30,17 @@ for d in $DOMAINS; do CERTBOT_ARGS="$CERTBOT_ARGS -d $d"; done
 [ "$(id -u)" -eq 0 ] || die "run with sudo — this writes to /etc/nginx"
 
 cd "$(dirname "$0")/.." || die "cannot find the repository root"
-APP_PORT=$(grep '^APP_HOST_PORT=' .env 2>/dev/null | cut -d= -f2- | tr -dc '0-9')
+# A key can appear more than once: these get set by appending, and appending
+# twice is easy. Take the LAST occurrence — the value docker compose itself
+# would use — rather than joining every match into one multi-line string.
+envval() { grep -E "^$1=" .env 2>/dev/null | tail -1 | cut -d= -f2- | tr -d "\"'"; }
+
+APP_PORT=$(envval APP_HOST_PORT | tr -dc '0-9')
 APP_PORT=${APP_PORT:-3100}
 # Let's Encrypt certificates last 90 days. Registered against an address, the
 # CA warns before one expires; registered anonymously, a renewal that quietly
 # stops working is discovered when the portal goes dark.
-ACME_EMAIL=$(grep '^ACME_EMAIL=' .env 2>/dev/null | cut -d= -f2- | tr -d '"'"'"'' | tr -d "'")
+ACME_EMAIL=$(envval ACME_EMAIL)
 
 AVAIL="/etc/nginx/sites-available/zamcops"
 ENABLED="/etc/nginx/sites-enabled/zamcops"
@@ -158,17 +163,18 @@ if [ "$DNS_OK" -ne 1 ]; then
   warn "once it does:  sudo certbot --nginx${CERTBOT_ARGS}"
 elif command -v certbot >/dev/null; then
   echo "  Requesting a certificate for ${DOMAIN}…"
+  # The address is passed as one quoted argument rather than inside a string
+  # that is then word-split, so a stray space in it cannot become a second
+  # argument that certbot rejects.
+  # shellcheck disable=SC2086 # CERTBOT_ARGS is intentionally word-split
   if [ -n "$ACME_EMAIL" ]; then
-    REGISTRATION="--email $ACME_EMAIL"
     ok "expiry warnings will go to ${ACME_EMAIL}"
+    certbot --nginx $CERTBOT_ARGS --non-interactive --agree-tos --email "$ACME_EMAIL" --redirect
   else
-    REGISTRATION="--register-unsafely-without-email"
     warn "ACME_EMAIL is not set in .env — no warning before this certificate expires"
-    warn "set it and re-run certbot to register an address"
+    certbot --nginx $CERTBOT_ARGS --non-interactive --agree-tos --register-unsafely-without-email --redirect
   fi
-  # shellcheck disable=SC2086 # REGISTRATION is two words by design
-  # shellcheck disable=SC2086 # both are intentionally word-split
-  if certbot --nginx $CERTBOT_ARGS --non-interactive --agree-tos $REGISTRATION --redirect; then
+  if [ $? -eq 0 ]; then
     ok "certificate installed; HTTP now redirects to HTTPS"
   else
     warn "certbot failed — the site still works on http://${DOMAIN}. Fix DNS, then: sudo certbot --nginx${CERTBOT_ARGS}"
