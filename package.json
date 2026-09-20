@@ -14,7 +14,8 @@
     "check:r2": "node scripts/preflight.mjs storage",
     "backfill:r2": "node scripts/backfill-r2.mjs",
     "check:forms": "node scripts/check-form-templates.mjs",
-    "backfill:album-works": "node scripts/backfill-album-works.mjs"
+    "backfill:album-works": "node scripts/backfill-album-works.mjs",
+    "map:forms": "node scripts/map-form-anchors.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
