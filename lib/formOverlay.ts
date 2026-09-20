@@ -14,7 +14,7 @@ import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-export type TemplateName = "individual" | "group" | "publisher" | "deed" | "admission";
+export type TemplateName = "individual" | "group" | "publisher" | "deed" | "admission" | "workdecl";
 
 // Where the forms live. Next's standalone bundle only carries what it traces,
 // so the Dockerfile copies assets/ explicitly and this resolves from the

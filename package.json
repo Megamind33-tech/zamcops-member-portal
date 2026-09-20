@@ -12,7 +12,8 @@
     "db:studio": "prisma studio",
     "preflight": "node scripts/preflight.mjs",
     "check:r2": "node scripts/preflight.mjs storage",
-    "backfill:r2": "node scripts/backfill-r2.mjs"
+    "backfill:r2": "node scripts/backfill-r2.mjs",
+    "check:forms": "node scripts/check-form-templates.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

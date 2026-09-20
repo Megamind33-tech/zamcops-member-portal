@@ -1,43 +1,38 @@
 // Field map for the society's admission letter (assets/forms/admission.pdf).
 //
-// Positions were read out of the template itself rather than estimated: each
-// constant below is where the specimen letter's own text sits, so a value
-// written there lands exactly where the office has always put it.
+// Positions are read out of the template itself, not estimated: each constant
+// is where the form's own rule or sentence sits, so a value written there lands
+// where the office has always put it.
 //
-// This template is the one exception among the five — it arrived as a filled
-// specimen rather than a blank, carrying a previous member's name, address and
-// date. Those runs are painted over before the real values are written, which
-// is why every field here has a `cover` as well as a position.
+// The template is blank. An earlier export carried a specimen member's name,
+// address and date, which had to be painted over — correct on the page but not
+// underneath, since the specimen's text stayed in the PDF's text layer and
+// would have travelled inside every member's letter. Working from a blank
+// removes that entirely, so nothing here covers anything except the one
+// sentence that has a value printed mid-line.
 
 import type { Stamp } from "@/lib/formOverlay";
 
-// Baseline y of each line in the specimen, bottom-left origin.
+// The four ruled lines of the addressee block, and what sits above each.
+// A value is written 14pt above its rule, which is where the specimen sat.
+const RULE = { name: 528, address1: 500, address2: 473, city: 445 } as const;
+const ABOVE_RULE = 14;
+
 const LINE = {
-  name: 546,
-  address1: 519,
-  address2: 491,
-  city: 463,
-  applicationDate: 312,
-  admittedSentence: 256,
-  signatureBaseline: 95, // the GM's name is printed at y=77; the mark sits above it
+  // "Reference is made to your application for membership dated" sits at 335;
+  // the date goes on the line beneath it, at the spacing the specimen used.
+  applicationDate: 308,
+  admittedSentence: 252,
+  // The General Manager's name is printed at y=72; the mark belongs above it.
+  signatureBaseline: 88,
 } as const;
 
-const LEFT = 36; // every line on this letter is flush to this margin
-const COVER_H = 16; // tall enough to hide a line of the specimen's 11pt text
-const COVER_W = 320; // past the longest specimen value, short of the dotted rule
-
-const cover = (y: number, width = COVER_W): Stamp => ({
-  kind: "cover",
-  page: 1,
-  x: LEFT - 2,
-  y: y - 4,
-  width,
-  height: COVER_H,
-});
+const LEFT = 36;
+const FIELD_W = 300; // the ruled lines run to roughly x=240; allow a little over
 
 export interface AdmissionLetterValues {
   memberName: string;
-  addressLines: string[]; // street, area, town — printed on the three ruled lines
+  addressLines: string[]; // street, area, town — one per ruled line
   applicationDate: string; // already formatted for print
   membershipClass: string; // e.g. CANDIDATE
   generalManagerSignature?: string; // transparent PNG data URL
@@ -45,39 +40,32 @@ export interface AdmissionLetterValues {
 
 export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
   const [a1 = "", a2 = "", a3 = ""] = v.addressLines;
-  const cls = (v.membershipClass || "CANDIDATE").toUpperCase();
+  const cls = (v.membershipClass || "CANDIDATE").trim().toUpperCase();
 
   const stamps: Stamp[] = [
-    // Addressee block.
-    cover(LINE.name),
-    { page: 1, x: LEFT, y: LINE.name, text: v.memberName, size: 11, maxWidth: COVER_W },
-    cover(LINE.address1),
-    { page: 1, x: LEFT, y: LINE.address1, text: a1, size: 11, maxWidth: COVER_W },
-    cover(LINE.address2),
-    { page: 1, x: LEFT, y: LINE.address2, text: a2, size: 11, maxWidth: COVER_W },
-    cover(LINE.city),
-    { page: 1, x: LEFT, y: LINE.city, text: a3, size: 11, maxWidth: COVER_W },
-
-    // "Reference is made to your application for membership dated …".
-    // The specimen renders "01" and "st" as separate runs, so the cover has to
-    // reach above the baseline to take the superscript with it.
-    { kind: "cover", page: 1, x: LEFT - 2, y: LINE.applicationDate - 4, width: 260, height: 20 },
+    { page: 1, x: LEFT, y: RULE.name + ABOVE_RULE, text: v.memberName, size: 11, maxWidth: FIELD_W },
+    { page: 1, x: LEFT, y: RULE.address1 + ABOVE_RULE, text: a1, size: 11, maxWidth: FIELD_W },
+    { page: 1, x: LEFT, y: RULE.address2 + ABOVE_RULE, text: a2, size: 11, maxWidth: FIELD_W },
+    { page: 1, x: LEFT, y: RULE.city + ABOVE_RULE, text: a3, size: 11, maxWidth: FIELD_W },
     { page: 1, x: LEFT, y: LINE.applicationDate, text: v.applicationDate, size: 11, maxWidth: 250 },
-
-    // The membership class sits mid-sentence, so the whole line is rewritten.
-    { kind: "cover", page: 1, x: LEFT - 2, y: LINE.admittedSentence - 4, width: 520, height: 18 },
-    {
-      page: 1,
-      x: LEFT,
-      y: LINE.admittedSentence,
-      text: `I'm pleased to inform you that you have been admitted as ${cls} member of ZAMCOPS.`,
-      size: 11,
-      maxWidth: 520,
-    },
   ];
 
-  // The General Manager's name and title are printed on the template; only the
-  // mark itself is added, sitting above them.
+  // The template prints "admitted as a CANDIDATE member". Any other class means
+  // rewriting the line, so it is only touched when it would otherwise be wrong.
+  if (cls !== "CANDIDATE") {
+    stamps.push(
+      { kind: "cover", page: 1, x: LEFT - 2, y: LINE.admittedSentence - 4, width: 530, height: 18 },
+      {
+        page: 1,
+        x: LEFT,
+        y: LINE.admittedSentence,
+        text: `I'm pleased to inform you that you have been admitted as a ${cls} member of ZAMCOPS.`,
+        size: 11,
+        maxWidth: 525,
+      },
+    );
+  }
+
   if (v.generalManagerSignature) {
     stamps.push({
       kind: "image",
@@ -86,7 +74,7 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
       y: LINE.signatureBaseline,
       data: v.generalManagerSignature,
       maxWidth: 150,
-      maxHeight: 55,
+      maxHeight: 52,
     });
   }
 
