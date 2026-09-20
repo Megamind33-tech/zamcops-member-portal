@@ -73,7 +73,7 @@ export async function issueMemberDocuments(ownerId: string): Promise<{ count: nu
     {
       docType: "Membership Application",
       note: `${formType} membership application — completed & signed`,
-      pdf: generateApplicationFormPdf({
+      pdf: await generateApplicationFormPdf({
         member,
         formType,
         payload,
@@ -85,7 +85,7 @@ export async function issueMemberDocuments(ownerId: string): Promise<{ count: nu
     {
       docType: "Deed of Assignment",
       note: "Deed of Assignment (incl. Mechanical) — executed by the Assignor and the Society",
-      pdf: generateDeedPdf({
+      pdf: await generateDeedPdf({
         member,
         formType,
         payload,
@@ -97,7 +97,7 @@ export async function issueMemberDocuments(ownerId: string): Promise<{ count: nu
     {
       docType: "Admission Letter",
       note: `Admission as ${(application.membershipClass || "CANDIDATE").toUpperCase()} member`,
-      pdf: generateAdmissionLetterPdf({
+      pdf: await generateAdmissionLetterPdf({
         member,
         formType,
         payload,
@@ -154,7 +154,7 @@ export async function issueWorkDocuments(workId: string): Promise<{ count: numbe
     {
       docType: "Work Declaration",
       note: `Declaration of the musical work “${work.title}” — signed by the member`,
-      pdf: generateWorkDeclarationPdf({ member, work: workLike, reference: `WD-${refBase}` }),
+      pdf: await generateWorkDeclarationPdf({ member, work: workLike, reference: `WD-${refBase}` }),
     },
     {
       docType: "Certificate of Registration",

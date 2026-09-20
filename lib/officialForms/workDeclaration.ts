@@ -23,6 +23,10 @@
 // covered — the template is blank, verified by `npm run check:forms`.
 
 import type { Stamp } from "@/lib/formOverlay";
+import { formDate } from "@/lib/officialForms/render";
+
+// Re-exported: callers that build a declaration also format its dates.
+export { formDate };
 import { ROLE_CODE, type ContributorRole } from "@/lib/roles";
 
 // Baseline y of each role row, in the order the form prints them.
@@ -117,15 +121,6 @@ export interface WorkDeclarationValues {
   fileNo?: string;
   factor?: string;
   dateOfRegistration?: string; // dd/mm/yyyy
-}
-
-// The sheet's boxes are narrow and its dates are written the short way.
-export function formDate(d: Date | string | null | undefined): string {
-  if (!d) return "";
-  const date = d instanceof Date ? d : new Date(d);
-  if (isNaN(date.getTime())) return "";
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(date.getDate())}/${p(date.getMonth() + 1)}/${date.getFullYear()}`;
 }
 
 const pct = (n: number | undefined): string => {

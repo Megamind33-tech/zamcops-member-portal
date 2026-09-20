@@ -1,5 +1,5 @@
-// Renders every official form with specimen answers, so placement can be
-// checked against the paper without registering a member.
+// Renders every official document with specimen details, so placement can be
+// checked against the paper without registering a member or approving a work.
 //
 //   node scripts/render-sample-forms.mjs [outDir]
 //
@@ -45,7 +45,11 @@ writeFileSync(
       // type errors belong, and a half-checked render is still worth looking at.
       noEmitOnError: false,
     },
-    files: [path.join(root, "lib", "officialForms", "applicationForm.ts")],
+    files: [
+      path.join(root, "lib", "officialForms", "applicationForm.ts"),
+      path.join(root, "lib", "documents.ts"),
+      path.join(root, "lib", "workDocuments.ts"),
+    ],
   }),
 );
 try {
@@ -77,6 +81,14 @@ const { applicationFormStamps, TEMPLATE_FOR } = await import(
 const { stampForm } = await import(
   pathToFileURL(path.join(build, "lib", "formOverlay.js")).href
 );
+// The deed, the admission letter and the work declaration go through the same
+// generators issuance uses, so this exercises that path and not a copy of it.
+const { generateDeedPdf, generateAdmissionLetterPdf } = await import(
+  pathToFileURL(path.join(build, "lib", "documents.js")).href
+);
+const { generateWorkDeclarationPdf } = await import(
+  pathToFileURL(path.join(build, "lib", "workDocuments.js")).href
+);
 
 const SAMPLES = JSON.parse(readFileSync(path.join(root, "scripts", "form-samples.json"), "utf8"));
 
@@ -98,6 +110,70 @@ for (const sample of SAMPLES) {
     unplacedTotal += unplaced.length;
     for (const u of unplaced) console.log(`    \x1b[31munplaced\x1b[0m ${u}`);
   }
+}
+
+// The documents that come with an approval or a work registration. They are
+// not filled from the application form's answers, so they carry their own
+// specimen.
+const SPECIMEN_MEMBER = {
+  fullName: "Bwalya Mwansa Chileshe",
+  memberNumber: "ZAM-2026-00417",
+  email: "bwalya.chileshe@example.zm",
+  phone: "+260 977 401 882",
+  address: "Plot 4417 Kabulonga Road\nKabulonga",
+  district: "Lusaka",
+  province: "Lusaka",
+  signature: SAMPLES[0].applicantSignature,
+};
+const OFFICER = (name, title) => ({
+  officerName: name,
+  officerTitle: title,
+  image: SAMPLES[0].applicantSignature,
+});
+const WORK = JSON.parse(readFileSync(path.join(root, "scripts", "work-sample.json"), "utf8"));
+
+const EXTRAS = [
+  {
+    name: "deed",
+    make: () =>
+      generateDeedPdf({
+        member: SPECIMEN_MEMBER,
+        formType: "Individual",
+        payload: SAMPLES[0].payload,
+        deedAgreedAt: new Date("2026-09-20T00:00:00Z"),
+        boardSecretary: OFFICER("Towera Nyirongo Mukubu", "BOARD SECRETARY"),
+        reference: "DOA-2026-00417",
+      }),
+  },
+  {
+    name: "admission",
+    make: () =>
+      generateAdmissionLetterPdf({
+        member: SPECIMEN_MEMBER,
+        formType: "Individual",
+        payload: SAMPLES[0].payload,
+        applicationDate: new Date("2026-08-14T00:00:00Z"),
+        membershipClass: "CANDIDATE",
+        generalManager: OFFICER("Mirrias Siamutundo", "GENERAL MANAGER"),
+        reference: "ADM-2026-00417",
+      }),
+  },
+  {
+    name: "workdecl",
+    make: () =>
+      generateWorkDeclarationPdf({
+        member: SPECIMEN_MEMBER,
+        work: { ...WORK, submittedAt: new Date("2026-09-02T00:00:00Z") },
+        reference: "WD-A1B2C3-2026-00417",
+      }),
+  },
+];
+
+for (const extra of EXTRAS) {
+  const pdf = await extra.make();
+  const dest = path.join(outDir, `${extra.name}.pdf`);
+  writeFileSync(dest, Buffer.from(pdf.base64, "base64"));
+  console.log(`  ${extra.name.padEnd(11)} ${pdf.fileName} -> ${path.relative(root, dest)}`);
 }
 
 if (unplacedTotal) {

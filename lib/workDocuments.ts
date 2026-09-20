@@ -35,7 +35,12 @@ import {
   WORK_EVIDENCE_NOTE,
 } from "@/lib/workDeedText";
 import { normalizeContributorRole } from "@/lib/roles";
-import { normalizeWorkType, splitsTotal } from "@/lib/works";
+import { renderOfficialForm, formDate } from "@/lib/officialForms/render";
+import {
+  workDeclarationStamps,
+  type WorkDeclarationParty,
+} from "@/lib/officialForms/workDeclaration";
+import { normalizeWorkType, shareOf, splitsTotal } from "@/lib/works";
 import type { OwnershipSplit } from "@/types";
 
 // The shape the renderers need — a WorkDeclaration row with its JSON columns
@@ -62,6 +67,22 @@ export interface WorkLike {
   dateCreated: string;
   status: string;
   submittedAt: Date | null;
+
+  // Carried by the society's official WORK DECLARATION form.
+  instruments: string;
+  yearComposed: string;
+  soundCarrier: string;
+  financedByPublisher: string; // Yes | No
+  publishingAgreementDate: string;
+  publishingValidity: string;
+  publishingTerritory: string;
+  enclosures: string[];
+  // The work's place in the batch the member submitted — track 2 of 10.
+  workNo: string;
+  // Completed by staff once the work is on the register.
+  fileNo: string;
+  factor: string;
+  registeredAt: Date | null;
 }
 
 // Adapts a WorkDeclaration row (JSON columns as stored) into the shape the
@@ -101,6 +122,18 @@ export function toWorkLike(row: any): WorkLike {
     dateCreated: row.dateCreated ?? "",
     status: row.status ?? "Pending",
     submittedAt: row.submittedAt ?? null,
+    instruments: row.instruments ?? "",
+    yearComposed: row.yearComposed ?? "",
+    soundCarrier: row.soundCarrier ?? "",
+    financedByPublisher: row.financedByPublisher ?? "",
+    publishingAgreementDate: row.publishingAgreementDate ?? "",
+    publishingValidity: row.publishingValidity ?? "",
+    publishingTerritory: row.publishingTerritory ?? "",
+    enclosures: parse<string[]>(row.enclosures, []),
+    workNo: row.workNo ?? "",
+    fileNo: row.fileNo ?? "",
+    factor: row.factor ?? "",
+    registeredAt: row.registeredAt ?? null,
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -233,46 +266,57 @@ const workRef = (work: WorkLike): string => work.id.slice(-6).toUpperCase();
 
 // ── 1. The Declaration of a Musical Work ───────────────────────────────────
 
-export function generateWorkDeclarationPdf(opts: {
+// The form's distribution key has one pair of boxes per role, not per person,
+// so the parties are handed over as declared and lib/officialForms groups them.
+function declarationParties(work: WorkLike): WorkDeclarationParty[] {
+  return work.ownershipSplits
+    .map((split) => ({
+      role: normalizeContributorRole(split.role),
+      party: (split.party ?? "").trim(),
+      performancePct: shareOf(split, "performancePct"),
+      recordingPct: shareOf(split, "recordingPct"),
+    }))
+    .filter((p) => p.party);
+}
+
+/**
+ * The member's copy of the declaration.
+ *
+ * The office's boxes — the distribution key, the file number, the factor, the
+ * date of registration — are left empty, because on paper this is the sheet the
+ * member fills in and hands over. They are not blank by oversight.
+ */
+export async function generateWorkDeclarationPdf(opts: {
   member: MemberLike;
   work: WorkLike;
   reference: string;
-}): GeneratedPdf {
+}): Promise<GeneratedPdf> {
   const { member, work } = opts;
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const p = letterhead(doc, WORK_DECLARATION_TITLE, `“${work.title}” — declared by ${member.fullName} (${member.memberNumber})`);
-
-  calloutRow(p, [
-    { label: "Declaration reference", value: opts.reference },
-    { label: "Work reference", value: workRef(work) },
-    { label: "Declared on", value: fmtDate(work.submittedAt ?? new Date()) },
-    { label: "Register status", value: work.status || "Pending" },
-  ]);
-
-  workParticulars(p, work);
-  splitsSection(p, work);
-  evidenceSection(p, work);
-  registeringMember(p, member);
-
-  sectionHeading(p, "Declaration by the member");
-  WORK_DECLARATION_CLAUSES.forEach((clause, i) =>
-    paragraph(p, `${i + 1}.  ${clause}`, { size: 8.5, gap: 2.5 }),
-  );
-
-  p.ensure(46);
-  p.y += 4;
-  signatureBlock(p, {
-    x: M,
-    width: 90,
-    label: "Signed by THE DECLARANT",
-    name: member.fullName,
-    role: `Member ${member.memberNumber}`,
-    image: member.signature || undefined,
-    date: fmtDate(work.submittedAt ?? new Date()),
+  return renderOfficialForm({
+    template: "workdecl",
+    stamps: workDeclarationStamps({
+      copy: "member",
+      title: work.title,
+      workNo: work.workNo,
+      yearComposed: work.yearComposed || work.dateCreated.slice(0, 4),
+      genre: work.genre,
+      instruments: work.instruments,
+      duration: work.duration,
+      soundCarrier: work.soundCarrier,
+      financedByPublisher: work.financedByPublisher,
+      publishingAgreementDate: work.publishingAgreementDate,
+      publishingValidity: work.publishingValidity,
+      publishingTerritory: work.publishingTerritory,
+      enclosures: work.enclosures,
+      otherDocuments: work.studioReceipt ? "Studio letter / receipt" : "",
+      parties: declarationParties(work),
+      declarantName: member.fullName,
+      declaredOn: formDate(work.submittedAt ?? new Date()),
+      memberSignature: member.signature || undefined,
+    }),
+    fileName: `Work-Declaration-${workRef(work)}-${member.memberNumber}.pdf`,
+    reference: opts.reference,
   });
-  p.y += 36;
-
-  return output(doc, `Work-Declaration-${workRef(work)}-${member.memberNumber}.pdf`, opts.reference);
 }
 
 // ── 2. The Certificate of Registration ─────────────────────────────────────
