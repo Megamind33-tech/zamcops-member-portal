@@ -5,6 +5,13 @@
 // sheet has a Performance/Broadcast column and a Recording/Rights column, side
 // by side, on each of seven role rows. A single figure could not fill it.
 //
+// The sheet is filled in two hands. A member declares the work, its creators
+// and what was lodged; the office completes the distribution key, the work and
+// file numbers and the factor when the work is entered on the register. A
+// member's copy therefore leaves those boxes empty, which is how the paper form
+// reaches the office — not blank by oversight but blank because they are not
+// the member's to fill.
+//
 // Positions are read out of the template, and re-read whenever it is replaced:
 // a fresh export of the same sheet moved every row by about 40pt and widened
 // the percentage columns by 25. Nothing here is estimated, and nothing is
@@ -69,8 +76,10 @@ const ENCLOSURE_TICK: Record<string, { x: number; y: number }> = {
 export interface WorkDeclarationParty {
   role: ContributorRole;
   party: string;
-  performancePct: number;
-  recordingPct: number;
+  // Printed only on an office copy — the distribution key is completed by the
+  // society, not declared by the member.
+  performancePct?: number;
+  recordingPct?: number;
 }
 
 export interface WorkDeclarationValues {
@@ -88,16 +97,28 @@ export interface WorkDeclarationValues {
   otherDocuments: string;
   parties: WorkDeclarationParty[];
   declarantName: string;
-  declaredOn: string; // formatted date
+  declaredOn: string; // dd/mm/yyyy — see formDate()
   memberSignature?: string; // transparent PNG data URL
-  // Completed by staff once the work is on the register.
+
+  // "office" additionally prints the distribution key and the boxes the
+  // society completes. A member's copy omits all of them.
+  copy?: "member" | "office";
   workNo?: string;
   fileNo?: string;
   factor?: string;
-  dateOfRegistration?: string;
+  dateOfRegistration?: string; // dd/mm/yyyy
 }
 
-const pct = (n: number): string => {
+// The sheet's boxes are narrow and its dates are written the short way.
+export function formDate(d: Date | string | null | undefined): string {
+  if (!d) return "";
+  const date = d instanceof Date ? d : new Date(d);
+  if (isNaN(date.getTime())) return "";
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(date.getDate())}/${p(date.getMonth() + 1)}/${date.getFullYear()}`;
+}
+
+const pct = (n: number | undefined): string => {
   if (!n) return "";
   return `${Number.isInteger(n) ? n : Math.round(n * 100) / 100}`;
 };
@@ -109,15 +130,21 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
     if (text && text.trim()) stamps.push({ page: 1, x: at.x, y: at.y, text: text.trim(), size, maxWidth });
   };
 
+  const office = v.copy === "office";
+
   put(HEAD.title, v.title, 260, 10);
-  put(HEAD.workNo, v.workNo ?? "", 90);
   put(HEAD.yearComposed, v.yearComposed, 80);
   put(HEAD.duration, v.duration, 26);
-  put(HEAD.dateOfRegistration, v.dateOfRegistration ?? "", 120);
   put(HEAD.instruments, v.instruments, 195);
-  put(HEAD.fileNo, v.fileNo ?? "", 26);
   put(HEAD.genre, v.genre, 85);
-  put(HEAD.factor, v.factor ?? "", 90);
+
+  // The society's own boxes, left empty on a member's copy.
+  if (office) {
+    put(HEAD.workNo, v.workNo ?? "", 90);
+    put(HEAD.fileNo, v.fileNo ?? "", 26);
+    put(HEAD.factor, v.factor ?? "", 90);
+    put(HEAD.dateOfRegistration, v.dateOfRegistration ?? "", 70);
+  }
 
   // One line per declared party, on the row its role owns. Two parties in the
   // same role would land on the same line, so only the first of each is placed
@@ -129,14 +156,19 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
     const y = ROLE_ROW[p.role];
     if (y === undefined) continue;
     if (used.has(p.role)) {
-      overflow.push(`${ROLE_CODE[p.role]} ${p.party} ${pct(p.performancePct)}%/${pct(p.recordingPct)}%`);
+      overflow.push(
+        office
+          ? `${ROLE_CODE[p.role]} ${p.party} ${pct(p.performancePct)}%/${pct(p.recordingPct)}%`
+          : `${ROLE_CODE[p.role]} ${p.party}`,
+      );
       continue;
     }
     used.add(p.role);
     stamps.push({ page: 1, x: COL.party, y, text: p.party, size: 9, maxWidth: 190 });
+    if (!office) continue; // the distribution key is the society's to complete
     const perf = pct(p.performancePct);
     const rec = pct(p.recordingPct);
-    // Right-aligned against the printed "%" so the figure reads into it.
+    // Centred just left of the printed "%" so the row reads "45 %".
     if (perf) stamps.push({ page: 1, x: COL.performanceRight, y, text: perf, size: 9, align: "center" });
     if (rec) stamps.push({ page: 1, x: COL.recordingRight, y, text: rec, size: 9, align: "center" });
   }
@@ -151,7 +183,13 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
   put(FOOT.validity, v.publishingValidity, 180);
   put(FOOT.territory, v.publishingTerritory, 420);
 
-  for (const e of v.enclosures ?? []) {
+  // Works reach the society through the portal and nowhere else, so "Online" is
+  // always the enclosure. The printed alternatives — a CD, a paper score, a
+  // signed contract handed in — describe a counter that no longer takes
+  // submissions, and ticking one would assert something was lodged that was
+  // not. Anything genuinely uploaded alongside is ticked in addition.
+  const enclosures = new Set<string>(["Online", ...(v.enclosures ?? [])]);
+  for (const e of enclosures) {
     const at = ENCLOSURE_TICK[e];
     if (at) stamps.push({ page: 1, x: at.x, y: at.y, text: "X", size: 9, bold: true });
   }
