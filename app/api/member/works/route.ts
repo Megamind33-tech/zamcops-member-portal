@@ -93,6 +93,9 @@ export async function POST(req: Request) {
         coverArt,
         studioReceipt,
         dateCreated: b.dateCreated ?? "",
+        // A single is a batch of one, so it is work 1 of its own submission.
+        // The form's "Work No" box is never blank on a member's copy.
+        workNo: "1",
         instruments: b.instruments ?? "",
         yearComposed: b.yearComposed ?? "",
         soundCarrier: b.soundCarrier ?? "",

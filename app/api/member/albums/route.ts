@@ -3,11 +3,21 @@ import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { albumDTO } from "@/lib/serialize";
 import { notifyMember } from "@/lib/notify";
-import { applyKnownMembers, contributorGaps, splitsTotalOk } from "@/lib/works";
+import { applyKnownMembers, contributorGaps, splitColumnErrors } from "@/lib/works";
+import { normalizeContributorRole } from "@/lib/roles";
 import { fetchRegisterHits } from "@/lib/registerHits";
 import type { Track } from "@/types";
 
 export const runtime = "nodejs";
+
+// Names on a track holding a given role, taken from its splits — the same
+// source the declaration's distribution key is built from.
+function namesFor(t: Track, role: string): string[] {
+  return (t.ownershipSplits ?? [])
+    .filter((s) => normalizeContributorRole(String(s.role ?? "")) === role)
+    .map((s) => String(s.party ?? "").trim())
+    .filter(Boolean);
+}
 
 export async function POST(req: Request) {
   const session = await requireMember();
@@ -33,7 +43,8 @@ export async function POST(req: Request) {
     const register = await fetchRegisterHits(raw);
     const splits = applyKnownMembers(raw, owner ?? undefined, register);
     t.ownershipSplits = splits;
-    if (!splitsTotalOk(splits)) return bad(`Splits on “${t.title}” must add up to 100%.`);
+    const splitErrors = splitColumnErrors(splits);
+    if (splitErrors.length) return bad(`On “${t.title}”: ${splitErrors[0]}`);
     const gaps = contributorGaps(splits, owner ?? undefined);
     if (gaps.length) return bad(`On “${t.title}”: ${gaps[0]}`);
   }
@@ -62,6 +73,45 @@ export async function POST(req: Request) {
       console.error("[albums] create failed:", err2);
       return bad("Could not submit the album. Check the studio receipt and each track, then try again.", 500);
     }
+  }
+
+  // An album is a batch of works, and every work is declared — the society's
+  // WORK DECLARATION is filled per song, not per release. Without this an album
+  // of ten tracks produced no declarations at all and ten registrable works
+  // existed only as JSON inside one row, invisible to review, to the register
+  // and to royalty distribution.
+  //
+  // Each track becomes its own declaration, numbered by its place in the batch,
+  // which is what the form's "Work No" box records.
+  try {
+    await prisma.workDeclaration.createMany({
+      data: tracks.map((t, i) => ({
+        ownerId: session.sub,
+        batchId: album.id,
+        workNo: String(i + 1),
+        title: String(t.title).trim(),
+        workType: "Song",
+        genre: t.genre ?? "",
+        language: "",
+        duration: t.duration ?? "",
+        isrc: t.isrc ?? "",
+        audioFile: t.audioFile ?? "",
+        coverArt: b.coverArt ?? "",
+        studioReceipt,
+        ownershipSplits: JSON.stringify(t.ownershipSplits ?? []),
+        composers: JSON.stringify(namesFor(t, "Composer")),
+        authors: JSON.stringify(namesFor(t, "Author")),
+        subArrangers: JSON.stringify(namesFor(t, "Arranger")),
+        publisher: namesFor(t, "Publisher")[0] ?? "",
+        yearComposed: String(b.releaseDate ?? "").slice(0, 4),
+        dateCreated: b.releaseDate ?? "",
+      })),
+    });
+  } catch (err) {
+    // The album is already saved and the member told. Losing the per-track
+    // declarations is worth shouting about, but not worth discarding the
+    // submission they just made.
+    console.error("[albums] per-track work declarations failed:", err);
   }
 
   const uploads: { ownerId: string; fileName: string; fileType: string; linkedTo: string; status: string }[] = [];

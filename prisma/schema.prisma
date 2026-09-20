@@ -168,8 +168,14 @@ model WorkDeclaration {
   publishingTerritory     String @default("")
   enclosures              String @default("[]") // JSON string[] — Lyrics | Musical score | Online | CD | Contract | Other
 
-  // Completed by staff on the paper form; blank until the work is registered.
-  workNo       String    @default("")
+  // Works sent together — an album's tracks — share a batch, and the number the
+  // form prints in "Work No" is the work's place within it: track 2 of 10. A
+  // single is a batch of one. The society does not issue this number; it comes
+  // from what the member submitted.
+  batchId String @default("")
+  workNo  String @default("")
+
+  // Completed by staff once the work is on the register.
   fileNo       String    @default("")
   factor       String    @default("")
   registeredAt DateTime?

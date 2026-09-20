@@ -156,7 +156,8 @@ export interface WorkDeclaration {
   publishingValidity?: string;
   publishingTerritory?: string;
   enclosures?: string[];
-  workNo?: string; // completed by staff
+  batchId?: string; // groups an album's tracks; a single is a batch of one
+  workNo?: string; // the work's place in its batch — printed as "Work No"
   fileNo?: string;
   factor?: string;
   registeredAt?: string;

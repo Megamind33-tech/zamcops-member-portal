@@ -113,6 +113,7 @@ export function workDTO(w: any): WorkDeclaration {
     publishingValidity: w.publishingValidity ?? "",
     publishingTerritory: w.publishingTerritory ?? "",
     enclosures: parse<string[]>(w.enclosures ?? "[]", []),
+    batchId: w.batchId ?? "",
     workNo: w.workNo ?? "",
     fileNo: w.fileNo ?? "",
     factor: w.factor ?? "",
