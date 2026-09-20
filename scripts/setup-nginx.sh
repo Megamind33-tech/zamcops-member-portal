@@ -3,8 +3,11 @@
 #
 #   sudo bash scripts/setup-nginx.sh example.org www.example.org
 #
-# Every name given is served by the one vhost and covered by one certificate,
-# which is what an apex plus its www alias needs.
+# The FIRST name is canonical: it is the one the portal is served on. Every
+# other name is given its own block that permanently redirects to the canonical
+# one, so an apex and its www alias end up as a single address rather than two
+# that both work. All of them go on one certificate — a redirect still has to
+# be reached over HTTPS, or the browser warns before it can fire.
 #
 # This machine serves other sites. The script therefore only ever ADDS a vhost:
 # it refuses to overwrite an existing config, refuses if another vhost already
@@ -80,12 +83,34 @@ done
 
 step "2. Writing ${AVAIL}"
 
+# Aliases (everything after the first name) redirect to the canonical host.
+ALIASES=""
+for d in $DOMAINS; do [ "$d" = "$DOMAIN" ] || ALIASES="$ALIASES $d"; done
+
 cat > "$AVAIL" <<NGINX
 # ZAMCOPS Member Portal — proxies to the container on 127.0.0.1:${APP_PORT}.
+NGINX
+
+if [ -n "$ALIASES" ]; then
+  cat >> "$AVAIL" <<NGINX
+# Aliases redirect to ${DOMAIN}. \$scheme is used rather than a hard-coded
+# https:// so this is correct both before a certificate exists and after —
+# certbot adds its own http-to-https redirect alongside.
 server {
     listen 80;
     listen [::]:80;
-    server_name ${DOMAINS};
+    server_name${ALIASES};
+    return 301 \$scheme://${DOMAIN}\$request_uri;
+}
+
+NGINX
+fi
+
+cat >> "$AVAIL" <<NGINX
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN};
 
     # Audio masters are up to 300MB; nginx defaults to 1MB and would reject them.
     client_max_body_size 300M;
@@ -108,7 +133,11 @@ server {
     }
 }
 NGINX
-ok "vhost written"
+if [ -n "$ALIASES" ]; then
+  ok "vhost written — ${DOMAIN} serves the portal; redirecting to it:${ALIASES}"
+else
+  ok "vhost written"
+fi
 
 ln -sfn "$AVAIL" "$ENABLED"
 ok "enabled"
@@ -152,4 +181,5 @@ fi
 
 step "Done"
 echo "  http://${DOMAIN}/api/health should now answer {\"status\":\"ok\"}."
+[ -n "$ALIASES" ] && echo "  ${ALIASES# } redirects to ${DOMAIN}."
 echo "  Staff sign-in: https://${DOMAIN}/admin   (password: grep ADMIN_PASSWORD .env)"
