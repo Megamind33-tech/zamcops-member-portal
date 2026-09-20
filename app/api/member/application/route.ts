@@ -3,6 +3,7 @@ import { requireMember } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { applicationDTO } from "@/lib/serialize";
 import { FORM_DEFS, FORM_TYPES, missingRequiredFields, type ApplicationFormType } from "@/lib/applicationForms";
+import { withPrefill, prefilledKeys, prefillFromAccount, formTypeForRole } from "@/lib/applicationPrefill";
 
 export const runtime = "nodejs";
 
@@ -15,13 +16,30 @@ export async function GET() {
 
   const [application, member] = await Promise.all([
     prisma.membershipApplication.findUnique({ where: { ownerId: session.sub } }),
-    prisma.member.findUnique({ where: { id: session.sub }, select: { signature: true, membershipStatus: true } }),
+    prisma.member.findUnique({ where: { id: session.sub } }),
   ]);
+  if (!member) return bad("Member not found.", 404);
+
+  // An application that is still open is answered from the account wherever the
+  // member has not answered it themselves, so a detail corrected on their
+  // profile after sign-up shows here instead of the copy taken at sign-up.
+  // Once submitted it is a record of what was sent and is left exactly as it
+  // was.
+  const formType = (application?.formType as ApplicationFormType) || formTypeForRole(member.role);
+  const open = !application || application.status === "Draft" || application.status === "Rejected";
+
+  const dto = application ? applicationDTO(application) : null;
+  const payload = open
+    ? withPrefill((dto?.payload as Record<string, unknown>) ?? {}, member, formType)
+    : ((dto?.payload as Record<string, unknown>) ?? {});
 
   return json({
-    application: application ? applicationDTO(application) : null,
-    signature: member?.signature || "",
-    membershipStatus: member?.membershipStatus || "Pending",
+    application: dto ? { ...dto, payload } : { formType, payload: prefillFromAccount(member, formType), status: "Draft" },
+    // Which answers came from the account, so the form can say so rather than
+    // letting them look like something the member typed and forgot.
+    fromAccount: open ? prefilledKeys(member, formType) : [],
+    signature: member.signature || "",
+    membershipStatus: member.membershipStatus || "Pending",
   });
 }
 
