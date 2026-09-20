@@ -223,7 +223,7 @@ the files, the volume holds the bytes.
 
 ```bash
 docker compose exec -T db pg_dump -U zamcops zamcops | gzip > zamcops-$(date +%F).sql.gz
-docker run --rm -v zamcops-member-portal_uploads:/data -v "$PWD":/backup alpine \
+docker run --rm -v zamcops_uploads:/data -v "$PWD":/backup alpine \
   tar czf /backup/uploads-$(date +%F).tar.gz -C /data .
 ```
 

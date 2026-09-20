@@ -11,10 +11,26 @@
 # To run without Caddy (behind an existing nginx, or to try it on localhost),
 # start just the two services:  docker compose up -d app db
 
+# Pinned so the volumes are always named zamcops_db-data / zamcops_uploads,
+# whatever the checkout directory is called. The backup commands in the README
+# reference those names — without this they follow the directory and a rename
+# makes them silently back up nothing.
+name: zamcops
+
+# Defaults applied to every service below. Docker's json-file driver does not
+# rotate on its own, and an unbounded log on a VPS that hosts other apps fills
+# the disk for all of them, not just this one.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
+    logging: *default-logging
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-zamcops}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
@@ -26,6 +42,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    # Postgres is the process you least want OOM-killed on a shared box: losing
+    # it takes the portal down and risks the members' register. Give it a floor
+    # the kernel will respect, and a ceiling so it cannot crowd out neighbours.
+    deploy:
+      resources:
+        limits:
+          memory: ${DB_MEMORY_LIMIT:-1g}
     # Not published: the database is reachable only from the compose network.
 
   app:
@@ -33,9 +56,16 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
+    logging: *default-logging
     depends_on:
       db:
         condition: service_healthy
+    # Sized for a society of this scale. Raise it if PDF generation for a large
+    # catalogue starts getting OOM-killed; lower it if the box is tighter.
+    deploy:
+      resources:
+        limits:
+          memory: ${APP_MEMORY_LIMIT:-1500m}
     environment:
       # Both point at the same server — there is no pooler in front of a local
       # Postgres, so the runtime and migration URLs are identical.
@@ -55,18 +85,30 @@ services:
       AT_SENDER_ID: ${AT_SENDER_ID:-}
     volumes:
       - uploads:/data/uploads
-    # Published on loopback only: Caddy terminates TLS and proxies to it. Drop
-    # the 127.0.0.1 prefix if you are not using the caddy service.
+    # Published on loopback only: whatever terminates TLS (the caddy service
+    # below, or an nginx already on the box) proxies to it; nothing reaches it
+    # from outside. Set APP_HOST_PORT when 3000 is already in use on the host —
+    # only the host side moves, the container still listens on 3000.
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:${APP_HOST_PORT:-3000}:3000"
 
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    logging: *default-logging
+    # Wait for the app to pass its healthcheck, not merely to start: the first
+    # boot syncs the schema, and proxying into that window serves errors to
+    # whoever happens to be watching the deploy.
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     environment:
-      PORTAL_DOMAIN: ${PORTAL_DOMAIN:?set PORTAL_DOMAIN in .env}
+      # Deliberately NOT ${PORTAL_DOMAIN:?...}. Compose interpolates every
+      # service in the file before it filters to the ones you named, so a
+      # required variable here would break `docker compose up -d app db` —
+      # the documented way to run behind an nginx that already owns 80/443.
+      # Caddy is only started explicitly, and it needs this set when it is.
+      PORTAL_DOMAIN: ${PORTAL_DOMAIN:-}
       # Let's Encrypt uses this to warn you before a certificate expires.
       ACME_EMAIL: ${ACME_EMAIL:-}
     volumes:

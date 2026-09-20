@@ -14,4 +14,9 @@ docker-compose.yml
 docker-compose.*.yml
 README.md
 tsconfig.tsbuildinfo
-data
+
+# NOTE: do not exclude `data/` — despite the name it is not a data directory,
+# it is source. data/reference.ts holds the province, genre and language lists
+# that the profile and submission pages import as @/data/reference, and
+# excluding it fails the build with "Module not found: Can't resolve
+# '@/data/reference'".
