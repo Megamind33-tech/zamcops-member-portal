@@ -5,9 +5,10 @@
 // sheet has a Performance/Broadcast column and a Recording/Rights column, side
 // by side, on each of seven role rows. A single figure could not fill it.
 //
-// Positions on this sheet are tight and its columns are not always where a
-// label suggests: the YEAR COMPOSED value sits beneath the "Work No" label
-// without belonging to it, which reads as an error and is not one.
+// Two of this sheet's boxes are taller than one line and carry their label at
+// the bottom: the year is written ABOVE the words "YEAR COMPOSED", inside the
+// same box, not to the right of them. Written to the right it drifts under the
+// "Work No" label and reads as that box's entry.
 //
 // The sheet is filled in two hands. A member declares the work, its creators
 // and what was lodged; the office completes the distribution key, the work and
@@ -46,7 +47,8 @@ const COL = {
 const HEAD = {
   title: { x: 115, y: 727 },
   workNo: { x: 452, y: 727 },
-  yearComposed: { x: 410, y: 714 },
+  // Above the "YEAR COMPOSED" label, sharing its box and its left edge.
+  yearComposed: { x: 335, y: 727 },
   duration: { x: 378, y: 701 },
   dateOfRegistration: { x: 496, y: 702 },
   instruments: { x: 115, y: 688 },
