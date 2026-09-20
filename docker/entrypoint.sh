@@ -25,9 +25,27 @@ else
   # Deliberately without --accept-data-loss: a change that would drop a column
   # must stop the deploy and be looked at, not be applied silently to members'
   # records. Set SKIP_DB_PUSH=1 and run the push by hand to work through one.
-  until $PRISMA db push --schema=/app/prisma/schema.prisma --skip-generate; do
+  while true; do
+    out=$($PRISMA db push --schema=/app/prisma/schema.prisma --skip-generate 2>&1) && break
+    printf '%s\n' "$out" >&2
+
+    # Only a connection problem is worth waiting out. Anything else — a broken
+    # image, an unwritable engines directory, a destructive migration — will
+    # fail identically on all ten attempts, and retrying it buries the real
+    # error under a misleading "database not ready".
+    case "$out" in
+      *"Can't write to"*|*"EACCES"*|*"permission denied"*|*"Permission denied"*)
+        echo "[entrypoint] the Prisma CLI cannot write inside its own install — this is an image problem, not a database one." >&2
+        echo "[entrypoint] /opt/prisma must be owned by the user the container runs as. Refusing to start." >&2
+        exit 1 ;;
+      *"data loss"*|*"force reset"*)
+        echo "[entrypoint] this schema change would lose data, so it was not applied. Refusing to start." >&2
+        echo "[entrypoint] review it, then re-run the push by hand with SKIP_DB_PUSH=1 set." >&2
+        exit 1 ;;
+    esac
+
     if [ "$attempt" -ge 10 ]; then
-      echo "[entrypoint] schema sync failed after $attempt attempts — refusing to start." >&2
+      echo "[entrypoint] database still unreachable after $attempt attempts — refusing to start." >&2
       exit 1
     fi
     echo "[entrypoint] database not ready (attempt $attempt) — retrying in 3s…"

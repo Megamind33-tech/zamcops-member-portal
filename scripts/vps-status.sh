@@ -65,11 +65,11 @@ if [ -n "$DIR" ] && [ -f "$DIR/.env" ]; then
   ok ".env present"
   for k in PORTAL_DOMAIN ACME_EMAIL POSTGRES_USER POSTGRES_PASSWORD POSTGRES_DB \
            AUTH_SECRET ADMIN_EMAIL ADMIN_PASSWORD ADMIN_NAME \
-           LOCAL_STORAGE_DIR RESEND_API_KEY EMAIL_FROM AT_USERNAME AT_API_KEY; do
+           LOCAL_STORAGE_DIR APP_HOST_PORT RESEND_API_KEY EMAIL_FROM AT_USERNAME AT_API_KEY; do
     v=$(grep -E "^${k}=" "$DIR/.env" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"'"'"'')
     if [ -n "$v" ]; then
       case "$k" in
-        PORTAL_DOMAIN|ADMIN_EMAIL|EMAIL_FROM|POSTGRES_USER|POSTGRES_DB|LOCAL_STORAGE_DIR|ACME_EMAIL|ADMIN_NAME)
+        PORTAL_DOMAIN|ADMIN_EMAIL|EMAIL_FROM|POSTGRES_USER|POSTGRES_DB|LOCAL_STORAGE_DIR|ACME_EMAIL|ADMIN_NAME|APP_HOST_PORT)
           ok "$k = $v" ;;                             # not secret, useful to see
         *) ok "$k set (${#v} chars)" ;;               # secret — length only
       esac
@@ -96,8 +96,11 @@ fi
 
 say "Service reachability"
 if command -v curl >/dev/null 2>&1; then
-  h=$(curl -fsS --max-time 6 http://127.0.0.1:3000/api/health 2>/dev/null)
-  [ -n "$h" ] && ok "app health (local): $h" || no "app not answering on 127.0.0.1:3000"
+  # The host-side port moves when 3000 is already taken on a shared box, so read
+  # it rather than assuming — probing the wrong port reports a healthy app as down.
+  hp=$(grep -E '^APP_HOST_PORT=' "${DIR:-.}/.env" 2>/dev/null | cut -d= -f2- | tr -d '"'"'"''); hp=${hp:-3000}
+  h=$(curl -fsS --max-time 6 "http://127.0.0.1:$hp/api/health" 2>/dev/null)
+  [ -n "$h" ] && ok "app health (127.0.0.1:$hp): $h" || no "app not answering on 127.0.0.1:$hp"
   d=$(grep -E '^PORTAL_DOMAIN=' "${DIR:-.}/.env" 2>/dev/null | cut -d= -f2- | tr -d '"'"'"'')
   if [ -n "$d" ]; then
     echo "  domain   : $d"

@@ -82,7 +82,13 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Uploads live on a mounted volume, owned by the unprivileged user the server
 # runs as. `node` (uid 1000) ships with the base image.
-RUN mkdir -p /data/uploads && chown -R node:node /data /app
+#
+# /opt/prisma is chowned too, and it is not optional: the Prisma CLI writes
+# inside its own @prisma/engines directory when it resolves a query engine, so
+# a root-owned tree makes every `prisma db push` fail as `node` with
+# "Can't write to /opt/prisma/node_modules/@prisma/engines". The entrypoint
+# then refuses to start and the container crash-loops with a healthy database.
+RUN mkdir -p /data/uploads && chown -R node:node /data /app /opt/prisma
 USER node
 
 EXPOSE 3000
