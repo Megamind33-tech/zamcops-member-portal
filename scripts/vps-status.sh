@@ -155,7 +155,24 @@ else
 fi
 
 say "Ports and firewall"
-(ss -tlnp 2>/dev/null || netstat -tlnp 2>/dev/null) | grep -E ':(80|443|3000|5432)\b' | sed 's/^/  /' || note "(none of 80/443/3000/5432 listening)"
+# Every listening socket, not a hand-picked few. Filtering this to a fixed list
+# of ports hid the portal's own published port on a shared box, which made a
+# healthy app look unreachable — the report has to show what is there, not what
+# it expected to find.
+(ss -tlnp 2>/dev/null || netstat -tlnp 2>/dev/null) | awk 'NR==1 || /LISTEN/' | head -40 | sed 's/^/  /'
+
+say "Where the portal is published"
+if command -v docker >/dev/null 2>&1 && [ -n "$DIR" ] && [ -f "$DIR/docker-compose.yml" ]; then
+  mapped=$(cd "$DIR" && docker compose port app 3000 2>/dev/null)
+  if [ -n "$mapped" ]; then
+    ok "app container port 3000 is published on $mapped"
+    note "point the reverse proxy at this address"
+  else
+    no "the app container publishes NO host port"
+    note "nginx cannot reach it over loopback. Either set APP_HOST_PORT in .env and"
+    note "re-run 'docker compose up -d app', or put nginx on the app's docker network."
+  fi
+fi
 command -v ufw >/dev/null 2>&1 && echo "  ufw: $(ufw status 2>/dev/null | head -1)"
 
 say "Recent app logs (last 25 lines)"
