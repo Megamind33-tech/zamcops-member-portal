@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ShieldCheck, UserPlus, Trash2, History } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td } from "@/components/admin/widgets";
-import { Field, TextInput } from "@/components/ui/Field";
+import { Field, Input } from "@/components/zam/Input";
 import { formatDate } from "@/lib/format";
 
 interface StaffAccount {
@@ -86,20 +86,20 @@ export default function AdminTeamPage() {
       <div className="mb-6 grid items-start gap-6 lg:grid-cols-2">
         <Panel title={`Staff accounts (${admins.length})`}>
           {admins.length === 0 ? (
-            <p className="px-5 py-8 text-center text-sm text-night-400">{loading ? "Loading…" : "No staff accounts yet."}</p>
+            <p className="px-5 py-8 text-center text-sm text-zam-muted">{loading ? "Loading…" : "No staff accounts yet."}</p>
           ) : (
-            <div className="divide-y divide-white/[0.06]">
+            <div className="divide-y divide-zam-line">
               {admins.map((a) => (
                 <div key={a.id} className="flex items-center gap-3 px-5 py-3.5">
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zam-orange-soft text-zam-orange">
                     <ShieldCheck size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-white">
+                    <p className="truncate text-sm font-semibold text-zam-ink">
                       {a.name}
                       {a.id === me && <span className="ml-2 rounded-full bg-zam-green/12 px-2 py-0.5 text-[10px] font-bold text-zam-green">You</span>}
                     </p>
-                    <p className="truncate text-xs text-night-400">
+                    <p className="truncate text-xs text-zam-muted">
                       {a.email} · joined {formatDate(a.createdAt)}
                     </p>
                   </div>
@@ -107,7 +107,7 @@ export default function AdminTeamPage() {
                     <button
                       onClick={() => remove(a)}
                       disabled={busy}
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-night-400 transition hover:bg-zam-red/10 hover:text-zam-red disabled:opacity-40"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zam-muted transition hover:bg-zam-red/10 hover:text-zam-red disabled:opacity-40"
                       aria-label={`Remove ${a.name}`}
                     >
                       <Trash2 size={15} />
@@ -122,33 +122,33 @@ export default function AdminTeamPage() {
         <Panel title="Add a staff account">
           <form onSubmit={create} className="space-y-3 p-5">
             <Field label="Full name">
-              <TextInput placeholder="e.g. Mary Zulu" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+              <Input placeholder="e.g. Mary Zulu" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
             </Field>
             <Field label="Staff email">
-              <TextInput type="email" placeholder="name@zamcops.org.zm" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+              <Input type="email" placeholder="name@zamcops.org.zm" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
             </Field>
             <Field label="Password (min. 8 characters)">
-              <TextInput type="password" placeholder="••••••••" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
+              <Input type="password" placeholder="••••••••" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
             </Field>
-            {msg && <p className={`text-sm font-medium ${msg.ok ? "text-emerald-300" : "text-red-300"}`}>{msg.text}</p>}
+            {msg && <p className={`text-sm font-medium ${msg.ok ? "text-zam-green" : "text-zam-red"}`}>{msg.text}</p>}
             <button
               type="submit"
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 hover:bg-accent-400 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-zam-orange px-4 py-2.5 text-sm font-semibold text-white hover:bg-zam-orange-dark disabled:opacity-50"
             >
               <UserPlus size={15} /> {busy ? "Saving…" : "Create account"}
             </button>
-            <p className="text-xs text-night-400">
+            <p className="text-xs text-zam-muted">
               Every console action is recorded against the signed-in account below, so give each staff member their own login.
             </p>
           </form>
         </Panel>
       </div>
 
-      <Panel title="Activity log" right={<History size={15} className="text-night-400" />}>
+      <Panel title="Activity log" right={<History size={15} className="text-zam-muted" />}>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px]">
-            <thead className="bg-white/[0.03]">
+            <thead className="bg-zam-canvas">
               <tr>
                 <Th>When</Th>
                 <Th>Staff</Th>
@@ -156,20 +156,20 @@ export default function AdminTeamPage() {
                 <Th>Detail</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-zam-line">
               {logs.map((l) => (
-                <tr key={l.id} className="hover:bg-white/[0.03]">
-                  <Td className="whitespace-nowrap text-xs text-night-400">{formatDate(l.createdAt)}</Td>
-                  <Td className="text-sm font-semibold text-white">{l.adminName}</Td>
+                <tr key={l.id} className="hover:bg-zam-canvas">
+                  <Td className="whitespace-nowrap text-xs text-zam-muted">{formatDate(l.createdAt)}</Td>
+                  <Td className="text-sm font-semibold text-zam-ink">{l.adminName}</Td>
                   <Td>
-                    <span className="rounded-md bg-white/[0.06] px-2 py-0.5 font-mono text-xs text-night-300">{l.action}</span>
+                    <span className="rounded-md bg-zam-canvas px-2 py-0.5 font-mono text-xs text-zam-muted">{l.action}</span>
                   </Td>
-                  <Td className="text-sm text-night-300">{l.summary || l.targetType}</Td>
+                  <Td className="text-sm text-zam-muted">{l.summary || l.targetType}</Td>
                 </tr>
               ))}
               {logs.length === 0 && (
                 <tr>
-                  <Td colSpan={4} className="py-8 text-center text-night-400">
+                  <Td colSpan={4} className="py-8 text-center text-zam-muted">
                     {loading ? "Loading…" : "No activity recorded yet — actions taken from now on will appear here."}
                   </Td>
                 </tr>

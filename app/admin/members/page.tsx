@@ -46,13 +46,13 @@ export default function AdminMembersPage() {
             />
             <button
               onClick={() => downloadMembers(shown, "csv")}
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-white/[0.06] px-3 text-xs font-semibold text-night-200 ring-1 ring-white/10 hover:text-white"
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-zam-canvas px-3 text-xs font-semibold text-zam-ink ring-1 ring-zam-line hover:text-zam-ink"
             >
               <Download size={14} /> CSV
             </button>
             <button
               onClick={() => downloadMembers(shown, "xls")}
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-white/[0.06] px-3 text-xs font-semibold text-night-200 ring-1 ring-white/10 hover:text-white"
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-zam-canvas px-3 text-xs font-semibold text-zam-ink ring-1 ring-zam-line hover:text-zam-ink"
             >
               <Download size={14} /> Excel
             </button>
@@ -62,7 +62,7 @@ export default function AdminMembersPage() {
       <Panel title="Members">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px]">
-            <thead className="bg-white/[0.03]">
+            <thead className="bg-zam-canvas">
               <tr>
                 <Th>Member</Th>
                 <Th>Member no.</Th>
@@ -73,26 +73,26 @@ export default function AdminMembersPage() {
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-zam-line">
               {shown.map((m) => (
-                <tr key={m.id} className="hover:bg-white/[0.03]">
+                <tr key={m.id} className="hover:bg-zam-canvas">
                   <Td>
                     <Link href={`/admin/members/${m.id}`} className="group flex items-center gap-3">
                       <Avatar name={m.stageName || m.fullName} src={m.profilePhoto || undefined} size={36} />
                       <div>
-                        <p className="font-semibold text-white group-hover:text-accent-300">{m.fullName}</p>
-                        <p className="text-xs text-night-300">{m.stageName || "—"}</p>
+                        <p className="font-semibold text-zam-ink group-hover:text-zam-orange">{m.fullName}</p>
+                        <p className="text-xs text-zam-muted">{m.stageName || "—"}</p>
                       </div>
-                      <ChevronRight size={15} className="text-night-500 opacity-0 transition group-hover:opacity-100" />
+                      <ChevronRight size={15} className="text-zam-muted/70 opacity-0 transition group-hover:opacity-100" />
                     </Link>
                   </Td>
                   <Td className="font-mono text-xs">{m.memberNumber}</Td>
                   <Td>{m.role}</Td>
                   <Td>
-                    <p className="text-xs text-night-300">{m.email}</p>
-                    <p className="text-xs text-night-400">{m.phone}</p>
+                    <p className="text-xs text-zam-muted">{m.email}</p>
+                    <p className="text-xs text-zam-muted">{m.phone}</p>
                   </Td>
-                  <Td className="text-night-300">{formatDate(m.joinedAt)}</Td>
+                  <Td className="text-zam-muted">{formatDate(m.joinedAt)}</Td>
                   <Td>
                     <StatusBadge status={m.membershipStatus} />
                   </Td>
@@ -103,7 +103,7 @@ export default function AdminMembersPage() {
               ))}
               {shown.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">No members match your search.</Td>
+                  <Td className="py-8 text-center text-zam-muted">No members match your search.</Td>
                 </tr>
               )}
             </tbody>
@@ -128,9 +128,9 @@ function ActBtn({
   label: string;
 }) {
   const tones = {
-    approve: "bg-emerald-400/12 text-emerald-300 hover:bg-emerald-400/20",
-    reject: "bg-red-400/12 text-red-300 hover:bg-red-400/20",
-    neutral: "bg-white/[0.06] text-night-200 hover:bg-white/[0.12]",
+    approve: "bg-emerald-400/12 text-zam-green hover:bg-emerald-400/20",
+    reject: "bg-red-400/12 text-zam-red hover:bg-red-400/20",
+    neutral: "bg-zam-canvas text-zam-ink hover:bg-zam-canvas",
   };
   return (
     <button

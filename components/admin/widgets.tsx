@@ -20,7 +20,7 @@ export function AdminStat({
     amber: "bg-zam-amber/15 text-zam-amber",
   };
   return (
-    <div className="card-lite p-4">
+    <div className="card p-4">
       <div className="flex items-center justify-between">
         <span className={cn("grid h-10 w-10 place-items-center rounded-xl", tones[tone])}>{icon}</span>
       </div>
@@ -40,7 +40,7 @@ export function Panel({
   right?: React.ReactNode;
 }) {
   return (
-    <section className="card-lite overflow-hidden">
+    <section className="card overflow-hidden">
       <div className="flex items-center justify-between border-b border-zam-line px-5 py-3.5">
         <h2 className="text-sm font-bold text-zam-ink">{title}</h2>
         {right}
@@ -75,7 +75,7 @@ export function Td({
 }
 
 // Light status badge for the staff console (the member app keeps the dark
-// variant in components/ui/StatusBadge).
+// variant in components/zam/StatusBadge).
 const badgeMap: Record<string, string> = {
   Approved: "bg-zam-green/12 text-zam-green ring-zam-green/25",
   Active: "bg-zam-green/12 text-zam-green ring-zam-green/25",

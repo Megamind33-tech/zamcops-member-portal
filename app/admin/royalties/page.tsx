@@ -34,7 +34,7 @@ export default function AdminRoyaltiesPage() {
       <Panel title="Per-member royalties">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px]">
-            <thead className="bg-white/[0.03]">
+            <thead className="bg-zam-canvas">
               <tr>
                 <Th>Member</Th>
                 <Th>Estimated</Th>
@@ -43,14 +43,14 @@ export default function AdminRoyaltiesPage() {
                 <Th>Top song</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-zam-line">
               {summaries.map((r) => (
-                <tr key={r.ownerId} className="hover:bg-white/[0.03]">
-                  <Td className="font-semibold text-white">{nameFor(r.ownerId)}</Td>
+                <tr key={r.ownerId} className="hover:bg-zam-canvas">
+                  <Td className="font-semibold text-zam-ink">{nameFor(r.ownerId)}</Td>
                   <Td>{formatKwacha(r.totalEstimated, r.currency)}</Td>
-                  <Td className="text-gold-300">{formatKwacha(r.pending, r.currency)}</Td>
-                  <Td className="text-emerald-300">{formatKwacha(r.paid, r.currency)}</Td>
-                  <Td className="text-night-300">{r.topSongs[0]?.title ?? "—"}</Td>
+                  <Td className="text-zam-amber">{formatKwacha(r.pending, r.currency)}</Td>
+                  <Td className="text-zam-green">{formatKwacha(r.paid, r.currency)}</Td>
+                  <Td className="text-zam-muted">{r.topSongs[0]?.title ?? "—"}</Td>
                 </tr>
               ))}
             </tbody>

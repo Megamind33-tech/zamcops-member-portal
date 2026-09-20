@@ -46,7 +46,7 @@ export default function AdminDirectoryPage() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search name, number, email…"
-              className="field-input-lite h-10 w-56"
+              className="field-input h-10 w-56"
             />
             <button
               onClick={() => downloadMembers(shown, "csv")}
@@ -91,7 +91,7 @@ export default function AdminDirectoryPage() {
       </div>
 
       {shown.length === 0 ? (
-        <div className="card-lite grid place-items-center gap-3 py-16 text-center">
+        <div className="card grid place-items-center gap-3 py-16 text-center">
           <span className="grid h-14 w-14 place-items-center rounded-2xl bg-zam-orange-soft text-zam-orange">
             <Contact size={26} />
           </span>
@@ -104,7 +104,7 @@ export default function AdminDirectoryPage() {
             <Link
               key={m.id}
               href={`/admin/members/${m.id}`}
-              className="card-lite group flex flex-col gap-3 p-4 transition hover:border-zam-orange/40 hover:shadow-card-lg"
+              className="card group flex flex-col gap-3 p-4 transition hover:border-zam-orange/40 hover:shadow-card-lg"
             >
               <div className="flex items-start gap-3">
                 <Avatar name={m.stageName || m.fullName} src={m.profilePhoto || undefined} size={48} />

@@ -47,7 +47,7 @@ export default function AdminDashboard() {
       <Panel title="Recent submissions">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[560px]">
-            <thead className="bg-white/[0.03]">
+            <thead className="bg-zam-canvas">
               <tr>
                 <Th>Type</Th>
                 <Th>Title</Th>
@@ -55,21 +55,21 @@ export default function AdminDashboard() {
                 <Th>Status</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-zam-line">
               {recent.map((r) => (
-                <tr key={r.id} className="hover:bg-white/[0.03]">
+                <tr key={r.id} className="hover:bg-zam-canvas">
                   <Td>
-                    <span className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs font-semibold text-night-300">
+                    <span className="rounded-md bg-zam-canvas px-2 py-0.5 text-xs font-semibold text-zam-muted">
                       {r.kind}
                     </span>
                   </Td>
-                  <Td className="font-semibold text-white">
+                  <Td className="font-semibold text-zam-ink">
                     <div className="flex items-center gap-3">
                       <CoverArt seed={r.title} size={36} rounded="rounded-lg" />
                       <span>{r.title}</span>
                     </div>
                   </Td>
-                  <Td className="text-night-300">{formatDate(r.at)}</Td>
+                  <Td className="text-zam-muted">{formatDate(r.at)}</Td>
                   <Td>
                     <StatusBadge status={r.status} />
                   </Td>
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
               ))}
               {recent.length === 0 && (
                 <tr>
-                  <Td colSpan={4} className="py-8 text-center text-night-400">
+                  <Td colSpan={4} className="py-8 text-center text-zam-muted">
                     <div className="flex flex-col items-center gap-3">
                       <Illustration name="inbox" size={100} />
                       <span>No recent submissions yet.</span>
@@ -97,16 +97,16 @@ function QueueCard({ href, label, count }: { href: string; label: string; count:
   return (
     <Link
       href={href}
-      className="card flex items-center justify-between p-5 transition hover:bg-white/[0.03]"
+      className="card flex items-center justify-between p-5 transition hover:bg-zam-canvas"
     >
       <div>
-        <p className="flex items-center gap-1.5 text-xs font-semibold text-gold-400">
+        <p className="flex items-center gap-1.5 text-xs font-semibold text-zam-amber">
           <Clock size={13} /> Pending review
         </p>
-        <p className="mt-1 text-3xl font-extrabold text-white">{count}</p>
-        <p className="text-sm text-night-300">{label}</p>
+        <p className="mt-1 text-3xl font-extrabold text-zam-ink">{count}</p>
+        <p className="text-sm text-zam-muted">{label}</p>
       </div>
-      <ChevronRight className="text-night-400" />
+      <ChevronRight className="text-zam-muted" />
     </Link>
   );
 }

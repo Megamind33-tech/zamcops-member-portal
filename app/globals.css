@@ -61,73 +61,26 @@ body {
 
 @layer components {
   .field-label {
-    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-night-300;
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em] text-zam-muted;
   }
 
   .field-input {
-    @apply w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition
-           placeholder:text-night-400 focus:border-accent-400/70 focus:bg-white/[0.06] focus:ring-4 focus:ring-accent-500/20;
+    @apply w-full rounded-xl border border-zam-line bg-white px-3.5 py-2.5 text-sm text-zam-ink outline-none transition
+           placeholder:text-zam-muted/60 focus:border-zam-orange focus:ring-4 focus:ring-zam-orange/15;
   }
 
-  /* Default surface — a dark material card with genuine physical elevation.
-     The gradient mimics overhead lighting (lighter at top, deeper at bottom);
-     the multi-layer shadow in tailwind.config gives the "floating panel" look
-     from the reference. */
+  /* The one surface in the app: a white panel on the warm canvas, used by
+     the member portal and the staff console alike. */
   .card {
-    @apply rounded-[1.5rem] border border-white/[0.11] shadow-card backdrop-blur-xl;
-    background: linear-gradient(
-      158deg,
-      rgba(32, 36, 58, 0.94) 0%,
-      rgba(15, 17, 30, 0.97) 100%
-    );
+    @apply rounded-2xl border border-zam-line bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_24px_-12px_rgba(16,24,40,0.12)];
   }
 
-  /* A slightly brighter surface for nested / elevated elements. */
-  .card-raised {
-    @apply rounded-[1.25rem] border border-white/[0.09];
-    background: rgba(255, 255, 255, 0.045);
-  }
-
-  /* Faint photographic grain over dark surfaces — the difference between a
-     "flat rectangle" and something that feels mastered, like sleeve art. */
-  .grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.05;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  .pill {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[11px] font-semibold backdrop-blur-sm;
-  }
-
-  /* The signature vibrant gradient used on the brand mark and hero accents. */
-  .brand-gradient {
-    background-image: linear-gradient(135deg, #5460f8 0%, #7338e0 48%, #8b5cf6 100%);
-  }
-
-  /* Frosted-glass input cluster for the lock-screen auth composition. */
-  .glass-group {
-    @apply overflow-hidden rounded-[1.4rem] border border-white/[0.12] bg-white/[0.06] backdrop-blur-xl;
-  }
-
-  .glass-group > * + * {
-    @apply border-t border-white/10;
-  }
-
-  .glass-field {
-    @apply flex w-full items-center gap-3 bg-transparent px-4 py-4 text-[15px] text-white outline-none
-           placeholder:text-white/45;
-  }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   ZAMCOPS brand flourishes + the "zam" light design system (ported from the
-   Magic Patterns reference). These power the staff console and any surface
-   that should read distinctly ZAMCOPS rather than generic.
+   ZAMCOPS brand flourishes. Everything above is the one design system the
+   whole app uses; these are the marks that make a page read as the society's
+   rather than as any other portal.
    ────────────────────────────────────────────────────────────────────────── */
 
 /* The signature Zambian-flag flagline — eagle orange, red, neutral, green. */
@@ -143,150 +96,18 @@ body {
   );
 }
 
-/* Same flagline tuned for dark surfaces (neutral band brightened). */
-.zam-flagline-dark {
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    #f26c21 0 28%,
-    #e2342b 28% 52%,
-    rgba(255, 255, 255, 0.55) 52% 74%,
-    #2ba45a 74% 100%
-  );
-}
-
 /* Warm ZAMCOPS orange gradient — brand mark, active nav tiles, primary CTAs. */
 .brand-gradient-zam {
   background-image: linear-gradient(135deg, #f26c21, #d85a14);
 }
 
-/* Orange→red text gradient for hero numerals / headings. */
-.text-gradient-zam {
-  background-image: linear-gradient(120deg, #f26c21, #e2342b 75%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Subtle dotted texture for dark brand headers in the light theme. */
-.ink-grid {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* A clean, opaque light canvas that lifts above the dark body textures.
-   The staff console and admin auth sit inside this. */
+/* The staff console's canvas — the same warm paper the member portal sits on,
+   so the two halves of the app read as one product. */
 .admin-surface {
   position: relative;
   isolation: isolate;
   z-index: 1;
   min-height: 100dvh;
-  background-color: #f6f7f9;
-  color: #1a1d21;
+  background-color: #f3eee6;
+  color: #1c1917;
 }
-
-@layer components {
-  /* Light material card — the default staff-console surface. */
-  .card-lite {
-    @apply rounded-2xl border border-zam-line bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04),0_8px_24px_-12px_rgba(16,24,40,0.12)];
-  }
-
-  .field-label-lite {
-    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em] text-zam-muted;
-  }
-
-  /* Light input used across the staff console. */
-  .field-input-lite {
-    @apply w-full rounded-xl border border-zam-line bg-white px-3.5 py-2.5 text-sm text-zam-ink outline-none transition
-           placeholder:text-zam-muted/60 focus:border-zam-orange focus:ring-4 focus:ring-zam-orange/15;
-  }
-}
-
-/* Scoped light overrides: any shared primitive (card / field / selection)
-   rendered inside the staff console inherits the light treatment automatically,
-   so the member app's dark styling is untouched. Higher specificity wins. */
-.admin-surface .card {
-  border-color: #e7e9ed;
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
-  backdrop-filter: none;
-}
-.admin-surface .card-raised {
-  border-color: #e7e9ed;
-  background: #f6f7f9;
-}
-.admin-surface .field-label {
-  color: #5a6470;
-}
-.admin-surface .field-input {
-  border-color: #e7e9ed;
-  background: #ffffff;
-  color: #1a1d21;
-}
-.admin-surface .field-input::placeholder {
-  color: rgba(90, 100, 112, 0.6);
-}
-.admin-surface .field-input:focus {
-  border-color: #f26c21;
-  background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(242, 108, 33, 0.15);
-}
-.admin-surface .pill {
-  border-color: #e7e9ed;
-  background: #f6f7f9;
-  color: #1a1d21;
-}
-.admin-surface ::selection {
-  background: rgba(242, 108, 33, 0.22);
-  color: #1a1d21;
-}
-
-/* Neutralise the dark utility classes used inside the staff pages so the
-   existing markup renders on the light "zam" canvas. Unlayered → wins over
-   Tailwind's layered utilities. The member app (outside .admin-surface) keeps
-   its dark styling untouched. */
-.admin-surface .text-white,
-.admin-surface .text-night-100,
-.admin-surface .text-night-200 { color: #1a1d21; }
-.admin-surface .text-night-300 { color: #5a6470; }
-.admin-surface .text-night-400 { color: #6a7382; }
-.admin-surface .text-night-500 { color: #98a2b3; }
-.admin-surface .hover\:text-white:hover { color: #1a1d21; }
-
-.admin-surface .text-accent-300,
-.admin-surface .text-accent-400,
-.admin-surface .hover\:text-accent-300:hover { color: #f26c21; }
-.admin-surface .text-brand-200 { color: #2f6fed; }
-.admin-surface .text-emerald-300 { color: #2ba45a; }
-.admin-surface .text-red-300,
-.admin-surface .hover\:text-red-300:hover { color: #e2342b; }
-.admin-surface .text-gold-300,
-.admin-surface .text-gold-400 { color: #b8791a; }
-
-.admin-surface .bg-night-950,
-.admin-surface .bg-night-900,
-.admin-surface .bg-night-850,
-.admin-surface .bg-night-900\/80,
-.admin-surface .bg-white\/\[0\.03\],
-.admin-surface .bg-white\/\[0\.04\],
-.admin-surface .bg-white\/\[0\.05\],
-.admin-surface .bg-white\/\[0\.06\],
-.admin-surface .bg-white\/\[0\.07\],
-.admin-surface .bg-white\/\[0\.08\] { background-color: #f6f7f9; }
-.admin-surface .hover\:bg-white\/\[0\.03\]:hover,
-.admin-surface .hover\:bg-white\/\[0\.06\]:hover,
-.admin-surface .hover\:bg-white\/\[0\.1\]:hover,
-.admin-surface .hover\:bg-white\/\[0\.12\]:hover { background-color: #eef0f3; }
-
-.admin-surface .border-white\/10,
-.admin-surface .border-white\/15,
-.admin-surface .border-white\/\[0\.07\],
-.admin-surface .border-white\/\[0\.08\],
-.admin-surface .border-white\/\[0\.09\],
-.admin-surface .border-white\/\[0\.11\] { border-color: #e7e9ed; }
-.admin-surface .ring-white\/10,
-.admin-surface .ring-white\/\[0\.06\],
-.admin-surface .ring-white\/\[0\.07\] { --tw-ring-color: #e7e9ed; }
-.admin-surface .divide-white\/\[0\.06\] > :not([hidden]) ~ :not([hidden]),
-.admin-surface .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-color: #e7e9ed; }

@@ -29,9 +29,9 @@ export default function AdminLoginScreen() {
     <div className="relative grid min-h-[100dvh] place-items-center overflow-hidden bg-zam-ink px-4">
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-6 flex justify-center">
-          <Logo size={36} onDark />
+          <Logo size={40} onDark withName />
         </div>
-        <div className="card-lite relative overflow-hidden p-7">
+        <div className="card relative overflow-hidden p-7">
           <div className="zam-flagline absolute inset-x-0 top-0 rounded-none" />
           <div className="mb-1 flex items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-zam-ink text-white">
@@ -43,20 +43,20 @@ export default function AdminLoginScreen() {
 
         <form onSubmit={submit} className="space-y-4">
           <label className="block">
-            <span className="field-label-lite">Staff email <span className="text-zam-red">*</span></span>
+            <span className="field-label">Staff email <span className="text-zam-red">*</span></span>
             <input
               type="email"
-              className="field-input-lite"
+              className="field-input"
               placeholder="admin@zamcops.org.zm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </label>
           <label className="block">
-            <span className="field-label-lite">Password <span className="text-zam-red">*</span></span>
+            <span className="field-label">Password <span className="text-zam-red">*</span></span>
             <input
               type="password"
-              className="field-input-lite"
+              className="field-input"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -68,7 +68,7 @@ export default function AdminLoginScreen() {
           <button
             type="submit"
             disabled={busy}
-            className="brand-gradient-zam inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-white shadow-[0_16px_38px_-14px_rgba(242,108,33,0.65)] transition hover:opacity-95 disabled:opacity-50"
+            className="brand-gradient-zam inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-zam-ink shadow-[0_16px_38px_-14px_rgba(242,108,33,0.65)] transition hover:opacity-95 disabled:opacity-50"
           >
             <LogIn size={18} /> {busy ? "Signing in…" : "Sign in to console"}
           </button>

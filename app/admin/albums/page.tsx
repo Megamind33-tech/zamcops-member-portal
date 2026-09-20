@@ -23,7 +23,7 @@ export default function AdminAlbumsPage() {
       <Panel title="Albums">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px]">
-            <thead className="bg-white/[0.03]">
+            <thead className="bg-zam-canvas">
               <tr>
                 <Th>Album</Th>
                 <Th>Performed by</Th>
@@ -35,10 +35,10 @@ export default function AdminAlbumsPage() {
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-zam-line">
               {albums.map((a) => (
-                <tr key={a.id} className="align-top hover:bg-white/[0.03]">
-                  <Td className="font-semibold text-white">
+                <tr key={a.id} className="align-top hover:bg-zam-canvas">
+                  <Td className="font-semibold text-zam-ink">
                     <div className="flex items-center gap-3">
                       {a.coverArt ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -48,7 +48,7 @@ export default function AdminAlbumsPage() {
                       )}
                       <div className="min-w-0">
                         {a.title}
-                        <span className="mt-1 block text-xs font-normal text-night-400">
+                        <span className="mt-1 block text-xs font-normal text-zam-muted">
                           {a.tracks.map((t) => t.title).join(" · ")}
                         </span>
                       </div>
@@ -56,9 +56,9 @@ export default function AdminAlbumsPage() {
                   </Td>
                   <Td>{a.artistName}</Td>
                   <Td>{a.tracks.length}</Td>
-                  <Td className="text-xs text-night-300">{a.studioReceipt || "—"}</Td>
-                  <Td className="text-night-300">{a.releaseDate ? formatDate(a.releaseDate) : "—"}</Td>
-                  <Td className="text-night-300">{formatDate(a.submittedAt)}</Td>
+                  <Td className="text-xs text-zam-muted">{a.studioReceipt || "—"}</Td>
+                  <Td className="text-zam-muted">{a.releaseDate ? formatDate(a.releaseDate) : "—"}</Td>
+                  <Td className="text-zam-muted">{formatDate(a.submittedAt)}</Td>
                   <Td>
                     <StatusBadge status={a.status} />
                   </Td>
@@ -83,7 +83,7 @@ export default function AdminAlbumsPage() {
               ))}
               {albums.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">
+                  <Td className="py-8 text-center text-zam-muted">
                     <div className="flex flex-col items-center gap-3">
                       <Illustration name="vinyl" />
                       <span>No album submissions yet.</span>

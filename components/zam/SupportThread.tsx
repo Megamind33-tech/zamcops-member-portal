@@ -24,14 +24,14 @@ export function SupportThread({
               "rounded-xl px-3 py-2.5 text-sm",
               admin
                 ? staff
-                  ? "bg-zam-green/10 text-night-100"
+                  ? "bg-zam-green/10 text-zam-ink"
                   : "bg-white/[0.04] text-white"
                 : staff
                   ? "bg-zam-canvas text-zam-ink"
                   : "bg-zam-orange-soft/50 text-zam-ink",
             )}
           >
-            <p className={cn("text-[10px] font-bold uppercase tracking-wide", admin ? "text-night-400" : "text-zam-muted")}>
+            <p className={cn("text-[10px] font-bold uppercase tracking-wide", admin ? "text-zam-green" : "text-zam-muted")}>
               {staff ? "ZAMCOPS" : admin ? "Member" : "You"} · {formatDateTime(m.at)}
             </p>
             <p className="mt-1 whitespace-pre-wrap leading-relaxed">{m.body}</p>
