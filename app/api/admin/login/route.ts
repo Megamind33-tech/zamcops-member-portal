@@ -6,6 +6,10 @@ import { rateLimit, clientIp } from "@/lib/rateLimit";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// The password shipped in .env.example, and the fallback used in development.
+// It is published in this repository, so it must never guard a real console.
+const DEFAULT_ADMIN_PASSWORD = "admin123";
+
 // Ensures the staff account configured via env exists, then signs in.
 // Returns an error message when seeding is refused (default password in
 // production), null otherwise.
@@ -15,11 +19,17 @@ async function ensureSeedAdmin(): Promise<string | null> {
   const name = process.env.ADMIN_NAME || "ZAMCOPS Staff";
   const existing = await prisma.adminUser.findUnique({ where: { email } });
   if (existing) return null;
-  if (!password && process.env.NODE_ENV === "production") {
-    return "No staff account exists and ADMIN_PASSWORD is not configured — refusing to create one with the default password in production. Set ADMIN_EMAIL/ADMIN_PASSWORD and try again.";
+
+  // Refuse the default in production whether it arrived by being left unset or
+  // by being copied verbatim out of .env.example. The second case is the one
+  // that actually happens: docker-compose.yml marks ADMIN_PASSWORD required, so
+  // it is never unset there — only, too often, still "admin123".
+  if (process.env.NODE_ENV === "production" && (!password || password === DEFAULT_ADMIN_PASSWORD)) {
+    return "No staff account exists and ADMIN_PASSWORD is unset or still the default — refusing to create one with a password published in the source. Set ADMIN_EMAIL/ADMIN_PASSWORD to real values and try again.";
   }
+
   await prisma.adminUser.create({
-    data: { email, name, passwordHash: await hashPassword(password || "admin123") },
+    data: { email, name, passwordHash: await hashPassword(password || DEFAULT_ADMIN_PASSWORD) },
   });
   return null;
 }

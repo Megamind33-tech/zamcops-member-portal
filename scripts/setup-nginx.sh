@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# ZAMCOPS Member Portal — put the portal behind the nginx already on this box.
+#
+#   sudo bash scripts/setup-nginx.sh example.org www.example.org
+#
+# The FIRST name is canonical: it is the one the portal is served on. Every
+# other name is given its own block that permanently redirects to the canonical
+# one, so an apex and its www alias end up as a single address rather than two
+# that both work. All of them go on one certificate — a redirect still has to
+# be reached over HTTPS, or the browser warns before it can fire.
+#
+# This machine serves other sites. The script therefore only ever ADDS a vhost:
+# it refuses to overwrite an existing config, refuses if another vhost already
+# claims the domain, and validates with `nginx -t` before reloading. It never
+# edits or removes anything that is already there.
+
+set -uo pipefail
+
+RED=$'\e[31m'; GRN=$'\e[32m'; YEL=$'\e[33m'; BLD=$'\e[1m'; RST=$'\e[0m'
+ok()   { echo "  ${GRN}✓${RST} $*"; }
+warn() { echo "  ${YEL}!${RST} $*"; }
+die()  { echo "  ${RED}✗${RST} $*" >&2; exit 1; }
+step() { echo; echo "${BLD}$*${RST}"; }
+
+[ "$#" -ge 1 ] || die "usage: sudo bash scripts/setup-nginx.sh <domain> [more domains…]"
+DOMAINS="$*"
+DOMAIN="$1"            # the primary name, used in messages and by certbot
+CERTBOT_ARGS=""
+for d in $DOMAINS; do CERTBOT_ARGS="$CERTBOT_ARGS -d $d"; done
+[ "$(id -u)" -eq 0 ] || die "run with sudo — this writes to /etc/nginx"
+
+cd "$(dirname "$0")/.." || die "cannot find the repository root"
+# A key can appear more than once: these get set by appending, and appending
+# twice is easy. Take the LAST occurrence — the value docker compose itself
+# would use — rather than joining every match into one multi-line string.
+envval() { grep -E "^$1=" .env 2>/dev/null | tail -1 | cut -d= -f2- | tr -d "\"'"; }
+
+APP_PORT=$(envval APP_HOST_PORT | tr -dc '0-9')
+APP_PORT=${APP_PORT:-3100}
+# Let's Encrypt certificates last 90 days. Registered against an address, the
+# CA warns before one expires; registered anonymously, a renewal that quietly
+# stops working is discovered when the portal goes dark.
+ACME_EMAIL=$(envval ACME_EMAIL)
+
+AVAIL="/etc/nginx/sites-available/zamcops"
+ENABLED="/etc/nginx/sites-enabled/zamcops"
+
+step "1. Pre-flight"
+
+command -v nginx >/dev/null || die "nginx is not installed"
+ok "nginx present"
+
+curl -fsS "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null 2>&1 \
+  || die "the portal is not answering on 127.0.0.1:${APP_PORT} — run scripts/deploy-vps.sh first"
+ok "portal healthy on 127.0.0.1:${APP_PORT}"
+
+# Never clobber an existing vhost.
+[ -e "$AVAIL" ] && die "$AVAIL already exists — inspect it yourself rather than letting this script overwrite it"
+
+# Never fight another vhost for the same hostname.
+for d in $DOMAINS; do
+  if grep -rlE "^\s*server_name\s+.*\b${d//./\\.}\b" /etc/nginx/sites-enabled/ 2>/dev/null | grep -q .; then
+    grep -rlE "^\s*server_name\s+.*\b${d//./\\.}\b" /etc/nginx/sites-enabled/ 2>/dev/null | sed 's/^/      /'
+    die "another enabled vhost already serves ${d} (listed above)"
+  fi
+done
+ok "no other vhost claims: ${DOMAINS}"
+
+# DNS must already point here, or certbot's challenge fails.
+SERVER_IP=$(curl -fsS --max-time 10 https://api.ipify.org 2>/dev/null || echo "")
+DNS_OK=1
+for d in $DOMAINS; do
+  RESOLVED=$(getent hosts "$d" 2>/dev/null | awk '{print $1}' | head -1)
+  if [ -z "$RESOLVED" ]; then
+    warn "${d} does not resolve — add an A record pointing at ${SERVER_IP:-this server}"
+    DNS_OK=0
+  elif [ -n "$SERVER_IP" ] && [ "$RESOLVED" != "$SERVER_IP" ]; then
+    warn "${d} resolves to ${RESOLVED}, but this server is ${SERVER_IP}"
+    DNS_OK=0
+  else
+    ok "${d} resolves to this server (${RESOLVED})"
+  fi
+done
+# A certificate request against a name that does not resolve here cannot
+# succeed, and Let's Encrypt counts the failure against an hourly limit. The
+# vhost is still worth writing — it just serves plain HTTP until DNS is right.
+[ "$DNS_OK" -eq 1 ] || warn "certificate request will be skipped until DNS is correct"
+
+step "2. Writing ${AVAIL}"
+
+# Aliases (everything after the first name) redirect to the canonical host.
+ALIASES=""
+for d in $DOMAINS; do [ "$d" = "$DOMAIN" ] || ALIASES="$ALIASES $d"; done
+
+cat > "$AVAIL" <<NGINX
+# ZAMCOPS Member Portal — proxies to the container on 127.0.0.1:${APP_PORT}.
+NGINX
+
+if [ -n "$ALIASES" ]; then
+  cat >> "$AVAIL" <<NGINX
+# Aliases redirect to ${DOMAIN}. \$scheme is used rather than a hard-coded
+# https:// so this is correct both before a certificate exists and after —
+# certbot adds its own http-to-https redirect alongside.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name${ALIASES};
+    return 301 \$scheme://${DOMAIN}\$request_uri;
+}
+
+NGINX
+fi
+
+cat >> "$AVAIL" <<NGINX
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN};
+
+    # Audio masters are up to 300MB; nginx defaults to 1MB and would reject them.
+    client_max_body_size 300M;
+
+    location / {
+        proxy_pass http://127.0.0.1:${APP_PORT};
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              \$host;
+        proxy_set_header X-Real-IP         \$remote_addr;
+        proxy_set_header X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Upgrade           \$http_upgrade;
+        proxy_set_header Connection        "upgrade";
+
+        # A large upload on a slow connection must not be cut off mid-transfer.
+        proxy_read_timeout    1800s;
+        proxy_send_timeout    1800s;
+        proxy_request_buffering off;
+    }
+}
+NGINX
+if [ -n "$ALIASES" ]; then
+  ok "vhost written — ${DOMAIN} serves the portal; redirecting to it:${ALIASES}"
+else
+  ok "vhost written"
+fi
+
+ln -sfn "$AVAIL" "$ENABLED"
+ok "enabled"
+
+step "3. Validating"
+if ! nginx -t 2>&1 | sed 's/^/      /'; then
+  rm -f "$ENABLED"
+  die "nginx rejected the config — the symlink has been removed, your other sites are untouched"
+fi
+ok "config valid"
+
+systemctl reload nginx || die "reload failed"
+ok "nginx reloaded (other sites unaffected)"
+
+step "4. HTTPS"
+if [ "$DNS_OK" -ne 1 ]; then
+  warn "skipping the certificate: DNS does not point here yet"
+  warn "once it does:  sudo certbot --nginx${CERTBOT_ARGS}"
+elif command -v certbot >/dev/null; then
+  echo "  Requesting a certificate for ${DOMAIN}…"
+  # The address is passed as one quoted argument rather than inside a string
+  # that is then word-split, so a stray space in it cannot become a second
+  # argument that certbot rejects.
+  # shellcheck disable=SC2086 # CERTBOT_ARGS is intentionally word-split
+  if [ -n "$ACME_EMAIL" ]; then
+    ok "expiry warnings will go to ${ACME_EMAIL}"
+    certbot --nginx $CERTBOT_ARGS --non-interactive --agree-tos --email "$ACME_EMAIL" --redirect
+  else
+    warn "ACME_EMAIL is not set in .env — no warning before this certificate expires"
+    certbot --nginx $CERTBOT_ARGS --non-interactive --agree-tos --register-unsafely-without-email --redirect
+  fi
+  if [ $? -eq 0 ]; then
+    ok "certificate installed; HTTP now redirects to HTTPS"
+  else
+    warn "certbot failed — the site still works on http://${DOMAIN}. Fix DNS, then: sudo certbot --nginx${CERTBOT_ARGS}"
+  fi
+else
+  warn "certbot not installed. To enable HTTPS:"
+  echo "      sudo apt install -y certbot python3-certbot-nginx"
+  echo "      sudo certbot --nginx -d ${DOMAIN}"
+fi
+
+step "Done"
+echo "  http://${DOMAIN}/api/health should now answer {\"status\":\"ok\"}."
+[ -n "$ALIASES" ] && echo "  ${ALIASES# } redirects to ${DOMAIN}."
+echo "  Staff sign-in: https://${DOMAIN}/admin   (password: grep ADMIN_PASSWORD .env)"

@@ -165,6 +165,48 @@ than into PostgreSQL, so a 300MB master costs the database nothing. Nothing
 under that directory is served statically — every download goes through an
 authenticated route, exactly as with R2.
 
+### Sharing the VPS with another project
+
+The compose file's `caddy` service binds ports **80 and 443**. If anything else
+on the box already terminates TLS — another project's nginx, Caddy, Traefik, or
+its own compose stack — starting it will collide with a service that is already
+serving traffic. Check before the first `up`:
+
+```bash
+bash scripts/vps-status.sh     # reports what else is running and what holds 80/443
+```
+
+If something already has those ports, run the portal **without** its Caddy and
+let the existing proxy reach it:
+
+```bash
+docker compose up -d app db    # no caddy; the app stays on 127.0.0.1:3000
+```
+
+Then add a vhost on the proxy that already owns 80/443, pointing at
+`127.0.0.1:3000`. For nginx that is a `proxy_pass http://127.0.0.1:3000;` with
+`client_max_body_size 300M;` and generous `proxy_read_timeout` /
+`proxy_send_timeout` (uploads go through it, so the defaults will cut a large
+master off mid-transfer). For an existing Caddy, the `docker/Caddyfile` block in
+this repo can be copied into it as-is.
+
+Nothing else in the stack competes for host ports: PostgreSQL is not published
+at all, and the app is bound to loopback. Docker volumes are namespaced by the
+project directory, so they will not clash with another stack's.
+
+### Checking a deployment
+
+`scripts/vps-status.sh` is a read-only report — host, Docker, which commit is
+checked out, which configuration keys are set, container states, whether the app
+and its certificate answer, table counts, the uploads volume, and what else is
+running on the box. It prints configuration as `set (48 chars)` rather than
+printing values, so its output is safe to paste into a chat or an issue.
+
+```bash
+bash scripts/vps-status.sh                     # auto-detects the checkout
+bash scripts/vps-status.sh /opt/zamcops-member-portal
+```
+
 ### Operating it
 
 ```bash
@@ -181,7 +223,7 @@ the files, the volume holds the bytes.
 
 ```bash
 docker compose exec -T db pg_dump -U zamcops zamcops | gzip > zamcops-$(date +%F).sql.gz
-docker run --rm -v zamcops-member-portal_uploads:/data -v "$PWD":/backup alpine \
+docker run --rm -v zamcops_uploads:/data -v "$PWD":/backup alpine \
   tar czf /backup/uploads-$(date +%F).tar.gz -C /data .
 ```
 
@@ -328,6 +370,7 @@ prisma/                  # schema (PostgreSQL)
 types/                   # domain models
 public/                  # manifest, icon, service worker
 docker/                  # entrypoint + Caddyfile for self-hosting
+scripts/                 # preflight, R2 backfill, VPS status report
 Dockerfile               # production image (Next.js standalone)
 docker-compose.yml       # portal + PostgreSQL + Caddy, for one VPS
 ```
