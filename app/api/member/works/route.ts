@@ -9,7 +9,7 @@ import {
   contributorGaps,
   namesFromSplits,
   normalizeWorkType,
-  splitsTotalOk,
+  splitColumnErrors,
 } from "@/lib/works";
 import { fetchRegisterHits } from "@/lib/registerHits";
 import type { OwnershipSplit } from "@/types";
@@ -48,7 +48,10 @@ export async function POST(req: Request) {
     : [];
   const register = await fetchRegisterHits(rawSplits);
   const splits = applyKnownMembers(rawSplits, owner ?? undefined, register);
-  if (!splitsTotalOk(splits)) return bad("Ownership splits must total 100%.");
+  // Each column of the declaration's distribution key is its own 100%, and the
+  // message names the one that is short rather than making the member work it out.
+  const splitErrors = splitColumnErrors(splits);
+  if (splitErrors.length) return bad(splitErrors[0]);
   const gaps = contributorGaps(splits, owner ?? undefined);
   if (gaps.length) return bad(gaps[0]);
 
@@ -90,6 +93,14 @@ export async function POST(req: Request) {
         coverArt,
         studioReceipt,
         dateCreated: b.dateCreated ?? "",
+        instruments: b.instruments ?? "",
+        yearComposed: b.yearComposed ?? "",
+        soundCarrier: b.soundCarrier ?? "",
+        financedByPublisher: b.financedByPublisher ?? "",
+        publishingAgreementDate: b.publishingAgreementDate ?? "",
+        publishingValidity: b.publishingValidity ?? "",
+        publishingTerritory: b.publishingTerritory ?? "",
+        enclosures: JSON.stringify(Array.isArray(b.enclosures) ? b.enclosures : []),
       },
     });
   } catch (err) {

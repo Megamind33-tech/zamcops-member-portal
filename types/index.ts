@@ -37,9 +37,16 @@ export interface OwnershipSplit {
   id: string;
   party: string; // contributor / rights holder name
   role: ContributorRole;
-  percentage: number;
+  // The WORK DECLARATION's distribution key carries two independent columns per
+  // rightsholder, because the streams are collected and reconciled separately
+  // and a share in one does not imply the same share in the other: a composer
+  // may hold 50% of performance and 25% of recording. `percentage` is the
+  // legacy single figure, kept so rows declared before this split still read.
+  performancePct: number; // "Performance / Broadcast" column
+  recordingPct: number; // "Recording / Mechanical" column
+  percentage?: number; // legacy — superseded by the two columns above
   ipiNumber?: string; // Interested Party Information number, for reciprocal-society registration
-  rightsType?: RightsType; // which royalty stream this share applies to
+  rightsType?: RightsType; // legacy — the two columns above say this precisely
   // Identity — members already on file skip NRC + affirmation letter.
   memberId?: string;
   memberNumber?: string;
@@ -140,6 +147,19 @@ export interface WorkDeclaration {
   audioFile?: string; // reference recording — file name
   studioReceipt?: string; // studio letter or receipt — required
   dateCreated: string;
+  // Carried by the society's official WORK DECLARATION form.
+  instruments?: string;
+  yearComposed?: string;
+  soundCarrier?: string;
+  financedByPublisher?: string; // Yes | No
+  publishingAgreementDate?: string;
+  publishingValidity?: string;
+  publishingTerritory?: string;
+  enclosures?: string[];
+  workNo?: string; // completed by staff
+  fileNo?: string;
+  factor?: string;
+  registeredAt?: string;
   status: ReviewStatus;
   rejectionReason?: string;
   submittedAt: string;

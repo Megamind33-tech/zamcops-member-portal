@@ -7,12 +7,51 @@ export function normalizeWorkType(value: unknown): WorkType {
   return "Song";
 }
 
-export function splitsTotal(splits: { percentage?: number }[]): number {
-  return splits.reduce((sum, x) => sum + (Number(x.percentage) || 0), 0);
+// The WORK DECLARATION's distribution key has two columns, and each is its own
+// 100% to account for. A share in performance does not imply the same share in
+// recording, so they are totalled and validated separately.
+export type SplitColumn = "performancePct" | "recordingPct";
+
+export interface SplitShares {
+  performancePct?: number;
+  recordingPct?: number;
+  percentage?: number; // legacy single figure
 }
 
-export function splitsTotalOk(splits: { percentage?: number }[]): boolean {
-  return splits.length > 0 && Math.abs(splitsTotal(splits) - 100) < 0.51;
+// A row declared before the split into two columns carries only `percentage`.
+// Reading it as the same share in both columns preserves what it meant.
+export function shareOf(split: SplitShares, column: SplitColumn): number {
+  const v = split[column];
+  if (v !== undefined && v !== null) return Number(v) || 0;
+  return Number(split.percentage) || 0;
+}
+
+export function splitsTotal(splits: SplitShares[], column: SplitColumn = "performancePct"): number {
+  return splits.reduce((sum, x) => sum + shareOf(x, column), 0);
+}
+
+const totals100 = (n: number) => Math.abs(n - 100) < 0.51;
+
+export function splitsTotalOk(splits: SplitShares[]): boolean {
+  return (
+    splits.length > 0 &&
+    totals100(splitsTotal(splits, "performancePct")) &&
+    totals100(splitsTotal(splits, "recordingPct"))
+  );
+}
+
+// Which columns do not add up, named for a message the member can act on.
+export function splitColumnErrors(splits: SplitShares[]): string[] {
+  if (splits.length === 0) return ["Add at least one creator and their shares."];
+  const errs: string[] = [];
+  for (const [col, label] of [
+    ["performancePct", "Performance"],
+    ["recordingPct", "Recording"],
+  ] as [SplitColumn, string][]) {
+    const t = splitsTotal(splits, col);
+    if (!totals100(t)) errs.push(`${label} shares total ${Math.round(t * 100) / 100}% — they must total 100%.`);
+  }
+  return errs;
 }
 
 function namesMatch(a?: string, b?: string): boolean {

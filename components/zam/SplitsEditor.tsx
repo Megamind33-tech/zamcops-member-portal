@@ -14,7 +14,7 @@ import { Progress } from "./Misc";
 import { MandateNote } from "@/components/zam/MandateNote";
 import { DocumentUpload } from "@/components/zam/DocumentUpload";
 import { CONTRIBUTOR_ROLES, normalizeContributorRole } from "@/lib/roles";
-import { isKnownOnFile, splitsTotal, splitsTotalOk } from "@/lib/works";
+import { isKnownOnFile, shareOf, splitsTotal, splitsTotalOk } from "@/lib/works";
 import { uid } from "@/lib/format";
 import type { OwnershipSplit } from "@/types";
 
@@ -34,8 +34,11 @@ export function SplitsEditor({
   workTitle?: string;
 }) {
   const owner = { fullName: ownerName, memberNumber: ownerMemberNumber };
-  const total = splitsTotal(splits);
+  // Two independent columns on the official form, so two independent totals.
+  const perfTotal = splitsTotal(splits, "performancePct");
+  const recTotal = splitsTotal(splits, "recordingPct");
   const valid = splitsTotalOk(splits);
+  const ok100 = (n: number) => Math.abs(n - 100) < 0.51;
   const [lookup, setLookup] = useState<Record<number, { q: string; hits: Hit[]; busy: boolean; error: string }>>({});
 
   function update(i: number, patch: Partial<OwnershipSplit>) {
@@ -54,7 +57,7 @@ export function SplitsEditor({
   }
 
   function add() {
-    onChange([...splits, { id: uid("split"), party: "", role: "Composer", percentage: 0 }]);
+    onChange([...splits, { id: uid("split"), party: "", role: "Composer", performancePct: 0, recordingPct: 0 }]);
   }
   function remove(i: number) {
     onChange(splits.filter((_, idx) => idx !== i));
@@ -131,17 +134,33 @@ export function SplitsEditor({
                     </option>
                   ))}
                 </Select>
-                <div className="col-span-2 relative">
+                <div className="col-span-1 relative">
                   <Input
                     type="number"
                     min={0}
                     max={100}
                     step={0.01}
-                    className="pr-7 text-right"
-                    value={s.percentage}
-                    onChange={(e) => update(i, { percentage: Number(e.target.value) })}
+                    className="pr-6 text-right"
+                    aria-label="Performance share"
+                    title="Performance / broadcast share"
+                    value={shareOf(s, "performancePct")}
+                    onChange={(e) => update(i, { performancePct: Number(e.target.value) })}
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zam-muted">%</span>
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zam-muted">%</span>
+                </div>
+                <div className="col-span-1 relative">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={0.01}
+                    className="pr-6 text-right"
+                    aria-label="Recording share"
+                    title="Recording / mechanical share"
+                    value={shareOf(s, "recordingPct")}
+                    onChange={(e) => update(i, { recordingPct: Number(e.target.value) })}
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zam-muted">%</span>
                 </div>
                 <button
                   type="button"
@@ -234,11 +253,21 @@ export function SplitsEditor({
         <div className="flex items-center justify-between mb-2">
           <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${valid ? "text-zam-green" : "text-[#B8791A]"}`}>
             {valid ? <CheckCircle2Icon className="h-4 w-4" /> : <AlertTriangleIcon className="h-4 w-4" />}
-            {valid ? "Splits total 100%" : "Splits must total 100%"}
+            {valid ? "Both columns total 100%" : "Each column must total 100%"}
           </span>
-          <span className={`font-display font-bold ${valid ? "text-zam-green" : "text-[#B8791A]"}`}>{total}%</span>
+          <span className="flex items-center gap-3 font-display font-bold">
+            <span className={ok100(perfTotal) ? "text-zam-green" : "text-[#B8791A]"}>
+              <span className="mr-1 text-xs font-normal text-zam-muted">Perf</span>
+              {Math.round(perfTotal * 100) / 100}%
+            </span>
+            <span className={ok100(recTotal) ? "text-zam-green" : "text-[#B8791A]"}>
+              <span className="mr-1 text-xs font-normal text-zam-muted">Rec</span>
+              {Math.round(recTotal * 100) / 100}%
+            </span>
+          </span>
         </div>
-        <Progress value={total} tone={valid ? "green" : "orange"} />
+        <Progress value={perfTotal} tone={ok100(perfTotal) ? "green" : "orange"} />
+        <Progress value={recTotal} tone={ok100(recTotal) ? "green" : "orange"} />
       </div>
     </div>
   );
