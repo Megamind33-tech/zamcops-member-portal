@@ -77,6 +77,12 @@ COPY --chown=node:node --from=prisma-cli /opt/prisma/node_modules /opt/prisma/no
 # documents. They are not under public/ — one carries a specimen letter with a
 # real name on it, and none of them should be downloadable without a session.
 COPY --from=builder /app/assets ./assets
+# Maintenance commands are run inside this container — preflight, the R2 and
+# album-track backfills. Without them the documented `docker compose exec app
+# node scripts/…` lines fail with MODULE_NOT_FOUND, which is a confusing way to
+# learn the file was never copied. They resolve @prisma/client and aws4fetch
+# from the standalone bundle's own node_modules, one directory up.
+COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
