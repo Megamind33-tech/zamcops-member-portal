@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { User, MapPin, Banknote, Users, FileUp } from "lucide-react";
+import { User, MapPin, Banknote, Users, FileUp, PenLine } from "lucide-react";
 import { PageHeader } from "@/app/(portal)/(member)/layout";
 import { Card, CardHeader } from "@/components/zam/Card";
 import { Field, Input, Select } from "@/components/zam/Input";
@@ -10,6 +10,7 @@ import { Button } from "@/components/zam/Button";
 import { Progress } from "@/components/zam/Misc";
 import { FilePicker } from "@/components/zam/FilePicker";
 import { ImageUpload } from "@/components/zam/ImageUpload";
+import { SignaturePad } from "@/components/member/SignaturePad";
 import { useApp } from "@/lib/store";
 import { profileCompletion } from "@/lib/member";
 import { ZM_PROVINCES } from "@/data/reference";
@@ -20,6 +21,46 @@ export default function ProfileScreen() {
   const member = currentMember!;
   const [form, setForm] = useState<Member>(member);
   const [busy, setBusy] = useState(false);
+
+  // The signature is kept off the member record the rest of this page edits: it
+  // has its own endpoint, it saves on its own, and the profile's "Save changes"
+  // has nothing to do with it. Only a boolean reaches the client store, so the
+  // image itself is fetched here to show what is currently on file.
+  const [signature, setSignature] = useState("");
+  const [savingSig, setSavingSig] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/member/signature")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && d) setSignature(d.image || "");
+      })
+      .catch(() => {
+        // Not being able to show the existing signature is no reason to stop
+        // someone drawing a new one.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const saveSignature = async (image: string) => {
+    setSavingSig(true);
+    const res = await fetch("/api/member/signature", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image }),
+    });
+    setSavingSig(false);
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      return { ok: false, error: (d.error as string) || "Could not save your signature." };
+    }
+    setSignature(image);
+    toast.success("Signature saved.");
+    return { ok: true };
+  };
 
   const set = (k: keyof Member) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -186,6 +227,21 @@ export default function ProfileScreen() {
             <Field label="Phone">
               <Input type="tel" value={form.nextOfKinPhone ?? ""} onChange={set("nextOfKinPhone")} />
             </Field>
+          </div>
+        </Card>
+
+        {/* Signature */}
+        <Card className="lg:col-span-2">
+          <CardHeader
+            title={
+              <span className="flex items-center gap-2">
+                <PenLine className="h-4 w-4 text-zam-orange" /> Your signature
+              </span>
+            }
+            description="Applied to your membership application, your Deed of Assignment and every work declaration you file. Saved on its own — you do not need to press Save changes."
+          />
+          <div className="p-5">
+            <SignaturePad value={signature} onSave={saveSignature} saving={savingSig} />
           </div>
         </Card>
 

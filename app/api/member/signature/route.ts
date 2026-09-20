@@ -6,6 +6,19 @@ export const runtime = "nodejs";
 
 const MAX_IMAGE = 500 * 1024; // data URL length — a drawn/processed PNG is far smaller
 
+// The member's own signature, so they can see what is on file before deciding
+// to replace it. Their own image and nobody else's — the session decides whose.
+export async function GET() {
+  const session = await requireMember();
+  if (!session) return bad("Not authenticated.", 401);
+
+  const member = await prisma.member.findUnique({
+    where: { id: session.sub },
+    select: { signature: true },
+  });
+  return json({ image: member?.signature || "" });
+}
+
 // Stores (or replaces) the member's reusable signature — a transparent PNG
 // produced client-side from a canvas drawing or a processed upload. It is
 // applied to every document section that requires the member's signature.
