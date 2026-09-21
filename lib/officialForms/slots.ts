@@ -15,12 +15,17 @@ import slotData from "@/assets/forms/slots.json";
 import type { TemplateName } from "@/lib/formOverlay";
 
 export interface Slot {
-  /** "blank" is a dotted rule, "text" printed words, "mark" a located substring. */
-  kind: "blank" | "text" | "mark";
+  /**
+   * "blank" is a dotted rule, "text" printed words, "mark" a located
+   * substring, "box" a tick box the form drew.
+   */
+  kind: "blank" | "text" | "mark" | "box";
   page: number; // 1-based
   x: number; // left edge
   x1: number; // right edge
-  y: number; // baseline, origin bottom-left
+  y: number; // baseline, origin bottom-left — a box's lower edge
+  /** A box's upper edge, so a mark can be centred inside it. */
+  y1?: number;
   size: number; // the size the form itself is printed at
   /** Printed words to the left of a rule on the same line, if any. */
   left?: string;
@@ -35,6 +40,7 @@ interface RawSlot {
   x: number;
   x1: number;
   y: number;
+  y1?: number;
   s: number;
   left?: string;
   right?: string;
@@ -56,6 +62,7 @@ export function maybeSlot(template: TemplateName, id: string): Slot | null {
     x: raw.x,
     x1: raw.x1,
     y: raw.y,
+    y1: raw.y1,
     size: raw.s,
     left: raw.left,
     right: raw.right,

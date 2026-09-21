@@ -96,8 +96,8 @@ export function deedStamps(v: DeedValues): Stamp[] {
       x: P3.assignorSignature.x,
       y: P3.assignorSignature.y,
       data: v.assignorSignature,
-      maxWidth: 150,
-      maxHeight: 40,
+      maxWidth: 240,
+      maxHeight: 64,
     });
   }
   stamps.push({ page: 3, x: P3.assignorName.x, y: P3.assignorName.y, text: v.assignorName, size: 8, maxWidth: 290 });
@@ -109,8 +109,8 @@ export function deedStamps(v: DeedValues): Stamp[] {
       x: P3.societySignature.x,
       y: P3.societySignature.y,
       data: v.boardSecretarySignature,
-      maxWidth: 150,
-      maxHeight: 40,
+      maxWidth: 240,
+      maxHeight: 64,
     });
   }
   if (v.boardSecretaryName) {

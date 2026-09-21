@@ -214,8 +214,8 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
       x: FOOT.signature.x,
       y: FOOT.signature.y,
       data: v.memberSignature,
-      maxWidth: 62,
-      maxHeight: 24,
+      maxWidth: 99,
+      maxHeight: 38,
     });
   }
 

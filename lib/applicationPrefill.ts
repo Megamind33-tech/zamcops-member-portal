@@ -56,6 +56,21 @@ export function addressLine(m: MemberLikeAccount): string {
     .join(", ");
 }
 
+/**
+ * The successor's address.
+ *
+ * The account names a next of kin but holds no address for them, and the form
+ * gives the successor a name rule with four address rules under it. Filling the
+ * name alone left a name standing over four empty lines on every form issued.
+ * The member's own address is the best answer available — a next of kin is
+ * usually of the same household — and like every other prefilled answer it is
+ * there to be corrected, not asserted. Nothing is offered when no next of kin
+ * was named, so the block stays wholly empty rather than half filled.
+ */
+function successorAddressFor(m: MemberLikeAccount): string {
+  return text(m.nextOfKinName) ? addressLine(m) : "";
+}
+
 /** How the member described themselves at sign-up, as a form capacity. */
 function capacitiesFrom(role: string): string[] {
   const r = text(role);
@@ -100,6 +115,7 @@ export function prefillFromAccount(
       bankAccount: [text(member.bankName), text(member.bankAccount)].filter(Boolean).join(" — "),
       mobileMoneyNumber: text(member.mobileMoneyNumber),
       successorName: text(member.nextOfKinName),
+      successorAddress: successorAddressFor(member),
     });
   }
 
@@ -121,6 +137,7 @@ export function prefillFromAccount(
     accountNumber: text(member.bankAccount),
     mobileMoneyNumber: text(member.mobileMoneyNumber),
     successorName: text(member.nextOfKinName),
+    successorAddress: successorAddressFor(member),
     capacities: capacitiesFrom(text(member.role)),
   });
 }

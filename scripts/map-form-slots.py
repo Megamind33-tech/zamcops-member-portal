@@ -35,6 +35,39 @@ DOT = set(".…·_")
 
 MIN_DOTS = 3  # fewer than this is punctuation, not a rule
 
+# A tick box. The forms draw these as a closed path of line segments rather
+# than as a rectangle primitive, so they are found by shape and size: small,
+# wider than tall, and empty. Without them a tick is placed relative to the
+# printed word beside the box, which lands in the gap to its left.
+BOX_MIN_W, BOX_MAX_W = 14, 60
+BOX_MIN_H, BOX_MAX_H = 10, 34
+
+
+def boxes_on(page):
+    out = []
+    h = page.rect.height
+    for d in page.get_drawings():
+        r = d["rect"]
+        if not (BOX_MIN_W <= r.width <= BOX_MAX_W and BOX_MIN_H <= r.height <= BOX_MAX_H):
+            continue
+        # Four or five segments: a rectangle, open or closed.
+        if sum(1 for it in d["items"] if it[0] == "l") not in (4, 5):
+            continue
+        out.append(
+            {
+                "k": "box",
+                "p": page.number + 1,
+                "x": round(r.x0, 1),
+                "x1": round(r.x1, 1),
+                # The baseline a tick drawn in this box should sit on, and the
+                # room it has, so the caller can centre a mark in it.
+                "y": round(h - r.y1, 1),
+                "y1": round(h - r.y0, 1),
+                "s": round(r.height, 1),
+            }
+        )
+    return out
+
 
 def lines_of(page):
     out = []
@@ -139,9 +172,15 @@ def main():
                         rec["text"] = body
                     anchors[f"p{pno + 1}.{round(y)}.{round(x0)}"] = rec
 
+            for box in boxes_on(page):
+                anchors[f"box.p{box['p']}.{round(box['y'])}.{round(box['x'])}"] = box
+
         out[name] = {"pages": sizes, "anchors": anchors}
-        blanks = sum(1 for a in out[name]["anchors"].values() if a["k"] == "blank")
-        print(f"{name:11} {doc.page_count} pages  {len(anchors):4} anchors  {blanks:3} rules")
+        kinds = {}
+        for a in out[name]["anchors"].values():
+            kinds[a["k"]] = kinds.get(a["k"], 0) + 1
+        print(f"{name:11} {doc.page_count} pages  {len(anchors):4} anchors  "
+              f"{kinds.get('blank', 0):3} rules  {kinds.get('box', 0):3} boxes")
 
     dest = os.path.join(root, "assets", "forms", "slots.json")
     with open(dest, "w") as fh:

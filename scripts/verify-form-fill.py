@@ -98,10 +98,10 @@ def strokes(path):
 # whose meaning is carried entirely by whether it is there.
 EXPECTED_TICKS = {
     "individual": [
-        ("p2.731.99", "20. full time employment — Yes"),
-        ("p2.593.99", "22. member of another society — Yes"),
-        ("p2.450.99", "24. Author (the specimen claims composer and author)"),
-        ("p2.450.423", "24. Publisher"),
+        ("box.p2.729.135", "20. full time employment — Yes"),
+        ("box.p2.575.135", "22. member of another society — Yes"),
+        ("box.p2.444.153", "24. Author (the specimen claims composer and author)"),
+        ("box.p2.442.486", "24. Publisher"),
     ],
     "group": [],
     "publisher": [],
@@ -110,9 +110,9 @@ EXPECTED_TICKS = {
 # Ticks that must NOT appear, because the specimen did not claim them.
 FORBIDDEN_TICKS = {
     "individual": [
-        ("p2.731.315", "20. full time employment — No"),
-        ("p2.593.315", "22. member of another society — No"),
-        ("p2.450.243", "24. Arranger, which the specimen did not claim"),
+        ("box.p2.729.351", "20. full time employment — No"),
+        ("box.p2.575.351", "22. member of another society — No"),
+        ("box.p2.444.297", "24. Arranger, which the specimen did not claim"),
     ],
     "group": [],
     "publisher": [],
@@ -204,9 +204,10 @@ def check_ticks(template, slots, blank, filled):
         a = anchors.get(slot_id)
         if not a:
             return False
-        # Drawn just after the printed word, sitting on its baseline.
+        # Inside the box the form drew, not merely near the word beside it —
+        # a tick in the gap to the box's left is not a ticked box.
         return any(
-            page == a["p"] and abs(y - a["y"]) <= 2.0 and a["x1"] + 2 <= x <= a["x1"] + 12
+            page == a["p"] and a["x"] - 1 <= x <= a["x1"] + 1 and a["y"] - 1 <= y <= a.get("y1", a["y"]) + 1
             for page, x, y in marks
         )
 
