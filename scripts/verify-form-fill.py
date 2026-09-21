@@ -42,6 +42,19 @@ OVERFLOW_SLACK = 5.0
 MIN_LEGIBLE = 6.0
 COMFORTABLE = 9.0
 
+# The glyphs a dot leader is drawn with. A signature belongs ON its rule, so a
+# mark lying over these is correctly placed; a mark lying over anything else is
+# covering the form's own words.
+DOT = {".", "\u00b7", "\u2026", "_"}
+
+# How far a signature must stay off the form's printed words. Three tenths
+# of a point is clearance on paper and a collision to the eye.
+SIGNATURE_CLEARANCE = 3.0
+# A signature PNG carries transparent margin, so its box reaches a little
+# further than its ink. A graze this narrow at a corner is the margin, not
+# the mark — the collisions worth failing on span whole words.
+X_GRAZE = 2.0
+
 # Marks that are deliberately not on a rule, because the form printed none
 # there. Each is (template, page, approximate y) with the reason.
 OFF_RULE_BY_DESIGN = {
@@ -141,6 +154,86 @@ SIGNATURE_RULE = {
     "group": "p3.370.210",
     "publisher": "p3.200.147",
 }
+
+
+def printed_words(path):
+    """The form's actual words, with the dot leaders left out.
+
+    A signature belongs ON its rule, so overlapping the dots is right and
+    overlapping the words is not. Splitting the run means the check can tell
+    the difference instead of objecting to a correctly placed mark.
+    """
+    doc = pymupdf.open(path)
+    out = []
+    for pno in range(doc.page_count):
+        page = doc[pno]
+        h = page.rect.height
+        for block in page.get_text("rawdict")["blocks"]:
+            if block["type"] != 0:
+                continue
+            for line in block["lines"]:
+                for span in line["spans"]:
+                    run = []
+                    for ch in list(span["chars"]) + [None]:
+                        solid = ch is not None and ch["c"] not in DOT and ch["c"].strip()
+                        if solid:
+                            run.append(ch)
+                            continue
+                        if run:
+                            x0 = min(c["bbox"][0] for c in run)
+                            x1 = max(c["bbox"][2] for c in run)
+                            y0 = h - max(c["bbox"][3] for c in run)
+                            y1 = h - min(c["bbox"][1] for c in run)
+                            out.append((pno + 1, x0, y0, x1, y1, "".join(c["c"] for c in run)))
+                            run = []
+    return out
+
+
+def check_signature_clear(template, blank, filled, label):
+    """A signature must not crowd the form's own words.
+
+    Making the signatures larger put the work declaration's mark across both
+    "SIGN:" and the date beside it. Bare overlap is the wrong thing to measure:
+    that mark cleared the labels by three tenths of a point and still read as
+    sitting on them. What matters is the gap, so a mark whose horizontal span
+    crosses a word must clear it vertically by SIGNATURE_CLEARANCE.
+
+    A mark on its own dotted rule is exempt, because that is where it belongs;
+    the dots are not words, and printed_words() has already dropped them.
+    """
+    words = printed_words(blank)
+    blank_doc = pymupdf.open(blank)
+    existing = {
+        (pno, round(im["bbox"][0]), round(im["bbox"][1]))
+        for pno in range(blank_doc.page_count)
+        for im in blank_doc[pno].get_image_info()
+    }
+
+    doc = pymupdf.open(filled)
+    bad = []
+    for pno in range(doc.page_count):
+        page = doc[pno]
+        h = page.rect.height
+        for im in page.get_image_info():
+            if (pno, round(im["bbox"][0]), round(im["bbox"][1])) in existing:
+                continue  # the template's own letterhead
+            x0, x1 = im["bbox"][0], im["bbox"][2]
+            y0, y1 = h - im["bbox"][3], h - im["bbox"][1]
+            for p, px0, py0, px1, py1, text in words:
+                if p != pno + 1:
+                    continue
+                if x1 - X_GRAZE <= px0 or px1 <= x0 + X_GRAZE:
+                    continue  # nowhere near it horizontally
+                if y0 >= py1 + SIGNATURE_CLEARANCE or y1 <= py0 - SIGNATURE_CLEARANCE:
+                    continue  # well above or well below
+                gap = y0 - py1 if y0 >= py1 else py0 - y1
+                how = "covers" if gap < 0 else f"clears by only {gap:.1f}pt"
+                bad.append(
+                    f"the signature {how} the printed {text[:24]!r} "
+                    f"(mark x={x0:.0f}-{x1:.0f} y={y0:.0f}-{y1:.0f}, "
+                    f"word x={px0:.0f}-{px1:.0f} y={py0:.0f}-{py1:.0f})"
+                )
+    return bad
 
 
 def check_signature(template, slots, filled):
@@ -291,6 +384,7 @@ def main(filled_dir):
         bad.extend(tick_bad)
         bad.extend(check_placements(template, slots, filled_dir, added))
         bad.extend(check_signature(template, slots, filled))
+        bad.extend(check_signature_clear(template, blank, filled, label))
 
         sizes = [s for *_, s, _ in ((a[0], a[1], a[2], a[3], a[4], a[5]) for a in added)]
         smallest = min(sizes) if sizes else 0
@@ -315,6 +409,7 @@ def main(filled_dir):
             problems += 1
             continue
         bad, marks = check_ticks(template, slots, blank, filled)
+        bad.extend(check_signature_clear(template, blank, filled, label))
         if bad:
             problems += len(bad)
             print(f"  \033[31m✗\033[0m {label:14} {len(bad)} misplaced")

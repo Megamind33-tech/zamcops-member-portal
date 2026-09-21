@@ -69,7 +69,21 @@ const FOOT = {
   territory: { x: 135, y: 314 },
   otherDocuments: { x: 135, y: 225 },
   declarantName: { x: 62, y: 85 },
-  signature: { x: 370, y: 91 },
+  // The sheet gives the signature 23 points of rule between "SIGN:" (which
+  // ends at x=383.8) and "DATE:" (which starts at x=409.4). No signature fits
+  // legibly in 23 points, so the mark sits above that line instead, the way a
+  // short line is signed on paper. It starts where the rule starts and is
+  // raised clear of the labels beneath it: "SIGN:" and "DATE:" reach y=90.7,
+  // and the next printed line up is the declaration at y=133.9, so the band
+  // from x=340 to the page border at x=549 is empty between them. A mark
+  // merely ABOVE those words is not enough — at one point of clearance it
+  // still reads as sitting on them, which is what `npm run verify:forms`
+  // measures and why SIGNATURE_CLEARANCE exists.
+  //
+  // It is centred on that 23-point rule rather than started at it: a mark
+  // anchored at the rule's left edge runs far enough right to sit over the
+  // date instead, and reads as the date's signature rather than the sign-off.
+  signature: { x: 368, y: 96 },
   declaredOn: { x: 445, y: 85 },
 } as const;
 
@@ -240,8 +254,8 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
       x: FOOT.signature.x,
       y: FOOT.signature.y,
       data: v.memberSignature,
-      maxWidth: 99,
-      maxHeight: 38,
+      maxWidth: 60,
+      maxHeight: 18,
     });
   }
 
