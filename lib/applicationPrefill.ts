@@ -49,11 +49,38 @@ export function splitName(fullName: string): { surname: string; firstName: strin
   return { surname: parts[parts.length - 1], firstName: parts.slice(0, -1).join(" ") };
 }
 
+/**
+ * The district and the province, as an address writes them.
+ *
+ * A Zambian district can carry its province's name — Lusaka district sits in
+ * Lusaka province — and joining the two blindly addressed those members in
+ * "Lusaka, Lusaka". Written out once, the way it would be on an envelope.
+ */
+export function districtProvince(district?: string | null, province?: string | null): string {
+  const d = text(district);
+  const p = text(province);
+  if (d && p && d.toLowerCase() === p.toLowerCase()) return d;
+  return [d, p].filter(Boolean).join(", ");
+}
+
 /** The member's address as the forms want it — street, area, town on one line. */
 export function addressLine(m: MemberLikeAccount): string {
-  return [text(m.address), [text(m.district), text(m.province)].filter(Boolean).join(", ")]
-    .filter(Boolean)
-    .join(", ");
+  return [text(m.address), districtProvince(m.district, m.province)].filter(Boolean).join(", ");
+}
+
+/**
+ * The successor's address.
+ *
+ * The account names a next of kin but holds no address for them, and the form
+ * gives the successor a name rule with four address rules under it. Filling the
+ * name alone left a name standing over four empty lines on every form issued.
+ * The member's own address is the best answer available — a next of kin is
+ * usually of the same household — and like every other prefilled answer it is
+ * there to be corrected, not asserted. Nothing is offered when no next of kin
+ * was named, so the block stays wholly empty rather than half filled.
+ */
+function successorAddressFor(m: MemberLikeAccount): string {
+  return text(m.nextOfKinName) ? addressLine(m) : "";
 }
 
 /** How the member described themselves at sign-up, as a form capacity. */
@@ -100,6 +127,7 @@ export function prefillFromAccount(
       bankAccount: [text(member.bankName), text(member.bankAccount)].filter(Boolean).join(" — "),
       mobileMoneyNumber: text(member.mobileMoneyNumber),
       successorName: text(member.nextOfKinName),
+      successorAddress: successorAddressFor(member),
     });
   }
 
@@ -121,6 +149,7 @@ export function prefillFromAccount(
     accountNumber: text(member.bankAccount),
     mobileMoneyNumber: text(member.mobileMoneyNumber),
     successorName: text(member.nextOfKinName),
+    successorAddress: successorAddressFor(member),
     capacities: capacitiesFrom(text(member.role)),
   });
 }

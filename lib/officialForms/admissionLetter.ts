@@ -73,8 +73,8 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
       x: LEFT,
       y: LINE.signatureBaseline,
       data: v.generalManagerSignature,
-      maxWidth: 150,
-      maxHeight: 52,
+      maxWidth: 240,
+      maxHeight: 83,
     });
   }
 

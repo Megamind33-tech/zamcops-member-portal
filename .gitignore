@@ -9,3 +9,6 @@ coverage/
 # TypeScript incremental build state
 tsconfig.tsbuildinfo
 tmp/
+
+# Python bytecode from the dev-time form scripts
+__pycache__/

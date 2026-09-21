@@ -24,6 +24,7 @@
 
 import type { Stamp } from "@/lib/formOverlay";
 import { formDate } from "@/lib/officialForms/render";
+import { maybeSlot } from "@/lib/officialForms/slots";
 
 // Re-exported: callers that build a declaration also format its dates.
 export { formDate };
@@ -63,24 +64,41 @@ const HEAD = {
 
 const FOOT = {
   soundCarrier: { x: 115, y: 403 },
-  financeYes: { x: 289, y: 391 }, // just right of "YES"
-  financeNo: { x: 373, y: 391 }, // just right of "NO"
   agreementDate: { x: 135, y: 327 },
   validity: { x: 378, y: 327 },
   territory: { x: 135, y: 314 },
   otherDocuments: { x: 135, y: 225 },
   declarantName: { x: 62, y: 85 },
-  signature: { x: 370, y: 91 },
+  // The sheet gives the signature 23 points of rule between "SIGN:" (which
+  // ends at x=383.8) and "DATE:" (which starts at x=409.4). No signature fits
+  // legibly in 23 points, so the mark sits above that line instead, the way a
+  // short line is signed on paper. It starts where the rule starts and is
+  // raised clear of the labels beneath it: "SIGN:" and "DATE:" reach y=90.7,
+  // and the next printed line up is the declaration at y=133.9, so the band
+  // from x=340 to the page border at x=549 is empty between them. A mark
+  // merely ABOVE those words is not enough — at one point of clearance it
+  // still reads as sitting on them, which is what `npm run verify:forms`
+  // measures and why SIGNATURE_CLEARANCE exists.
+  //
+  // It is centred on that 23-point rule rather than started at it: a mark
+  // anchored at the rule's left edge runs far enough right to sit over the
+  // date instead, and reads as the date's signature rather than the sign-off.
+  signature: { x: 368, y: 96 },
   declaredOn: { x: 445, y: 85 },
 } as const;
 
-// A tick placed just before each enclosure's printed label.
-const ENCLOSURE_TICK: Record<string, { x: number; y: number }> = {
-  Lyrics: { x: 24, y: 276 },
-  "Musical score": { x: 240, y: 276 },
-  Online: { x: 342, y: 276 },
-  CD: { x: 30, y: 264 },
-  Contract: { x: 242, y: 264 },
+// The boxes this sheet draws, by the slot ids scripts/map-form-slots.py gives
+// them. Every one sits to the LEFT of the words it belongs to — "☐ YES",
+// "☐ Lyrics" — which is why placing a mark relative to the printed label put
+// it on the wrong side of the box entirely.
+const FINANCE_BOX = { yes: "box.p1.392.251", no: "box.p1.390.342" } as const;
+
+const ENCLOSURE_BOX: Record<string, string> = {
+  Lyrics: "box.p1.277.21",
+  "Musical score": "box.p1.278.241",
+  Online: "box.p1.278.339",
+  CD: "box.p1.265.24",
+  Contract: "box.p1.265.241",
 };
 
 export interface WorkDeclarationParty {
@@ -127,6 +145,28 @@ const pct = (n: number | undefined): string => {
   if (!n) return "";
   return `${Number.isInteger(n) ? n : Math.round(n * 100) / 100}`;
 };
+
+/**
+ * A tick centred in one of the sheet's printed boxes.
+ *
+ * These are small — around 8 by 5 points — so the mark is sized to the box
+ * rather than set at a fixed size. A 10pt "X" in a 5pt box spills out of it
+ * and reads as a mark beside the option rather than in it.
+ */
+function tickBox(stamps: Stamp[], boxId: string): void {
+  const b = maybeSlot("workdecl", boxId);
+  if (!b) return;
+  const w = Math.max(1, b.x1 - b.x);
+  const h = Math.max(1, (b.y1 ?? b.y) - b.y);
+  const size = Math.min(h * 0.86, w * 0.78);
+  stamps.push({
+    kind: "tick",
+    page: b.page,
+    x: b.x + (w - size * 0.92) / 2,
+    y: b.y + (h - size) / 2,
+    size,
+  });
+}
 
 export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
   const stamps: Stamp[] = [];
@@ -184,8 +224,8 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
   put(FOOT.soundCarrier, v.soundCarrier, 240);
 
   const fin = (v.financedByPublisher || "").trim().toLowerCase();
-  if (fin === "yes") stamps.push({ page: 1, x: FOOT.financeYes.x, y: FOOT.financeYes.y, text: "X", size: 10, bold: true });
-  if (fin === "no") stamps.push({ page: 1, x: FOOT.financeNo.x, y: FOOT.financeNo.y, text: "X", size: 10, bold: true });
+  if (fin === "yes") tickBox(stamps, FINANCE_BOX.yes);
+  if (fin === "no") tickBox(stamps, FINANCE_BOX.no);
 
   put(FOOT.agreementDate, v.publishingAgreementDate, 180);
   put(FOOT.validity, v.publishingValidity, 180);
@@ -198,8 +238,8 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
   // not. Anything genuinely uploaded alongside is ticked in addition.
   const enclosures = new Set<string>(["Online", ...(v.enclosures ?? [])]);
   for (const e of enclosures) {
-    const at = ENCLOSURE_TICK[e];
-    if (at) stamps.push({ page: 1, x: at.x, y: at.y, text: "X", size: 9, bold: true });
+    const box = ENCLOSURE_BOX[e];
+    if (box) tickBox(stamps, box);
   }
 
   put(FOOT.otherDocuments, v.otherDocuments, 420, 8);
@@ -214,8 +254,8 @@ export function workDeclarationStamps(v: WorkDeclarationValues): Stamp[] {
       x: FOOT.signature.x,
       y: FOOT.signature.y,
       data: v.memberSignature,
-      maxWidth: 62,
-      maxHeight: 24,
+      maxWidth: 60,
+      maxHeight: 18,
     });
   }
 

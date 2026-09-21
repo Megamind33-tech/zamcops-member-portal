@@ -23,6 +23,7 @@ import { renderOfficialForm, formDate } from "@/lib/officialForms/render";
 import { applicationFormStamps, TEMPLATE_FOR } from "@/lib/officialForms/applicationForm";
 import { deedStamps } from "@/lib/officialForms/deedOfAssignment";
 import { admissionLetterStamps } from "@/lib/officialForms/admissionLetter";
+import { districtProvince } from "@/lib/applicationPrefill";
 
 export type { GeneratedPdf, OfficialSigner } from "@/lib/pdfKit";
 
@@ -33,7 +34,7 @@ function addressLinesOf(member: MemberLike): string[] {
       .split(/\n|,/)
       .map((s) => s.trim())
       .filter(Boolean),
-    [member.district, member.province].filter(Boolean).join(", "),
+    districtProvince(member.district, member.province),
   ].filter(Boolean);
 }
 
@@ -88,6 +89,8 @@ export async function generateDeedPdf(opts: {
     stamps: deedStamps({
       assignorName: applicantName(opts.formType, opts.payload, opts.member.fullName),
       assignorMemberNumber: opts.member.memberNumber,
+      // One line, where the admission letter stacks the same parts.
+      assignorAddress: addressLinesOf(opts.member).join(", "),
       madeOn: opts.deedAgreedAt ?? new Date(),
       assignorSignature: opts.member.signature || undefined,
       boardSecretarySignature: opts.boardSecretary.image,

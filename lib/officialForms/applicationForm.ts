@@ -214,19 +214,37 @@ class Sheet {
     });
   }
 
-  /** A tick just after the printed word it belongs to. */
-  tick(labelId: string, on: boolean): void {
+  /**
+   * A tick centred in the box the form drew for it.
+   *
+   * The boxes are closed paths of line segments rather than rectangles, so
+   * scripts/map-form-slots.py finds them by shape and records their bounds.
+   * Placing a tick relative to the word beside the box instead put it in the
+   * gap to the box's left — beside the answer rather than in it.
+   */
+  tick(boxId: string, on: boolean): void {
     if (!on) return;
-    const s = this.at(labelId);
-    if (!s) return;
-    this.stamps.push({ kind: "tick", page: s.page, x: s.x1 + 6, y: s.y, size: 9 });
+    const b = this.at(boxId);
+    if (!b) return;
+    const w = Math.max(1, b.x1 - b.x);
+    const h = Math.max(1, (b.y1 ?? b.y) - b.y);
+    // Comfortably inside the box, with the mark's own proportions (a tick is
+    // drawn about 0.92 wide for its height) kept square to it.
+    const size = Math.min(h * 0.72, w * 0.66);
+    this.stamps.push({
+      kind: "tick",
+      page: b.page,
+      x: b.x + (w - size * 0.92) / 2,
+      y: b.y + (h - size) / 2,
+      size,
+    });
   }
 
   /** A yes/no pair, where only the answer given is marked. */
-  yesNo(key: string, yesId: string, noId: string): void {
+  yesNo(key: string, yesBoxId: string, noBoxId: string): void {
     const answer = this.value(key).toLowerCase();
-    this.tick(yesId, answer === "yes");
-    this.tick(noId, answer === "no");
+    this.tick(yesBoxId, answer === "yes");
+    this.tick(noBoxId, answer === "no");
   }
 
   signature(sigId: string, dateId: string): void {
@@ -238,8 +256,8 @@ class Sheet {
         x: sig.x + INSET,
         y: sig.y,
         data: this.v.applicantSignature,
-        maxWidth: Math.max(60, widthOf(sig) - INSET * 2),
-        maxHeight: 28,
+        maxWidth: Math.max(96, widthOf(sig) - INSET * 2),
+        maxHeight: 45,
       });
     }
     this.text(dateId, this.v.signedOn ?? "");
@@ -319,9 +337,9 @@ function individual(s: Sheet, v: ApplicationFormValues): void {
   s.text("p1.91.182", paymentDetail(s, "accountNumber")); // 19. Account number
 
   // Page 2 — employment, other societies, capacity, works.
-  s.yesNo("fullTimeEmployment", "p2.731.99", "p2.731.315"); // 20. Yes / No
+  s.yesNo("fullTimeEmployment", "box.p2.729.135", "box.p2.729.351"); // 20. Yes / No
   s.paraField(["p2.676.99", "p2.655.99"], "employerDetails"); // 21
-  s.yesNo("otherSociety", "p2.593.99", "p2.593.315"); // 22. Yes / No
+  s.yesNo("otherSociety", "box.p2.575.135", "box.p2.575.351"); // 22. Yes / No
   s.paraField(["p2.538.99", "p2.517.99", "p2.496.99"], "otherSocietyDetails"); // 23
 
   // 24 "Tick as appropriate?" — the form prints Author, Arranger and Publisher.
@@ -329,9 +347,9 @@ function individual(s: Sheet, v: ApplicationFormValues): void {
   // the capacities nobody claimed stay blank.
   const capacities = asList(v.payload.capacities).map((c) => c.toLowerCase());
   s.used.add("capacities");
-  s.tick("p2.450.99", capacities.includes("author") || capacities.includes("composer"));
-  s.tick("p2.450.243", capacities.includes("arranger"));
-  s.tick("p2.450.423", capacities.includes("publisher"));
+  s.tick("box.p2.444.153", capacities.includes("author") || capacities.includes("composer")); // Author
+  s.tick("box.p2.444.297", capacities.includes("arranger")); // Arranger
+  s.tick("box.p2.442.486", capacities.includes("publisher")); // Publisher
 
   // 25 — six rules, one work to a line.
   const works = asRows(v.payload.worksProduced)

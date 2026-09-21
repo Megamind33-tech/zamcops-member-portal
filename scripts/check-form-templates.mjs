@@ -86,7 +86,7 @@ for (const file of readdirSync(mapDir).filter((f) => f.endsWith(".ts"))) {
   const src = readFileSync(path.join(mapDir, file), "utf8");
   // Which sheets this map writes on, so an id is only looked for where it belongs.
   const sheets = Object.keys(slots).filter((t) => src.includes(`"${t}"`));
-  const ids = [...src.matchAll(/"((?:p\d+\.\d+\.\d+)|(?:mark:[^"]+))"/g)].map((m) => m[1]);
+  const ids = [...src.matchAll(/"((?:box\.)?p\d+\.\d+\.\d+|mark:[^"]+)"/g)].map((m) => m[1]);
   if (!ids.length) continue;
   const bad = [];
   for (const id of new Set(ids)) {
