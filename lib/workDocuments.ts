@@ -21,7 +21,6 @@ import {
   type OfficialSigner,
   calloutRow,
   fmtDate,
-  gridTable,
   labelValueRow,
   letterhead,
   output,
@@ -33,9 +32,7 @@ import {
 import {
   CLEARANCE_CERTIFICATE_CLAUSES,
   CLEARANCE_CERTIFICATE_TITLE,
-  WORK_DECLARATION_CLAUSES,
   WORK_DECLARATION_TITLE,
-  WORK_EVIDENCE_NOTE,
 } from "@/lib/workDeedText";
 import { normalizeContributorRole } from "@/lib/roles";
 import { renderOfficialForm, formDate } from "@/lib/officialForms/render";
@@ -43,7 +40,7 @@ import {
   workDeclarationStamps,
   type WorkDeclarationParty,
 } from "@/lib/officialForms/workDeclaration";
-import { normalizeWorkType, shareOf, splitsTotal } from "@/lib/works";
+import { normalizeWorkType, shareOf } from "@/lib/works";
 import type { OwnershipSplit } from "@/types";
 
 // The shape the renderers need — a WorkDeclaration row with its JSON columns
@@ -140,117 +137,6 @@ export function toWorkLike(row: any): WorkLike {
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
-
-const list = (names: string[]): string => names.filter(Boolean).join(", ");
-
-const pct = (n: number): string => `${Number.isInteger(n) ? n : n.toFixed(2)}%`;
-
-// How an interested party is identified to the Society: by their membership if
-// they have one, otherwise by the national ID given on their affirmation letter.
-function identityOf(s: OwnershipSplit): string {
-  if (s.memberNumber?.trim()) return `Member ${s.memberNumber.trim()}`;
-  if (s.knownMember) return "ZAMCOPS member";
-  if (s.nrc?.trim()) return `NRC ${s.nrc.trim()}`;
-  return "Not a member — identity not supplied";
-}
-
-// The full schedule of interested parties: who holds a share, in what capacity,
-// over which royalty stream, under which cross-society identifier, and how much.
-function splitsSection(p: ReturnType<typeof letterhead>, work: WorkLike) {
-  sectionHeading(p, "Schedule of interested parties and shares");
-  const splits = work.ownershipSplits ?? [];
-  const rows = splits.map((s) => [
-    s.party || "—",
-    normalizeContributorRole(String(s.role || "Composer")),
-    s.rightsType || "Both",
-    s.ipiNumber?.trim() || "—",
-    identityOf(s),
-    pct(Number(s.percentage) || 0),
-  ]);
-  const total = splitsTotal(splits);
-
-  gridTable(
-    p,
-    [
-      { label: "Interested party", width: 26 },
-      { label: "Capacity", width: 14 },
-      { label: "Rights", width: 13 },
-      { label: "IPI / CAE", width: 14 },
-      { label: "Identified as", width: 23 },
-      { label: "Share", width: 10, align: "right" },
-    ],
-    rows,
-    {
-      emptyText: "No shares declared.",
-      totalRow: ["Total", "", "", "", "", pct(total)],
-    },
-  );
-
-  paragraph(
-    p,
-    "Capacity is the contribution that earns the share. Rights states whether the share applies to performing " +
-      "rights, mechanical rights or both — the two streams are collected and reconciled separately. The IPI / CAE " +
-      "number identifies a rightsholder across CISAC-affiliated societies; it is required before the work can be " +
-      "registered abroad.",
-    { size: 7.5, gap: 2 },
-  );
-
-  // A schedule that does not total 100% cannot be distributed against, so the
-  // document says so on its face rather than leaving the reader to add it up.
-  if (Math.abs(total - 100) >= 0.51) {
-    paragraph(
-      p,
-      `NOTE: the shares above total ${pct(total)}. A work is only distributable once its shares total 100%. ` +
-        "Contact the ZAMCOPS office to correct this schedule.",
-      { size: 8.5, bold: true, gap: 2 },
-    );
-  }
-}
-
-// What the member lodged in support of the registration. Named files only —
-// the bytes stay in the Society's storage, behind an authenticated download.
-function evidenceSection(p: ReturnType<typeof letterhead>, work: WorkLike) {
-  sectionHeading(p, "Evidence lodged with the Society");
-  const rows: string[][] = [];
-  if (work.audioFile) rows.push(["Reference recording", work.audioFile]);
-  if (work.coverArt) rows.push(["Artwork", work.coverArt.startsWith("data:") ? "Lodged with the registration" : work.coverArt]);
-  if (work.studioReceipt) rows.push(["Studio letter / receipt", work.studioReceipt]);
-  for (const s of work.ownershipSplits ?? []) {
-    if (s.affirmationLetter) rows.push([`Affirmation — ${s.party}`, s.affirmationLetter]);
-  }
-  gridTable(
-    p,
-    [
-      { label: "Item", width: 30 },
-      { label: "Lodged as", width: 70 },
-    ],
-    rows,
-    { emptyText: "No supporting files are recorded against this work." },
-  );
-  paragraph(p, WORK_EVIDENCE_NOTE, { size: 7.5, gap: 2 });
-}
-
-// Identity of the work — the particulars an affiliated society needs to match
-// this registration against a usage log.
-function workParticulars(p: ReturnType<typeof letterhead>, work: WorkLike) {
-  sectionHeading(p, "The work");
-  labelValueRow(p, "Title of the work", work.title);
-  labelValueRow(p, "Alternative title / subtitle", work.alternativeTitle);
-  labelValueRow(p, "Type of work", work.workType);
-  labelValueRow(p, "Language of the lyrics", work.language);
-  labelValueRow(p, "Genre", work.genre);
-  labelValueRow(p, "Duration", work.duration);
-  labelValueRow(p, "Date the work was created", work.dateCreated ? fmtDate(work.dateCreated) : "");
-  labelValueRow(p, "ISWC (work code)", work.iswc);
-  labelValueRow(p, "ISRC (recording code)", work.isrc);
-
-  sectionHeading(p, "Creators and publisher");
-  labelValueRow(p, "Composer(s) of the music", list(work.composers));
-  labelValueRow(p, "Author(s) of the lyrics", list(work.authors));
-  labelValueRow(p, "Arranger(s)", list(work.arrangers));
-  labelValueRow(p, "Publisher", work.publisher);
-  labelValueRow(p, "Publisher IPI / CAE number", work.publisherIpi);
-}
 
 function registeringMember(p: ReturnType<typeof letterhead>, member: MemberLike) {
   sectionHeading(p, "Registering member");
