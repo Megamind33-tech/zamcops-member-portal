@@ -35,12 +35,14 @@ DOT = set(".…·_")
 
 MIN_DOTS = 3  # fewer than this is punctuation, not a rule
 
-# A tick box. The forms draw these as a closed path of line segments rather
-# than as a rectangle primitive, so they are found by shape and size: small,
-# wider than tall, and empty. Without them a tick is placed relative to the
-# printed word beside the box, which lands in the gap to its left.
-BOX_MIN_W, BOX_MAX_W = 14, 60
-BOX_MIN_H, BOX_MAX_H = 10, 34
+# A tick box. The forms draw these two different ways — the membership forms as
+# a closed path of four or five line segments, the work declaration as a
+# rectangle primitive — and at two quite different sizes: 27x18pt on one,
+# 8x5pt on the other. Both are found here, because a mark placed relative to
+# the printed word beside a box lands next to the answer rather than in it,
+# whichever way that box was drawn.
+BOX_MIN_W, BOX_MAX_W = 6, 60
+BOX_MIN_H, BOX_MAX_H = 4, 34
 
 
 def boxes_on(page):
@@ -50,8 +52,9 @@ def boxes_on(page):
         r = d["rect"]
         if not (BOX_MIN_W <= r.width <= BOX_MAX_W and BOX_MIN_H <= r.height <= BOX_MAX_H):
             continue
-        # Four or five segments: a rectangle, open or closed.
-        if sum(1 for it in d["items"] if it[0] == "l") not in (4, 5):
+        kinds = [it[0] for it in d["items"]]
+        # A rectangle primitive, or four/five segments tracing one.
+        if not (kinds == ["re"] or (set(kinds) == {"l"} and len(kinds) in (4, 5))):
             continue
         out.append(
             {

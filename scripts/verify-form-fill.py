@@ -28,6 +28,10 @@ import pymupdf
 
 FORMS = {"individual": "Individual", "group": "Group", "publisher": "Publisher"}
 
+# Documents checked for their ticks alone — they carry no dotted rules to
+# speak of, but they do draw boxes, and a mark beside a box is not a tick.
+TICK_ONLY = {"workdecl": "Work declaration"}
+
 # How far above its rule a value is written, and the slack allowed either way.
 RISE = 2.0
 Y_TOLERANCE = 2.5
@@ -105,6 +109,12 @@ EXPECTED_TICKS = {
     ],
     "group": [],
     "publisher": [],
+    "workdecl": [
+        ("box.p1.392.251", "Finance by Publisher? — YES"),
+        ("box.p1.277.21", "enclosure: Lyrics"),
+        ("box.p1.278.241", "enclosure: Musical score"),
+        ("box.p1.278.339", "enclosure: Online, always lodged"),
+    ],
 }
 
 # Ticks that must NOT appear, because the specimen did not claim them.
@@ -116,6 +126,11 @@ FORBIDDEN_TICKS = {
     ],
     "group": [],
     "publisher": [],
+    "workdecl": [
+        ("box.p1.390.342", "Finance by Publisher? — NO"),
+        ("box.p1.265.24", "enclosure: CD, which the portal never takes"),
+        ("box.p1.265.241", "enclosure: Contract, not lodged"),
+    ],
 }
 
 
@@ -290,6 +305,23 @@ def main(filled_dir):
                   f"(smallest {smallest}pt){ticks}")
             for t in tight:
                 print(f"       \033[33m·\033[0m {t}")
+
+    # The documents whose only marks are ticks.
+    for template, label in TICK_ONLY.items():
+        filled = os.path.join(filled_dir, f"{template}.pdf")
+        blank = os.path.join(root, "assets", "forms", f"{template}.pdf")
+        if not os.path.exists(filled):
+            print(f"  ! {label:11} not rendered")
+            problems += 1
+            continue
+        bad, marks = check_ticks(template, slots, blank, filled)
+        if bad:
+            problems += len(bad)
+            print(f"  \033[31m✗\033[0m {label:14} {len(bad)} misplaced")
+            for b in bad:
+                print(f"       {b}")
+        else:
+            print(f"  \033[32m✓\033[0m {label:14} {marks // 2} tick(s), each inside its box")
 
     if problems:
         print(f"\n\033[31m{problems} mark(s) are not where the form expects them.\033[0m")
