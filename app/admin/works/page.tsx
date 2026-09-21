@@ -25,7 +25,7 @@ export default function AdminWorksPage() {
       <Panel title="Declarations">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px]">
-            <thead className="bg-white/[0.03]">
+            <thead className="bg-zam-canvas">
               <tr>
                 <Th>Title</Th>
                 <Th>Type</Th>
@@ -37,15 +37,15 @@ export default function AdminWorksPage() {
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-zam-line">
               {works.map((w) => (
-                <tr key={w.id} className="hover:bg-white/[0.03]">
-                  <Td className="font-semibold text-white">
+                <tr key={w.id} className="hover:bg-zam-canvas">
+                  <Td className="font-semibold text-zam-ink">
                     <div className="flex items-center gap-3">
                       <CoverArt src={w.coverArt} seed={w.title} size={40} rounded="rounded-lg" />
                       <div className="min-w-0">
                         {w.title}
-                        <span className="block text-xs font-normal text-night-400">
+                        <span className="block text-xs font-normal text-zam-muted">
                           {w.genre} · {w.language}
                         </span>
                       </div>
@@ -53,12 +53,12 @@ export default function AdminWorksPage() {
                   </Td>
                   <Td>{w.workType}</Td>
                   <Td>{nameFor(w.ownerId)}</Td>
-                  <Td className="text-xs text-night-300">
+                  <Td className="text-xs text-zam-muted">
                     {w.ownershipSplits
                       .map((s) => `${s.party} ${s.percentage}%${s.ipiNumber ? ` · IPI ${s.ipiNumber}` : ""}`)
                       .join(", ")}
                   </Td>
-                  <Td className="text-xs text-night-300">
+                  <Td className="text-xs text-zam-muted">
                     <span className="block">{w.studioReceipt ? `Studio: ${w.studioReceipt}` : "No studio receipt"}</span>
                     {w.ownershipSplits.map((s) => (
                       <span key={s.id || s.party} className="block">
@@ -69,7 +69,7 @@ export default function AdminWorksPage() {
                       </span>
                     ))}
                   </Td>
-                  <Td className="text-night-300">{formatDate(w.submittedAt)}</Td>
+                  <Td className="text-zam-muted">{formatDate(w.submittedAt)}</Td>
                   <Td>
                     <StatusBadge status={w.status} />
                   </Td>
@@ -84,8 +84,8 @@ export default function AdminWorksPage() {
                       {w.status === "Approved" && (
                         <button
                           onClick={() => reissueWorkDocuments(w.id)}
-                          title="Re-issue the declaration and certificate of registration"
-                          className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs font-semibold text-night-200 transition hover:bg-white/10"
+                          title="Re-issue the clearance certificate for this submission"
+                          className="inline-flex items-center gap-1 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink transition hover:bg-zam-line/60"
                         >
                           <FileText size={14} /> Re-issue
                         </button>
@@ -103,7 +103,7 @@ export default function AdminWorksPage() {
               ))}
               {works.length === 0 && (
                 <tr>
-                  <Td className="py-8 text-center text-night-400">
+                  <Td className="py-8 text-center text-zam-muted">
                     <div className="flex flex-col items-center gap-3">
                       <Illustration name="works" />
                       <span>No work declarations yet.</span>

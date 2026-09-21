@@ -15,6 +15,7 @@ import { Card, CardHeader } from "@/components/zam/Card";
 import { Button } from "@/components/zam/Button";
 import { Field, Input, Select, Textarea } from "@/components/zam/Input";
 import { SignaturePad } from "@/components/member/SignaturePad";
+import { prefillFromAccount } from "@/lib/applicationPrefill";
 import { useApp } from "@/lib/store";
 import { cn, formatDate } from "@/lib/format";
 import {
@@ -33,50 +34,13 @@ const TYPE_META: Record<ApplicationFormType, { icon: React.ReactNode; blurb: str
 };
 
 // Sensible starting answers taken from the member's account profile.
-function prefill(formType: ApplicationFormType, m: Member): Payload {
-  if (formType === "Individual") {
-    const parts = m.fullName.trim().split(/\s+/);
-    return {
-      surname: parts.length > 1 ? parts[parts.length - 1] : "",
-      firstName: parts.slice(0, Math.max(1, parts.length - 1)).join(" "),
-      pseudonyms: m.stageName || "",
-      sex: m.gender || "",
-      dateOfBirth: m.dateOfBirth || "",
-      nationality: "Zambian",
-      placeOfBirth: "Zambia",
-      passportNo: m.nrcOrPassport || "",
-      resAddress: [m.address, m.district, m.province].filter(Boolean).join(", "),
-      accountNumber: m.bankAccount || "",
-      bankAddress: m.bankName || "",
-      successorName: m.nextOfKinName || "",
-    };
-  }
-  if (formType === "Group") {
-    return {
-      groupName: m.stageName || "",
-      country: "Zambia",
-      repName: m.fullName,
-      passportOrIdNumber: m.nrcOrPassport || "",
-      homeAddress: [m.address, m.district, m.province].filter(Boolean).join(", "),
-      cell: m.phone,
-      homeEmail: m.email,
-      bankAccount: m.bankAccount || "",
-    };
-  }
-  return {
-    corporateName: m.stageName || m.fullName,
-    country: "Zambia",
-    headquartersAddress: [m.address, m.district, m.province].filter(Boolean).join(", "),
-    cell: m.phone,
-    hqEmail: m.email,
-    bankAccount: m.bankAccount || "",
-  };
-}
-
 export default function ApplicationPage() {
   const { currentMember, refresh } = useApp();
   const [application, setApplication] = useState<MembershipApplication | null>(null);
   const [signature, setSignature] = useState("");
+  // Which answers the portal filled in from the member's account, so the form
+  // can say where they came from instead of looking like something they typed.
+  const [fromAccount, setFromAccount] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
 
@@ -86,6 +50,7 @@ export default function ApplicationPage() {
       const d = await res.json();
       setApplication(d.application);
       setSignature(d.signature || "");
+      setFromAccount(Array.isArray(d.fromAccount) ? d.fromAccount : []);
     }
     setLoading(false);
   }, []);
@@ -156,6 +121,7 @@ export default function ApplicationPage() {
           member={currentMember}
           application={application}
           signature={signature}
+          fromAccount={fromAccount}
           onSignatureSaved={setSignature}
           onDone={async () => {
             setEditing(false);
@@ -195,11 +161,13 @@ function StatusCard({
 }
 
 function Wizard({
-  member, application, signature, onSignatureSaved, onDone,
+  member, application, signature, fromAccount, onSignatureSaved, onDone,
 }: {
   member: Member;
   application: MembershipApplication | null;
   signature: string;
+  /** Answers the portal filled in from the account, so the form can say so. */
+  fromAccount: string[];
   onSignatureSaved: (img: string) => void;
   onDone: () => Promise<void>;
 }) {
@@ -207,7 +175,7 @@ function Wizard({
     application?.formType ?? (member.role === "Publisher" ? "Publisher" : "Individual");
   const [formType, setFormType] = useState<ApplicationFormType>(defaultType);
   const [payload, setPayload] = useState<Payload>(
-    () => (application?.payload as Payload) ?? prefill(defaultType, member)
+    () => (application?.payload as Payload) ?? (prefillFromAccount(member, defaultType) as Payload)
   );
   const [step, setStep] = useState(0); // 0 = form type; 1..n = sections; then signature, deed, review
   const [deedAgreed, setDeedAgreed] = useState(false);
@@ -230,7 +198,7 @@ function Wizard({
   const pickType = (t: ApplicationFormType) => {
     if (t === formType) return;
     setFormType(t);
-    setPayload((p) => ({ ...prefill(t, member), ...p }));
+    setPayload((p) => ({ ...(prefillFromAccount(member, t) as Payload), ...p }));
   };
 
   const saveDraft = async (silent = false) => {
@@ -365,7 +333,7 @@ function Wizard({
       )}
 
       {step >= 1 && step <= sectionCount && (
-        <SectionStep section={def.sections[step - 1]} payload={payload} set={set} />
+        <SectionStep section={def.sections[step - 1]} payload={payload} set={set} fromAccount={fromAccount} />
       )}
 
       {step === SIG && (
@@ -445,13 +413,20 @@ function ChecklistRow({ ok, label, detail }: { ok: boolean; label: string; detai
   );
 }
 
-function SectionStep({ section, payload, set }: { section: AppSection; payload: Payload; set: (k: string, v: unknown) => void }) {
+function SectionStep({
+  section, payload, set, fromAccount = [],
+}: {
+  section: AppSection;
+  payload: Payload;
+  set: (k: string, v: unknown) => void;
+  fromAccount?: string[];
+}) {
   return (
     <Card>
       <CardHeader title={section.title} description={section.description} />
       <div className="grid gap-4 p-5 sm:grid-cols-2">
         {(section.fields ?? []).map((f) => (
-          <FieldControl key={f.key} field={f} payload={payload} set={set} />
+          <FieldControl key={f.key} field={f} payload={payload} set={set} fromAccount={fromAccount} />
         ))}
       </div>
       {section.repeat && <RepeatEditor repeat={section.repeat} payload={payload} set={set} />}
@@ -459,20 +434,31 @@ function SectionStep({ section, payload, set }: { section: AppSection; payload: 
   );
 }
 
-function FieldControl({ field: f, payload, set }: { field: AppField; payload: Payload; set: (k: string, v: unknown) => void }) {
+function FieldControl({
+  field: f, payload, set, fromAccount = [],
+}: {
+  field: AppField;
+  payload: Payload;
+  set: (k: string, v: unknown) => void;
+  fromAccount?: string[];
+}) {
   if (f.showIf && String(payload[f.showIf.key] ?? "") !== f.showIf.value) return null;
   const value = payload[f.key];
+  // Answered from what the member gave at sign-up or on their profile. Said
+  // plainly, and still editable — the form wants the legal version of a name
+  // and an account holds the everyday one.
+  const hint = fromAccount.includes(f.key) ? [f.hint, "From your account — edit if it differs"].filter(Boolean).join(" · ") : f.hint;
 
   if (f.type === "textarea") {
     return (
-      <Field label={f.label} hint={f.hint} required={f.required} className="sm:col-span-2">
+      <Field label={f.label} hint={hint} required={f.required} className="sm:col-span-2">
         <Textarea value={String(value ?? "")} onChange={(e) => set(f.key, e.target.value)} rows={3} />
       </Field>
     );
   }
   if (f.type === "select") {
     return (
-      <Field label={f.label} hint={f.hint} required={f.required}>
+      <Field label={f.label} hint={hint} required={f.required}>
         <Select value={String(value ?? "")} onChange={(e) => set(f.key, e.target.value)}>
           <option value="">Select…</option>
           {(f.options ?? []).map((o) => (
@@ -484,7 +470,7 @@ function FieldControl({ field: f, payload, set }: { field: AppField; payload: Pa
   }
   if (f.type === "yesno") {
     return (
-      <Field label={f.label} hint={f.hint} required={f.required} className="sm:col-span-2">
+      <Field label={f.label} hint={hint} required={f.required} className="sm:col-span-2">
         <div className="flex gap-2">
           {(f.options ?? ["Yes", "No"]).map((o) => (
             <button
@@ -510,7 +496,7 @@ function FieldControl({ field: f, payload, set }: { field: AppField; payload: Pa
     const toggle = (o: string) =>
       set(f.key, selected.includes(o) ? selected.filter((s) => s !== o) : [...selected, o]);
     return (
-      <Field label={f.label} hint={f.hint} required={f.required} className="sm:col-span-2">
+      <Field label={f.label} hint={hint} required={f.required} className="sm:col-span-2">
         <div className="flex flex-wrap gap-2">
           {(f.options ?? []).map((o) => (
             <button
@@ -532,7 +518,7 @@ function FieldControl({ field: f, payload, set }: { field: AppField; payload: Pa
     );
   }
   return (
-    <Field label={f.label} hint={f.hint} required={f.required}>
+    <Field label={f.label} hint={hint} required={f.required}>
       <Input
         type={f.type === "date" ? "date" : "text"}
         value={String(value ?? "")}

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Inbox, CheckCircle2, KeyRound, RotateCcw, Send, MessageSquare } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { AdminStat, Panel, StatusBadge } from "@/components/admin/widgets";
-import { TextArea } from "@/components/ui/Field";
+import { Textarea } from "@/components/zam/Input";
 import { SupportThread } from "@/components/zam/SupportThread";
 import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
@@ -65,11 +65,11 @@ export default function AdminSupportPage() {
 
       <Panel title={tab === "Open" ? "Open tickets" : "Resolved tickets"}>
         {shown.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-night-400">
+          <p className="px-5 py-10 text-center text-sm text-zam-muted">
             {loading ? "Loading…" : tab === "Open" ? "No open conversations — inbox zero." : "Nothing resolved yet."}
           </p>
         ) : (
-          <div className="divide-y divide-white/[0.06]">
+          <div className="divide-y divide-zam-line">
             {shown.map((t) => {
               const m = memberFor(t);
               const isReset = t.topic === "Password reset";
@@ -77,15 +77,15 @@ export default function AdminSupportPage() {
               return (
                 <div key={t.id} className="px-5 py-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs font-semibold text-night-300">{t.topic}</span>
+                    <span className="rounded-md bg-zam-canvas px-2 py-0.5 text-xs font-semibold text-zam-muted">{t.topic}</span>
                     <StatusBadge status={t.status === "Open" ? "Pending" : "Approved"} className="!text-[10px]" />
-                    <span className="ml-auto text-xs text-night-400">{formatDate(t.createdAt)}</span>
+                    <span className="ml-auto text-xs text-zam-muted">{formatDate(t.createdAt)}</span>
                   </div>
-                  <p className="mt-1 text-xs text-night-400">
+                  <p className="mt-1 text-xs text-zam-muted">
                     {m ? (
                       <>
                         From{" "}
-                        <Link href={`/admin/members/${m.id}`} className="font-semibold text-accent-300 hover:underline">
+                        <Link href={`/admin/members/${m.id}`} className="font-semibold text-zam-orange hover:underline">
                           {m.fullName}
                         </Link>{" "}
                         · <span className="font-mono">{m.memberNumber}</span> · {m.email}
@@ -98,9 +98,9 @@ export default function AdminSupportPage() {
                     )}
                   </p>
                   {isReset && m && t.status === "Open" && (
-                    <p className="mt-1.5 text-xs text-night-300">
+                    <p className="mt-1.5 text-xs text-zam-muted">
                       Verify the member&apos;s identity, then issue a temporary password from{" "}
-                      <Link href={`/admin/members/${m.id}`} className="font-semibold text-accent-300 hover:underline">
+                      <Link href={`/admin/members/${m.id}`} className="font-semibold text-zam-orange hover:underline">
                         their member page
                       </Link>{" "}
                       and close this ticket.
@@ -113,7 +113,7 @@ export default function AdminSupportPage() {
 
                   {t.status === "Open" ? (
                     <div className="mt-3 space-y-2">
-                      <TextArea
+                      <Textarea
                         rows={2}
                         placeholder={m ? "Reply to the member (sent as an in-app notice)…" : "Internal note (requester has no account)…"}
                         value={draft}
@@ -123,7 +123,7 @@ export default function AdminSupportPage() {
                         <button
                           onClick={() => send(t, false)}
                           disabled={busyId === t.id || !draft.trim()}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.12] disabled:opacity-40"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-zam-canvas px-4 py-2.5 text-sm font-semibold text-zam-ink transition hover:bg-zam-canvas disabled:opacity-40"
                         >
                           <MessageSquare size={14} /> {busyId === t.id ? "Saving…" : "Send reply"}
                         </button>
@@ -140,7 +140,7 @@ export default function AdminSupportPage() {
                     <button
                       onClick={() => reopen(t)}
                       disabled={busyId === t.id}
-                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-night-300 transition hover:bg-white/[0.1] disabled:opacity-40"
+                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-zam-canvas px-3 py-1.5 text-xs font-semibold text-zam-muted transition hover:bg-zam-canvas disabled:opacity-40"
                     >
                       <RotateCcw size={13} /> Reopen
                     </button>

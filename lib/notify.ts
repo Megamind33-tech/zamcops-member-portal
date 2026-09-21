@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { renderEmail, type EmailContent } from "@/lib/email";
 
 // Central member-notification dispatcher. Every notice a member receives goes
 // through here: it always writes the in-app notification, then — best effort —
@@ -55,16 +56,16 @@ function normalizePhone(phone: string): string {
 // configured, regardless of the member's notification preferences. Falls back
 // to Resend's shared onboarding sender until EMAIL_FROM is set to an address
 // on a domain verified in the Resend dashboard.
-export async function sendTransactionalEmail(to: string, subject: string, body: string): Promise<void> {
-  return sendEmail(to, subject, body);
+export async function sendTransactionalEmail(to: string, content: EmailContent): Promise<void> {
+  return sendEmail(to, content);
 }
 
-async function sendEmail(to: string, subject: string, body: string): Promise<void> {
+async function sendEmail(to: string, content: EmailContent): Promise<void> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || "ZAMCOPS <onboarding@resend.dev>";
   if (!to) return;
   if (!key) {
-    console.warn(`[notify] RESEND_API_KEY is not set — email "${subject}" to ${to} was skipped`);
+    console.warn(`[notify] RESEND_API_KEY is not set — email "${content.subject}" to ${to} was skipped`);
     return;
   }
   if (!process.env.EMAIL_FROM) {
@@ -73,26 +74,13 @@ async function sendEmail(to: string, subject: string, body: string): Promise<voi
     );
   }
 
-  const html = `
-    <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#1a1d21">
-      <div style="background:#1a1d21;padding:20px 24px;border-radius:12px 12px 0 0">
-        <span style="color:#fff;font-size:18px;font-weight:bold">ZAMCOPS</span>
-        <span style="color:#c8c8c8;font-size:12px;display:block;margin-top:2px">Zambian Music Copyright Protection Society</span>
-      </div>
-      <div style="height:4px;background:linear-gradient(90deg,#f26c21 0 28%,#e2342b 28% 52%,#c9ceda 52% 74%,#2ba45a 74% 100%)"></div>
-      <div style="border:1px solid #e7e9ed;border-top:0;border-radius:0 0 12px 12px;padding:24px">
-        <h2 style="margin:0 0 10px;font-size:17px">${escapeHtml(subject)}</h2>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#3a4149">${escapeHtml(body)}</p>
-        <p style="margin:20px 0 0;font-size:12px;color:#5a6470">
-          Sign in to the member portal to view details. Manage how we contact you under Settings → Notification preferences.
-        </p>
-      </div>
-    </div>`;
-
+  const { html, text } = renderEmail(content);
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from, to, subject: `ZAMCOPS — ${subject}`, html }),
+    // Both parts: a client that prefers text, or a filter that distrusts
+    // HTML-only mail, gets something properly written rather than nothing.
+    body: JSON.stringify({ from, to, subject: content.subject, html, text }),
   });
   if (!res.ok) {
     console.error(`[notify] email to ${to} (from ${from}) failed:`, res.status, await res.text().catch(() => ""));
@@ -119,9 +107,6 @@ async function sendSMS(phone: string, text: string): Promise<void> {
   if (!res.ok) console.error("[notify] sms failed:", res.status, await res.text().catch(() => ""));
 }
 
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 // In-app deep links only — reject protocol-relative and off-site URLs.
 export function safeNoticeHref(raw?: string): string {
@@ -129,6 +114,11 @@ export function safeNoticeHref(raw?: string): string {
   const h = raw.trim();
   if (h.startsWith("/") && !h.startsWith("//") && !h.startsWith("/\\")) return h.slice(0, 240);
   return "";
+}
+
+// What the button should say, given what kind of notice this is.
+function actionLabel(type: NotifyInput["type"]): string {
+  return type === "action" ? "Take a look" : "View in the portal";
 }
 
 // Notify one member across all channels. Never throws — a provider outage must
@@ -171,7 +161,22 @@ export async function notifyMember(memberId: string, input: NotifyInput): Promis
     const wantSms = category === "security" || prefs.sms;
 
     await Promise.all([
-      wantEmail ? sendEmail(member.email, input.title, input.body) : Promise.resolve(),
+      wantEmail
+        ? sendEmail(member.email, {
+            subject: input.title,
+            preheader: input.body.slice(0, 120),
+            heading: input.title,
+            greeting: member.fullName ? `Hello ${member.fullName.split(" ")[0]},` : undefined,
+            paragraphs: [input.body],
+            action: href
+              ? { label: actionLabel(type), href }
+              : { label: "Open the member portal", href: "/dashboard" },
+            footnote:
+              category === "security"
+                ? "This is a security notice, so it is sent whatever your notification settings say."
+                : "You can change which notices reach you under Settings → Notification preferences.",
+          })
+        : Promise.resolve(),
       wantSms ? sendSMS(member.phone, input.sms ?? `${input.title} — ${input.body}`) : Promise.resolve(),
     ]);
   } catch (err) {

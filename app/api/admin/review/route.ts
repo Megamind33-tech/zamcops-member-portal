@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { notifyMember } from "@/lib/notify";
 import { logAudit } from "@/lib/audit";
-import { issueWorkDocuments, IssueError } from "@/lib/issueDocuments";
+import { issueOnWorkApproval, IssueError, type WorkApprovalResult } from "@/lib/issueDocuments";
 
 export const runtime = "nodejs";
 
@@ -43,15 +43,19 @@ export async function PATCH(req: Request) {
 
   const label = LABELS[kind];
 
-  // Approving a work enters it in the register, so the member's signed
-  // Declaration of a Musical Work and the counter-signed Certificate of
-  // Registration are issued onto their file. A missing signature is the usual
-  // cause of failure and is worth reporting; the work stays approved either
-  // way, and staff can re-issue from the member's record once it is fixed.
+  // Accepting a work onto the register issues the clearance certificate for
+  // the submission it came in with, and — when it is the member's first — it
+  // admits them, which is what approves their membership application and
+  // issues the deed, the form and the admission letter alongside it.
+  //
+  // A missing signature is the usual cause of failure and is worth reporting.
+  // The work stays approved either way, and staff can re-issue from the
+  // member's record once it is fixed.
   let documentWarning = "";
+  let issued: WorkApprovalResult | null = null;
   if (workApproved) {
     try {
-      await issueWorkDocuments(id);
+      issued = await issueOnWorkApproval(id);
     } catch (e) {
       documentWarning =
         e instanceof IssueError
@@ -62,16 +66,26 @@ export async function PATCH(req: Request) {
   }
 
   if (ownerId && (status === "Approved" || status === "Rejected")) {
+    // Being admitted is the bigger news, so it leads when it happens.
+    const covers =
+      issued && issued.works > 1 ? `${issued.works} works from that submission` : `“${title}”`;
     await notifyMember(ownerId, {
-      title: `${label} ${status.toLowerCase()}`,
+      title:
+        status === "Rejected"
+          ? `${label} rejected`
+          : issued?.admitted
+            ? "You have been admitted to ZAMCOPS"
+            : `${label} approved`,
       body:
         status === "Rejected"
           ? `Your ${label.toLowerCase()} “${title}” was rejected${reason ? `: ${reason}` : "."}`
-          : workApproved && !documentWarning
-            ? `“${title}” is now entered in the ZAMCOPS register of works. Your signed declaration and certificate of registration are ready under My Documents.`
-            : `Your ${label.toLowerCase()} “${title}” has been ${status.toLowerCase()}.`,
+          : issued?.admitted
+            ? `“${title}” has been accepted onto the ZAMCOPS register, and you are now a CANDIDATE member. Your membership application, Deed of Assignment, admission letter and the clearance certificate covering ${covers} are under My Documents.`
+            : issued
+              ? `“${title}” is now entered in the ZAMCOPS register of works. The clearance certificate covering ${covers} is under My Documents.`
+              : `Your ${label.toLowerCase()} “${title}” has been ${status.toLowerCase()}.`,
       type: status === "Approved" ? "success" : "warning",
-      href: workApproved && !documentWarning ? "/documents" : "/works",
+      href: issued ? "/documents" : "/works",
     });
   }
 
@@ -84,9 +98,11 @@ export async function PATCH(req: Request) {
   return json({ ok: true, warning: documentWarning || undefined });
 }
 
-// Re-issues the documents of a work already in the register — used after the
-// member supplies a missing signature, after a new Board Secretary signature is
-// uploaded, or after staff amend the particulars of a registered work.
+// Re-issues the clearance certificate for a registered work's submission —
+// used after the member supplies a missing signature, after a new Board
+// Secretary signature is uploaded, or after staff amend a registered work.
+// Where the member was never admitted (their first approval failed for want of
+// a signature), this admits them too.
 export async function POST(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
@@ -100,8 +116,9 @@ export async function POST(req: Request) {
   if (!work) return bad("Work not found.", 404);
   if (work.status !== "Approved") return bad("Only a registered work has documents to re-issue.");
 
+  let issued: WorkApprovalResult;
   try {
-    await issueWorkDocuments(id);
+    issued = await issueOnWorkApproval(id);
   } catch (e) {
     if (e instanceof IssueError) return bad(e.message);
     console.error("[review] work document re-issue failed:", e);
@@ -109,9 +126,11 @@ export async function POST(req: Request) {
   }
 
   await notifyMember(work.ownerId, {
-    title: "Work documents re-issued",
-    body: `ZAMCOPS re-issued the declaration and certificate of registration for “${work.title}”. The latest copies are under My Documents.`,
-    type: "info",
+    title: issued.admitted ? "You have been admitted to ZAMCOPS" : "Certificate re-issued",
+    body: issued.admitted
+      ? `Your membership has been confirmed and your documents are under My Documents, together with the clearance certificate for “${work.title}”.`
+      : `ZAMCOPS re-issued the clearance certificate covering “${work.title}”. The latest copy is under My Documents.`,
+    type: issued.admitted ? "success" : "info",
     href: "/documents",
   });
 

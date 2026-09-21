@@ -50,7 +50,7 @@ interface AppContextValue extends MemberState {
   currentMember: Member | null;
   refresh: () => Promise<boolean>;
   login: (identifier: string, password: string) => Promise<Result>;
-  register: (data: Partial<Member> & { password: string }) => Promise<Result>;
+  register: (data: Partial<Member> & { password: string; membershipType?: string }) => Promise<Result>;
   logout: () => Promise<void>;
   updateProfile: (patch: Partial<Member>) => Promise<Result>;
   changePassword: (current: string, next: string) => Promise<Result>;

@@ -9,7 +9,8 @@ import {
   KeyRound, Copy, Bell,
 } from "lucide-react";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
-import { Field, TextInput, Select, FilePicker, TextArea } from "@/components/ui/Field";
+import { Field, Input, Select, Textarea } from "@/components/zam/Input";
+import { FilePicker } from "@/components/zam/FilePicker";
 import { ApplicationPanel, AdminDocDownload } from "@/components/admin/ApplicationPanel";
 import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
@@ -63,13 +64,13 @@ export default function AdminMemberDetailPage() {
   };
 
   if (loading && !member) {
-    return <div className="grid h-64 place-items-center"><span className="h-7 w-7 animate-spin rounded-full border-2 border-white/15 border-t-brand-400" /></div>;
+    return <div className="grid h-64 place-items-center"><span className="h-7 w-7 animate-spin rounded-full border-2 border-zam-line border-t-zam-orange" /></div>;
   }
   if (!member) {
     return (
-      <div className="py-16 text-center text-night-300">
+      <div className="py-16 text-center text-zam-muted">
         <p>Member not found.</p>
-        <Link href="/admin/members" className="mt-3 inline-block text-accent-300">← Back to members</Link>
+        <Link href="/admin/members" className="mt-3 inline-block text-zam-orange">← Back to members</Link>
       </div>
     );
   }
@@ -78,7 +79,7 @@ export default function AdminMemberDetailPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/members" className="inline-flex items-center gap-1.5 text-sm font-semibold text-night-300 hover:text-white">
+      <Link href="/admin/members" className="inline-flex items-center gap-1.5 text-sm font-semibold text-zam-muted hover:text-zam-ink">
         <ArrowLeft size={16} /> All members
       </Link>
 
@@ -87,8 +88,8 @@ export default function AdminMemberDetailPage() {
         <div className="flex items-center gap-4">
           <Avatar name={member.stageName || member.fullName} src={member.profilePhoto || undefined} size={56} />
           <div>
-            <h1 className="text-xl font-extrabold text-white">{member.fullName}</h1>
-            <p className="text-sm text-night-300">
+            <h1 className="text-xl font-extrabold text-zam-ink">{member.fullName}</h1>
+            <p className="text-sm text-zam-muted">
               {member.stageName ? `${member.stageName} · ` : ""}{member.role} · <span className="font-mono">{member.memberNumber}</span>
             </p>
             <div className="mt-1.5"><StatusBadge status={s} /></div>
@@ -102,7 +103,7 @@ export default function AdminMemberDetailPage() {
           <button
             onClick={doReset}
             disabled={busy}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.06] px-4 py-2 text-sm font-semibold text-night-300 transition hover:bg-white/[0.1] disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zam-canvas px-4 py-2 text-sm font-semibold text-zam-muted transition hover:bg-zam-canvas disabled:opacity-40"
           >
             <KeyRound size={15} /> Reset password
           </button>
@@ -113,21 +114,21 @@ export default function AdminMemberDetailPage() {
         <div className="card flex flex-wrap items-center gap-3 border border-zam-amber/40 p-4">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zam-amber/15 text-zam-amber"><KeyRound size={16} /></span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white">Temporary password issued — shown only once</p>
-            <p className="text-xs text-night-400">
+            <p className="text-sm font-semibold text-zam-ink">Temporary password issued — shown only once</p>
+            <p className="text-xs text-zam-muted">
               Verify the member's identity, share it securely, and ask them to change it under Settings after signing in.
             </p>
           </div>
-          <code className="rounded-lg bg-white/[0.06] px-3 py-1.5 font-mono text-base font-bold tracking-wider text-white">{tempPassword}</code>
+          <code className="rounded-lg bg-zam-canvas px-3 py-1.5 font-mono text-base font-bold tracking-wider text-zam-ink">{tempPassword}</code>
           <button
             onClick={copyTemp}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-night-300 hover:bg-white/[0.1]"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-zam-canvas px-3 py-1.5 text-xs font-semibold text-zam-muted hover:bg-zam-canvas"
           >
             <Copy size={13} /> {copied ? "Copied" : "Copy"}
           </button>
           <button
             onClick={() => setTempPassword("")}
-            className="rounded-lg px-2 py-1.5 text-xs font-semibold text-night-400 hover:text-white"
+            className="rounded-lg px-2 py-1.5 text-xs font-semibold text-zam-muted hover:text-zam-ink"
           >
             Dismiss
           </button>
@@ -229,14 +230,14 @@ function MemberNoticePanel({
   return (
     <Panel title="Send an in-app notice">
       <form onSubmit={submit} className="space-y-3 p-5">
-        <p className="flex items-center gap-1.5 text-sm text-night-300">
+        <p className="flex items-center gap-1.5 text-sm text-zam-muted">
           <Bell size={14} /> Lands in {memberName}&apos;s Notifications (email/SMS follow their preferences).
         </p>
         <Field label="Title" required>
-          <TextInput placeholder="Short subject" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input placeholder="Short subject" value={title} onChange={(e) => setTitle(e.target.value)} />
         </Field>
         <Field label="Message" required>
-          <TextArea rows={3} placeholder="What should they know?" value={message} onChange={(e) => setMessage(e.target.value)} />
+          <Textarea rows={3} placeholder="What should they know?" value={message} onChange={(e) => setMessage(e.target.value)} />
         </Field>
         <Field label="Open this page when tapped">
           <Select value={href} onChange={(e) => setHref(e.target.value)}>
@@ -252,7 +253,7 @@ function MemberNoticePanel({
         <button
           type="submit"
           disabled={busy || title.trim().length < 3 || message.trim().length < 8}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 transition hover:bg-accent-400 disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-zam-orange px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zam-orange-dark disabled:opacity-40"
         >
           <Bell size={14} /> {busy ? "Sending…" : "Send notice"}
         </button>
@@ -262,7 +263,7 @@ function MemberNoticePanel({
 }
 
 function Btn({ tone, busy, onClick, icon, label }: { tone: "approve" | "reject"; busy: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
-  const tones = { approve: "bg-emerald-400/15 text-emerald-300 hover:bg-emerald-400/25", reject: "bg-red-400/15 text-red-300 hover:bg-red-400/25" };
+  const tones = { approve: "bg-emerald-400/15 text-zam-green hover:bg-emerald-400/25", reject: "bg-red-400/15 text-zam-red hover:bg-red-400/25" };
   return (
     <button onClick={onClick} disabled={busy} className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:opacity-40 ${tones[tone]}`}>
       {icon} {label}
@@ -273,7 +274,7 @@ function Btn({ tone, busy, onClick, icon, label }: { tone: "approve" | "reject";
 function Group({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="py-2">
-      <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-night-400">{icon} {title}</p>
+      <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-zam-muted">{icon} {title}</p>
       <div className="space-y-1">{children}</div>
     </div>
   );
@@ -282,8 +283,8 @@ function Group({ icon, title, children }: { icon: React.ReactNode; title: string
 function Row({ label, value }: { label: string; value?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 text-sm">
-      <span className="text-night-400">{label}</span>
-      <span className="text-right font-medium text-white">{value?.trim() ? value : "—"}</span>
+      <span className="text-zam-muted">{label}</span>
+      <span className="text-right font-medium text-zam-ink">{value?.trim() ? value : "—"}</span>
     </div>
   );
 }
@@ -292,15 +293,15 @@ function ListPanel({ title, icon, count, rows }: { title: string; icon: React.Re
   return (
     <Panel title={`${title} (${count})`}>
       {rows.length === 0 ? (
-        <p className="px-5 py-6 text-center text-sm text-night-400">Nothing submitted yet.</p>
+        <p className="px-5 py-6 text-center text-sm text-zam-muted">Nothing submitted yet.</p>
       ) : (
-        <div className="divide-y divide-white/[0.06]">
+        <div className="divide-y divide-zam-line">
           {rows.map((r) => (
             <div key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/[0.06] text-brand-200">{icon}</span>
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-zam-canvas text-zam-blue">{icon}</span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-white">{r.main}</p>
-                <p className="truncate text-xs text-night-400">{r.sub}</p>
+                <p className="truncate text-sm font-semibold text-zam-ink">{r.main}</p>
+                <p className="truncate text-xs text-zam-muted">{r.sub}</p>
               </div>
               <StatusBadge status={r.status} />
             </div>
@@ -343,19 +344,19 @@ function DocumentsPanel({
       <div className="grid gap-6 p-5 lg:grid-cols-2">
         {/* Existing docs */}
         <div className="space-y-2">
-          {docs.length === 0 && <p className="text-sm text-night-400">No documents attached yet.</p>}
+          {docs.length === 0 && <p className="text-sm text-zam-muted">No documents attached yet.</p>}
           {docs.map((d) => (
-            <div key={d.id} className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2.5 ring-1 ring-white/[0.06]">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-500/15 text-brand-200"><FileText size={16} /></span>
+            <div key={d.id} className="flex items-center gap-3 rounded-xl bg-zam-canvas px-3 py-2.5 ring-1 ring-zam-line">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zam-blue-soft text-zam-blue"><FileText size={16} /></span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-white">{d.docType}</p>
-                <p className="truncate text-xs text-night-400">
+                <p className="truncate text-sm font-semibold text-zam-ink">{d.docType}</p>
+                <p className="truncate text-xs text-zam-muted">
                   {d.fileName}{d.reference ? ` · ${d.reference}` : ""} · {formatDate(d.uploadedAt)}
                 </p>
-                {d.note && <p className="truncate text-xs text-night-500">{d.note}</p>}
+                {d.note && <p className="truncate text-xs text-zam-muted/70">{d.note}</p>}
               </div>
               <AdminDocDownload id={d.id} hasFile={d.hasFile} />
-              <button onClick={() => onRemove(d.id)} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-night-400 hover:bg-red-400/15 hover:text-red-300" aria-label="Remove document">
+              <button onClick={() => onRemove(d.id)} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zam-muted hover:bg-red-400/15 hover:text-zam-red" aria-label="Remove document">
                 <Trash2 size={15} />
               </button>
             </div>
@@ -363,20 +364,20 @@ function DocumentsPanel({
         </div>
 
         {/* Attach form */}
-        <form onSubmit={submit} className="space-y-3 rounded-2xl bg-white/[0.03] p-4 ring-1 ring-white/[0.06]">
-          <p className="flex items-center gap-1.5 text-sm font-bold text-white"><FilePlus2 size={15} /> Attach a document</p>
+        <form onSubmit={submit} className="space-y-3 rounded-2xl bg-zam-canvas p-4 ring-1 ring-zam-line">
+          <p className="flex items-center gap-1.5 text-sm font-bold text-zam-ink"><FilePlus2 size={15} /> Attach a document</p>
           <Field label="Document type">
             <Select value={docType} onChange={(e) => setDocType(e.target.value as MemberDocType)}>
               {DOC_TYPES.map((t) => <option key={t}>{t}</option>)}
             </Select>
           </Field>
-          <FilePicker label="File" accept=".pdf,.doc,.docx,image/*" value={fileName} onPick={setFileName} hint="PDF or scanned document" />
+          <FilePicker label="File" kind="document" value={fileName} onChange={(n) => setFileName(n ?? "")} hint="PDF or scanned document" />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Reference"><TextInput placeholder="e.g. DOA-2026-014" value={reference} onChange={(e) => setReference(e.target.value)} /></Field>
-            <Field label="Note"><TextInput placeholder="Optional" value={note} onChange={(e) => setNote(e.target.value)} /></Field>
+            <Field label="Reference"><Input placeholder="e.g. DOA-2026-014" value={reference} onChange={(e) => setReference(e.target.value)} /></Field>
+            <Field label="Note"><Input placeholder="Optional" value={note} onChange={(e) => setNote(e.target.value)} /></Field>
           </div>
-          {error && <p className="text-xs font-medium text-red-300">{error}</p>}
-          <button type="submit" disabled={busy} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 py-2.5 text-sm font-semibold text-night-950 hover:bg-accent-400 disabled:opacity-50">
+          {error && <p className="text-xs font-medium text-zam-red">{error}</p>}
+          <button type="submit" disabled={busy} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-zam-orange py-2.5 text-sm font-semibold text-white hover:bg-zam-orange-dark disabled:opacity-50">
             <Paperclip size={15} /> {busy ? "Attaching…" : "Attach document"}
           </button>
         </form>

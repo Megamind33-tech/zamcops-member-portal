@@ -8,70 +8,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // ZAMCOPS — "Midnight Studio" premium music-app palette.
-        // Primary accent: an electric indigo that reads as energetic, not corporate.
-        brand: {
-          50: "#eef1ff",
-          100: "#dbe1ff",
-          200: "#bcc6ff",
-          300: "#93a2ff",
-          400: "#6f80ff",
-          500: "#5460f8", // primary accent
-          600: "#4445e6",
-          700: "#3733bf",
-          800: "#2c2c94",
-          900: "#1e1f63",
-        },
-        // Violet companion used for vibrant gradients (the music "energy").
-        iris: {
-          300: "#c4a8ff",
-          400: "#a87dff",
-          500: "#8b5cf6",
-          600: "#7338e0",
-          700: "#5a27b3",
-        },
-        // Warm amber accent — CTAs, highlights, royalty/value moments.
-        gold: {
-          300: "#ffd98a",
-          400: "#ffc24d",
-          500: "#f5a623", // accent
-          600: "#d9871a",
-        },
-        // Hot magenta used very sparingly for "live"/energetic flourishes.
-        pop: {
-          400: "#ff6fae",
-          500: "#f63d8b",
-        },
-        // Signature ACTION accent — warm amber/copper, the colour of stage
-        // lighting and vinyl sleeves rather than another fintech mint. Primary
-        // CTAs are a confident solid of this (no gradient).
-        accent: {
-          300: "#ffcf99",
-          400: "#ffac5c",
-          500: "#ff8a3d",
-          600: "#e8630a",
-          700: "#b84d08",
-        },
-        // Dark neutral surface scale — the canvas the whole app sits on.
-        night: {
-          50: "#f5f6fb",
-          100: "#e4e6f0",
-          200: "#c2c6d8",
-          300: "#9aa0b8",
-          400: "#6b7190",
-          500: "#474d68",
-          600: "#2f3450",
-          700: "#222640",
-          800: "#181b30",
-          850: "#141627",
-          900: "#0d0f1d",
-          950: "#070814",
-        },
-        ink: "#f5f6fb",
-        canvas: "#0b0d1a",
-        // ZAMCOPS "zam" institutional light palette (ported from the Magic
-        // Patterns design). Zambian-flag colour family — eagle orange + red +
-        // green over clean paper. Used by the staff console and brand flourishes.
+        // The ZAMCOPS palette — the society's orange, the Zambian flag's red
+        // and green, on warm paper. This is the whole system; the member
+        // portal and the staff console both draw from it and nothing else.
         zam: {
           orange: "#F26C21",
           "orange-dark": "#D85A14",

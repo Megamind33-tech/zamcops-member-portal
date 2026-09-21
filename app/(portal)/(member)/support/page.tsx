@@ -98,7 +98,7 @@ export default function SupportScreen() {
 
   const contacts = [
     { icon: Phone, label: "Phone", value: "+260 211 250 082" },
-    { icon: Mail, label: "Email", value: "info@zamcops.org.zm" },
+    { icon: Mail, label: "Email", value: "zamcops1@gmail.com" },
     { icon: MapPin, label: "Office", value: "ZAMCOPS House, Lusaka, Zambia" },
   ];
 

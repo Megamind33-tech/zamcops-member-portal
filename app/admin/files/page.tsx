@@ -35,7 +35,7 @@ export default function AdminFilesPage() {
             onClick={() => setFilter(f)}
             className={
               "rounded-full px-3.5 py-1.5 text-xs font-semibold " +
-              (filter === f ? "bg-accent-500 text-night-950 ring-1 ring-accent-300/30" : "bg-white/[0.06] text-night-300 ring-1 ring-white/10 hover:text-white")
+              (filter === f ? "bg-zam-orange text-white ring-1 ring-zam-orange" : "bg-zam-canvas text-zam-muted ring-1 ring-zam-line hover:text-zam-ink")
             }
           >
             {f}
@@ -45,7 +45,7 @@ export default function AdminFilesPage() {
       <Panel title="Files">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px]">
-            <thead className="bg-white/[0.03]">
+            <thead className="bg-zam-canvas">
               <tr>
                 <Th>File name</Th>
                 <Th>Type</Th>
@@ -56,16 +56,16 @@ export default function AdminFilesPage() {
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-zam-line">
               {shown.map((u) => (
-                <tr key={u.id} className="hover:bg-white/[0.03]">
-                  <Td className="font-mono text-xs font-semibold text-white">
+                <tr key={u.id} className="hover:bg-zam-canvas">
+                  <Td className="font-mono text-xs font-semibold text-zam-ink">
                     <div className="flex items-start gap-3">
                       <CoverArt seed={u.fileName} size={40} rounded="rounded-lg" />
                       <div className="min-w-0">
                         <span className="block max-w-[240px] truncate">{u.fileName}</span>
                         {u.fileSize ? (
-                          <span className="block text-[11px] font-sans font-normal text-night-400">
+                          <span className="block text-[11px] font-sans font-normal text-zam-muted">
                             {(u.fileSize / 1024 / 1024).toFixed(2)} MB
                           </span>
                         ) : null}
@@ -81,14 +81,14 @@ export default function AdminFilesPage() {
                     </div>
                   </Td>
                   <Td>{u.fileType}</Td>
-                  <Td className="text-night-300">{u.linkedTo ?? "—"}</Td>
+                  <Td className="text-zam-muted">{u.linkedTo ?? "—"}</Td>
                   <Td>{nameFor(u.ownerId)}</Td>
-                  <Td className="text-night-300">{formatDate(u.uploadedAt)}</Td>
+                  <Td className="text-zam-muted">{formatDate(u.uploadedAt)}</Td>
                   <Td>
                     <div className="flex flex-col gap-1">
                       <StatusBadge status={u.status} />
                       {u.rejectionReason && (
-                        <span className="text-[11px] text-red-300">{u.rejectionReason}</span>
+                        <span className="text-[11px] text-zam-red">{u.rejectionReason}</span>
                       )}
                     </div>
                   </Td>
@@ -117,7 +117,7 @@ export default function AdminFilesPage() {
               ))}
               {shown.length === 0 && (
                 <tr>
-                  <Td colSpan={7} className="py-8 text-center text-night-400">
+                  <Td colSpan={7} className="py-8 text-center text-zam-muted">
                     <div className="flex flex-col items-center gap-3">
                       <Illustration name="upload" />
                       <span>No files match this filter.</span>

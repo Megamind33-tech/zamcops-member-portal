@@ -4,7 +4,7 @@ import { json, bad } from "@/lib/server";
 import { applicationDTO } from "@/lib/serialize";
 import { notifyMember } from "@/lib/notify";
 import { logAudit } from "@/lib/audit";
-import { issueMemberDocuments, IssueError } from "@/lib/issueDocuments";
+import { issueMemberDocuments, IssueError, ADMISSION_CLASS } from "@/lib/issueDocuments";
 import { ADMIN_FIELDS } from "@/lib/applicationForms";
 
 export const runtime = "nodejs";
@@ -46,16 +46,25 @@ export async function PATCH(req: Request) {
 }
 
 // Decide an application:
-//   approve    — counter-sign & issue the document set, activate the membership
 //   reject     — decline with a reason; the member can correct and resubmit
-//   regenerate — re-issue the documents of an approved member (e.g. after an
+//   regenerate — re-issue the documents of an admitted member (e.g. after an
 //                official signature was replaced)
+//
+// There is deliberately no "approve". A person is admitted when the society
+// accepts their first work onto the register, so approving that work is what
+// approves the membership, in app/api/admin/review. An application on its own
+// is not something that can be granted.
 export async function POST(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
 
   const b = await req.json().catch(() => null);
-  if (!b?.ownerId || !["approve", "reject", "regenerate"].includes(b.action)) {
+  if (b?.action === "approve") {
+    return bad(
+      "Membership is granted by accepting the member's first work, not on its own. Approve a submitted work under Work Declarations and the application is approved with it.",
+    );
+  }
+  if (!b?.ownerId || !["reject", "regenerate"].includes(b.action)) {
     return bad("Invalid request body.");
   }
   const { ownerId, action } = b;
@@ -89,15 +98,14 @@ export async function POST(req: Request) {
     return json({ application: applicationDTO(updated) });
   }
 
-  if (action === "approve" && application.status !== "Submitted") {
-    return bad("Only a submitted application can be approved.");
-  }
-  if (action === "regenerate" && application.status !== "Approved") {
-    return bad("Documents can only be regenerated for an approved application.");
+  if (application.status !== "Approved") {
+    return bad(
+      "This member has not been admitted yet — their documents are issued when the society accepts their first work.",
+    );
   }
 
   const membershipClass =
-    String(b.membershipClass ?? "").trim() || application.membershipClass || "CANDIDATE";
+    String(b.membershipClass ?? "").trim() || application.membershipClass || ADMISSION_CLASS;
 
   // Persist the class before generation so the admission letter carries it.
   await prisma.membershipApplication.update({
@@ -113,35 +121,19 @@ export async function POST(req: Request) {
     return bad("Could not generate the documents. Please try again.", 500);
   }
 
-  const updated = await prisma.membershipApplication.update({
-    where: { ownerId },
-    data:
-      action === "approve"
-        ? { status: "Approved", rejectionReason: "", decidedAt: new Date() }
-        : {},
+  const updated = await prisma.membershipApplication.findUniqueOrThrow({ where: { ownerId } });
+
+  await notifyMember(ownerId, {
+    title: "Your documents were re-issued",
+    body: "ZAMCOPS re-issued your official membership documents. The latest copies are available under My Documents.",
+    type: "info",
+    href: "/documents",
   });
 
-  if (action === "approve") {
-    await prisma.member.update({ where: { id: ownerId }, data: { membershipStatus: "Active" } });
-    await notifyMember(ownerId, {
-      title: "Membership approved",
-      body: `Congratulations — you have been admitted as a ${membershipClass.toUpperCase()} member of ZAMCOPS. Your signed application, Deed of Assignment and admission letter are ready to download under My Documents.`,
-      type: "success",
-      href: "/documents",
-    });
-  } else {
-    await notifyMember(ownerId, {
-      title: "Your documents were re-issued",
-      body: "ZAMCOPS re-issued your official membership documents. The latest copies are available under My Documents.",
-      type: "info",
-      href: "/documents",
-    });
-  }
-
-  await logAudit(session.sub, action === "approve" ? "application.approved" : "application.regenerated", {
+  await logAudit(session.sub, "application.regenerated", {
     targetType: "MembershipApplication",
     targetId: updated.id,
-    summary: `${action === "approve" ? "Approved" : "Re-issued documents for"} ${member.fullName} (${member.memberNumber}) as ${membershipClass.toUpperCase()}`,
+    summary: `Re-issued documents for ${member.fullName} (${member.memberNumber}) as ${membershipClass.toUpperCase()}`,
   });
 
   return json({ application: applicationDTO(updated) });

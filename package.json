@@ -17,6 +17,7 @@
     "backfill:album-works": "node scripts/backfill-album-works.mjs",
     "map:forms": "python3 scripts/map-form-slots.py",
     "render:forms": "node scripts/render-sample-forms.mjs tmp/forms",
+    "check:prefill": "node scripts/check-prefill.mjs",
     "verify:forms": "node scripts/render-sample-forms.mjs tmp/forms && python3 scripts/verify-form-fill.py tmp/forms"
   },
   "dependencies": {

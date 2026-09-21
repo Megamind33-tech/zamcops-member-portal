@@ -6,7 +6,7 @@ import { Bell, Send } from "lucide-react";
 import { toast } from "sonner";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel } from "@/components/admin/widgets";
-import { Field, TextInput, TextArea, Select } from "@/components/ui/Field";
+import { Field, Input, Textarea, Select } from "@/components/zam/Input";
 import { useAdminData } from "@/lib/adminClient";
 
 const LINKS = [
@@ -84,7 +84,7 @@ export default function AdminNoticesPage() {
           {audience === "one" && (
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Search members">
-                <TextInput placeholder="Name, number or email" value={q} onChange={(e) => setQ(e.target.value)} />
+                <Input placeholder="Name, number or email" value={q} onChange={(e) => setQ(e.target.value)} />
               </Field>
               <Field label="Member" required>
                 <Select value={memberId} onChange={(e) => setMemberId(e.target.value)}>
@@ -100,10 +100,10 @@ export default function AdminNoticesPage() {
           )}
 
           <Field label="Title" required>
-            <TextInput placeholder="Short subject" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <Input placeholder="Short subject" value={title} onChange={(e) => setTitle(e.target.value)} />
           </Field>
           <Field label="Message" required hint="Shown in the member's Notifications list and, if they opted in, by email/SMS.">
-            <TextArea rows={5} placeholder="What should members know?" value={message} onChange={(e) => setMessage(e.target.value)} />
+            <Textarea rows={5} placeholder="What should members know?" value={message} onChange={(e) => setMessage(e.target.value)} />
           </Field>
           <Field label="Open this page when tapped" hint="Optional. Members land on this portal path from the notice.">
             <Select value={href} onChange={(e) => setHref(e.target.value)}>
@@ -119,20 +119,20 @@ export default function AdminNoticesPage() {
             <button
               type="submit"
               disabled={busy || title.trim().length < 3 || message.trim().length < 8}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 transition hover:bg-accent-400 disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-zam-orange px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zam-orange-dark disabled:opacity-40"
             >
               <Send size={15} /> {busy ? "Sending…" : "Send notice"}
             </button>
-            <p className="inline-flex items-center gap-1.5 text-xs text-night-400">
+            <p className="inline-flex items-center gap-1.5 text-xs text-zam-muted">
               <Bell size={13} /> Delivered to Notifications. Email and SMS follow each member&apos;s preferences.
             </p>
           </div>
         </form>
       </Panel>
 
-      <p className="mt-4 text-xs text-night-400">
+      <p className="mt-4 text-xs text-zam-muted">
         To message one person from their file, open{" "}
-        <Link href="/admin/directory" className="font-semibold text-accent-300 hover:underline">
+        <Link href="/admin/directory" className="font-semibold text-zam-orange hover:underline">
           All Members
         </Link>{" "}
         and compose on their page.

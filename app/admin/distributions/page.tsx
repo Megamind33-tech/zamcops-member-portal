@@ -63,7 +63,7 @@ export default function AdminDistributionsPage() {
         right={
           <button
             onClick={() => setShowNew((v) => !v)}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-accent-500 px-3.5 py-2 text-sm font-semibold text-night-950 transition hover:bg-accent-400"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-zam-orange px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-zam-orange-dark"
           >
             <Plus size={16} /> New period
           </button>
@@ -82,7 +82,7 @@ export default function AdminDistributionsPage() {
           <Panel title="New distribution period">
             <form onSubmit={submitNew} className="grid gap-3 p-5 sm:grid-cols-2">
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-night-300">Period label</span>
+                <span className="mb-1.5 block text-xs font-semibold text-zam-muted">Period label</span>
                 <input
                   value={periodLabel}
                   onChange={(e) => setPeriodLabel(e.target.value)}
@@ -91,7 +91,7 @@ export default function AdminDistributionsPage() {
                 />
               </label>
               <label className="block sm:col-span-2">
-                <span className="mb-1.5 block text-xs font-semibold text-night-300">Notes (optional, internal only)</span>
+                <span className="mb-1.5 block text-xs font-semibold text-zam-muted">Notes (optional, internal only)</span>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -103,7 +103,7 @@ export default function AdminDistributionsPage() {
                 <button
                   type="submit"
                   disabled={creating || !periodLabel.trim()}
-                  className="rounded-xl bg-accent-500 px-4 py-2.5 text-sm font-semibold text-night-950 transition hover:bg-accent-400 disabled:opacity-40"
+                  className="rounded-xl bg-zam-orange px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zam-orange-dark disabled:opacity-40"
                 >
                   {creating ? "Creating…" : "Create draft period"}
                 </button>
@@ -117,7 +117,7 @@ export default function AdminDistributionsPage() {
         <Panel title="Distribution periods">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px]">
-              <thead className="bg-white/[0.03]">
+              <thead className="bg-zam-canvas">
                 <tr>
                   <Th>Period</Th>
                   <Th>Status</Th>
@@ -127,30 +127,30 @@ export default function AdminDistributionsPage() {
                   <Th className="text-right">Actions</Th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.06]">
+              <tbody className="divide-y divide-zam-line">
                 {distributions.map((d) => {
                   const total = d.entries.reduce((s, e) => s + e.amount, 0);
                   return (
-                    <tr key={d.id} className="hover:bg-white/[0.03]">
-                      <Td className="font-semibold text-white">{d.periodLabel}</Td>
+                    <tr key={d.id} className="hover:bg-zam-canvas">
+                      <Td className="font-semibold text-zam-ink">{d.periodLabel}</Td>
                       <Td>
                         <StatusBadge status={d.status} />
                       </Td>
                       <Td>{d.entries.length}</Td>
-                      <Td className="text-accent-300">{formatKwacha(total)}</Td>
-                      <Td className="text-night-300">{d.publishedAt ? formatDate(d.publishedAt) : "—"}</Td>
+                      <Td className="text-zam-orange">{formatKwacha(total)}</Td>
+                      <Td className="text-zam-muted">{d.publishedAt ? formatDate(d.publishedAt) : "—"}</Td>
                       <Td>
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => setSelectedId(selectedId === d.id ? null : d.id)}
-                            className="rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-xs font-semibold text-night-200 transition hover:bg-white/[0.1] hover:text-white"
+                            className="rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink transition hover:bg-zam-canvas hover:text-zam-ink"
                           >
                             {selectedId === d.id ? "Hide entries" : "Manage entries"}
                           </button>
                           {d.status === "Draft" && (
                             <button
                               onClick={() => publish(d.id, d.periodLabel)}
-                              className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/12 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20"
+                              className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/12 px-2.5 py-1.5 text-xs font-semibold text-zam-green transition hover:bg-emerald-500/20"
                             >
                               <Send size={14} /> Publish
                             </button>
@@ -162,7 +162,7 @@ export default function AdminDistributionsPage() {
                 })}
                 {distributions.length === 0 && (
                   <tr>
-                    <Td colSpan={6} className="py-8 text-center text-night-400">
+                    <Td colSpan={6} className="py-8 text-center text-zam-muted">
                       No distribution periods yet — create one to get started.
                     </Td>
                   </tr>
@@ -176,21 +176,21 @@ export default function AdminDistributionsPage() {
           <Panel title={`Entries — ${selected.periodLabel}`} right={<StatusBadge status={selected.status} />}>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px]">
-                <thead className="bg-white/[0.03]">
+                <thead className="bg-zam-canvas">
                   <tr>
                     <Th>Member</Th>
                     <Th>Confirmed payout (ZMW)</Th>
                     <Th className="text-right">Save</Th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.06]">
+                <tbody className="divide-y divide-zam-line">
                   {members.map((m) => {
                     const entry = selected.entries.find((e) => e.ownerId === m.id);
                     const value = drafts[m.id] ?? (entry ? String(entry.amount) : "");
                     return (
-                      <tr key={m.id} className="hover:bg-white/[0.03]">
-                        <Td className="font-semibold text-white">
-                          {m.fullName} <span className="font-normal text-night-400">· {m.memberNumber}</span>
+                      <tr key={m.id} className="hover:bg-zam-canvas">
+                        <Td className="font-semibold text-zam-ink">
+                          {m.fullName} <span className="font-normal text-zam-muted">· {m.memberNumber}</span>
                         </Td>
                         <Td>
                           <input
@@ -205,7 +205,7 @@ export default function AdminDistributionsPage() {
                           <button
                             onClick={() => saveOne(m.id)}
                             disabled={savingId === m.id || !drafts[m.id]}
-                            className="rounded-lg bg-accent-500/15 px-3 py-1.5 text-xs font-semibold text-accent-300 transition hover:bg-accent-500/25 disabled:opacity-40"
+                            className="rounded-lg bg-zam-orange/15 px-3 py-1.5 text-xs font-semibold text-zam-orange transition hover:bg-zam-orange/25 disabled:opacity-40"
                           >
                             {savingId === m.id ? "Saving…" : entry ? "Update" : "Add"}
                           </button>
@@ -216,9 +216,9 @@ export default function AdminDistributionsPage() {
                 </tbody>
               </table>
             </div>
-            <p className="border-t border-white/[0.07] px-5 py-3 text-xs text-night-400">
+            <p className="border-t border-zam-line px-5 py-3 text-xs text-zam-muted">
               Set each member&apos;s confirmed payout, then{" "}
-              <strong className="text-night-200">publish</strong> the period from the table above — that is the moment members are notified and can see their earnings.
+              <strong className="text-zam-ink">publish</strong> the period from the table above — that is the moment members are notified and can see their earnings.
             </p>
           </Panel>
         )}

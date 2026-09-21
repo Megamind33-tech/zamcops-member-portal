@@ -6,7 +6,7 @@
 // (counter-sign & issue the document set), reject, or re-issue documents.
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Check, X, FileDown, RefreshCcw, Save, ScrollText } from "lucide-react";
+import { X, FileDown, RefreshCcw, Save, ScrollText } from "lucide-react";
 import { Panel, StatusBadge } from "@/components/admin/widgets";
 import { formatDate } from "@/lib/format";
 import { FORM_DEFS, ADMIN_FIELDS, type ApplicationFormType } from "@/lib/applicationForms";
@@ -61,16 +61,13 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
     setTimeout(() => setNotice(""), 2500);
   };
 
-  const decide = async (action: "approve" | "reject" | "regenerate") => {
+  const decide = async (action: "reject" | "regenerate") => {
     let reason: string | undefined;
     if (action === "reject") {
       const answer = window.prompt("Why is this application being rejected? The member will see this explanation.", "");
       if (answer === null) return;
       reason = answer.trim();
     }
-    if (action === "approve" && !window.confirm(
-      `Approve this application as a ${membershipClass} member?\n\nThis counter-signs the Deed of Assignment, issues the official document set and activates the membership.`
-    )) return;
 
     setBusy(true);
     setError("");
@@ -87,7 +84,7 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
     return (
       <Panel title="Membership Application">
         <div className="grid h-24 place-items-center">
-          <span className="h-6 w-6 animate-spin rounded-full border-2 border-white/15 border-t-brand-400" />
+          <span className="h-6 w-6 animate-spin rounded-full border-2 border-zam-line border-t-zam-orange" />
         </div>
       </Panel>
     );
@@ -96,7 +93,7 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
   if (!application) {
     return (
       <Panel title="Membership Application">
-        <p className="px-5 py-6 text-sm text-night-400">
+        <p className="px-5 py-6 text-sm text-zam-muted">
           This member has not completed the official membership application yet. They fill it in under
           &ldquo;Membership&rdquo; in the member app; it appears here once submitted.
         </p>
@@ -114,17 +111,17 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
       right={<StatusBadge status={s} />}
     >
       <div className="space-y-5 p-5">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-night-300">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-zam-muted">
           {application.submittedAt && <span>Submitted {formatDate(application.submittedAt)}</span>}
           {application.deedAgreedAt && (
             <span className="inline-flex items-center gap-1.5">
-              <ScrollText size={14} className="text-brand-200" /> Deed of Assignment executed{" "}
+              <ScrollText size={14} className="text-zam-blue" /> Deed of Assignment executed{" "}
               {formatDate(application.deedAgreedAt)}
             </span>
           )}
           {application.membershipClass && <span>Class: {application.membershipClass.toUpperCase()}</span>}
           {application.rejectionReason && (
-            <span className="text-red-300">Rejection reason: {application.rejectionReason}</span>
+            <span className="text-zam-red">Rejection reason: {application.rejectionReason}</span>
           )}
         </div>
 
@@ -132,7 +129,7 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
         <div className="grid gap-x-8 gap-y-4 lg:grid-cols-2">
           {def.sections.map((section) => (
             <div key={section.id}>
-              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-night-400">{section.title}</p>
+              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-zam-muted">{section.title}</p>
               <div className="space-y-1">
                 {(section.fields ?? []).map((f) => {
                   if (f.showIf && String(payload[f.showIf.key] ?? "") !== f.showIf.value) return null;
@@ -140,8 +137,8 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
                   const text = Array.isArray(v) ? v.join(", ") : String(v ?? "").trim();
                   return (
                     <div key={f.key} className="flex items-baseline justify-between gap-3 text-sm">
-                      <span className="text-night-400">{f.label}</span>
-                      <span className="text-right font-medium text-white">{text || "—"}</span>
+                      <span className="text-zam-muted">{f.label}</span>
+                      <span className="text-right font-medium text-zam-ink">{text || "—"}</span>
                     </div>
                   );
                 })}
@@ -151,11 +148,11 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
                       ? (payload[section.repeat!.key] as Record<string, string>[])
                       : [];
                     return rows.length === 0 ? (
-                      <p className="text-sm text-night-400">None declared.</p>
+                      <p className="text-sm text-zam-muted">None declared.</p>
                     ) : (
                       <div className="mt-1 space-y-1">
                         {rows.map((row, i) => (
-                          <p key={i} className="text-sm text-white">
+                          <p key={i} className="text-sm text-zam-ink">
                             {section.repeat!.columns.map((c) => row[c.key]).filter(Boolean).join(" · ") || "—"}
                           </p>
                         ))}
@@ -168,8 +165,8 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
         </div>
 
         {/* For official use only */}
-        <div className="rounded-2xl bg-white/[0.03] p-4 ring-1 ring-white/[0.06]">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-night-400">For official use only</p>
+        <div className="rounded-2xl bg-zam-canvas p-4 ring-1 ring-zam-line">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-zam-muted">For official use only</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ADMIN_FIELDS.map((f) => (
               <label key={f.key} className="block">
@@ -187,24 +184,24 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
             <button
               onClick={saveAdminFields}
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.06] px-4 py-2 text-sm font-semibold text-night-300 transition hover:bg-white/[0.1] disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-zam-canvas px-4 py-2 text-sm font-semibold text-zam-muted transition hover:bg-zam-canvas disabled:opacity-40"
             >
               <Save size={15} /> Save internal fields
             </button>
-            {notice && <span className="text-xs font-semibold text-emerald-300">{notice}</span>}
+            {notice && <span className="text-xs font-semibold text-zam-green">{notice}</span>}
           </div>
         </div>
 
         {/* Decision */}
-        <div className="flex flex-wrap items-center gap-3 border-t border-white/[0.06] pt-4">
+        <div className="flex flex-wrap items-center gap-3 border-t border-zam-line pt-4">
           {s === "Submitted" && (
             <>
-              <label className="flex items-center gap-2 text-sm text-night-300">
+              <label className="flex items-center gap-2 text-sm text-zam-muted">
                 Admit as
                 <select
                   value={membershipClass}
                   onChange={(e) => setMembershipClass(e.target.value)}
-                  className="field-input h-10 w-auto appearance-none bg-night-850 pr-8 [&>option]:bg-night-850 [&>option]:text-white"
+                  className="field-input h-10 w-auto appearance-none bg-white pr-8 [&>option]:bg-white [&>option]:text-zam-ink"
                 >
                   {MEMBERSHIP_CLASSES.map((c) => (
                     <option key={c}>{c}</option>
@@ -213,23 +210,19 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
                 member
               </label>
               <button
-                onClick={() => decide("approve")}
-                disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-400/15 px-4 py-2 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-400/25 disabled:opacity-40"
-              >
-                <Check size={15} /> Approve & issue documents
-              </button>
-              <button
                 onClick={() => decide("reject")}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-red-400/15 px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-400/25 disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-red-400/15 px-4 py-2 text-sm font-semibold text-zam-red transition hover:bg-red-400/25 disabled:opacity-40"
               >
                 <X size={15} /> Reject
               </button>
-              <p className="w-full text-xs text-night-400">
-                Approving generates the completed application form, the Deed of Assignment (counter-signed by the Board
-                Secretary) and the admission letter (signed by the General Manager), and makes them downloadable to the
-                member. Both official signatures must be on file under Official Signatures.
+              <p className="w-full text-xs text-zam-muted">
+                There is no approval to give here. The applicant is admitted when the society accepts their first work,
+                so approving a submission under <strong className="font-semibold text-zam-ink">Work Declarations</strong>{" "}
+                is what approves this application — and it issues the completed application form, the Deed of Assignment
+                counter-signed by the Board Secretary, the admission letter signed by the General Manager, and the
+                clearance certificate for that submission. Both official signatures must be on file first. The class
+                chosen above is the one the admission letter will carry.
               </p>
             </>
           )}
@@ -238,21 +231,21 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
               <button
                 onClick={() => decide("regenerate")}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-white/[0.06] px-4 py-2 text-sm font-semibold text-night-300 transition hover:bg-white/[0.1] disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-zam-canvas px-4 py-2 text-sm font-semibold text-zam-muted transition hover:bg-zam-canvas disabled:opacity-40"
               >
                 <RefreshCcw size={15} /> Regenerate documents
               </button>
-              <p className="text-xs text-night-400">
+              <p className="text-xs text-zam-muted">
                 Re-issues the document set with the current data and official signatures — the member&apos;s downloads
                 are replaced.
               </p>
             </>
           )}
-          {s === "Draft" && <p className="text-sm text-night-400">The member is still completing this application.</p>}
+          {s === "Draft" && <p className="text-sm text-zam-muted">The member is still completing this application.</p>}
           {s === "Rejected" && (
-            <p className="text-sm text-night-400">Rejected — the member can correct and resubmit it.</p>
+            <p className="text-sm text-zam-muted">Rejected — the member can correct and resubmit it.</p>
           )}
-          {error && <p className="w-full text-sm font-medium text-red-300">{error}</p>}
+          {error && <p className="w-full text-sm font-medium text-zam-red">{error}</p>}
         </div>
       </div>
     </Panel>
@@ -267,7 +260,7 @@ export function AdminDocDownload({ id, hasFile }: { id: string; hasFile?: boolea
       href={`/api/admin/member-documents/${id}`}
       target="_blank"
       rel="noreferrer"
-      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-night-400 transition hover:bg-white/[0.1] hover:text-white"
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zam-muted transition hover:bg-zam-canvas hover:text-zam-ink"
       aria-label="Download document"
     >
       <FileDown size={15} />

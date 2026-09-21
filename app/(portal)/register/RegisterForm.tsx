@@ -8,6 +8,7 @@ import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { useApp } from "@/lib/store";
 import { MEMBER_ROLES } from "@/lib/roles";
+import { FORM_TYPES, type ApplicationFormType } from "@/lib/applicationForms";
 import type { MemberRole } from "@/types";
 
 const roles: MemberRole[] = [...MEMBER_ROLES];
@@ -22,6 +23,7 @@ export function RegisterForm() {
     phone: "",
     email: "",
     role: "Composer" as MemberRole,
+    membershipType: "Individual" as ApplicationFormType,
     password: "",
     confirm: "",
   });
@@ -54,6 +56,7 @@ export function RegisterForm() {
         phone: form.phone,
         email: form.email,
         role: form.role,
+        membershipType: form.membershipType,
         password: form.password,
       });
       if (res.ok) router.replace("/verify-email");
@@ -68,7 +71,10 @@ export function RegisterForm() {
   return (
     <>
       <h1 className="font-display text-2xl font-semibold text-zam-ink">Create your account</h1>
-      <p className="mt-1 text-sm text-zam-muted">Open to composers, authors and publishers of musical works.</p>
+      <p className="mt-1 text-sm text-zam-muted">
+        Open to composers, authors and publishers of musical works. What you enter here starts your membership
+        application — you will not be asked for it again.
+      </p>
 
       <form onSubmit={submit} className="mt-6">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -80,6 +86,24 @@ export function RegisterForm() {
           </Field>
           <Field label="NRC / passport number">
             <Input placeholder="NRC / passport number" value={form.nrcOrPassport} onChange={set("nrcOrPassport")} />
+          </Field>
+          <Field
+            label="Registering as"
+            hint={
+              form.membershipType === "Individual"
+                ? "One person, in their own name"
+                : form.membershipType === "Group"
+                  ? "A band, choir or ensemble — you register on its behalf"
+                  : "A music publishing company"
+            }
+          >
+            <Select value={form.membershipType} onChange={set("membershipType")}>
+              {FORM_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t === "Individual" ? "An individual" : t === "Group" ? "A group" : "A publisher"}
+                </option>
+              ))}
+            </Select>
           </Field>
           <Field label="You are joining as">
             <Select value={form.role} onChange={set("role")}>
