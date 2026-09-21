@@ -49,11 +49,23 @@ export function splitName(fullName: string): { surname: string; firstName: strin
   return { surname: parts[parts.length - 1], firstName: parts.slice(0, -1).join(" ") };
 }
 
+/**
+ * The district and the province, as an address writes them.
+ *
+ * A Zambian district can carry its province's name — Lusaka district sits in
+ * Lusaka province — and joining the two blindly addressed those members in
+ * "Lusaka, Lusaka". Written out once, the way it would be on an envelope.
+ */
+export function districtProvince(district?: string | null, province?: string | null): string {
+  const d = text(district);
+  const p = text(province);
+  if (d && p && d.toLowerCase() === p.toLowerCase()) return d;
+  return [d, p].filter(Boolean).join(", ");
+}
+
 /** The member's address as the forms want it — street, area, town on one line. */
 export function addressLine(m: MemberLikeAccount): string {
-  return [text(m.address), [text(m.district), text(m.province)].filter(Boolean).join(", ")]
-    .filter(Boolean)
-    .join(", ");
+  return [text(m.address), districtProvince(m.district, m.province)].filter(Boolean).join(", ");
 }
 
 /**

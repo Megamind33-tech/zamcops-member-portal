@@ -21,6 +21,19 @@ const P1 = {
   yearSuffix: { x: 497, y: 599 },
   // The long rule beneath "between", where the assignor is named.
   assignorLine: { centreX: 285, y: 548 },
+  // The assignor's address, centred just under that rule.
+  //
+  // A deed identifies each party by name AND address, and this one already
+  // does so for the Society — "with its registered office at 3rd Floor,
+  // Anchor Hse, Cairo rd, Lusaka" is printed a few lines below. Naming the
+  // member alone left the two parties described unequally on a document that
+  // assigns their rights.
+  //
+  // The band is narrow: the rule's glyphs reach down to y=541.2 and the
+  // "(Hereinafter referred to as..." line beneath tops out at y=526.9, so
+  // there are about 14 points to work in. At 8.5pt this clears the rule above
+  // by roughly 3 and the line below, descenders included, by about 2.
+  assignorAddress: { centreX: 285, y: 531.5, size: 8.5 },
 } as const;
 
 const P3 = {
@@ -35,6 +48,9 @@ const P3 = {
 export interface DeedValues {
   assignorName: string; // the member, as the deed should name them
   assignorMemberNumber?: string;
+  // Written under the name, the way the Society's own address is printed
+  // under its. Omitted rather than left as an empty line when unknown.
+  assignorAddress?: string;
   madeOn: Date | string; // the date the deed was executed
   assignorSignature?: string; // the member's mark, a transparent PNG data URL
   boardSecretarySignature?: string; // the Society's mark
@@ -72,6 +88,19 @@ export function deedStamps(v: DeedValues): Stamp[] {
       maxWidth: 350,
     },
   ];
+
+  const address = (v.assignorAddress || "").trim();
+  if (address) {
+    stamps.push({
+      page: 1,
+      x: P1.assignorAddress.centreX,
+      y: P1.assignorAddress.y,
+      text: address,
+      size: P1.assignorAddress.size,
+      align: "center",
+      maxWidth: 350,
+    });
+  }
 
   if (valid) {
     stamps.push(

@@ -34,7 +34,8 @@ try {
 } catch { /* emitted anyway */ }
 
 const load = (f) => import(pathToFileURL(path.join(build, "lib", f)).href);
-const { prefillFromAccount, withPrefill, splitName } = await load("applicationPrefill.js");
+const { prefillFromAccount, withPrefill, splitName, addressLine, districtProvince } =
+  await load("applicationPrefill.js");
 const { FORM_DEFS, FORM_TYPES } = await load("applicationForms.js");
 
 const MEMBER = {
@@ -98,6 +99,21 @@ if (merged.surname === "Chileshe-Mulenga") ok("an answer the member typed beats 
 else bad(`the account overwrote the member's own surname (${merged.surname})`);
 if (merged.firstName === "Bwalya Mwansa") ok("a blank the member left is still filled from the account");
 else bad(`a blank was not filled from the account (${JSON.stringify(merged.firstName)})`);
+
+// A district that carries its province's name is written once. The specimen
+// member lives in Lusaka district, Lusaka province, and every document that
+// named them — the deed, the admission letter, the certificate — addressed
+// them in "Lusaka, Lusaka".
+if (districtProvince("Lusaka", "Lusaka") === "Lusaka") ok("a district is not repeated as its own province");
+else bad(`district and province read as ${JSON.stringify(districtProvince("Lusaka", "Lusaka"))}`);
+if (districtProvince("Kabwe", "Central") === "Kabwe, Central") ok("a district and a different province are both written");
+else bad(`a distinct district and province read as ${JSON.stringify(districtProvince("Kabwe", "Central"))}`);
+if (districtProvince("", "Lusaka") === "Lusaka") ok("a missing district leaves no stray comma");
+else bad(`a missing district read as ${JSON.stringify(districtProvince("", "Lusaka"))}`);
+
+const addr = addressLine(MEMBER);
+if (!/Lusaka.*Lusaka/.test(addr)) ok(`the address line reads ${JSON.stringify(addr)}`);
+else bad(`the address line repeats the town: ${JSON.stringify(addr)}`);
 
 // Zambian convention: the last word is the surname.
 const one = splitName("Mampi");

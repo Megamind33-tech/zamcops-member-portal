@@ -34,6 +34,7 @@ import {
   CLEARANCE_CERTIFICATE_TITLE,
   WORK_DECLARATION_TITLE,
 } from "@/lib/workDeedText";
+import { districtProvince } from "@/lib/applicationPrefill";
 import { normalizeContributorRole } from "@/lib/roles";
 import { renderOfficialForm, formDate } from "@/lib/officialForms/render";
 import {
@@ -147,7 +148,7 @@ function registeringMember(p: ReturnType<typeof letterhead>, member: MemberLike)
   labelValueRow(
     p,
     "Address",
-    [member.address, [member.district, member.province].filter(Boolean).join(", ")].filter(Boolean).join(" · "),
+    [member.address, districtProvince(member.district, member.province)].filter(Boolean).join(" · "),
   );
 }
 
