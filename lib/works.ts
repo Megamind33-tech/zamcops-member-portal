@@ -1,4 +1,4 @@
-import type { OwnershipSplit, WorkType } from "@/types";
+import type { OwnershipSplit, UploadFile, WorkType } from "@/types";
 
 export const WORK_TYPES = ["Song", "Instrumental", "Arrangement"] as const;
 
@@ -131,4 +131,37 @@ export function applyKnownMembers(
     }
     return { ...s, knownMember: false, memberId: undefined, memberNumber: "" };
   });
+}
+
+/**
+ * The upload holding a work's audio, so a reviewer can hear it before accepting.
+ *
+ * A work records the audio's file NAME, not the upload's id — the member picks
+ * a file and the row stores what they attached — so the way back is the owner
+ * plus that name. Within one member's uploads a name is specific enough: the
+ * same person does not lodge two different recordings under one filename.
+ *
+ * `linkedTo` is the fallback. It holds the title the work had when the file
+ * went up, which still finds the audio if the member renamed the file after
+ * attaching it. It is second because a title can be edited too, and two works
+ * can briefly share one.
+ *
+ * Uploads with no stored binary are skipped: a row with nothing behind it
+ * would give the reviewer a player that plays silence, which is worse than
+ * telling them the audio is missing.
+ */
+export function audioUploadFor(
+  work: { ownerId: string; title: string; audioFile?: string },
+  uploads: UploadFile[],
+): UploadFile | undefined {
+  const mine = uploads.filter(
+    (u) => u.ownerId === work.ownerId && u.fileType === "Audio" && u.hasFile,
+  );
+  const name = (work.audioFile || "").trim();
+  if (name) {
+    const byName = mine.find((u) => u.fileName === name);
+    if (byName) return byName;
+  }
+  const title = work.title.trim();
+  return title ? mine.find((u) => (u.linkedTo || "").trim() === title) : undefined;
 }
