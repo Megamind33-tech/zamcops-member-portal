@@ -29,12 +29,16 @@ export function DocumentUpload({
   value,
   onChange,
   linkedTo,
+  // What the upload is filed as. Staff screens look a document up by its type,
+  // so a lyric sheet filed as a generic "Document" is stored but not found.
+  fileType = "Document",
 }: {
   label: string;
   hint?: string;
   value?: string;
   onChange: (fileName: string) => void;
   linkedTo?: string;
+  fileType?: "Document" | "Lyrics";
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -48,7 +52,7 @@ export function DocumentUpload({
       body: JSON.stringify({
         url: storedUrl,
         fileName: file.name,
-        fileType: "Document",
+        fileType,
         fileSize: file.size,
         mimeType: file.type,
         linkedTo: linkedTo || "",
@@ -84,7 +88,7 @@ export function DocumentUpload({
   const inlineUpload = async (file: File): Promise<string> => {
     if (file.size > INLINE_MAX)
       throw new Error(`File is too large (${prettySize(file.size)}). Storage isn't connected — max 4MB without it.`);
-    const qs = new URLSearchParams({ type: "Document", name: file.name, linkedTo: linkedTo || "" });
+    const qs = new URLSearchParams({ type: fileType, name: file.name, linkedTo: linkedTo || "" });
     const res = await fetch(`/api/member/upload?${qs.toString()}`, {
       method: "POST",
       headers: { "Content-Type": file.type || "application/octet-stream" },

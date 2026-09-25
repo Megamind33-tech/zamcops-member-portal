@@ -123,6 +123,7 @@ export function workDTO(w: any): WorkDeclaration {
     audioFile: w.audioFile,
     coverArt: w.coverArt || undefined,
     studioReceipt: studioFrom(w),
+    lyricsFile: w.lyricsFile || undefined,
     dateCreated: w.dateCreated,
     status: w.status,
     rejectionReason: w.rejectionReason || undefined,

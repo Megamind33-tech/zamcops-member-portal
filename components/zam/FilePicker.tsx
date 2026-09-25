@@ -11,6 +11,18 @@ import {
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
+// CAUTION: this control does NOT upload anything. It records the name of the
+// file the user chose and throws the file itself away — note that handleFiles
+// below reads `files[0].name` and nothing else, and that it shows "Ready to
+// submit" regardless. Anywhere it stood in for a real upload, members attached
+// a document, were told it was ready, and staff later found nothing to open.
+//
+// It remains only for the staff console's "attach a document" panel, whose
+// endpoint (app/api/admin/member-documents) stores a file name and has no way
+// to accept a binary. Give that endpoint one and this component should go.
+//
+// For anything a member submits, use DocumentUpload, AudioUpload or
+// CoverUpload, which put the bytes somewhere staff can read them.
 type Kind = "audio" | "image" | "document";
 
 const iconMap: Record<Kind, React.ReactNode> = {
