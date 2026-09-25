@@ -146,6 +146,7 @@ export interface WorkDeclaration {
   iswc?: string;
   audioFile?: string; // reference recording — file name
   studioReceipt?: string; // studio letter or receipt — required
+  lyricsFile?: string; // lyric sheet, if one was lodged
   dateCreated: string;
   // Carried by the society's official WORK DECLARATION form.
   instruments?: string;

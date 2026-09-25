@@ -179,13 +179,14 @@ export function audioUploadFor(
   return uploadFor(work, uploads, "Audio", work.audioFile);
 }
 
-/** Every document lodged with a work: the studio letter, then each party's
- *  affirmation letter, named by the party who is vouched for. */
+/** Every document lodged with a work: the studio letter, the lyric sheet, then
+ *  each party's affirmation letter, named by the party who is vouched for. */
 export function workDocumentsFor(
   work: {
     ownerId: string;
     title: string;
     studioReceipt?: string;
+    lyricsFile?: string;
     ownershipSplits?: { party?: string; affirmationLetter?: string }[];
   },
   uploads: UploadFile[],
@@ -198,6 +199,15 @@ export function workDocumentsFor(
       label: "Studio letter",
       fileName: receipt,
       upload: uploadFor(work, uploads, "Document", receipt, `${work.title} — studio receipt`),
+    });
+  }
+
+  const lyrics = (work.lyricsFile || "").trim();
+  if (lyrics) {
+    out.push({
+      label: "Lyrics",
+      fileName: lyrics,
+      upload: uploadFor(work, uploads, "Lyrics", lyrics, `${work.title} — lyrics`),
     });
   }
 

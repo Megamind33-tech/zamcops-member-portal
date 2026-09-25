@@ -67,6 +67,7 @@ export async function POST(req: Request) {
   const workType = normalizeWorkType(b.workType);
   const studioReceipt = String(b.studioReceipt).trim();
   const coverArt = String(b.coverArt ?? "");
+  const lyricsFile = String(b.lyricsFile ?? "").trim();
 
   let work;
   try {
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
         audioFile: b.audioFile ?? "",
         coverArt,
         studioReceipt,
+        lyricsFile,
         dateCreated: b.dateCreated ?? "",
         // A single is a batch of one, so it is work 1 of its own submission.
         // The form's "Work No" box is never blank on a member's copy.

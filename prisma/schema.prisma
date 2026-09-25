@@ -156,6 +156,7 @@ model WorkDeclaration {
   audioFile        String @default("") // reference recording — file name
   coverArt         String @default("") // sleeve / cover artwork (data URL or storage URL)
   studioReceipt    String @default("") // studio letter or payment receipt
+  lyricsFile       String @default("") // lyric sheet lodged with the work
   dateCreated      String @default("")
 
   // Fields carried by the society's official WORK DECLARATION form.

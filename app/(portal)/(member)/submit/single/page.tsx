@@ -12,7 +12,6 @@ import { SplitsEditor } from "@/components/zam/SplitsEditor";
 import { AudioUpload } from "@/components/zam/AudioUpload";
 import { CoverUpload } from "@/components/zam/CoverUpload";
 import { DocumentUpload } from "@/components/zam/DocumentUpload";
-import { FilePicker } from "@/components/zam/FilePicker";
 import { SubmitSuccess } from "@/components/zam/SubmitSuccess";
 import { useApp } from "@/lib/store";
 import { GENRES, LANGUAGES } from "@/data/reference";
@@ -203,11 +202,13 @@ export default function RegisterWorkScreen() {
                 onChange={setStudioReceipt}
                 linkedTo={`${form.title || "Work"} — studio receipt`}
               />
-              <FilePicker
+              <DocumentUpload
                 label="Lyrics (optional)"
-                kind="document"
+                hint="The lyric sheet, if you have one"
+                fileType="Lyrics"
                 value={form.lyricsFile}
-                onChange={(name) => setForm((f) => ({ ...f, lyricsFile: name ?? "" }))}
+                onChange={(name) => setForm((f) => ({ ...f, lyricsFile: name }))}
+                linkedTo={`${form.title || "Work"} — lyrics`}
               />
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="ISRC" hint="Recording identifier, if known">

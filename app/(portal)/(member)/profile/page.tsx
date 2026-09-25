@@ -8,7 +8,7 @@ import { Card, CardHeader } from "@/components/zam/Card";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { Button } from "@/components/zam/Button";
 import { Progress } from "@/components/zam/Misc";
-import { FilePicker } from "@/components/zam/FilePicker";
+import { DocumentUpload } from "@/components/zam/DocumentUpload";
 import { ImageUpload } from "@/components/zam/ImageUpload";
 import { SignaturePad } from "@/components/member/SignaturePad";
 import { useApp } from "@/lib/store";
@@ -256,12 +256,12 @@ export default function ProfileScreen() {
             description="Used to confirm your membership application"
           />
           <div className="p-5">
-            <FilePicker
+            <DocumentUpload
               label="NRC / Passport copy"
               hint="PDF or image"
-              kind="document"
               value={form.nrcDocument}
               onChange={setFile("nrcDocument")}
+              linkedTo="NRC / Passport copy"
             />
           </div>
         </Card>
