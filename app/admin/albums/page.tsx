@@ -44,7 +44,12 @@ export default function AdminAlbumsPage() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={a.coverArt} alt={`${a.title} cover`} className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-zam-line" />
                       ) : (
-                        <CoverArt src={a.coverArt} seed={a.title} size={40} rounded="rounded-lg" />
+                        <CoverArt
+                          src={a.coverArt ? `/api/admin/media/album/${a.id}` : undefined}
+                          seed={a.title}
+                          size={40}
+                          rounded="rounded-lg"
+                        />
                       )}
                       <div className="min-w-0">
                         {a.title}

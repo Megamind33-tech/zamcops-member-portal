@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { FileText, Play, Square, Trash2 } from "lucide-react";
+import { Download, FileText, Play, Square, Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { CoverArt } from "@/components/media/CoverArt";
 import { Illustration } from "@/components/media/Illustration";
 import { cn, formatDate } from "@/lib/format";
-import { audioUploadFor, shareOf } from "@/lib/works";
+import { audioUploadFor, shareOf, workDocumentsFor } from "@/lib/works";
 import type { OwnershipSplit, UploadFile } from "@/types";
 
 // What a reviewer actually decides on: is the studio letter there, and is every
@@ -18,11 +18,13 @@ import type { OwnershipSplit, UploadFile } from "@/types";
 function EvidenceCell({
   work,
   audio,
+  hasFiles,
   open,
   onToggle,
 }: {
   work: { studioReceipt?: string; ownershipSplits: OwnershipSplit[] };
   audio?: UploadFile;
+  hasFiles: boolean;
   open: boolean;
   onToggle: () => void;
 }) {
@@ -45,18 +47,16 @@ function EvidenceCell({
         )
         .join("\n")}
     >
-      {audio ? (
+      {!audio && <span className="block font-semibold text-zam-red">No audio to play</span>}
+      {hasFiles && (
         <button
           type="button"
           onClick={onToggle}
-          title={`Play ${audio.fileName}`}
           className="mb-1 inline-flex items-center gap-1 rounded-md bg-zam-orange-soft px-2 py-1 text-[11px] font-semibold text-zam-orange transition hover:bg-zam-orange/20"
         >
           {open ? <Square size={11} /> : <Play size={11} />}
-          {open ? "Close player" : "Listen"}
+          {open ? "Close files" : audio ? "Listen & files" : "Open files"}
         </button>
-      ) : (
-        <span className="mb-1 block font-semibold text-zam-red">No audio to play</span>
       )}
       <span className={cn("block truncate", work.studioReceipt ? "text-zam-ink" : "text-zam-red")}>
         {work.studioReceipt ? "Studio letter on file" : "No studio receipt"}
@@ -106,13 +106,21 @@ export default function AdminWorksPage() {
             <tbody className="divide-y divide-zam-line">
               {works.map((w) => {
                 const audio = audioUploadFor(w, uploads);
-                const open = listening === w.id && !!audio;
+                const docs = workDocumentsFor(w, uploads);
+                const cover = w.coverArt ? `/api/admin/media/work/${w.id}` : "";
+                const hasFiles = !!audio || !!cover || docs.length > 0;
+                const open = listening === w.id && hasFiles;
                 return (
                 <React.Fragment key={w.id}>
                 <tr className="hover:bg-zam-canvas">
                   <Td className="font-semibold text-zam-ink">
                     <div className="flex items-center gap-3">
-                      <CoverArt src={w.coverArt} seed={w.title} size={40} rounded="rounded-lg" />
+                      <CoverArt
+                        src={w.coverArt ? `/api/admin/media/work/${w.id}` : undefined}
+                        seed={w.title}
+                        size={40}
+                        rounded="rounded-lg"
+                      />
                       <div className="min-w-0">
                         {w.title}
                         <span className="block text-xs font-normal text-zam-muted">
@@ -151,6 +159,7 @@ export default function AdminWorksPage() {
                     <EvidenceCell
                       work={w}
                       audio={audio}
+                      hasFiles={hasFiles}
                       open={open}
                       onToggle={() => setListening(open ? null : w.id)}
                     />
@@ -186,30 +195,93 @@ export default function AdminWorksPage() {
                     </div>
                   </Td>
                 </tr>
-                {open && audio && (
+                {open && (
                   <tr className="bg-zam-canvas/70">
-                    <Td colSpan={8} className="py-2">
-                      <div className="flex flex-wrap items-center gap-3">
-                        {/* Streamed from /api/admin/files/<id>, which honours Range
-                            requests, so staff can scrub a 40MB master rather than
-                            wait for the whole file. */}
-                        <audio
-                          controls
-                          autoPlay
-                          preload="metadata"
-                          src={`/api/admin/files/${audio.id}`}
-                          className="h-9 w-[340px] max-w-full"
-                        />
-                        <span className="text-xs text-zam-muted">
-                          <span className="block max-w-[260px] truncate font-mono">{audio.fileName}</span>
-                          {audio.fileSize ? <span>{(audio.fileSize / 1024 / 1024).toFixed(2)} MB</span> : null}
-                        </span>
-                        <a
-                          href={`/api/admin/files/${audio.id}?download=1`}
-                          className="rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink ring-1 ring-zam-line transition hover:bg-zam-line/60"
-                        >
-                          Download
-                        </a>
+                    <Td colSpan={8} className="py-3">
+                      {/* Capped so the panel wraps inside the visible area: the table itself
+                          is wider than the window and scrolls sideways, and a row of
+                          files laid out across its full width puts the last of them
+                          off-screen. */}
+                      <div className="flex max-w-[860px] flex-wrap items-start gap-x-5 gap-y-3">
+                        {audio && (
+                          <div className="flex flex-wrap items-center gap-3">
+                            {/* Streamed from /api/admin/files/<id>, which honours
+                                Range requests, so staff can scrub a 40MB master
+                                rather than wait for the whole file. */}
+                            <audio
+                              controls
+                              autoPlay
+                              preload="metadata"
+                              src={`/api/admin/files/${audio.id}`}
+                              className="h-9 w-[340px] max-w-full"
+                            />
+                            <span className="text-xs text-zam-muted">
+                              <span className="block max-w-[260px] truncate font-mono">{audio.fileName}</span>
+                              {audio.fileSize ? <span>{(audio.fileSize / 1024 / 1024).toFixed(2)} MB</span> : null}
+                            </span>
+                            <a
+                              href={`/api/admin/files/${audio.id}?download=1`}
+                              className="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-zam-ink ring-1 ring-zam-line transition hover:bg-zam-line/40"
+                            >
+                              <Download size={12} /> Audio
+                            </a>
+                          </div>
+                        )}
+
+                        {cover && (
+                          <div className="flex items-center gap-2">
+                            <a href={cover} target="_blank" rel="noreferrer" title="Open the artwork full size">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={cover}
+                                alt={`Artwork for ${w.title}`}
+                                className="h-16 w-16 rounded-lg object-cover ring-1 ring-zam-line"
+                              />
+                            </a>
+                            <a
+                              href={`${cover}?download=1`}
+                              className="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-zam-ink ring-1 ring-zam-line transition hover:bg-zam-line/40"
+                            >
+                              <Download size={12} /> Artwork
+                            </a>
+                          </div>
+                        )}
+
+                        {docs.length > 0 && (
+                          <div className="space-y-1">
+                            {docs.map((d) => (
+                              <div key={`${d.label}-${d.fileName}`} className="flex items-center gap-2 text-xs">
+                                <span className="text-zam-muted">{d.label}:</span>
+                                {d.upload ? (
+                                  <>
+                                    <a
+                                      href={`/api/admin/files/${d.upload.id}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="max-w-[200px] truncate font-semibold text-zam-orange hover:underline"
+                                    >
+                                      {d.fileName}
+                                    </a>
+                                    <a
+                                      href={`/api/admin/files/${d.upload.id}?download=1`}
+                                      title={`Download ${d.fileName}`}
+                                      className="text-zam-muted hover:text-zam-ink"
+                                    >
+                                      <Download size={12} />
+                                    </a>
+                                  </>
+                                ) : (
+                                  // Named on the declaration, but no file was ever
+                                  // stored for it — the reviewer should know the
+                                  // difference between "not lodged" and "not shown".
+                                  <span className="font-semibold text-zam-red">
+                                    {d.fileName} — not uploaded
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </Td>
                   </tr>

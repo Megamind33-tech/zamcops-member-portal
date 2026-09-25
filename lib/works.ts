@@ -134,34 +134,82 @@ export function applyKnownMembers(
 }
 
 /**
- * The upload holding a work's audio, so a reviewer can hear it before accepting.
+ * The upload holding one of a work's attachments, so a reviewer can open it.
  *
- * A work records the audio's file NAME, not the upload's id — the member picks
- * a file and the row stores what they attached — so the way back is the owner
- * plus that name. Within one member's uploads a name is specific enough: the
- * same person does not lodge two different recordings under one filename.
+ * A work records each attachment's file NAME, not the upload's id — the member
+ * picks a file and the row stores what they attached — so the way back is the
+ * owner plus that name. Within one member's uploads a name is specific enough:
+ * the same person does not lodge two different files under one filename.
  *
  * `linkedTo` is the fallback. It holds the title the work had when the file
- * went up, which still finds the audio if the member renamed the file after
- * attaching it. It is second because a title can be edited too, and two works
- * can briefly share one.
+ * went up, which still finds the attachment if the member renamed the file
+ * after attaching it. It is second because a title can be edited too, and two
+ * works can briefly share one.
  *
- * Uploads with no stored binary are skipped: a row with nothing behind it
- * would give the reviewer a player that plays silence, which is worse than
- * telling them the audio is missing.
+ * Uploads with no stored binary are skipped, and that is not a detail. A work
+ * creates a second, empty row for its studio receipt alongside the real one
+ * the upload widget already wrote, so matching on the name alone finds a row
+ * with nothing behind it about half the time. A reviewer given a link that
+ * downloads nothing is worse off than one told the file is missing.
  */
-export function audioUploadFor(
-  work: { ownerId: string; title: string; audioFile?: string },
+export function uploadFor(
+  work: { ownerId: string; title: string },
   uploads: UploadFile[],
+  fileType: UploadFile["fileType"],
+  fileName?: string,
+  linkedTo?: string,
 ): UploadFile | undefined {
   const mine = uploads.filter(
-    (u) => u.ownerId === work.ownerId && u.fileType === "Audio" && u.hasFile,
+    (u) => u.ownerId === work.ownerId && u.fileType === fileType && u.hasFile,
   );
-  const name = (work.audioFile || "").trim();
+  const name = (fileName || "").trim();
   if (name) {
     const byName = mine.find((u) => u.fileName === name);
     if (byName) return byName;
   }
-  const title = work.title.trim();
-  return title ? mine.find((u) => (u.linkedTo || "").trim() === title) : undefined;
+  const tag = (linkedTo || work.title).trim();
+  return tag ? mine.find((u) => (u.linkedTo || "").trim() === tag) : undefined;
+}
+
+/** The recording, so a reviewer can hear a work before accepting it. */
+export function audioUploadFor(
+  work: { ownerId: string; title: string; audioFile?: string },
+  uploads: UploadFile[],
+): UploadFile | undefined {
+  return uploadFor(work, uploads, "Audio", work.audioFile);
+}
+
+/** Every document lodged with a work: the studio letter, then each party's
+ *  affirmation letter, named by the party who is vouched for. */
+export function workDocumentsFor(
+  work: {
+    ownerId: string;
+    title: string;
+    studioReceipt?: string;
+    ownershipSplits?: { party?: string; affirmationLetter?: string }[];
+  },
+  uploads: UploadFile[],
+): { label: string; fileName: string; upload?: UploadFile }[] {
+  const out: { label: string; fileName: string; upload?: UploadFile }[] = [];
+
+  const receipt = (work.studioReceipt || "").trim();
+  if (receipt) {
+    out.push({
+      label: "Studio letter",
+      fileName: receipt,
+      upload: uploadFor(work, uploads, "Document", receipt, `${work.title} — studio receipt`),
+    });
+  }
+
+  for (const s of work.ownershipSplits ?? []) {
+    const letter = (s.affirmationLetter || "").trim();
+    if (!letter) continue;
+    out.push({
+      label: `Affirmation — ${(s.party || "party").trim()}`,
+      fileName: letter,
+      upload: uploadFor(work, uploads, "Document", letter),
+    });
+  }
+
+  return out;
 }

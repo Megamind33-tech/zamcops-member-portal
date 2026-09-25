@@ -39,7 +39,12 @@ export default function AdminSongsPage() {
                 <tr key={s.id} className="hover:bg-zam-canvas">
                   <Td className="font-semibold text-zam-ink">
                     <div className="flex items-center gap-3">
-                      <CoverArt src={s.coverArt} seed={s.title} size={40} rounded="rounded-lg" />
+                      <CoverArt
+                          src={s.coverArt ? `/api/admin/media/song/${s.id}` : undefined}
+                          seed={s.title}
+                          size={40}
+                          rounded="rounded-lg"
+                        />
                       <span>{s.title}</span>
                     </div>
                   </Td>
