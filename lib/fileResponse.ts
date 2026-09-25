@@ -105,13 +105,26 @@ export async function storedFileResponse(
 
   if (!file.data) return bad("This document has no downloadable file.", 404);
 
+  // The inline fallback answers Range like the other two drivers. It is decoded
+  // whole either way — the row is capped at a few megabytes — but a player that
+  // asks for a window and is handed the entire file back cannot seek, and staff
+  // reviewing a submission scrub through it rather than listen start to finish.
   const bytes = Buffer.from(file.data, "base64");
-  return new Response(new Uint8Array(bytes), {
-    headers: {
-      "Content-Type": contentType,
-      "Content-Length": String(bytes.length),
-      "Content-Disposition": disposition,
-      "Cache-Control": "private, no-store",
-    },
+  const headers = new Headers({
+    "Content-Type": contentType,
+    "Content-Disposition": disposition,
+    "Accept-Ranges": "bytes",
+    "Cache-Control": "private, no-store",
   });
+
+  const range = parseRange(opts.range, bytes.length);
+  if (range) {
+    const slice = bytes.subarray(range.start, range.end + 1);
+    headers.set("Content-Length", String(slice.length));
+    headers.set("Content-Range", `bytes ${range.start}-${range.end}/${bytes.length}`);
+    return new Response(new Uint8Array(slice), { status: 206, headers });
+  }
+
+  headers.set("Content-Length", String(bytes.length));
+  return new Response(new Uint8Array(bytes), { headers });
 }

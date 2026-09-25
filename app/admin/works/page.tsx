@@ -1,21 +1,31 @@
 "use client";
 
 import React from "react";
-import { FileText, Trash2 } from "lucide-react";
+import { FileText, Play, Square, Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { CoverArt } from "@/components/media/CoverArt";
 import { Illustration } from "@/components/media/Illustration";
 import { cn, formatDate } from "@/lib/format";
-import { shareOf } from "@/lib/works";
-import type { OwnershipSplit } from "@/types";
+import { audioUploadFor, shareOf } from "@/lib/works";
+import type { OwnershipSplit, UploadFile } from "@/types";
 
 // What a reviewer actually decides on: is the studio letter there, and is every
 // party either a member on file or backed by an NRC and an affirmation letter.
 // Listing one line per party repeated the Splits column beside it and made the
 // row as tall as the work had contributors.
-function EvidenceCell({ work }: { work: { studioReceipt?: string; ownershipSplits: OwnershipSplit[] } }) {
+function EvidenceCell({
+  work,
+  audio,
+  open,
+  onToggle,
+}: {
+  work: { studioReceipt?: string; ownershipSplits: OwnershipSplit[] };
+  audio?: UploadFile;
+  open: boolean;
+  onToggle: () => void;
+}) {
   const splits = work.ownershipSplits ?? [];
   const onFile = splits.filter((s) => s.knownMember || s.memberNumber);
   const short = splits.filter(
@@ -35,6 +45,19 @@ function EvidenceCell({ work }: { work: { studioReceipt?: string; ownershipSplit
         )
         .join("\n")}
     >
+      {audio ? (
+        <button
+          type="button"
+          onClick={onToggle}
+          title={`Play ${audio.fileName}`}
+          className="mb-1 inline-flex items-center gap-1 rounded-md bg-zam-orange-soft px-2 py-1 text-[11px] font-semibold text-zam-orange transition hover:bg-zam-orange/20"
+        >
+          {open ? <Square size={11} /> : <Play size={11} />}
+          {open ? "Close player" : "Listen"}
+        </button>
+      ) : (
+        <span className="mb-1 block font-semibold text-zam-red">No audio to play</span>
+      )}
       <span className={cn("block truncate", work.studioReceipt ? "text-zam-ink" : "text-zam-red")}>
         {work.studioReceipt ? "Studio letter on file" : "No studio receipt"}
       </span>
@@ -49,8 +72,12 @@ function EvidenceCell({ work }: { work: { studioReceipt?: string; ownershipSplit
 }
 
 export default function AdminWorksPage() {
-  const { works, members, setReviewStatus, reissueWorkDocuments, deleteSubmission } = useAdminData();
+  const { works, members, uploads, setReviewStatus, reissueWorkDocuments, deleteSubmission } = useAdminData();
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
+
+  // Which row has its player open. One at a time, so opening a second work
+  // stops the first rather than leaving two recordings playing over each other.
+  const [listening, setListening] = React.useState<string | null>(null);
 
   const del = async (id: string, title: string) => {
     if (!window.confirm(`Permanently delete the declaration “${title}”? This removes it from the member's repertoire and can't be undone.`))
@@ -77,8 +104,12 @@ export default function AdminWorksPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zam-line">
-              {works.map((w) => (
-                <tr key={w.id} className="hover:bg-zam-canvas">
+              {works.map((w) => {
+                const audio = audioUploadFor(w, uploads);
+                const open = listening === w.id && !!audio;
+                return (
+                <React.Fragment key={w.id}>
+                <tr className="hover:bg-zam-canvas">
                   <Td className="font-semibold text-zam-ink">
                     <div className="flex items-center gap-3">
                       <CoverArt src={w.coverArt} seed={w.title} size={40} rounded="rounded-lg" />
@@ -117,7 +148,12 @@ export default function AdminWorksPage() {
                     </div>
                   </Td>
                   <Td className="text-xs">
-                    <EvidenceCell work={w} />
+                    <EvidenceCell
+                      work={w}
+                      audio={audio}
+                      open={open}
+                      onToggle={() => setListening(open ? null : w.id)}
+                    />
                   </Td>
                   <Td className="whitespace-nowrap text-zam-muted">{formatDate(w.submittedAt)}</Td>
                   <Td>
@@ -150,7 +186,37 @@ export default function AdminWorksPage() {
                     </div>
                   </Td>
                 </tr>
-              ))}
+                {open && audio && (
+                  <tr className="bg-zam-canvas/70">
+                    <Td colSpan={8} className="py-2">
+                      <div className="flex flex-wrap items-center gap-3">
+                        {/* Streamed from /api/admin/files/<id>, which honours Range
+                            requests, so staff can scrub a 40MB master rather than
+                            wait for the whole file. */}
+                        <audio
+                          controls
+                          autoPlay
+                          preload="metadata"
+                          src={`/api/admin/files/${audio.id}`}
+                          className="h-9 w-[340px] max-w-full"
+                        />
+                        <span className="text-xs text-zam-muted">
+                          <span className="block max-w-[260px] truncate font-mono">{audio.fileName}</span>
+                          {audio.fileSize ? <span>{(audio.fileSize / 1024 / 1024).toFixed(2)} MB</span> : null}
+                        </span>
+                        <a
+                          href={`/api/admin/files/${audio.id}?download=1`}
+                          className="rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink ring-1 ring-zam-line transition hover:bg-zam-line/60"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </Td>
+                  </tr>
+                )}
+                </React.Fragment>
+                );
+              })}
               {works.length === 0 && (
                 <tr>
                   <Td className="py-8 text-center text-zam-muted">
