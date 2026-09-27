@@ -1,16 +1,17 @@
 "use client";
 
 import React from "react";
-import { Trash2 } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { CoverArt } from "@/components/media/CoverArt";
 import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
+import { uploadFor } from "@/lib/works";
 
 export default function AdminAlbumsPage() {
-  const { albums, setReviewStatus, deleteSubmission } = useAdminData();
+  const { albums, uploads, setReviewStatus, deleteSubmission } = useAdminData();
 
   const del = async (id: string, title: string) => {
     if (!window.confirm(`Permanently delete the album “${title}”? This can't be undone.`)) return;
@@ -36,7 +37,11 @@ export default function AdminAlbumsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zam-line">
-              {albums.map((a) => (
+              {albums.map((a) => {
+                const receipt = a.studioReceipt
+                  ? uploadFor({ ownerId: a.ownerId, title: a.title }, uploads, "Document", a.studioReceipt)
+                  : undefined;
+                return (
                 <tr key={a.id} className="align-top hover:bg-zam-canvas">
                   <Td className="font-semibold text-zam-ink">
                     <div className="flex items-center gap-3">
@@ -61,7 +66,31 @@ export default function AdminAlbumsPage() {
                   </Td>
                   <Td>{a.artistName}</Td>
                   <Td>{a.tracks.length}</Td>
-                  <Td className="text-xs text-zam-muted">{a.studioReceipt || "—"}</Td>
+                  <Td className="text-xs">
+                    {!a.studioReceipt ? (
+                      <span className="font-semibold text-zam-red">No studio receipt</span>
+                    ) : receipt ? (
+                      <span className="flex items-center gap-1.5">
+                        <a
+                          href={`/api/admin/files/${receipt.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="max-w-[140px] truncate font-semibold text-zam-orange hover:underline"
+                        >
+                          {a.studioReceipt}
+                        </a>
+                        <a
+                          href={`/api/admin/files/${receipt.id}?download=1`}
+                          title={`Download ${a.studioReceipt}`}
+                          className="text-zam-muted hover:text-zam-ink"
+                        >
+                          <Download size={12} />
+                        </a>
+                      </span>
+                    ) : (
+                      <span className="font-semibold text-zam-red">{a.studioReceipt} — not uploaded</span>
+                    )}
+                  </Td>
                   <Td className="text-zam-muted">{a.releaseDate ? formatDate(a.releaseDate) : "—"}</Td>
                   <Td className="text-zam-muted">{formatDate(a.submittedAt)}</Td>
                   <Td>
@@ -85,7 +114,8 @@ export default function AdminAlbumsPage() {
                     </div>
                   </Td>
                 </tr>
-              ))}
+                );
+              })}
               {albums.length === 0 && (
                 <tr>
                   <Td className="py-8 text-center text-zam-muted">
