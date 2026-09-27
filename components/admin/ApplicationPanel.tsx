@@ -221,7 +221,7 @@ export function ApplicationPanel({ ownerId, onDecided }: { ownerId: string; onDe
                 so approving a submission under <strong className="font-semibold text-zam-ink">Work Declarations</strong>{" "}
                 is what approves this application — and it issues the completed application form, the Deed of Assignment
                 counter-signed by the Board Secretary, the admission letter signed by the General Manager, and the
-                clearance certificate for that submission. Both official signatures must be on file first. The class
+                clearance letter for that submission. Both official signatures must be on file first. The class
                 chosen above is the one the admission letter will carry.
               </p>
             </>

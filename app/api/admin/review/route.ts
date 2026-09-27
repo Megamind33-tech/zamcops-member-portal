@@ -43,7 +43,7 @@ export async function PATCH(req: Request) {
 
   const label = LABELS[kind];
 
-  // Accepting a work onto the register issues the clearance certificate for
+  // Accepting a work onto the register issues the clearance letter for
   // the submission it came in with, and — when it is the member's first — it
   // admits them, which is what approves their membership application and
   // issues the deed, the form and the admission letter alongside it.
@@ -80,9 +80,9 @@ export async function PATCH(req: Request) {
         status === "Rejected"
           ? `Your ${label.toLowerCase()} “${title}” was rejected${reason ? `: ${reason}` : "."}`
           : issued?.admitted
-            ? `“${title}” has been accepted onto the ZAMCOPS register, and you are now a CANDIDATE member. Your membership application, Deed of Assignment, admission letter and the clearance certificate covering ${covers} are under My Documents.`
+            ? `“${title}” has been accepted onto the ZAMCOPS register, and you are now a CANDIDATE member. Your membership application, Deed of Assignment, admission letter and the clearance letter covering ${covers} are under My Documents.`
             : issued
-              ? `“${title}” is now entered in the ZAMCOPS register of works. The clearance certificate covering ${covers} is under My Documents.`
+              ? `“${title}” is now entered in the ZAMCOPS register of works. The clearance letter covering ${covers} is under My Documents.`
               : `Your ${label.toLowerCase()} “${title}” has been ${status.toLowerCase()}.`,
       type: status === "Approved" ? "success" : "warning",
       href: issued ? "/documents" : "/works",
@@ -98,7 +98,7 @@ export async function PATCH(req: Request) {
   return json({ ok: true, warning: documentWarning || undefined });
 }
 
-// Re-issues the clearance certificate for a registered work's submission —
+// Re-issues the clearance letter for a registered work's submission —
 // used after the member supplies a missing signature, after a new Board
 // Secretary signature is uploaded, or after staff amend a registered work.
 // Where the member was never admitted (their first approval failed for want of
@@ -126,10 +126,10 @@ export async function POST(req: Request) {
   }
 
   await notifyMember(work.ownerId, {
-    title: issued.admitted ? "You have been admitted to ZAMCOPS" : "Certificate re-issued",
+    title: issued.admitted ? "You have been admitted to ZAMCOPS" : "Letter re-issued",
     body: issued.admitted
-      ? `Your membership has been confirmed and your documents are under My Documents, together with the clearance certificate for “${work.title}”.`
-      : `ZAMCOPS re-issued the clearance certificate covering “${work.title}”. The latest copy is under My Documents.`,
+      ? `Your membership has been confirmed and your documents are under My Documents, together with the clearance letter for “${work.title}”.`
+      : `ZAMCOPS re-issued the clearance letter covering “${work.title}”. The latest copy is under My Documents.`,
     type: issued.admitted ? "success" : "info",
     href: "/documents",
   });

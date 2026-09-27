@@ -179,7 +179,7 @@ export default function AdminWorksPage() {
                       {w.status === "Approved" && (
                         <button
                           onClick={() => reissueWorkDocuments(w.id)}
-                          title="Re-issue the clearance certificate for this submission"
+                          title="Re-issue the clearance letter for this submission"
                           className="inline-flex items-center gap-1 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink transition hover:bg-zam-line/60"
                         >
                           <FileText size={14} /> Re-issue

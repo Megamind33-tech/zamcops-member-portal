@@ -12,10 +12,10 @@
 export const WORK_DECLARATION_TITLE = "DECLARATION OF A MUSICAL WORK";
 export const WORK_CERTIFICATE_TITLE = "CERTIFICATE OF REGISTRATION OF A MUSICAL WORK";
 
-// The certificate a member receives for a submission. One submission, one
-// certificate, however many works it carried — a single is a certificate for
-// one work, an album of ten is one certificate listing ten.
-export const CLEARANCE_CERTIFICATE_TITLE = "CERTIFICATE OF REGISTRATION";
+// The letter a member receives for a submission. One submission, one letter,
+// however many works it carried — a single gets a letter for one work, an
+// album of ten is one letter listing ten.
+export const CLEARANCE_LETTER_TITLE = "CLEARANCE LETTER";
 
 // Printed above the declarant's signature on the declaration.
 export const WORK_DECLARATION_CLAUSES: string[] = [
@@ -28,12 +28,12 @@ export const WORK_DECLARATION_CLAUSES: string[] = [
   "I understand that royalties are distributed on the strength of these particulars, that a false or misleading declaration may result in the suspension of distribution in respect of the work, and that I am liable to the Society and to any affected party for any loss arising from a declaration I knew, or ought to have known, to be untrue.",
 ];
 
-// Printed on the certificate, under the Society's counter-signature.
-export const CLEARANCE_CERTIFICATE_CLAUSES: string[] = [
-  "This is to certify that the musical work or works described in this certificate have been entered in the register of works maintained by the Zambia Music Copyright Protection Society, on the declaration of the member named above and on the evidence lodged with the Society.",
+// Printed on the letter, under the Society's counter-signature.
+export const CLEARANCE_LETTER_CLAUSES: string[] = [
+  "This is to certify that the musical work or works described in this letter have been entered in the register of works maintained by the Zambia Music Copyright Protection Society, on the declaration of the member named above and on the evidence lodged with the Society.",
   "The rights in those works are administered by the Society in accordance with the Deed of Assignment executed by the member, the Memorandum and Articles of Association of the Society and the rules and regulations made thereunder.",
   "Registration records the particulars declared to the Society. It is not an adjudication of authorship or of ownership, and it does not by itself create, transfer or confirm copyright in a work. The Society may amend or cancel an entry where the particulars are shown to be incorrect or where a dispute is upheld.",
-  "Any person disputing the particulars shown in this certificate may lodge a claim with the Society in writing, stating the grounds of the dispute and supplying the evidence relied upon.",
+  "Any person disputing the particulars shown in this letter may lodge a claim with the Society in writing, stating the grounds of the dispute and supplying the evidence relied upon.",
 ];
 
 export const WORK_CERTIFICATE_CLAUSES: string[] = [
