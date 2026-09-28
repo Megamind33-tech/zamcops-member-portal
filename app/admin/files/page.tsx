@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download } from "lucide-react";
+import Link from "next/link";
+import { Download, Search, X } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
@@ -15,9 +16,26 @@ const filters: ("All" | UploadStatus)[] = ["All", "Pending", "Processing", "Appr
 export default function AdminFilesPage() {
   const { uploads, members, setFileStatus } = useAdminData();
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
+  const [q, setQ] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
-  const shown = uploads.filter((u) => filter === "All" || u.status === filter);
+
+  // This list is every file from every member — a society with a few thousand
+  // submissions makes scrolling it to find one artist's file impractical.
+  // Their Uploaded Files section on their own member page is the intended way
+  // to find a specific artist's paperwork now; this search is a fallback for
+  // when only the file or member name is known and not which member page to
+  // open.
+  const needle = q.trim().toLowerCase();
+  const shown = uploads.filter((u) => {
+    if (filter !== "All" && u.status !== filter) return false;
+    if (!needle) return true;
+    return (
+      u.fileName.toLowerCase().includes(needle) ||
+      (u.linkedTo ?? "").toLowerCase().includes(needle) ||
+      nameFor(u.ownerId).toLowerCase().includes(needle)
+    );
+  });
 
   const act = async (id: string, status: "Approved" | "Rejected") => {
     setBusyId(id);
@@ -28,7 +46,7 @@ export default function AdminFilesPage() {
   return (
     <div>
       <AdminHeader title="Uploaded Files" subtitle={`${uploads.length} files across all members`} />
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         {filters.map((f) => (
           <button
             key={f}
@@ -41,6 +59,27 @@ export default function AdminFilesPage() {
             {f}
           </button>
         ))}
+        {/* A specific artist's files are better found on their own member
+            page (Documents & Files there); this is for when only the file
+            name or the member's name is known. */}
+        <div className="relative ml-auto w-full max-w-[260px]">
+          <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-zam-muted" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search file or member name…"
+            className="w-full rounded-full bg-zam-canvas py-1.5 pl-8 pr-7 text-xs ring-1 ring-zam-line placeholder:text-zam-muted focus:outline-none focus:ring-zam-orange"
+          />
+          {q && (
+            <button
+              onClick={() => setQ("")}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-zam-muted hover:text-zam-ink"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
       </div>
       <Panel title="Files">
         <div className="overflow-x-auto">
@@ -82,7 +121,11 @@ export default function AdminFilesPage() {
                   </Td>
                   <Td>{u.fileType}</Td>
                   <Td className="text-zam-muted">{u.linkedTo ?? "—"}</Td>
-                  <Td>{nameFor(u.ownerId)}</Td>
+                  <Td>
+                    <Link href={`/admin/members/${u.ownerId}`} className="font-semibold text-zam-orange hover:underline">
+                      {nameFor(u.ownerId)}
+                    </Link>
+                  </Td>
                   <Td className="text-zam-muted">{formatDate(u.uploadedAt)}</Td>
                   <Td>
                     <div className="flex flex-col gap-1">
