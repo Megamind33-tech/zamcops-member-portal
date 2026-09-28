@@ -2,11 +2,11 @@
 //   1. the Declaration of a Musical Work — the society's own form, filled from
 //      what the member declared and signed by them. Downloaded on demand from
 //      the work's page rather than filed automatically.
-//   2. the clearance certificate — one per submission, listing every work in it
+//   2. the clearance letter — one per submission, listing every work in it
 //      that reached the register, counter-signed by the Board Secretary's
 //      stored official signature. Issued when the society accepts the work.
 //
-// The certificate is drawn on the same stationery as the membership documents
+// The letter is drawn on the same stationery as the membership documents
 // (lib/pdfKit.ts) because the society has no printed certificate to fill in.
 // Runs only on the server, so official signature images never reach the client
 // raw — members only ever receive the rendered PDFs.
@@ -21,7 +21,6 @@ import {
   type OfficialSigner,
   calloutRow,
   fmtDate,
-  labelValueRow,
   letterhead,
   output,
   paragraph,
@@ -30,11 +29,10 @@ import {
   signatureBlock,
 } from "@/lib/pdfKit";
 import {
-  CLEARANCE_CERTIFICATE_CLAUSES,
-  CLEARANCE_CERTIFICATE_TITLE,
+  CLEARANCE_LETTER_CLAUSES,
+  CLEARANCE_LETTER_TITLE,
   WORK_DECLARATION_TITLE,
 } from "@/lib/workDeedText";
-import { districtProvince } from "@/lib/applicationPrefill";
 import { normalizeContributorRole } from "@/lib/roles";
 import { renderOfficialForm, formDate } from "@/lib/officialForms/render";
 import {
@@ -139,19 +137,6 @@ export function toWorkLike(row: any): WorkLike {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-function registeringMember(p: ReturnType<typeof letterhead>, member: MemberLike) {
-  sectionHeading(p, "Registering member");
-  labelValueRow(p, "Full name", member.fullName);
-  labelValueRow(p, "ZAMCOPS member number", member.memberNumber);
-  labelValueRow(p, "E-mail address", member.email);
-  labelValueRow(p, "Telephone", member.phone);
-  labelValueRow(
-    p,
-    "Address",
-    [member.address, districtProvince(member.district, member.province)].filter(Boolean).join(" · "),
-  );
-}
-
 const workRef = (work: WorkLike): string => work.id.slice(-6).toUpperCase();
 
 // ── 1. The Declaration of a Musical Work ───────────────────────────────────
@@ -209,18 +194,24 @@ export async function generateWorkDeclarationPdf(opts: {
   });
 }
 
-// ── 2. The clearance certificate ───────────────────────────────────────────
+// ── 2. The clearance letter ─────────────────────────────────────────────────
 
 /**
- * One certificate per submission, listing every work in it that reached the
+ * One letter per submission, listing every work in it that reached the
  * register.
  *
  * A submission is what the member sent in one go: a single is one work, an
- * album is all of its tracks. The office issues one certificate for that
+ * album is all of its tracks. The office issues one letter for that
  * submission rather than one per song, so a ten-track album produces a
- * certificate naming ten works and not ten certificates.
+ * letter naming ten works and not ten letters.
+ *
+ * Deliberately does not repeat the member's address, phone or e-mail: the
+ * letter already carries their name (in the subtitle and on the signature
+ * line) and their member number (in the reference row below), so a separate
+ * "Registering member" block would only restate those two facts and add
+ * contact details this letter has no reason to disclose.
  */
-export function generateClearanceCertificatePdf(opts: {
+export function generateClearanceLetterPdf(opts: {
   member: MemberLike;
   works: WorkLike[];
   submissionRef: string;
@@ -234,7 +225,7 @@ export function generateClearanceCertificatePdf(opts: {
   const many = works.length !== 1;
   const p = letterhead(
     doc,
-    CLEARANCE_CERTIFICATE_TITLE,
+    CLEARANCE_LETTER_TITLE,
     many
       ? `${works.length} works entered in the ZAMCOPS register on the declaration of ${member.fullName}`
       : `Entered in the ZAMCOPS register of works on the declaration of ${member.fullName}`,
@@ -243,7 +234,7 @@ export function generateClearanceCertificatePdf(opts: {
   calloutRow(
     p,
     [
-      { label: "Certificate reference", value: opts.reference },
+      { label: "Reference", value: opts.reference },
       { label: "Submission", value: opts.submissionRef },
       { label: "Registered on", value: fmtDate(registered) },
       { label: "Registered to", value: member.memberNumber },
@@ -270,10 +261,8 @@ export function generateClearanceCertificatePdf(opts: {
     })),
   );
 
-  registeringMember(p, member);
-
   sectionHeading(p, "Certification");
-  CLEARANCE_CERTIFICATE_CLAUSES.forEach((clause, i) =>
+  CLEARANCE_LETTER_CLAUSES.forEach((clause, i) =>
     paragraph(p, `${i + 1}.  ${clause}`, { size: 8.5, gap: 2.5 }),
   );
 
@@ -306,11 +295,11 @@ export function generateClearanceCertificatePdf(opts: {
   p.doc.setFont("helvetica", "italic");
   p.doc.setFontSize(7.5);
   p.doc.text(
-    `Verify this certificate with the ZAMCOPS office quoting reference ${opts.reference}.`,
+    `Verify this letter with the ZAMCOPS office quoting reference ${opts.reference}.`,
     W / 2,
     p.y,
     { align: "center" },
   );
 
-  return output(doc, `Certificate-of-Registration-${opts.submissionRef}-${member.memberNumber}.pdf`, opts.reference);
+  return output(doc, `Clearance-Letter-${opts.submissionRef}-${member.memberNumber}.pdf`, opts.reference);
 }

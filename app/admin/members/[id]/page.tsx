@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import {
   ArrowLeft, Check, X, Ban, RotateCcw, Music2, FileText, Disc3,
   Paperclip, Trash2, IdCard, MapPin, Wallet, Users, FilePlus2,
-  KeyRound, Copy, Bell,
+  KeyRound, Copy, Bell, Download,
 } from "lucide-react";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Field, Input, Select, Textarea } from "@/components/zam/Input";
@@ -14,6 +14,7 @@ import { FilePicker } from "@/components/zam/FilePicker";
 import { ApplicationPanel, AdminDocDownload } from "@/components/admin/ApplicationPanel";
 import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
+import { uploadFor } from "@/lib/works";
 import { Avatar } from "@/components/zam/Misc";
 import { toast } from "sonner";
 import type { MemberDocType } from "@/types";
@@ -33,6 +34,19 @@ export default function AdminMemberDetailPage() {
   const mAlbums = albums.filter((a) => a.ownerId === id);
   const mUploads = uploads.filter((u) => u.ownerId === id);
   const mDocs = memberDocuments.filter((d) => d.ownerId === id);
+
+  // The scanned NRC/passport a member attaches under Profile → Document
+  // uploads, matched the same way a work's studio letter is (lib/works.ts) —
+  // `member.nrcOrPassport` above is only the ID number they typed, not this.
+  const nrcUpload = member
+    ? uploadFor(
+        { ownerId: member.id, title: member.fullName },
+        uploads,
+        "Document",
+        member.nrcDocument,
+        "NRC / Passport copy",
+      )
+    : undefined;
 
   const [busy, setBusy] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
@@ -142,6 +156,7 @@ export default function AdminMemberDetailPage() {
             <Row label="Full name" value={member.fullName} />
             <Row label="Pseudonym" value={member.stageName} />
             <Row label="NRC / passport" value={member.nrcOrPassport} />
+            <FileRow label="NRC / passport scan" fileName={member.nrcDocument} uploadId={nrcUpload?.id} />
             <Row label="Date of birth" value={member.dateOfBirth} />
             <Row label="Gender" value={member.gender} />
           </Group>
@@ -285,6 +300,42 @@ function Row({ label, value }: { label: string; value?: string }) {
     <div className="flex items-baseline justify-between gap-3 text-sm">
       <span className="text-zam-muted">{label}</span>
       <span className="text-right font-medium text-zam-ink">{value?.trim() ? value : "—"}</span>
+    </div>
+  );
+}
+
+// Like Row, but for a lodged file rather than a text value: a link to open it
+// plus a download icon when the bytes are on file, "not uploaded" in red when
+// a filename was recorded but nothing matches it, and "—" when nothing was
+// ever lodged at all — a reviewer needs to tell those two apart.
+function FileRow({ label, fileName, uploadId }: { label: string; fileName?: string; uploadId?: string }) {
+  const name = fileName?.trim();
+  return (
+    <div className="flex items-baseline justify-between gap-3 text-sm">
+      <span className="text-zam-muted">{label}</span>
+      {!name ? (
+        <span className="text-right font-medium text-zam-ink">—</span>
+      ) : uploadId ? (
+        <span className="flex items-center gap-1.5">
+          <a
+            href={`/api/admin/files/${uploadId}`}
+            target="_blank"
+            rel="noreferrer"
+            className="max-w-[180px] truncate text-right font-semibold text-zam-orange hover:underline"
+          >
+            {name}
+          </a>
+          <a
+            href={`/api/admin/files/${uploadId}?download=1`}
+            title={`Download ${name}`}
+            className="text-zam-muted hover:text-zam-ink"
+          >
+            <Download size={12} />
+          </a>
+        </span>
+      ) : (
+        <span className="text-right text-xs font-semibold text-zam-red">{name} — not uploaded</span>
+      )}
     </div>
   );
 }

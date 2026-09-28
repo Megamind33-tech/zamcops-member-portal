@@ -10,15 +10,15 @@
 //       the membership application as submitted
 //       the Deed of Assignment, executed by the member and the society
 //       the admission letter, signed by the General Manager
-//       the clearance certificate for that submission
+//       the clearance letter for that submission
 //
 //   every later accepted submission
-//       the clearance certificate alone
+//       the clearance letter alone
 //
 // A submission is what the member sent in one go. A single is one work; an
-// album is all of its tracks, sharing a batch. One submission gets one
-// certificate however many works it carried, so a ten-track album produces a
-// certificate naming ten works rather than ten certificates.
+// album is all of its tracks, sharing a batch. One submission gets one letter
+// however many works it carried, so a ten-track album produces a letter
+// naming ten works rather than ten letters.
 
 import { prisma } from "@/lib/db";
 import {
@@ -28,14 +28,14 @@ import {
   type GeneratedPdf,
   type OfficialSigner,
 } from "@/lib/documents";
-import { generateClearanceCertificatePdf, toWorkLike } from "@/lib/workDocuments";
+import { generateClearanceLetterPdf, toWorkLike } from "@/lib/workDocuments";
 import type { ApplicationFormType } from "@/lib/applicationForms";
 
 export const OFFICES = ["GENERAL_MANAGER", "BOARD_SECRETARY"] as const;
 export type Office = (typeof OFFICES)[number];
 
 const MEMBERSHIP_DOC_TYPES = ["Membership Application", "Deed of Assignment", "Admission Letter"] as const;
-const CLEARANCE_DOC_TYPE = "Clearance Certificate";
+const CLEARANCE_DOC_TYPE = "Clearance Letter";
 
 /** The class a member holds from the moment their first work is accepted. */
 export const ADMISSION_CLASS = "CANDIDATE";
@@ -156,7 +156,7 @@ export async function issueMemberDocuments(ownerId: string): Promise<{ count: nu
 export interface WorkApprovalResult {
   /** True when this approval is what admitted the member. */
   admitted: boolean;
-  /** How many works the certificate covers. */
+  /** How many works the letter covers. */
   works: number;
   documents: string[];
 }
@@ -164,7 +164,7 @@ export interface WorkApprovalResult {
 /**
  * Everything that follows a work being accepted onto the register.
  *
- * Issues the clearance certificate for the whole submission, and — if this is
+ * Issues the clearance letter for the whole submission, and — if this is
  * the member's first accepted work — admits them and issues the membership set
  * alongside it.
  */
@@ -175,12 +175,12 @@ export async function issueOnWorkApproval(workId: string): Promise<WorkApprovalR
   const member = await prisma.member.findUnique({ where: { id: work.ownerId } });
   if (!member) throw new IssueError("Member not found.");
   if (!member.signature) {
-    throw new IssueError("The member has not provided their signature yet — the certificate cannot be signed.");
+    throw new IssueError("The member has not provided their signature yet — the letter cannot be signed.");
   }
   const secretary = await signer("BOARD_SECRETARY", "Board Secretary");
 
   // Everything the member sent in with this work that has since been accepted.
-  // Approving an album track by track re-issues a certificate covering the
+  // Approving an album track by track re-issues a letter covering the
   // tracks cleared so far, which is what the office would hand over.
   const batch = work.batchId
     ? await prisma.workDeclaration.findMany({
@@ -192,9 +192,9 @@ export async function issueOnWorkApproval(workId: string): Promise<WorkApprovalR
 
   const refBase = member.memberNumber.replace(/^ZAM-/, "");
   const submissionRef = (work.batchId || work.id).slice(-6).toUpperCase();
-  const reference = `COR-${submissionRef}-${refBase}`;
+  const reference = `CLR-${submissionRef}-${refBase}`;
 
-  const certificate = generateClearanceCertificatePdf({
+  const letter = generateClearanceLetterPdf({
     member,
     works,
     submissionRef,
@@ -203,15 +203,15 @@ export async function issueOnWorkApproval(workId: string): Promise<WorkApprovalR
     reference,
   });
 
-  // This submission's certificate only — matched on the reference, which
-  // carries the submission, so another submission's is never touched.
+  // This submission's letter only — matched on the reference, which carries
+  // the submission, so another submission's is never touched.
   await prisma.memberDocument.deleteMany({
     where: { ownerId: member.id, generated: true, docType: CLEARANCE_DOC_TYPE, reference },
   });
   await file(member.id, [
     {
       docType: CLEARANCE_DOC_TYPE,
-      pdf: certificate,
+      pdf: letter,
       note:
         works.length === 1
           ? `“${works[0].title}” entered in the ZAMCOPS register of works`

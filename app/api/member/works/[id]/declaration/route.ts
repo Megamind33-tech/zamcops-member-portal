@@ -13,9 +13,9 @@ export const runtime = "nodejs";
 // registration is queried. It is rendered per request rather than stored, so it
 // always reflects the current particulars and costs the database nothing.
 //
-// The Certificate of Registration is a different document: it is counter-signed
-// by the Society and only exists once the work is entered in the register, so it
-// is issued to the member's documents at approval instead.
+// The Clearance Letter is a different document: it is counter-signed by the
+// Society and only exists once the work is entered in the register, so it is
+// issued to the member's documents at approval instead.
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireMember();
   if (!session) return bad("Not authenticated.", 401);
