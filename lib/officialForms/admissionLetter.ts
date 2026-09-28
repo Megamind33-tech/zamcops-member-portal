@@ -36,6 +36,7 @@ export interface AdmissionLetterValues {
   applicationDate: string; // already formatted for print
   membershipClass: string; // e.g. CANDIDATE
   generalManagerSignature?: string; // transparent PNG data URL
+  signedOn?: string; // already formatted for print — when the GM signed
 }
 
 export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
@@ -66,6 +67,11 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
     );
   }
 
+  // Room above the mark runs from the baseline up to "Yours faithfully," —
+  // comfortably more than the box a typical wide, short signature ever fills,
+  // so this is sized to read as a confident, official mark rather than one
+  // shrunk to the smallest space that would technically hold it.
+  const SIG_W = 300;
   if (v.generalManagerSignature) {
     stamps.push({
       kind: "image",
@@ -73,8 +79,22 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
       x: LEFT,
       y: LINE.signatureBaseline,
       data: v.generalManagerSignature,
-      maxWidth: 240,
-      maxHeight: 83,
+      maxWidth: SIG_W,
+      maxHeight: 110,
+    });
+  }
+  // The printed name and title beneath the mark are part of the template
+  // (assets/forms/admission.pdf) and not written by this code, so the date has
+  // nowhere to sit under the signature without overprinting them — it goes
+  // beside the mark instead, at the same band as "Mirrias Siamutundo".
+  if (v.signedOn) {
+    stamps.push({
+      page: 1,
+      x: LEFT + SIG_W + 16,
+      y: LINE.signatureBaseline + 4,
+      text: `Date: ${v.signedOn}`,
+      size: 9,
+      maxWidth: 140,
     });
   }
 

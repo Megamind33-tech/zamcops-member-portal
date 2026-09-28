@@ -257,7 +257,11 @@ class Sheet {
         y: sig.y,
         data: this.v.applicantSignature,
         maxWidth: Math.max(96, widthOf(sig) - INSET * 2),
-        maxHeight: 45,
+        // Width stays tied to the printed rule's own length — that is the
+        // form's real constraint. Height only had to clear the "Signature"
+        // line below it, so it was capped well short of the clear space
+        // above; raised to use more of it.
+        maxHeight: 60,
       });
     }
     this.text(dateId, this.v.signedOn ?? "");

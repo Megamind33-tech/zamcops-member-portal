@@ -120,6 +120,9 @@ export async function generateAdmissionLetterPdf(opts: {
       applicationDate: formDate(opts.applicationDate ?? new Date()),
       membershipClass: opts.membershipClass || "CANDIDATE",
       generalManagerSignature: opts.generalManager.image,
+      // The letter is generated the moment the General Manager's signature is
+      // applied (at approval), so issuance and signing are the same instant.
+      signedOn: formDate(new Date()),
     }),
     fileName: `Admission-Letter-${opts.member.memberNumber}.pdf`,
     reference: opts.reference,

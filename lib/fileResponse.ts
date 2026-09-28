@@ -81,7 +81,35 @@ export async function storedFileResponse(
       return new Response(localReadStream(key), { headers });
     }
 
-    if (!isR2Url(file.url)) return Response.redirect(file.url, 302);
+    if (!isR2Url(file.url)) {
+      // A straight redirect is fine for viewing inline — the browser fetches
+      // the public URL directly and shows it, which is faster than proxying.
+      // For a download it is not: the browser follows the 302 and renders
+      // whatever the origin serves with whatever headers THAT origin sets, and
+      // the Content-Disposition: attachment computed above never reaches it —
+      // a public image typically has no such header, so it just opens instead
+      // of downloading, with no error to say why. Proxying is the only way to
+      // guarantee the attachment header actually lands on the browser.
+      if (opts.disposition === "inline") return Response.redirect(file.url, 302);
+
+      const upstream = await fetch(file.url, {
+        headers: opts.range ? { range: opts.range } : undefined,
+      });
+      if (!upstream.ok && upstream.status !== 206) return bad("File unavailable.", 502);
+
+      const headers = new Headers({
+        "Content-Type": contentType,
+        "Content-Disposition": disposition,
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "private, no-store",
+      });
+      const len = upstream.headers.get("content-length");
+      if (len) headers.set("Content-Length", len);
+      const cr = upstream.headers.get("content-range");
+      if (cr) headers.set("Content-Range", cr);
+
+      return new Response(upstream.body, { status: upstream.status, headers });
+    }
     if (!r2Configured()) return bad("File storage is not configured.", 502);
 
     const upstream = await fetch(await r2PresignGet(r2Key(file.url)), {

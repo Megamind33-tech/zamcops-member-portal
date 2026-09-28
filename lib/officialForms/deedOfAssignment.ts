@@ -12,6 +12,7 @@
 // characters.
 
 import type { Stamp } from "@/lib/formOverlay";
+import { formDate } from "@/lib/officialForms/render";
 
 const P1 = {
   // "By this DEED OF ASSIGNMENT made on the …… day of …… 20…."
@@ -56,6 +57,10 @@ export interface DeedValues {
   boardSecretarySignature?: string; // the Society's mark
   boardSecretaryName?: string; // printed under the Society's rule
 }
+
+// Both marks are made when the deed is executed, so the one tracked date
+// (`madeOn`) is what appears against each — the deed does not record the
+// assignor and the Society signing on two different days.
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -117,7 +122,14 @@ export function deedStamps(v: DeedValues): Stamp[] {
     );
   }
 
-  // The marks at the foot of page 3, each above its rule.
+  // The marks at the foot of page 3, each above its rule. There is well over a
+  // hundred points of clear page between the last clause and each rule, far
+  // more than a wide, short signature ever fills at the old 64pt ceiling — so
+  // this is sized to look like an executed legal instrument, not a thumbnail.
+  const SIG_W = 300;
+  const SIG_H = 100;
+  const signedOn = valid ? formDate(when) : "";
+
   if (v.assignorSignature) {
     stamps.push({
       kind: "image",
@@ -125,11 +137,25 @@ export function deedStamps(v: DeedValues): Stamp[] {
       x: P3.assignorSignature.x,
       y: P3.assignorSignature.y,
       data: v.assignorSignature,
-      maxWidth: 240,
-      maxHeight: 64,
+      maxWidth: SIG_W,
+      maxHeight: SIG_H,
     });
   }
   stamps.push({ page: 3, x: P3.assignorName.x, y: P3.assignorName.y, text: v.assignorName, size: 8, maxWidth: 290 });
+  // On its own line beneath the name rather than appended after it: "BOARD
+  // SECRETARY" is pre-printed on the template hard against where the society's
+  // name goes, so anything appended there overprints it. A line below is clear
+  // under both names and keeps the two signing blocks looking alike.
+  if (signedOn) {
+    stamps.push({
+      page: 3,
+      x: P3.assignorName.x,
+      y: P3.assignorName.y - 12,
+      text: `Date: ${signedOn}`,
+      size: 7.5,
+      maxWidth: 150,
+    });
+  }
 
   if (v.boardSecretarySignature) {
     stamps.push({
@@ -138,12 +164,29 @@ export function deedStamps(v: DeedValues): Stamp[] {
       x: P3.societySignature.x,
       y: P3.societySignature.y,
       data: v.boardSecretarySignature,
-      maxWidth: 240,
-      maxHeight: 64,
+      maxWidth: SIG_W,
+      maxHeight: SIG_H,
     });
   }
   if (v.boardSecretaryName) {
-    stamps.push({ page: 3, x: P3.societyName.x, y: P3.societyName.y, text: v.boardSecretaryName, size: 8, maxWidth: 80 });
+    stamps.push({
+      page: 3,
+      x: P3.societyName.x,
+      y: P3.societyName.y,
+      text: v.boardSecretaryName,
+      size: 8,
+      maxWidth: 80,
+    });
+  }
+  if (signedOn) {
+    stamps.push({
+      page: 3,
+      x: P3.societyName.x,
+      y: P3.societyName.y - 12,
+      text: `Date: ${signedOn}`,
+      size: 7.5,
+      maxWidth: 150,
+    });
   }
 
   return stamps;
