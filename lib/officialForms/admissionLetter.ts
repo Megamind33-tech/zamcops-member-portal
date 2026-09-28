@@ -67,10 +67,10 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
     );
   }
 
-  // Kept at the template's original box — enlarging this one specifically
-  // read as oversized rather than official, unlike the deed and the
-  // application form. Left as-is on request; only the date beside it is new.
-  const SIG_W = 240;
+  // The template has no bounding box around this mark, so 300x110 (the deed
+  // and application form's size) read as oversized here; the original 240x83
+  // then read as too small on its own. Split the difference.
+  const SIG_W = 270;
   if (v.generalManagerSignature) {
     stamps.push({
       kind: "image",
@@ -79,7 +79,7 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
       y: LINE.signatureBaseline,
       data: v.generalManagerSignature,
       maxWidth: SIG_W,
-      maxHeight: 83,
+      maxHeight: 97,
     });
   }
   // The printed name and title beneath the mark are part of the template
