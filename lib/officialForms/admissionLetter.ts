@@ -67,11 +67,10 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
     );
   }
 
-  // Room above the mark runs from the baseline up to "Yours faithfully," —
-  // comfortably more than the box a typical wide, short signature ever fills,
-  // so this is sized to read as a confident, official mark rather than one
-  // shrunk to the smallest space that would technically hold it.
-  const SIG_W = 300;
+  // Kept at the template's original box — enlarging this one specifically
+  // read as oversized rather than official, unlike the deed and the
+  // application form. Left as-is on request; only the date beside it is new.
+  const SIG_W = 240;
   if (v.generalManagerSignature) {
     stamps.push({
       kind: "image",
@@ -80,7 +79,7 @@ export function admissionLetterStamps(v: AdmissionLetterValues): Stamp[] {
       y: LINE.signatureBaseline,
       data: v.generalManagerSignature,
       maxWidth: SIG_W,
-      maxHeight: 110,
+      maxHeight: 83,
     });
   }
   // The printed name and title beneath the mark are part of the template
