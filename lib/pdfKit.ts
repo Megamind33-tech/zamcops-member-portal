@@ -95,11 +95,12 @@ export function letterhead(doc: jsPDF, title: string, subtitle?: string): Page {
   doc.text(SOCIETY_ADDRESS, W / 2, 36, { align: "center" });
   doc.text(SOCIETY_CONTACT, W / 2, 40, { align: "center" });
 
-  const flagW = (W - M * 2) / 4;
-  FLAG.forEach((c, i) => {
-    doc.setFillColor(...c);
-    doc.rect(M + i * flagW, 43.5, flagW, 1.2, "F");
-  });
+  // A single accent rule, not the four-colour flag bar: one confident line
+  // reads as letterhead stationery, four blocks of flat colour reads as a
+  // template banner.
+  doc.setDrawColor(...ORANGE);
+  doc.setLineWidth(0.6);
+  doc.line(M, 43.8, W - M, 43.8);
 
   doc.setTextColor(...INK);
   doc.setFont("helvetica", "bold");
@@ -148,12 +149,12 @@ export function signatureBlock(
   opts: { x: number; width: number; label: string; name: string; role: string; image?: string; date?: string }
 ) {
   const { doc } = p;
-  const baseline = p.y + 22;
+  const baseline = p.y + 25;
   doc.setTextColor(...MUTED);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.text(opts.label, opts.x, p.y + 2);
-  if (opts.image) drawSignature(doc, opts.image, opts.x, baseline - 1, Math.min(55, opts.width - 5));
+  if (opts.image) drawSignature(doc, opts.image, opts.x, baseline - 1, Math.min(72, opts.width - 5), 21);
   doc.setDrawColor(...INK);
   doc.line(opts.x, baseline, opts.x + opts.width, baseline);
   doc.setTextColor(...INK);
@@ -166,16 +167,20 @@ export function signatureBlock(
   doc.text(opts.role + (opts.date ? ` · ${opts.date}` : ""), opts.x, baseline + 9.5);
 }
 
+// A section label and a hairline, not a filled pill — the same division a
+// printed form marks with a rule and a small caption, not a coloured banner.
 export function sectionHeading(p: Page, text: string) {
-  p.ensure(14);
-  p.y += 4;
-  p.doc.setFillColor(250, 240, 233);
-  p.doc.roundedRect(M, p.y - 4.5, W - M * 2, 7, 1.5, 1.5, "F");
+  p.ensure(12);
+  p.y += 5;
   p.doc.setTextColor(...ORANGE);
   p.doc.setFont("helvetica", "bold");
-  p.doc.setFontSize(9);
-  p.doc.text(text.toUpperCase(), M + 3, p.y);
-  p.y += 7;
+  p.doc.setFontSize(9.5);
+  p.doc.text(text.toUpperCase(), M, p.y);
+  p.y += 2.5;
+  p.doc.setDrawColor(...LINE);
+  p.doc.setLineWidth(0.3);
+  p.doc.line(M, p.y, W - M, p.y);
+  p.y += 5;
 }
 
 export function labelValueRow(p: Page, label: string, value: string) {
@@ -339,21 +344,25 @@ export function paragraph(
   p.y += opts.gap ?? 2.5;
 }
 
-// A tinted callout — the registration reference and status strip that heads a
-// work document, so the reader sees what they are holding before the detail.
-export function calloutRow(p: Page, cells: { label: string; value: string }[], tone: "orange" | "green" = "orange") {
+// A quiet metadata strip — the registration reference and status a reader
+// needs before anything else, ruled top and bottom like a printed form's
+// identifying-details row rather than filled like a status badge.
+export function calloutRow(p: Page, cells: { label: string; value: string }[]) {
   const { doc } = p;
   p.ensure(20);
   const content = W - M * 2;
   const cellW = content / cells.length;
-  const tint: [number, number, number] = tone === "green" ? [237, 248, 241] : [250, 240, 233];
-  doc.setFillColor(...tint);
-  doc.roundedRect(M, p.y - 4, content, 15, 2, 2, "F");
+
+  doc.setDrawColor(...LINE);
+  doc.setLineWidth(0.3);
+  doc.line(M, p.y - 4, W - M, p.y - 4);
+  doc.line(M, p.y + 11, W - M, p.y + 11);
+
   cells.forEach((c, i) => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     doc.setTextColor(...MUTED);
-    doc.text(c.label.toUpperCase(), M + 4 + i * cellW, p.y + 1);
+    doc.text(c.label.toUpperCase(), M + i * cellW + 3, p.y + 1);
 
     // A callout value is one line by definition, and a reference that overflows
     // its cell is worse than a small one — a truncated reference is the wrong
@@ -366,10 +375,15 @@ export function calloutRow(p: Page, cells: { label: string; value: string }[], t
       size -= 0.25;
       doc.setFontSize(size);
     }
-    doc.setTextColor(...(tone === "green" ? GREEN : INK));
-    doc.text(value, M + 4 + i * cellW, p.y + 7);
+    doc.setTextColor(...INK);
+    doc.text(value, M + i * cellW + 3, p.y + 7);
+
+    if (i > 0) {
+      doc.setDrawColor(...LINE);
+      doc.line(M + i * cellW, p.y - 4, M + i * cellW, p.y + 11);
+    }
   });
-  p.y += 18;
+  p.y += 15;
 }
 
 export interface GeneratedPdf {

@@ -231,16 +231,12 @@ export function generateClearanceLetterPdf(opts: {
       : `Entered in the ZAMCOPS register of works on the declaration of ${member.fullName}`,
   );
 
-  calloutRow(
-    p,
-    [
-      { label: "Reference", value: opts.reference },
-      { label: "Submission", value: opts.submissionRef },
-      { label: "Registered on", value: fmtDate(registered) },
-      { label: "Registered to", value: member.memberNumber },
-    ],
-    "green",
-  );
+  calloutRow(p, [
+    { label: "Reference", value: opts.reference },
+    { label: "Submission", value: opts.submissionRef },
+    { label: "Registered on", value: fmtDate(registered) },
+    { label: "Registered to", value: member.memberNumber },
+  ]);
 
   sectionHeading(p, many ? `Works registered (${works.length})` : "Work registered");
   repeatTable(
@@ -289,7 +285,9 @@ export function generateClearanceLetterPdf(opts: {
     image: opts.boardSecretary.image,
     date: fmtDate(registered),
   });
-  p.y = startY + 36;
+  // The role/date line now sits at baseline+9.5 (baseline = startY+25), so
+  // this needs to clear startY+34.5 with real room, not the old baseline's +36.
+  p.y = startY + 42;
 
   p.doc.setTextColor(...MUTED);
   p.doc.setFont("helvetica", "italic");

@@ -17,7 +17,7 @@ import { formatDate } from "@/lib/format";
 import { uploadFor } from "@/lib/works";
 import { Avatar } from "@/components/zam/Misc";
 import { toast } from "sonner";
-import type { MemberDocType } from "@/types";
+import type { MemberDocType, UploadFile } from "@/types";
 
 const DOC_TYPES: MemberDocType[] = ["Clearance Letter", "Deed of Assignment", "Contract", "ID Document", "Other"];
 
@@ -186,23 +186,25 @@ export default function AdminMemberDetailPage() {
       <MemberNoticePanel memberId={id} memberName={member.fullName} sendNotice={sendNotice} />
 
       {/* Songs / Works / Albums */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         <ListPanel title="Submitted Songs" icon={<Music2 size={15} />} count={mSingles.length}
           rows={mSingles.map((x) => ({ id: x.id, main: x.title, sub: x.genre, status: x.status }))} />
         <ListPanel title="Work Declarations" icon={<FileText size={15} />} count={mWorks.length}
           rows={mWorks.map((x) => ({ id: x.id, main: x.title, sub: `${x.workType} · ${x.genre}`, status: x.status }))} />
         <ListPanel title="Albums" icon={<Disc3 size={15} />} count={mAlbums.length}
           rows={mAlbums.map((x) => ({ id: x.id, main: x.title, sub: `${x.tracks.length} tracks`, status: x.status }))} />
-        <ListPanel title="Uploaded Files" icon={<Paperclip size={15} />} count={mUploads.length}
-          rows={mUploads.map((x) => ({ id: x.id, main: x.fileName, sub: `${x.fileType}${x.linkedTo ? ` · ${x.linkedTo}` : ""}`, status: x.status }))} />
       </div>
 
-      {/* Documents */}
+      {/* Documents — official (generated/attached) and everything the artist
+          has lodged with a submission (receipts, artwork, lyric sheets,
+          masters), both here rather than staff having to find the latter by
+          searching the site-wide Uploaded Files list for this one member. */}
       <DocumentsPanel
         docs={mDocs}
         onAttach={(p) => attachDocument({ ownerId: id, ...p })}
         onRemove={removeDocument}
       />
+      <MemberUploadsPanel uploads={mUploads} />
     </div>
   );
 }
@@ -433,6 +435,84 @@ function DocumentsPanel({
           </button>
         </form>
       </div>
+    </Panel>
+  );
+}
+
+// Every file this artist has lodged with a submission — studio letters,
+// affirmation letters, artwork, lyric sheets, audio masters — grouped by kind
+// with a play/download action on each. Reviewing a submission already links
+// to the file it needs (the Works and Albums pages), but there was nowhere to
+// see everything one member has ever lodged in one place: finding it meant
+// searching the site-wide Uploaded Files list, one row per file across every
+// member, for this member's rows specifically.
+function MemberUploadsPanel({ uploads }: { uploads: UploadFile[] }) {
+  const GROUPS: { label: string; type: UploadFile["fileType"] }[] = [
+    { label: "Studio receipts & documents", type: "Document" },
+    { label: "Audio masters", type: "Audio" },
+    { label: "Artwork", type: "Cover Art" },
+    { label: "Lyric sheets", type: "Lyrics" },
+  ];
+
+  return (
+    <Panel title={`Artist's Uploaded Files (${uploads.length})`}>
+      {uploads.length === 0 ? (
+        <p className="px-5 py-6 text-center text-sm text-zam-muted">Nothing uploaded yet.</p>
+      ) : (
+        <div className="divide-y divide-zam-line">
+          {GROUPS.map(({ label, type }) => {
+            const rows = uploads.filter((u) => u.fileType === type);
+            if (rows.length === 0) return null;
+            return (
+              <div key={type} className="px-5 py-3.5">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-zam-muted">
+                  {label} ({rows.length})
+                </p>
+                <div className="space-y-2">
+                  {rows.map((u) => (
+                    <div
+                      key={u.id}
+                      className="flex flex-wrap items-center gap-3 rounded-xl bg-zam-canvas px-3 py-2.5 ring-1 ring-zam-line"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-zam-ink">{u.fileName}</p>
+                        <p className="truncate text-xs text-zam-muted">
+                          {u.linkedTo ? `${u.linkedTo} · ` : ""}
+                          {formatDate(u.uploadedAt)}
+                          {u.fileSize ? ` · ${(u.fileSize / 1024 / 1024).toFixed(2)} MB` : ""}
+                        </p>
+                        {u.fileType === "Audio" && u.hasFile && (
+                          <audio
+                            controls
+                            preload="none"
+                            src={`/api/admin/files/${u.id}`}
+                            className="mt-1.5 h-8 w-full max-w-[280px]"
+                          />
+                        )}
+                        {u.rejectionReason && (
+                          <p className="mt-0.5 truncate text-[11px] text-zam-red">{u.rejectionReason}</p>
+                        )}
+                      </div>
+                      <StatusBadge status={u.status} />
+                      {u.hasFile ? (
+                        <a
+                          href={`/api/admin/files/${u.id}?download=1`}
+                          title={`Download ${u.fileName}`}
+                          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zam-muted transition hover:bg-zam-line/60 hover:text-zam-ink"
+                        >
+                          <Download size={15} />
+                        </a>
+                      ) : (
+                        <span className="shrink-0 text-[11px] italic text-zam-muted">No file</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </Panel>
   );
 }
