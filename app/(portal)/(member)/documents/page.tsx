@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { FileText, FileDown, Lock, ScrollText, BadgeCheck, ClipboardList } from "lucide-react";
+import { FileText, FileDown, Lock, ScrollText, BadgeCheck, ClipboardList, FileSignature } from "lucide-react";
 import { PageHeader } from "../layout";
 import { Card } from "@/components/zam/Card";
 import { Button } from "@/components/zam/Button";
@@ -17,6 +17,7 @@ const DOC_ICON: Record<string, React.ReactNode> = {
   "Membership Application": <ClipboardList size={18} />,
   "Deed of Assignment": <ScrollText size={18} />,
   "Admission Letter": <BadgeCheck size={18} />,
+  "Work Declaration": <FileSignature size={18} />,
 };
 
 export default function DocumentsPage() {
