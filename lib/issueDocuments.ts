@@ -28,7 +28,7 @@ import {
   type GeneratedPdf,
   type OfficialSigner,
 } from "@/lib/documents";
-import { generateClearanceLetterPdf, toWorkLike } from "@/lib/workDocuments";
+import { generateClearanceLetterPdf, generateWorkDeclarationPdf, toWorkLike } from "@/lib/workDocuments";
 import type { ApplicationFormType } from "@/lib/applicationForms";
 
 export const OFFICES = ["GENERAL_MANAGER", "BOARD_SECRETARY"] as const;
@@ -36,6 +36,7 @@ export type Office = (typeof OFFICES)[number];
 
 const MEMBERSHIP_DOC_TYPES = ["Membership Application", "Deed of Assignment", "Admission Letter"] as const;
 const CLEARANCE_DOC_TYPE = "Clearance Letter";
+const DECLARATION_DOC_TYPE = "Work Declaration";
 
 /** The class a member holds from the moment their first work is accepted. */
 export const ADMISSION_CLASS = "CANDIDATE";
@@ -179,6 +180,13 @@ export async function issueOnWorkApproval(workId: string): Promise<WorkApprovalR
   }
   const secretary = await signer("BOARD_SECRETARY", "Board Secretary");
 
+  // Set once, on the work's own first approval — a re-issue (after a missing
+  // signature is added, say) must not make it look newly registered.
+  const registeredAt = work.registeredAt ?? new Date();
+  if (!work.registeredAt) {
+    await prisma.workDeclaration.update({ where: { id: work.id }, data: { registeredAt } });
+  }
+
   // Everything the member sent in with this work that has since been accepted.
   // Approving an album track by track re-issues a letter covering the
   // tracks cleared so far, which is what the office would hand over.
@@ -198,15 +206,31 @@ export async function issueOnWorkApproval(workId: string): Promise<WorkApprovalR
     member,
     works,
     submissionRef,
-    registeredAt: new Date(),
+    registeredAt,
     boardSecretary: secretary,
     reference,
+  });
+
+  // The office's completed copy of this work's own declaration — the
+  // distribution key, file number and factor the society fills in once a work
+  // reaches the register. Filed alongside the clearance letter so the finished
+  // record sits on both the member's and the office's file, not only rendered
+  // on request as the member's own (uncompleted) copy still is.
+  const declarationRef = `WD-${work.id.slice(-6).toUpperCase()}-${refBase}`;
+  const declaration = await generateWorkDeclarationPdf({
+    member,
+    work: toWorkLike({ ...work, registeredAt }),
+    reference: declarationRef,
+    copy: "office",
   });
 
   // This submission's letter only — matched on the reference, which carries
   // the submission, so another submission's is never touched.
   await prisma.memberDocument.deleteMany({
     where: { ownerId: member.id, generated: true, docType: CLEARANCE_DOC_TYPE, reference },
+  });
+  await prisma.memberDocument.deleteMany({
+    where: { ownerId: member.id, generated: true, docType: DECLARATION_DOC_TYPE, reference: declarationRef },
   });
   await file(member.id, [
     {
@@ -217,9 +241,14 @@ export async function issueOnWorkApproval(workId: string): Promise<WorkApprovalR
           ? `“${works[0].title}” entered in the ZAMCOPS register of works`
           : `${works.length} works entered in the ZAMCOPS register`,
     },
+    {
+      docType: DECLARATION_DOC_TYPE,
+      pdf: declaration,
+      note: `Completed Work Declaration for “${work.title}”, filed by the office`,
+    },
   ]);
 
-  const documents = [CLEARANCE_DOC_TYPE];
+  const documents = [CLEARANCE_DOC_TYPE, DECLARATION_DOC_TYPE];
 
   // Admission. The application is approved by this same act, because accepting
   // the work is what makes the applicant a member.

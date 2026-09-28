@@ -155,22 +155,29 @@ function declarationParties(work: WorkLike): WorkDeclarationParty[] {
 }
 
 /**
- * The member's copy of the declaration.
+ * The declaration, as either copy the sheet is meant to produce.
  *
- * The office's boxes — the distribution key, the file number, the factor, the
- * date of registration — are left empty, because on paper this is the sheet the
- * member fills in and hands over. They are not blank by oversight.
+ * The member's copy leaves the office's boxes — the distribution key, the
+ * file number, the factor, the date of registration — empty, because on
+ * paper this is the sheet the member fills in and hands over. The office
+ * copy completes them once the work is on the register, which is also the
+ * copy filed to both the member's and the office's records at that point.
  */
 export async function generateWorkDeclarationPdf(opts: {
   member: MemberLike;
   work: WorkLike;
   reference: string;
+  copy?: "member" | "office";
 }): Promise<GeneratedPdf> {
   const { member, work } = opts;
+  const office = opts.copy === "office";
   return renderOfficialForm({
     template: "workdecl",
     stamps: workDeclarationStamps({
-      copy: "member",
+      copy: office ? "office" : "member",
+      fileNo: work.fileNo,
+      factor: work.factor,
+      dateOfRegistration: work.registeredAt ? formDate(work.registeredAt) : "",
       title: work.title,
       workNo: work.workNo,
       yearComposed: work.yearComposed || work.dateCreated.slice(0, 4),

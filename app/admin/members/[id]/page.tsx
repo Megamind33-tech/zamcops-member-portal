@@ -19,7 +19,14 @@ import { Avatar } from "@/components/zam/Misc";
 import { toast } from "sonner";
 import type { MemberDocType, UploadFile } from "@/types";
 
-const DOC_TYPES: MemberDocType[] = ["Clearance Letter", "Deed of Assignment", "Contract", "ID Document", "Other"];
+const DOC_TYPES: MemberDocType[] = [
+  "Clearance Letter",
+  "Work Declaration",
+  "Deed of Assignment",
+  "Contract",
+  "ID Document",
+  "Other",
+];
 
 export default function AdminMemberDetailPage() {
   const { id } = useParams<{ id: string }>();

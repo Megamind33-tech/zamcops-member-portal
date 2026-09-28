@@ -273,6 +273,7 @@ export type MemberDocType =
   | "ID Document"
   | "Membership Application"
   | "Admission Letter"
+  | "Work Declaration"
   | "Other";
 
 export interface MemberDocument {

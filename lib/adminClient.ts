@@ -104,6 +104,18 @@ export function useAdminData() {
     [load]
   );
 
+  // Complete a work's distribution key (shares per contributor) and its file
+  // number / factor — the office's own boxes on the declaration.
+  const updateWorkSplits = useCallback(
+    async (id: string, payload: { ownershipSplits?: unknown; fileNo?: string; factor?: string }) => {
+      const { res, data: d } = await postJSON(`/api/admin/works/${id}`, payload, "PATCH");
+      if (!res.ok) return { ok: false as const, error: d.error || "Could not save these particulars." };
+      await load();
+      return { ok: true as const };
+    },
+    [load]
+  );
+
   // Permanently delete a submission (admin-only — including registered ones).
   const deleteSubmission = useCallback(
     async (kind: "work" | "single" | "album", id: string) => {
@@ -248,6 +260,7 @@ export function useAdminData() {
     loading,
     setReviewStatus,
     reissueWorkDocuments,
+    updateWorkSplits,
     deleteSubmission,
     setFileStatus,
     setMemberStatus,

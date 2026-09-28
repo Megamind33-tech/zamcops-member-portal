@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { Download, FileText, Play, Square, Trash2 } from "lucide-react";
+import { Download, Eye, FileText, Play, Square, Trash2 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge, ReviewActions } from "@/components/admin/widgets";
+import { WorkPreviewModal } from "@/components/admin/WorkPreviewModal";
 import { useAdminData } from "@/lib/adminClient";
 import { CoverArt } from "@/components/media/CoverArt";
 import { Illustration } from "@/components/media/Illustration";
@@ -72,12 +73,19 @@ function EvidenceCell({
 }
 
 export default function AdminWorksPage() {
-  const { works, members, uploads, setReviewStatus, reissueWorkDocuments, deleteSubmission } = useAdminData();
+  const { works, members, uploads, setReviewStatus, reissueWorkDocuments, updateWorkSplits, deleteSubmission } =
+    useAdminData();
   const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
 
   // Which row has its player open. One at a time, so opening a second work
   // stops the first rather than leaving two recordings playing over each other.
   const [listening, setListening] = React.useState<string | null>(null);
+
+  // The work whose full declaration is open in the preview modal — where
+  // staff complete the distribution key and download the office's copy,
+  // rather than working from the table's truncated Splits column.
+  const [previewId, setPreviewId] = React.useState<string | null>(null);
+  const previewWork = works.find((w) => w.id === previewId) ?? null;
 
   const del = async (id: string, title: string) => {
     if (!window.confirm(`Permanently delete the declaration “${title}”? This removes it from the member's repertoire and can't be undone.`))
@@ -114,7 +122,12 @@ export default function AdminWorksPage() {
                 <React.Fragment key={w.id}>
                 <tr className="hover:bg-zam-canvas">
                   <Td className="font-semibold text-zam-ink">
-                    <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewId(w.id)}
+                      title="Open full declaration"
+                      className="flex items-center gap-3 text-left"
+                    >
                       <CoverArt
                         src={w.coverArt ? `/api/admin/media/work/${w.id}` : undefined}
                         seed={w.title}
@@ -122,12 +135,12 @@ export default function AdminWorksPage() {
                         rounded="rounded-lg"
                       />
                       <div className="min-w-0">
-                        {w.title}
+                        <span className="hover:text-zam-orange hover:underline">{w.title}</span>
                         <span className="block text-xs font-normal text-zam-muted">
                           {w.genre} · {w.language}
                         </span>
                       </div>
-                    </div>
+                    </button>
                   </Td>
                   <Td className="whitespace-nowrap">{w.workType}</Td>
                   <Td className="whitespace-nowrap">{nameFor(w.ownerId)}</Td>
@@ -170,6 +183,13 @@ export default function AdminWorksPage() {
                   </Td>
                   <Td>
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setPreviewId(w.id)}
+                        title="Preview & complete the declaration"
+                        className="inline-flex items-center gap-1 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink transition hover:bg-zam-line/60"
+                      >
+                        <Eye size={14} /> Preview
+                      </button>
                       <ReviewActions
                         disabled={w.status === "Approved" || w.status === "Rejected"}
                         onApprove={() => setReviewStatus("work", w.id, "Approved")}
@@ -303,6 +323,14 @@ export default function AdminWorksPage() {
           </table>
         </div>
       </Panel>
+      {previewWork && (
+        <WorkPreviewModal
+          work={previewWork}
+          ownerName={nameFor(previewWork.ownerId)}
+          onClose={() => setPreviewId(null)}
+          onSave={(payload) => updateWorkSplits(previewWork.id, payload)}
+        />
+      )}
     </div>
   );
 }
