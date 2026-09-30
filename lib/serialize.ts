@@ -253,6 +253,9 @@ export function memberDistributionDTO(d: any, entry: any): MemberDistribution {
     amount: entry.amount,
     currency: entry.currency,
     topSongs: parse<MemberDistribution["topSongs"]>(entry.topSongs, []),
+    grossAmount: entry.grossAmount || entry.amount,
+    adminFee: entry.adminFee || 0,
+    lines: parse<MemberDistribution["lines"]>(entry.lines, []),
   };
 }
 
@@ -264,6 +267,10 @@ export function distributionEntryDTO(e: any): DistributionEntry {
     amount: e.amount,
     currency: e.currency,
     topSongs: parse<DistributionEntry["topSongs"]>(e.topSongs, []),
+    grossAmount: e.grossAmount || e.amount,
+    adminFee: e.adminFee || 0,
+    lines: parse<DistributionEntry["lines"]>(e.lines, []),
+    externalRef: e.externalRef || "",
   };
 }
 

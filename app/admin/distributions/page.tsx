@@ -1,14 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
-import { CalendarRange, Plus, Send, Users, Wallet } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { toast } from "sonner";
+import { CalendarRange, Download, FileSpreadsheet, Plus, Send, Users, Wallet } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { AdminStat, Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { formatKwacha, formatDate } from "@/lib/format";
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Could not read that file."));
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function AdminDistributionsPage() {
-  const { members, distributions, createDistribution, setDistributionStatus, saveDistributionEntry } = useAdminData();
+  const { members, distributions, createDistribution, setDistributionStatus, saveDistributionEntry, importDistributionStatements } =
+    useAdminData();
   const [showNew, setShowNew] = useState(false);
   const [periodLabel, setPeriodLabel] = useState("");
   const [notes, setNotes] = useState("");
@@ -16,6 +27,8 @@ export default function AdminDistributionsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selected = distributions.find((d) => d.id === selectedId) ?? null;
   const published = distributions.filter((d) => d.status === "Published");
@@ -53,6 +66,24 @@ export default function AdminDistributionsPage() {
   const publish = async (id: string, label: string) => {
     if (!confirm(`Publish "${label}"? Members will immediately see their confirmed payouts for this period.`)) return;
     await setDistributionStatus(id, "Published");
+  };
+
+  const importFile = async (file: File) => {
+    if (!selected) return;
+    setImporting(true);
+    const base64 = await fileToBase64(file);
+    const res = await importDistributionStatements(selected.id, base64);
+    setImporting(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (!res.ok) return toast.error(res.error);
+    if (res.unmatched.length === 0) {
+      toast.success(`Imported statements for ${res.matched} member${res.matched === 1 ? "" : "s"}.`);
+      return;
+    }
+    toast.warning(
+      `Imported ${res.matched} matched. ${res.unmatched.length} row${res.unmatched.length === 1 ? "" : "s"} could not be matched to a member: ` +
+        res.unmatched.map((u) => u.memberName || u.externalRef || u.memberNumber || "unnamed").join(", "),
+    );
   };
 
   return (
@@ -173,14 +204,40 @@ export default function AdminDistributionsPage() {
         </Panel>
 
         {selected && (
-          <Panel title={`Entries — ${selected.periodLabel}`} right={<StatusBadge status={selected.status} />}>
+          <Panel
+            title={`Entries — ${selected.periodLabel}`}
+            right={
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) importFile(file);
+                  }}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={importing}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink transition hover:bg-zam-line/60 disabled:opacity-50"
+                  title="Import statements from an Excel workbook — one usage line per row"
+                >
+                  <FileSpreadsheet size={14} /> {importing ? "Importing…" : "Import Excel"}
+                </button>
+                <StatusBadge status={selected.status} />
+              </div>
+            }
+          >
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px]">
+              <table className="w-full min-w-[720px]">
                 <thead className="bg-zam-canvas">
                   <tr>
                     <Th>Member</Th>
                     <Th>Confirmed payout (ZMW)</Th>
-                    <Th className="text-right">Save</Th>
+                    <Th>Lines</Th>
+                    <Th className="text-right">Actions</Th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zam-line">
@@ -201,14 +258,26 @@ export default function AdminDistributionsPage() {
                             className="field-input h-9 w-32"
                           />
                         </Td>
+                        <Td className="text-zam-muted">{entry?.lines.length ? `${entry.lines.length} imported` : "—"}</Td>
                         <Td className="text-right">
-                          <button
-                            onClick={() => saveOne(m.id)}
-                            disabled={savingId === m.id || !drafts[m.id]}
-                            className="rounded-lg bg-zam-orange/15 px-3 py-1.5 text-xs font-semibold text-zam-orange transition hover:bg-zam-orange/25 disabled:opacity-40"
-                          >
-                            {savingId === m.id ? "Saving…" : entry ? "Update" : "Add"}
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            {entry && (
+                              <a
+                                href={`/api/admin/distributions/${selected.id}/entries/${m.id}/statement`}
+                                title="Download this member's statement"
+                                className="inline-flex items-center gap-1 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink transition hover:bg-zam-line/60"
+                              >
+                                <Download size={13} />
+                              </a>
+                            )}
+                            <button
+                              onClick={() => saveOne(m.id)}
+                              disabled={savingId === m.id || !drafts[m.id]}
+                              className="rounded-lg bg-zam-orange/15 px-3 py-1.5 text-xs font-semibold text-zam-orange transition hover:bg-zam-orange/25 disabled:opacity-40"
+                            >
+                              {savingId === m.id ? "Saving…" : entry ? "Update" : "Add"}
+                            </button>
+                          </div>
                         </Td>
                       </tr>
                     );
@@ -217,7 +286,8 @@ export default function AdminDistributionsPage() {
               </table>
             </div>
             <p className="border-t border-zam-line px-5 py-3 text-xs text-zam-muted">
-              Set each member&apos;s confirmed payout, then{" "}
+              Import an Excel workbook (one usage line per row: category, source, work code, licence period, amount, and
+              the member&apos;s number, account ref or name) or set a flat payout by hand, then{" "}
               <strong className="text-zam-ink">publish</strong> the period from the table above — that is the moment members are notified and can see their earnings.
             </p>
           </Panel>

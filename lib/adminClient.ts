@@ -182,6 +182,22 @@ export function useAdminData() {
     [load]
   );
 
+  // Bulk-loads a distribution period's statements from an uploaded workbook —
+  // one usage line per row, grouped and matched to members server-side.
+  const importDistributionStatements = useCallback(
+    async (distributionId: string, fileBase64: string) => {
+      const { res, data: d } = await postJSON(`/api/admin/distributions/${distributionId}/import`, { fileBase64 });
+      if (!res.ok) return { ok: false as const, error: d.error || "Could not import this workbook." };
+      await load();
+      return {
+        ok: true as const,
+        matched: d.matched as number,
+        unmatched: d.unmatched as { memberName: string; memberNumber: string; externalRef: string; netAmount: number; currency: string }[],
+      };
+    },
+    [load]
+  );
+
   // Creates or updates a member's confirmed payout within a distribution period.
   const saveDistributionEntry = useCallback(
     async (payload: { distributionId: string; ownerId: string; amount: number; currency?: string }) => {
@@ -269,6 +285,7 @@ export function useAdminData() {
     createDistribution,
     setDistributionStatus,
     saveDistributionEntry,
+    importDistributionStatements,
     setLicenseRequestStatus,
     resetMemberPassword,
     setTicketStatus,

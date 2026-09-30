@@ -122,6 +122,7 @@ export default function RoyaltiesScreen() {
                   <Th>Published</Th>
                   <Th>Works in this period</Th>
                   <Th className="text-right">Amount received</Th>
+                  <Th className="text-right">Statement</Th>
                 </Tr>
               </thead>
               <tbody>
@@ -135,6 +136,14 @@ export default function RoyaltiesScreen() {
                         : "—"}
                     </Td>
                     <Td className="text-right font-semibold text-zam-ink">{formatKwacha(d.amount, d.currency)}</Td>
+                    <Td className="text-right">
+                      <a
+                        href={`/api/member/distributions/${d.id}/statement`}
+                        className="inline-flex items-center gap-1 rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink ring-1 ring-zam-line transition hover:bg-zam-line/50"
+                      >
+                        <Download size={13} /> PDF
+                      </a>
+                    </Td>
                   </Tr>
                 ))}
               </tbody>

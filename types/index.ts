@@ -324,6 +324,21 @@ export interface Distribution {
   createdAt: string;
 }
 
+// One usage line on an imported statement — a category (e.g. "Television")
+// broken down by source (a broadcaster/station) and the licence window it was
+// billed under. This is the level of detail the paper "Individual Account"
+// statement prints, and what an Excel import supplies one row of.
+export interface DistributionLine {
+  category: string; // e.g. "Television"
+  source: string; // e.g. "Power TV"
+  workCode: string; // e.g. "TV-WL-01"
+  periodStart: string; // license period, as printed — not necessarily ISO
+  periodEnd: string;
+  rightType: string; // e.g. "PR"
+  currency: string;
+  amount: number;
+}
+
 export interface DistributionEntry {
   id: string;
   distributionId: string;
@@ -331,6 +346,10 @@ export interface DistributionEntry {
   amount: number;
   currency: string;
   topSongs: { title: string; plays: number; amount: number }[];
+  grossAmount: number;
+  adminFee: number;
+  lines: DistributionLine[];
+  externalRef?: string;
 }
 
 // A distribution period as seen by a member: the period plus their own confirmed payout.
@@ -338,6 +357,9 @@ export interface MemberDistribution extends Distribution {
   amount: number;
   currency: string;
   topSongs: { title: string; plays: number; amount: number }[];
+  grossAmount: number;
+  adminFee: number;
+  lines: DistributionLine[];
 }
 
 export type LicenseUsageType =

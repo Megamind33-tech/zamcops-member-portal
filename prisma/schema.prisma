@@ -71,6 +71,13 @@ model Member {
   profilePhoto String @default("")
   signature    String @default("") @db.Text // member's signature — transparent PNG data URL, reused on every document they sign
 
+  // The account number the previous system used for this member's royalty
+  // statements (e.g. "133-20034-R") — not a ZAMCOPS member number, and not
+  // guaranteed unique on its own, but learned once an imported statement is
+  // matched to this member so later imports for the same account resolve
+  // automatically instead of needing a name match every time.
+  externalRef String @default("")
+
   notificationPrefs String @default("") // JSON { email, sms, royalty, marketing }
 
   membershipStatus String   @default("Pending")
@@ -95,6 +102,8 @@ model Member {
   documents           MemberDocument[]
   supportTickets      SupportTicket[]
   application         MembershipApplication?
+
+  @@index([externalRef])
 }
 
 // The official ZAMCOPS membership application (Individual / Group / Publisher),
@@ -314,6 +323,13 @@ model DistributionEntry {
   amount         Float        @default(0)
   currency       String       @default("ZMW")
   topSongs       String       @default("[]") // JSON [{ title, plays, amount }] — breakdown for this period
+
+  // The imported statement this entry came from, when it was built from an
+  // Excel upload rather than typed in by hand.
+  externalRef String @default("") // the source system's account number, as matched
+  adminFee    Float  @default(0)
+  grossAmount Float  @default(0) // amount is the net; gross is kept so a re-issued statement can still show both
+  lines       String @default("[]") // JSON DistributionLine[] — the category/source/usage breakdown a statement prints
 
   @@unique([distributionId, ownerId])
   @@index([ownerId])
