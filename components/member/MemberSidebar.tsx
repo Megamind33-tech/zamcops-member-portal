@@ -20,6 +20,7 @@ import {
 import { Logo } from "@/components/ui/Logo";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/format";
+import { InstallAppButton } from "@/components/member/InstallApp";
 
 const nav = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard, exact: true },
@@ -85,6 +86,7 @@ export function MemberSidebar({ open, onClose }: { open: boolean; onClose: () =>
         </nav>
 
         <div className="border-t border-zam-line p-3">
+          <InstallAppButton />
           <div className="overflow-hidden rounded-xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/img/piano.webp" alt="" className="h-20 w-full object-cover" />
