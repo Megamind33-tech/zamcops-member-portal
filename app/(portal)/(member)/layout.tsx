@@ -8,6 +8,7 @@ import { useApp } from "@/lib/store";
 import { MemberSidebar } from "@/components/member/MemberSidebar";
 import { MemberTopbar } from "@/components/member/MemberTopbar";
 import { MemberBottomBar } from "@/components/member/MemberBottomBar";
+import { InstallAppBanner } from "@/components/member/InstallApp";
 
 const titles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -69,6 +70,7 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
             </Link>
           </div>
         )}
+        <InstallAppBanner />
         <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-24 pt-6 lg:px-8 lg:pb-10">{children}</main>
         <MemberBottomBar />
       </div>
