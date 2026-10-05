@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
+import { inviteEmailFor, emailConfigured } from "@/lib/invites";
 
 export const runtime = "nodejs";
 
@@ -42,8 +43,19 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     /* leave empty */
   }
 
+  // never send the token hash to the browser
+  const { inviteTokenHash: _hash, ...safe } = h;
+  void _hash;
   return json({
-    holder: { ...h, identifiers },
+    holder: { ...safe, identifiers },
+    invite: {
+      email: inviteEmailFor(h),
+      typedEmail: h.inviteEmail,
+      sentAt: h.inviteSentAt,
+      expiresAt: h.inviteExpiresAt,
+      count: h.inviteCount,
+      canSend: emailConfigured(),
+    },
     shareCount,
     shares: shares.map((s) => ({
       id: s.id,

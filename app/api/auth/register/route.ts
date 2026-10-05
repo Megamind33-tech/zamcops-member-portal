@@ -5,6 +5,7 @@ import { bad, genMemberNumber, normalizePhone, seedMemberDefaults } from "@/lib/
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { memberDTO } from "@/lib/serialize";
 import { issueEmailOtp } from "@/lib/otp";
+import { findInvite, memberFieldsFromHolder } from "@/lib/invites";
 import { isMemberRole } from "@/lib/roles";
 import { prefillFromAccount, formTypeForRole } from "@/lib/applicationPrefill";
 import { FORM_TYPES, type ApplicationFormType } from "@/lib/applicationForms";
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!body) return bad("Invalid request body.");
 
-  const { fullName, stageName, nrcOrPassport, phone, email, role, password, membershipType } = body;
+  const { fullName, stageName, nrcOrPassport, phone, email, role, password, membershipType, invite } = body;
   if (!fullName || !phone || !email || !password) return bad("Please complete all required fields.");
   if (String(password).length < 6) return bad("Password must be at least 6 characters.");
   if (role && !isMemberRole(role)) return bad("Invalid role.");
@@ -31,6 +32,15 @@ export async function POST(req: Request) {
   });
   if (existing) return bad("An account with that email or phone already exists.", 409);
 
+  // Arriving from an invitation: the link must still be good, and the society's
+  // record then supplies what it already holds (IPI numbers, NRC, address).
+  let holder: Awaited<ReturnType<typeof findInvite>> = null;
+  if (invite) {
+    holder = await findInvite(String(invite));
+    if (!holder) return bad("This invitation link is no longer valid. Ask ZAMCOPS to send you a new one, or register without it.", 400);
+  }
+  const fromRecord = holder ? memberFieldsFromHolder(holder) : {};
+
   const passwordHash = await hashPassword(password);
 
   // Member numbers are random, so retry a few times on a rare collision.
@@ -39,13 +49,15 @@ export async function POST(req: Request) {
     try {
       member = await prisma.member.create({
         data: {
+          // what the society holds first, then what they typed over it
+          ...fromRecord,
           memberNumber: genMemberNumber(),
           email: String(email).toLowerCase(),
           phone: normalizedPhone,
           passwordHash,
           fullName,
           stageName: stageName ?? "",
-          nrcOrPassport: nrcOrPassport ?? "",
+          nrcOrPassport: nrcOrPassport || fromRecord.nrcOrPassport || "",
           role: isMemberRole(role) ? role : "Composer",
         },
       });
@@ -61,6 +73,19 @@ export async function POST(req: Request) {
   if (!member) return bad("We could not allocate a member number — please try again.", 500);
 
   await seedMemberDefaults(member.id, member.memberNumber);
+
+  // Link the new account to the register entry. updateMany with memberId null in
+  // the filter makes the link single-use even if two sign-ups race on one link.
+  if (holder) {
+    try {
+      await prisma.rightHolder.updateMany({
+        where: { id: holder.id, memberId: null },
+        data: { memberId: member.id, matchedBy: "invite", inviteTokenHash: "", inviteExpiresAt: null },
+      });
+    } catch (err) {
+      console.error("[register] could not link the invited right-holder:", err);
+    }
+  }
 
   // The membership application starts here, already carrying everything just
   // given. Asking for a surname, an NRC, a phone number and an email a second

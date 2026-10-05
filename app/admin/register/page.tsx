@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Link2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Link2, Send } from "lucide-react";
+import { toast } from "sonner";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 
@@ -19,12 +20,15 @@ type Holder = {
   isAffiliated: boolean;
   shareCount: number;
   member: { id: string; memberNumber: string } | null;
+  email: string;
+  inviteStatus: "member" | "invited" | "ready" | "noemail";
+  inviteSentAt: string | null;
 };
 type Result = {
   page: number;
   pageSize: number;
   total: number;
-  stats: { all: number; withIpi: number; linked: number };
+  stats: { all: number; withIpi: number; linked: number; ready: number; invited: number; noEmail: number };
   holders: Holder[];
 };
 
@@ -32,7 +36,17 @@ const FILTERS = [
   { key: "", label: "All" },
   { key: "ipi", label: "With IPI number" },
   { key: "member", label: "Portal members" },
+  { key: "ready", label: "Ready to invite" },
+  { key: "invited", label: "Invited" },
+  { key: "noemail", label: "Need an email" },
 ] as const;
+
+const INVITE_LABEL: Record<Holder["inviteStatus"], string> = {
+  member: "Has an account",
+  invited: "Invited",
+  ready: "Ready to invite",
+  noemail: "No email yet",
+};
 
 export default function RegisterPage() {
   const [q, setQ] = useState("");
@@ -41,6 +55,30 @@ export default function RegisterPage() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState<Result | null>(null);
   const [err, setErr] = useState("");
+  const [tick, setTick] = useState(0);
+  const [sending, setSending] = useState(false);
+
+  const sendBatch = async () => {
+    if (!data?.stats.ready) return;
+    const n = Math.min(50, data.stats.ready);
+    if (!window.confirm(`Send invitation emails to ${n} right-holder${n === 1 ? "" : "s"} now? (${data.stats.ready} are ready in total.)`)) return;
+    setSending(true);
+    try {
+      const r = await fetch("/api/admin/register/invites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: true }),
+      });
+      const b = await r.json();
+      if (!r.ok) throw new Error(b.error ?? "Could not send invites.");
+      toast.success(`Sent ${b.sent} invite${b.sent === 1 ? "" : "s"}${b.skipped ? ` · ${b.skipped} skipped` : ""} · ${b.remaining} still waiting`);
+      setTick((t) => t + 1);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not send invites.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   // debounce typing so each keystroke is not a query over 20k rows
   useEffect(() => {
@@ -66,7 +104,7 @@ export default function RegisterPage() {
     return () => {
       live = false;
     };
-  }, [term, filter, page]);
+  }, [term, filter, page, tick]);
 
   const pages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
 
@@ -76,16 +114,25 @@ export default function RegisterPage() {
         title="Right-holders"
         subtitle={
           data
-            ? `${data.stats.all.toLocaleString()} on the WIPO Connect register · ${data.stats.withIpi.toLocaleString()} with an IPI number · ${data.stats.linked} linked to portal members`
+            ? `${data.stats.all.toLocaleString()} on the register · ${data.stats.linked} with a portal account · ${data.stats.invited} invited · ${data.stats.ready.toLocaleString()} ready to invite · ${data.stats.noEmail.toLocaleString()} need an email`
             : "WIPO Connect register"
         }
         right={
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search name, IPI, NRC, WIPOCOS ID…"
-            className="field-input h-10 w-72"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search name, IPI, NRC, WIPOCOS ID…"
+              className="field-input h-10 w-72"
+            />
+            <button
+              onClick={sendBatch}
+              disabled={sending || !data?.stats.ready}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-zam-orange px-3.5 text-sm font-semibold text-white disabled:opacity-40"
+            >
+              <Send size={14} /> {sending ? "Sending…" : "Send invites"}
+            </button>
+          </div>
         }
       />
 
@@ -140,7 +187,7 @@ export default function RegisterPage() {
         }
       >
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[820px]">
+          <table className="w-full min-w-[980px]">
             <thead>
               <tr className="border-b border-zam-line bg-zam-canvas/60">
                 <Th>Name</Th>
@@ -150,7 +197,8 @@ export default function RegisterPage() {
                 <Th>NRC</Th>
                 <Th>Status</Th>
                 <Th className="text-right">Works</Th>
-                <Th>Portal</Th>
+                <Th>Portal account</Th>
+                <Th>Invite</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zam-line">
@@ -180,11 +228,17 @@ export default function RegisterPage() {
                       <span className="text-xs text-zam-muted">No account</span>
                     )}
                   </Td>
+                  <Td className="text-xs">
+                    <span className={h.inviteStatus === "noemail" ? "text-zam-muted" : "font-medium text-zam-ink"}>
+                      {INVITE_LABEL[h.inviteStatus]}
+                    </span>
+                    {h.email && h.inviteStatus !== "member" && <div className="text-[11px] text-zam-muted">{h.email}</div>}
+                  </Td>
                 </tr>
               ))}
               {data && data.holders.length === 0 && (
                 <tr>
-                  <Td colSpan={8} className="py-10 text-center text-zam-muted">
+                  <Td colSpan={9} className="py-10 text-center text-zam-muted">
                     No right-holders match.
                   </Td>
                 </tr>
