@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Download, Mail, Phone, MapPin, ChevronRight, Contact } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
+import { RegisterList } from "@/components/admin/RegisterList";
 import { StatusBadge } from "@/components/admin/widgets";
 import { Avatar } from "@/components/zam/Misc";
 import { useAdminData } from "@/lib/adminClient";
@@ -16,6 +17,7 @@ export default function AdminDirectoryPage() {
   const { members } = useAdminData();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<(typeof STATUSES)[number]>("All");
+  const [tab, setTab] = useState<"portal" | "affiliated" | "other">("portal");
 
   const shown = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -34,6 +36,39 @@ export default function AdminDirectoryPage() {
 
   const countFor = (s: (typeof STATUSES)[number]) =>
     s === "All" ? members.length : members.filter((m) => m.membershipStatus === s).length;
+
+  const tabs = (
+    <div className="mb-5 inline-flex rounded-xl border border-zam-line bg-white p-1">
+      {(
+        [
+          ["portal", `Portal accounts (${members.length})`],
+          ["affiliated", "ZAMCOPS members (WIPO Connect)"],
+          ["other", "Other right-holders"],
+        ] as const
+      ).map(([key, label]) => (
+        <button
+          key={key}
+          onClick={() => setTab(key)}
+          className={
+            "rounded-lg px-4 py-2 text-sm font-semibold transition-colors " +
+            (tab === key ? "bg-zam-orange text-white" : "text-zam-muted hover:text-zam-ink")
+          }
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (tab !== "portal") {
+    return (
+      <div>
+        <AdminHeader title="All Members" subtitle="Portal accounts, and everyone the society register shows as a ZAMCOPS member" />
+        {tabs}
+        <RegisterList embedded scope={tab} key={tab} />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -63,6 +98,8 @@ export default function AdminDirectoryPage() {
           </div>
         }
       />
+
+      {tabs}
 
       {/* Status filter */}
       <div className="mb-5 flex flex-wrap gap-2">

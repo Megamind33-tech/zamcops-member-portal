@@ -12,6 +12,7 @@ import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Field, Input, Select, Textarea } from "@/components/zam/Input";
 import { FilePicker } from "@/components/zam/FilePicker";
 import { ApplicationPanel, AdminDocDownload } from "@/components/admin/ApplicationPanel";
+import { RegisterCard } from "@/components/admin/RegisterCard";
 import { useAdminData } from "@/lib/adminClient";
 import { formatDate } from "@/lib/format";
 import { uploadFor } from "@/lib/works";
@@ -157,6 +158,8 @@ export default function AdminMemberDetailPage() {
       )}
 
       {/* Profile */}
+      <RegisterCard memberId={member.id} searchHint={member.stageName || member.fullName} />
+
       <Panel title="Profile">
         <div className="grid gap-x-8 gap-y-1 p-5 sm:grid-cols-2 lg:grid-cols-3">
           <Group icon={<IdCard size={14} />} title="Identity">

@@ -22,6 +22,7 @@ const parseIdents = (s: string): Ident[] => {
 //   ?q=      name, IPI, NRC, WIPO id or WIPOCOS id
 //   ?filter= member (linked to a portal account) | ipi (has an IPI number)
 //            | ready (has an email, not invited) | invited | noemail
+//   ?scope=  affiliated (the register shows them as ZAMCOPS members) | other
 //   ?page=   1-based
 export async function GET(req: Request) {
   const session = await requireAdmin();
@@ -34,9 +35,20 @@ export async function GET(req: Request) {
 
   const and: Prisma.RightHolderWhereInput[] = [];
   if (q) {
+    // Each word must appear in the main name or in any other name the person is
+    // known by (pseudonyms, stage names) — "mc wabwino" finds "WABWINO MC" and a
+    // pseudonym row alike. Number-like fields match the whole search text.
+    const words = q.split(/\s+/).filter(Boolean).slice(0, 5);
     and.push({
       OR: [
-        { displayName: { contains: q, mode: "insensitive" } },
+        {
+          AND: words.map((w) => ({
+            OR: [
+              { displayName: { contains: w, mode: "insensitive" as const } },
+              { names: { some: { OR: [{ name: { contains: w, mode: "insensitive" as const } }, { firstName: { contains: w, mode: "insensitive" as const } }] } } },
+            ],
+          })),
+        },
         { ipiNumber: { contains: q } },
         { ipiBaseNumber: { contains: q } },
         { nrc: { contains: q, mode: "insensitive" } },
@@ -46,6 +58,11 @@ export async function GET(req: Request) {
       ],
     });
   }
+  const scope = url.searchParams.get("scope");
+  if (scope === "affiliated") and.push({ isAffiliated: true });
+  if (scope === "other") and.push({ isAffiliated: false });
+  const memberIdParam = url.searchParams.get("memberId");
+  if (memberIdParam) and.push({ memberId: memberIdParam });
   if (filter === "member") and.push({ memberId: { not: null } });
   if (filter === "ipi") and.push({ NOT: { ipiNumber: "" } });
   if (filter === "ready") and.push(READY);
@@ -53,7 +70,7 @@ export async function GET(req: Request) {
   if (filter === "noemail") and.push(NO_EMAIL);
   const where: Prisma.RightHolderWhereInput = and.length ? { AND: and } : {};
 
-  const [rows, total, all, withIpi, linked, ready, invited, noEmail] = await Promise.all([
+  const [rows, total, all, withIpi, linked, ready, invited, noEmail, affiliated] = await Promise.all([
     prisma.rightHolder.findMany({
       where,
       orderBy: { displayName: "asc" },
@@ -72,13 +89,14 @@ export async function GET(req: Request) {
     prisma.rightHolder.count({ where: READY }),
     prisma.rightHolder.count({ where: INVITED }),
     prisma.rightHolder.count({ where: NO_EMAIL }),
+    prisma.rightHolder.count({ where: { isAffiliated: true } }),
   ]);
 
   return json({
     page,
     pageSize: PAGE_SIZE,
     total,
-    stats: { all, withIpi, linked, ready, invited, noEmail },
+    stats: { all, withIpi, linked, ready, invited, noEmail, affiliated, other: all - affiliated },
     holders: rows.map((h) => ({
       id: h.id,
       wipoId: h.wipoId,
