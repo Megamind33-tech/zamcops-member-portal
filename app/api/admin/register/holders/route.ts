@@ -34,9 +34,20 @@ export async function GET(req: Request) {
 
   const and: Prisma.RightHolderWhereInput[] = [];
   if (q) {
+    // Each word must appear in the main name or in any other name the person is
+    // known by (pseudonyms, stage names) — "mc wabwino" finds "WABWINO MC" and a
+    // pseudonym row alike. Number-like fields match the whole search text.
+    const words = q.split(/\s+/).filter(Boolean).slice(0, 5);
     and.push({
       OR: [
-        { displayName: { contains: q, mode: "insensitive" } },
+        {
+          AND: words.map((w) => ({
+            OR: [
+              { displayName: { contains: w, mode: "insensitive" as const } },
+              { names: { some: { OR: [{ name: { contains: w, mode: "insensitive" as const } }, { firstName: { contains: w, mode: "insensitive" as const } }] } } },
+            ],
+          })),
+        },
         { ipiNumber: { contains: q } },
         { ipiBaseNumber: { contains: q } },
         { nrc: { contains: q, mode: "insensitive" } },
@@ -46,6 +57,8 @@ export async function GET(req: Request) {
       ],
     });
   }
+  const memberIdParam = url.searchParams.get("memberId");
+  if (memberIdParam) and.push({ memberId: memberIdParam });
   if (filter === "member") and.push({ memberId: { not: null } });
   if (filter === "ipi") and.push({ NOT: { ipiNumber: "" } });
   if (filter === "ready") and.push(READY);

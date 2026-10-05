@@ -453,6 +453,34 @@ async function main() {
   // ── write ────────────────────────────────────────────────────────────────
   const kept = new Map((await prisma.registryWork.findMany({ where: { declarationId: { not: null } }, select: { wipoId: true, declarationId: true } })).map((r) => [r.wipoId, r.declarationId]));
 
+  // Links staff made by hand, and invitations already sent, live on the
+  // RightHolder rows this run replaces. Read them first and put them back, so a
+  // re-import never forgets who was linked or invited.
+  const prior = await prisma.rightHolder.findMany({
+    where: { OR: [{ memberId: { not: null } }, { NOT: { inviteEmail: "" } }, { inviteSentAt: { not: null } }] },
+    select: { wipoId: true, memberId: true, matchedBy: true, inviteEmail: true, inviteTokenHash: true, inviteSentAt: true, inviteExpiresAt: true, inviteCount: true },
+  });
+  const priorByWipo = new Map(prior.map((p) => [p.wipoId, p]));
+  const priorOwner = new Map(prior.filter((p) => p.memberId).map((p) => [p.memberId, p.wipoId]));
+  let restored = 0;
+  for (const h of holders) {
+    // a member already linked to one record is not taken by another
+    if (h.memberId && priorOwner.has(h.memberId) && priorOwner.get(h.memberId) !== h.wipoId) {
+      h.memberId = null;
+      h.matchedBy = "";
+    }
+    const p = priorByWipo.get(h.wipoId);
+    if (!p) continue;
+    if (p.memberId) {
+      h.memberId = p.memberId;
+      h.matchedBy = p.matchedBy;
+      restored++;
+    }
+    Object.assign(h, { inviteEmail: p.inviteEmail, inviteTokenHash: p.inviteTokenHash, inviteSentAt: p.inviteSentAt, inviteExpiresAt: p.inviteExpiresAt, inviteCount: p.inviteCount });
+  }
+  const finalLinked = new Set(holders.filter((h) => h.memberId).map((h) => h.memberId));
+  console.log(`  keeping ${restored} existing links and ${prior.filter((p) => p.inviteSentAt || p.inviteEmail).length} invite records`);
+
   console.log("\nReplacing previously imported register rows…");
   await prisma.distributionLine.deleteMany();
   await prisma.workShare.deleteMany();
@@ -486,7 +514,7 @@ async function main() {
 
   let n = 0;
   for (const u of updates) {
-    if (!Object.keys(u.data).length) continue;
+    if (!Object.keys(u.data).length || !finalLinked.has(u.id)) continue;
     await prisma.member.update({ where: { id: u.id }, data: u.data });
     n++;
   }

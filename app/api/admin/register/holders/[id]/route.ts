@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { inviteEmailFor, emailConfigured } from "@/lib/invites";
+import { suggestMembers } from "@/lib/registerLink";
 
 export const runtime = "nodejs";
 
@@ -43,6 +44,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     /* leave empty */
   }
 
+  const suggestions = h.memberId ? [] : await suggestMembers(h);
+
   // never send the token hash to the browser
   const { inviteTokenHash: _hash, ...safe } = h;
   void _hash;
@@ -56,6 +59,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       count: h.inviteCount,
       canSend: emailConfigured(),
     },
+    suggestions,
     shareCount,
     shares: shares.map((s) => ({
       id: s.id,

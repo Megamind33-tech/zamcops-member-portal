@@ -80,6 +80,12 @@ export default function RegisterPage() {
     }
   };
 
+  // arriving from a member page with ?q=
+  useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get("q");
+    if (initial) setQ(initial);
+  }, []);
+
   // debounce typing so each keystroke is not a query over 20k rows
   useEffect(() => {
     const t = setTimeout(() => {
