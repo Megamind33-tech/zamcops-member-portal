@@ -379,8 +379,10 @@ async function main() {
   console.log(`  with IPI number ${holders.filter((h) => h.ipiNumber).length}, with IPI base ${holders.filter((h) => h.ipiBaseNumber).length}, with NRC ${holders.filter((h) => h.nrc).length}`);
   console.log(`  works ${registry.length}  shares ${shares.length} (without a right-holder: ${reg.sharesNoHolder})`);
   console.log(`  distributions ${distributions.length}  lines ${lines.length}`);
-  const shareVals = shares.map((s) => s.share);
-  console.log(`  share values: min ${Math.min(...shareVals, 0)}, max ${Math.max(...shareVals, 0)} (WIPO units kept as they are)`);
+  // reduce, not Math.min(...array): spreading 260k values overflows the call stack
+  const lo = shares.reduce((a, s) => Math.min(a, s.share), 0);
+  const hi = shares.reduce((a, s) => Math.max(a, s.share), 0);
+  console.log(`  share values: min ${lo}, max ${hi} (WIPO units kept as they are)`);
   const codes = {};
   for (const h of holders) for (const i of JSON.parse(h.identifiers)) codes[`${i.code}|${i.label}`] = (codes[`${i.code}|${i.label}`] ?? 0) + 1;
   console.log("  identifier types on right-holders:", JSON.stringify(codes));
