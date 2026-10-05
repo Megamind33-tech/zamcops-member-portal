@@ -6,6 +6,7 @@ import { AdminHeader } from "@/components/admin/AdminShell";
 import { AdminStat, Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { useAdminData } from "@/lib/adminClient";
 import { formatKwacha, formatDate } from "@/lib/format";
+import { RunsList } from "@/components/admin/RunsList";
 
 export default function AdminDistributionsPage() {
   const { members, distributions, createDistribution, setDistributionStatus, saveDistributionEntry } = useAdminData();
@@ -16,6 +17,7 @@ export default function AdminDistributionsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"payouts" | "runs">("payouts");
 
   const selected = distributions.find((d) => d.id === selectedId) ?? null;
   const published = distributions.filter((d) => d.status === "Published");
@@ -55,6 +57,35 @@ export default function AdminDistributionsPage() {
     await setDistributionStatus(id, "Published");
   };
 
+  const tabs = (
+    <div className="mb-5 inline-flex rounded-xl border border-zam-line bg-white p-1">
+      {(
+        [
+          ["payouts", "Member payouts"],
+          ["runs", "Society runs (WIPO Connect)"],
+        ] as const
+      ).map(([key, label]) => (
+        <button
+          key={key}
+          onClick={() => setTab(key)}
+          className={"rounded-lg px-4 py-2 text-sm font-semibold transition-colors " + (tab === key ? "bg-zam-orange text-white" : "text-zam-muted hover:text-zam-ink")}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (tab === "runs") {
+    return (
+      <div>
+        <AdminHeader title="Distributions" subtitle="Every distribution run on the society's books, with the full allocation behind each" />
+        {tabs}
+        <RunsList />
+      </div>
+    );
+  }
+
   return (
     <div>
       <AdminHeader
@@ -69,6 +100,8 @@ export default function AdminDistributionsPage() {
           </button>
         }
       />
+
+      {tabs}
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <AdminStat icon={<CalendarRange size={18} />} label="Periods" value={distributions.length} />
