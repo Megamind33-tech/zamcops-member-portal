@@ -105,6 +105,22 @@ function build(dir) {
   const conts = opt(dir, "contacts");
   const dyn = opt(dir, "ip_dynamic");
 
+  // "ZAMCOPS member" comes from the affiliation records, not from WIPO's
+  // is_affiliated flag, which this install leaves false for everyone. A person
+  // is a member when they hold a current affiliation (no end date, or one still
+  // in the future) to the society named ZAMCOPS in the society list.
+  const societyIds = new Set(opt(dir, "lk_cmo").filter((c) => /zamcops/i.test(`${c.name} ${c.acronym}`)).map((c) => c.id_cmo));
+  const today = new Date().toISOString().slice(0, 10);
+  const memberSince = new Map(); // WIPO ip id -> earliest start date of a current ZAMCOPS affiliation
+  for (const a of opt(dir, "affiliations")) {
+    if (!societyIds.has(a.fk_cmo)) continue;
+    const end = clean(a.end_date).slice(0, 10);
+    if (end && end < today) continue; // ended
+    const start = clean(a.start_date).slice(0, 10);
+    const had = memberSince.get(a.fk_interested_party);
+    if (had === undefined || (start && (!had || start < had))) memberSince.set(a.fk_interested_party, start);
+  }
+
   const namesByIp = group(names, "fk_interested_party");
   const identsByIp = group(idents, "fk_interested_party");
   const addrsByIp = group(addrs, "fk_interested_party");
@@ -146,8 +162,9 @@ function build(dir) {
       birthDate: clean(ip.birth_date).slice(0, 10),
       deathDate: clean(ip.death_date).slice(0, 10),
       status: clean(ip.status),
-      isAffiliated: truthy(ip.is_affiliated),
-      affiliatedFrom: clean(ip.affiliation_start_date).slice(0, 10),
+      // affiliation records decide when the society is in the list; the flag is only a fallback
+      isAffiliated: societyIds.size ? memberSince.has(id) : truthy(ip.is_affiliated),
+      affiliatedFrom: memberSince.get(id) || clean(ip.affiliation_start_date).slice(0, 10),
       region: d.REGION ?? "",
       nextOfKin: d.HEIR_REPRESENTATIVE ?? "",
       spouse: d.SPOUSE ?? "",
@@ -282,7 +299,7 @@ function build(dir) {
     });
   }
 
-  return { holders, holderIds, registry, shares, sharesNoHolder, distributions, lines };
+  return { holders, holderIds, registry, shares, sharesNoHolder, distributions, lines, societyIds: [...societyIds] };
 }
 
 // ── match to portal members ─────────────────────────────────────────────────
@@ -388,6 +405,7 @@ async function main() {
   const reg = build(dir);
   const { holders, registry, shares, distributions, lines } = reg;
   console.log(`  right-holders ${holders.length}  (names ${holders.reduce((n, h) => n + h.names.length, 0)}, addresses ${holders.reduce((n, h) => n + h.addresses.length, 0)}, contacts ${holders.reduce((n, h) => n + h.contacts.length, 0)})`);
+  console.log(`  ZAMCOPS members (current affiliation to society id ${reg.societyIds.join(", ") || "— none found in lk_cmo"}): ${holders.filter((h) => h.isAffiliated).length}`);
   console.log(`  with IPI number ${holders.filter((h) => h.ipiNumber).length}, with IPI base ${holders.filter((h) => h.ipiBaseNumber).length}, with NRC ${holders.filter((h) => h.nrc).length}`);
   console.log(`  works ${registry.length}  shares ${shares.length} (without a right-holder: ${reg.sharesNoHolder})`);
   console.log(`  distributions ${distributions.length}  lines ${lines.length}`);
