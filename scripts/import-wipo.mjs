@@ -315,6 +315,17 @@ function matchMembers(holders, members) {
         stats.ambiguous++; // two members share the key — don't guess
         continue;
       }
+      // A phone number can be shared or reassigned, so a phone-only hit needs
+      // the names to agree on at least one word; otherwise leave it for staff.
+      if (how === "phone") {
+        const m = members.find((x) => x.id === hits[0]);
+        const words = (s) => new Set(clean(s).toUpperCase().replace(/[^A-Z ]/g, " ").split(" ").filter((w) => w.length > 1));
+        const a = words(m.fullName);
+        if (![...words(h.displayName)].some((w) => a.has(w))) {
+          stats.weakPhone = (stats.weakPhone ?? 0) + 1;
+          continue;
+        }
+      }
       if (claimed.has(hits[0])) {
         stats.collisions++; // another holder already took this member
         break;
@@ -352,6 +363,7 @@ function memberChanges(member, h) {
     if (!v) continue;
     const cur = clean(member[k]);
     if (cur === v) continue;
+    if (k === "nrcOrPassport" && cur && normNrc(cur) === normNrc(v)) continue; // spacing / slashes only
     data[k] = v;
     if (cur) conflicts.push({ field: k, portal: cur, wipo: v });
   }
@@ -398,7 +410,7 @@ async function main() {
     members = await prisma.member.findMany();
     report.match = matchMembers(holders, members);
     const matched = holders.filter((h) => h.memberId);
-    console.log(`  members in portal ${members.length}; matched ${matched.length} (by ipi ${report.match.ipi}, nrc ${report.match.nrc}, email ${report.match.email}, phone ${report.match.phone}); ambiguous ${report.match.ambiguous}, collisions ${report.match.collisions}`);
+    console.log(`  members in portal ${members.length}; matched ${matched.length} (by ipi ${report.match.ipi}, nrc ${report.match.nrc}, email ${report.match.email}, phone ${report.match.phone}); ambiguous ${report.match.ambiguous}, collisions ${report.match.collisions}, phone hits rejected on name ${report.match.weakPhone ?? 0}`);
     console.log(`  unmatched members ${members.length - matched.length} · right-holders staying as records only ${holders.length - matched.length}`);
     // Name-only candidates for members the hard keys missed. Reported for staff
     // to confirm by hand; never linked automatically, since names coincide.
