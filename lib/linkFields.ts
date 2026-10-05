@@ -9,6 +9,8 @@ export type LinkData = {
   adminFeeIntl?: number;
   adminFeeIntlRevenue?: number;
   adminFeeReserved?: number;
+  className?: string;
+  subClass?: string;
   periodStart?: string;
   periodEnd?: string;
   notes?: string;
@@ -44,6 +46,8 @@ export async function readLinkFields(b: Record<string, unknown>): Promise<{ data
     if (p === null) return { error: `The ${label} must be between 0 and 100%.` };
     (data as Record<string, number>)[k] = p;
   }
+  if (b.className !== undefined) data.className = String(b.className).trim().slice(0, 60);
+  if (b.subClass !== undefined) data.subClass = String(b.subClass).trim().slice(0, 120);
   if (b.periodStart !== undefined) data.periodStart = String(b.periodStart).slice(0, 10);
   if (b.periodEnd !== undefined) data.periodEnd = String(b.periodEnd).slice(0, 10);
   if (data.periodStart && data.periodEnd && data.periodStart > data.periodEnd) return { error: "The period ends before it starts." };

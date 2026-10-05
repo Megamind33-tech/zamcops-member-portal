@@ -8,8 +8,8 @@ import { readLinkFields } from "@/lib/linkFields";
 export const runtime = "nodejs";
 
 // The pool links of one distribution run — WIPO Connect's "Distribution Pool
-// Link" table: main id, pool, class, station (sub class), period, how many works
-// are on the list, status, amount.
+// Link" table: main id, pool, creation class, right type, method, class, sub
+// class, period, # of works, status, amount.
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
@@ -20,23 +20,30 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const links = await prisma.distributionPoolLink.findMany({
     where: { distributionId: id },
     orderBy: { seq: "asc" },
-    include: { pool: { select: { id: true, code: true, kind: true, method: true, rightType: true, creationClass: true } }, _count: { select: { works: true } } },
+    include: { pool: { select: { id: true, code: true, className: true, method: true, rightType: true, creationClass: true } }, _count: { select: { works: true } } },
   });
   const sums = links.length
     ? await prisma.distributionLine.groupBy({ by: ["linkId"], where: { linkId: { in: links.map((l) => l.id) } }, _sum: { amount: true, adminFee: true, reserved: true }, _count: { _all: true } })
     : [];
   const by = new Map(sums.map((s) => [s.linkId, s]));
+
+  // what has been typed before, offered as suggestions for Class / Sub Class
+  const [classes, subs] = await Promise.all([
+    prisma.distributionPoolLink.groupBy({ by: ["className"], where: { className: { not: "" } }, _count: { _all: true }, orderBy: { _count: { className: "desc" } }, take: 30 }),
+    prisma.distributionPoolLink.groupBy({ by: ["subClass"], where: { subClass: { not: "" } }, _count: { _all: true }, orderBy: { _count: { subClass: "desc" } }, take: 200 }),
+  ]);
+
   return json({
     locked: lockReason(d),
     closedAt: d.closedAt,
     runAt: d.runAt,
+    suggestions: { classes: classes.map((c) => c.className), subClasses: subs.map((s) => s.subClass) },
     links: links.map((l) => ({
       id: l.id,
       seq: l.seq,
       pool: l.pool,
-      stationId: l.stationId,
-      stationName: l.stationName,
-      kind: l.kind || l.pool?.kind || "",
+      className: l.className || l.pool?.className || "",
+      subClass: l.subClass,
       periodStart: l.periodStart,
       periodEnd: l.periodEnd,
       amount: l.amount,
@@ -55,9 +62,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   });
 }
 
-// Add a pool link: pick a pool and a station (or type a new station), a period,
-// the amount to share out and the admin fees. Fees, reserve type and methods
-// start from the pool's settings and can be changed per link.
+// Add a pool link: pick a distribution pool, type the Class and Sub Class
+// (for example RADIO / ZNBC-RADIO), a period, the amount and the admin fees.
+// Class, fees, reserve type and methods start from the pool and can be changed
+// on the link.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
@@ -72,36 +80,24 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const read = await readLinkFields(b as Record<string, unknown>);
   if ("error" in read) return bad(read.error);
   const f = read.data;
-
   const pool = f.poolId ? await prisma.distributionPool.findUnique({ where: { id: f.poolId } }) : null;
-
-  let station = b.stationId ? await prisma.broadcastStation.findUnique({ where: { id: String(b.stationId) } }) : null;
-  if (b.stationId && !station) return bad("That station does not exist.");
-  const newName = String(b.newStation?.name ?? "").trim();
-  if (!station && newName) {
-    const kind = ["Radio", "Television", "Live performance", "Online", "Other"].includes(b.newStation?.kind) ? (b.newStation.kind as string) : pool?.kind || "Radio";
-    station =
-      (await prisma.broadcastStation.findFirst({ where: { name: { equals: newName, mode: "insensitive" }, kind } })) ??
-      (await prisma.broadcastStation.create({ data: { name: newName.slice(0, 200), kind } }));
-  }
-  if (!station && !pool) return bad("Choose a pool or a station for this link.");
+  if (!pool) return bad("Choose a distribution pool for this link.");
 
   const link = await prisma.distributionPoolLink.create({
     data: {
       distributionId: id,
-      poolId: pool?.id ?? null,
-      stationId: station?.id ?? null,
-      stationName: station?.name ?? "",
-      kind: station?.kind ?? pool?.kind ?? "",
+      poolId: pool.id,
+      className: f.className ?? pool.className,
+      subClass: f.subClass ?? pool.subClass,
       periodStart: f.periodStart ?? "",
       periodEnd: f.periodEnd ?? "",
       amount: f.amount ?? 0,
       currency: f.currency ?? "ZMW",
-      adminFeePct: f.adminFeePct ?? pool?.adminFeePct ?? 0,
+      adminFeePct: f.adminFeePct ?? pool.adminFeePct ?? 0,
       adminFeeIntl: f.adminFeeIntl ?? 0,
       adminFeeIntlRevenue: f.adminFeeIntlRevenue ?? 0,
       adminFeeReserved: f.adminFeeReserved ?? 0,
-      reserveType: f.reserveType ?? pool?.reserveType ?? "",
+      reserveType: f.reserveType ?? pool.reserveType ?? "",
       affiliation: f.affiliation ?? "ZAMCOPS",
       workMethodId: f.workMethodId ?? null,
       roMethodId: f.roMethodId ?? null,
@@ -111,8 +107,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   await logAudit(session.sub, "distribution.link-added", {
     targetType: "Distribution",
     targetId: id,
-    summary: `Added pool link 133-${link.seq}-DPL ${pool?.code ?? ""} ${station?.name ?? ""} to “${d.periodLabel}”`.replace(/\s+/g, " "),
-    changes: [{ field: "Pool link", from: "", to: `133-${link.seq}-DPL · ${[pool?.code, station?.name].filter(Boolean).join(" · ")} — ${link.currency} ${link.amount.toFixed(2)}` }],
+    summary: `Added pool link 133-${link.seq}-DPL ${pool.code} ${link.subClass} to “${d.periodLabel}”`.replace(/\s+/g, " "),
+    changes: [{ field: "Pool link", from: "", to: `133-${link.seq}-DPL · ${[pool.code, link.className, link.subClass].filter(Boolean).join(" · ")} — ${link.currency} ${link.amount.toFixed(2)}` }],
   });
   return json({ id: link.id, seq: link.seq }, 201);
 }

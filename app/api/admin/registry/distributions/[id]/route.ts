@@ -277,3 +277,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   });
   return json({ ok: true });
 }
+
+// Delete a distribution (the bin button on WIPO Connect's list): its pool links,
+// allocation lines, reserves and member payouts go with it. Refused once it is
+// closed or published — reopen / unpublish it first.
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await requireAdmin();
+  if (!session) return bad("Not authorized.", 401);
+  const { id } = await params;
+  const d = await prisma.distribution.findUnique({ where: { id }, select: { periodLabel: true, code: true, status: true, closedAt: true } });
+  if (!d) return bad("Distribution not found.", 404);
+  const locked = lockReason(d);
+  if (locked) return bad(locked);
+  await prisma.distribution.delete({ where: { id } });
+  await logAudit(session.sub, "distribution.deleted", { targetType: "Distribution", targetId: id, summary: `Deleted distribution ${d.code} “${d.periodLabel}”` });
+  return json({ ok: true });
+}

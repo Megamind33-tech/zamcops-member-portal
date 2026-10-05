@@ -10,7 +10,7 @@ type Pool = {
   id: string;
   code: string;
   name: string;
-  kind: string;
+  className: string;
   subClass: string;
   method: string;
   creationClass: string;
@@ -45,7 +45,7 @@ export default function PoolsPage() {
     return () => ctl.abort();
   }, [status]);
 
-  const shown = (rows ?? []).filter((p) => !q.trim() || [p.code, p.name, p.kind, p.subClass, p.method].join(" ").toLowerCase().includes(q.trim().toLowerCase()));
+  const shown = (rows ?? []).filter((p) => !q.trim() || [p.code, p.name, p.className, p.subClass, p.method].join(" ").toLowerCase().includes(q.trim().toLowerCase()));
 
   return (
     <div>
@@ -101,7 +101,7 @@ export default function PoolsPage() {
                     </Link>
                     {p.name && <span className="ml-2 font-sans font-normal text-zam-muted">{p.name}</span>}
                   </Td>
-                  <Td>{p.kind}</Td>
+                  <Td>{p.className || "—"}</Td>
                   <Td>{p.subClass || "—"}</Td>
                   <Td>{p.creationClass}</Td>
                   <Td>{p.rightType === "Performing" ? "PR" : p.rightType === "Mechanical" ? "MR" : p.rightType}</Td>

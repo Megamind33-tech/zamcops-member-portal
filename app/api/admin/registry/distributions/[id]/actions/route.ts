@@ -23,19 +23,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (b?.action === "run-all") {
     const locked = lockReason(d);
     if (locked) return bad(locked);
-    const links = await prisma.distributionPoolLink.findMany({ where: { distributionId: id, status: { not: "Allocated" } }, orderBy: { seq: "asc" }, select: { id: true, seq: true, stationName: true, amount: true, _count: { select: { works: true } } } });
+    const links = await prisma.distributionPoolLink.findMany({ where: { distributionId: id, status: { not: "Allocated" } }, orderBy: { seq: "asc" }, select: { id: true, seq: true, subClass: true, amount: true, _count: { select: { works: true } } } });
     if (links.length === 0) return bad("Every pool link is already allocated.");
-    const done: { seq: number; station: string; ok: boolean; message: string }[] = [];
+    const done: { seq: number; subClass: string; ok: boolean; message: string }[] = [];
     for (const l of links) {
       if (!(l.amount > 0) || l._count.works === 0) {
-        done.push({ seq: l.seq, station: l.stationName, ok: false, message: l._count.works === 0 ? "No works on the list" : "No amount" });
+        done.push({ seq: l.seq, subClass: l.subClass, ok: false, message: l._count.works === 0 ? "No works on the list" : "No amount" });
         continue;
       }
       try {
         const r = await allocateLink(l.id);
-        done.push({ seq: l.seq, station: l.stationName, ok: true, message: `${r.lines.toLocaleString()} lines${r.reserved ? `, ${r.reserved.toFixed(2)} reserved` : ""}` });
+        done.push({ seq: l.seq, subClass: l.subClass, ok: true, message: `${r.lines.toLocaleString()} lines${r.reserved ? `, ${r.reserved.toFixed(2)} reserved` : ""}` });
       } catch (e) {
-        done.push({ seq: l.seq, station: l.stationName, ok: false, message: e instanceof Error ? e.message : "Failed" });
+        done.push({ seq: l.seq, subClass: l.subClass, ok: false, message: e instanceof Error ? e.message : "Failed" });
       }
     }
     await logAudit(session.sub, "distribution.run-all", {

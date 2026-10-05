@@ -11,7 +11,7 @@ type Result = {
   total: number;
   notRun: number;
   byStatus: { status: string; count: number }[];
-  works: { id: string; workId: string; title: string; iswc: string; wipoId: string; registryStatus: string; status: string; note: string; linkId: string; linkSeq: number; station: string }[];
+  works: { id: string; workId: string; title: string; iswc: string; wipoId: string; registryStatus: string; status: string; note: string; linkId: string; linkSeq: number; subClass: string }[];
 };
 
 // "Pend. Works" — the works in this run's pool links that could not be paid in
@@ -96,7 +96,7 @@ export function PendingWorks({ distributionId, refresh }: { distributionId: stri
                     <Link href={`/admin/distributions/${distributionId}/pools/${w.linkId}`} className="font-mono hover:text-zam-orange">
                       133-{w.linkSeq}-DPL
                     </Link>
-                    {w.station && <span className="ml-1 text-zam-muted">{w.station}</span>}
+                    {w.subClass && <span className="ml-1 text-zam-muted">{w.subClass}</span>}
                   </Td>
                   <Td className="whitespace-nowrap">
                     <StatusBadge status={w.status === "Not distributable" ? "Rejected" : "Pending"} /> <span className="ml-1 text-[11px] text-zam-muted">{w.status}</span>

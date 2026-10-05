@@ -38,7 +38,7 @@ export async function PATCH(req: Request) {
 
   // Edit the run's particulars (label, notes, dates) without touching its status.
   if (b.status === undefined) {
-    const data: { periodLabel?: string; notes?: string; code?: string; startDate?: string; endDate?: string } = {};
+    const data: { periodLabel?: string; notes?: string; code?: string; startDate?: string; endDate?: string; deadline?: string } = {};
     if (b.periodLabel !== undefined) {
       const label = String(b.periodLabel).trim();
       if (!label) return bad("The period needs a label.");
@@ -48,6 +48,7 @@ export async function PATCH(req: Request) {
     if (b.code !== undefined) data.code = String(b.code).trim().slice(0, 40);
     if (b.startDate !== undefined) data.startDate = String(b.startDate).trim().slice(0, 20);
     if (b.endDate !== undefined) data.endDate = String(b.endDate).trim().slice(0, 20);
+    if (b.deadline !== undefined) data.deadline = String(b.deadline).trim().slice(0, 20);
     if (Object.keys(data).length === 0) return bad("Nothing to update.");
     const updated = await prisma.distribution.update({ where: { id: b.id }, data });
     await logAudit(session.sub, "distribution.updated", {

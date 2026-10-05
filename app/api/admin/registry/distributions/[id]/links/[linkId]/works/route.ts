@@ -12,7 +12,7 @@ async function guard(id: string, linkId: string) {
   return link;
 }
 
-const label = (l: { pool: { code: string } | null; stationName: string }) => [l.pool?.code, l.stationName].filter(Boolean).join(" · ") || "pool link";
+const label = (l: { pool: { code: string } | null; subClass: string }) => [l.pool?.code, l.subClass].filter(Boolean).join(" · ") || "pool link";
 
 // Bulk add works to the link.
 //   { action: "check", text }   read a pasted / uploaded list and say what each

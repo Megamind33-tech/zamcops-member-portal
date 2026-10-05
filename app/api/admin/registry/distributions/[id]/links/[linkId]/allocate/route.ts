@@ -22,7 +22,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     await logAudit(session.sub, "distribution.link-allocated", {
       targetType: "Distribution",
       targetId: id,
-      summary: `Allocated ${[link.pool?.code, link.stationName].filter(Boolean).join(" · ") || "pool link"}: ZMW ${r.amount.toFixed(2)} across ${r.works.toLocaleString()} works`,
+      summary: `Allocated ${[link.pool?.code, link.subClass].filter(Boolean).join(" · ") || "pool link"}: ZMW ${r.amount.toFixed(2)} across ${r.works.toLocaleString()} works`,
       changes: [{ field: "Allocation", from: link.status, to: `${r.lines.toLocaleString()} lines, ZMW ${r.amount.toFixed(2)}${r.reserved ? `, ZMW ${r.reserved.toFixed(2)} reserved` : ""}` }],
     });
     return json(r);

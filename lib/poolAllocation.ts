@@ -414,8 +414,8 @@ async function run(link: LinkIn): Promise<AllocationResult> {
       const reserveRows = Object.entries(byReserve).map(([reserveType, amount]) => ({
         distributionId: link.distributionId,
         linkId: link.id,
-        className: link.kind,
-        subClass: link.stationName,
+        className: link.className,
+        subClass: link.subClass,
         creationClass: pool?.creationClass ?? "MW",
         rightType,
         reserveType,

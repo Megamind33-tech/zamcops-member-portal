@@ -14,7 +14,6 @@ import {
   FolderOpen,
   Wallet,
   CalendarRange,
-  Radio,
   Layers,
   Calculator,
   ListChecks,
@@ -39,53 +38,55 @@ import { useAdminAuth } from "@/lib/adminAuth";
 import { useAdminData } from "@/lib/adminClient";
 import { cn } from "@/lib/format";
 
+// The menu follows WIPO Connect's main menu (Rights Owners, Works, Matching and
+// Distribution …) and its names. Pages that only exist because ZAMCOPS has a
+// member portal sit in their own group at the end.
 const sections = [
-  { title: "Overview", items: [{ href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true }] },
+  { title: "Home", items: [{ href: "/admin", label: "Home page", icon: LayoutDashboard, exact: true }] },
   {
-    title: "Rights owners",
+    title: "Rights Owners",
     items: [
-      { href: "/admin/register", label: "Right-holders", icon: BookUser },
-      { href: "/admin/groups", label: "Groups", icon: UsersRound },
-      { href: "/admin/members", label: "Member Applications", icon: Users },
-      { href: "/admin/directory", label: "All Members", icon: Contact },
+      { href: "/admin/register", label: "Browse", icon: BookUser },
+      { href: "/admin/groups", label: "Group", icon: UsersRound },
     ],
   },
   {
     title: "Works",
     items: [
-      { href: "/admin/catalogue", label: "Registered Works", icon: Library },
-      { href: "/admin/works", label: "Work Declarations", icon: FileText },
+      { href: "/admin/catalogue", label: "Browse all Creation Classes", icon: Library },
+      { href: "/admin/works", label: "Pending", icon: FileText },
+      { href: "/admin/work-sets", label: "Set", icon: ListChecks },
+    ],
+  },
+  {
+    title: "Matching and Distribution",
+    items: [
+      { href: "/admin/distributions", label: "Distribution", icon: CalendarRange },
+      { href: "/admin/pools", label: "Distribution Pool", icon: Layers },
+      { href: "/admin/allocation-methods", label: "Allocation Method", icon: Calculator },
+      { href: "/admin/reserves", label: "Reserve Management", icon: PiggyBank },
+    ],
+  },
+  {
+    title: "Reports and Administration",
+    items: [
+      { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+      { href: "/admin/team", label: "Audit and Accounts", icon: ShieldCheck },
+    ],
+  },
+  {
+    title: "Member Portal",
+    items: [
+      { href: "/admin/members", label: "Member Applications", icon: Users },
+      { href: "/admin/directory", label: "All Members", icon: Contact },
       { href: "/admin/songs", label: "Song Submissions", icon: Music2 },
       { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
-      { href: "/admin/work-sets", label: "Work Sets", icon: ListChecks },
-    ],
-  },
-  {
-    title: "Matching & distribution",
-    items: [
-      { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
-      { href: "/admin/pools", label: "Distribution Pools", icon: Layers },
-      { href: "/admin/stations", label: "Radio & TV Stations", icon: Radio },
-      { href: "/admin/allocation-methods", label: "Allocation Methods", icon: Calculator },
-      { href: "/admin/reserves", label: "Reserve Management", icon: PiggyBank },
-      { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
-    ],
-  },
-  { title: "Licensing", items: [{ href: "/admin/licensing", label: "Licensing Desk", icon: Handshake }] },
-  {
-    title: "Operations",
-    items: [
       { href: "/admin/files", label: "Uploaded Files", icon: FolderOpen },
+      { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
+      { href: "/admin/licensing", label: "Licensing Desk", icon: Handshake },
       { href: "/admin/support", label: "Support Inbox", icon: LifeBuoy },
       { href: "/admin/notices", label: "Member notices", icon: Bell },
       { href: "/admin/signatures", label: "Official Signatures", icon: PenLine },
-    ],
-  },
-  {
-    title: "Reports & administration",
-    items: [
-      { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-      { href: "/admin/team", label: "Team & Activity", icon: ShieldCheck },
     ],
   },
 ];

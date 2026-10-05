@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/db";
-import { POOL_METHODS, POOL_RIGHT_TYPES, STATION_KINDS } from "@/lib/poolConst";
+import { POOL_METHODS, POOL_RIGHT_TYPES } from "@/lib/poolConst";
 import { RESERVE_TYPES } from "@/lib/poolAllocation";
 
 export type PoolData = {
   code?: string;
   name?: string;
-  kind?: string;
+  className?: string;
   subClass?: string;
   method?: string;
   creationClass?: string;
@@ -33,11 +33,7 @@ export async function readPoolFields(b: Record<string, unknown>, existingCode?: 
     data.code = c;
   }
   for (const [k, max] of [["name", 200], ["subClass", 120], ["creationClass", 10], ["notes", 2000]] as const) if (b[k] !== undefined) data[k] = String(b[k]).trim().slice(0, max);
-  if (b.kind !== undefined) {
-    const k = String(b.kind).trim();
-    if (!(STATION_KINDS as readonly string[]).includes(k)) return { error: "Unknown class of use." };
-    data.kind = k;
-  }
+  if (b.className !== undefined) data.className = String(b.className).trim().slice(0, 60);
   if (b.method !== undefined) {
     if (!(POOL_METHODS as readonly string[]).includes(String(b.method))) return { error: "Unknown distribution method." };
     data.method = String(b.method);
@@ -80,7 +76,7 @@ export async function readPoolFields(b: Record<string, unknown>, existingCode?: 
 export const POOL_LABELS: Record<string, string> = {
   code: "Code",
   name: "Name",
-  kind: "Class",
+  className: "Class",
   subClass: "Sub class",
   method: "Distribution method",
   creationClass: "Creation class",
@@ -101,7 +97,7 @@ export const poolJson = (p: {
   id: string;
   code: string;
   name: string;
-  kind: string;
+  className: string;
   subClass: string;
   method: string;
   creationClass: string;

@@ -1,6 +1,5 @@
-// Shared option lists for stations, distribution pools and reserves (used by the
+// Shared option lists for distribution pools and reserves (used by the
 // staff console pages and kept in step with the API validation).
-export const STATION_KINDS = ["Radio", "Television", "Live performance", "Online", "Other"] as const;
 // WIPO Connect's six distribution methods. Work List is fully supported; the
 // others are recorded on the pool and described in the console.
 export const POOL_METHODS = ["Work List", "Log Based", "RO List", "Reserve", "Analogy", "CRD"] as const;

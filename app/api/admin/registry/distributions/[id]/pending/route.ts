@@ -34,7 +34,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       orderBy: [{ status: "desc" }, { work: { title: "asc" } }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
-      include: { work: { select: { id: true, title: true, iswc: true, status: true, wipoId: true } }, link: { select: { id: true, seq: true, stationName: true } } },
+      include: { work: { select: { id: true, title: true, iswc: true, status: true, wipoId: true } }, link: { select: { id: true, seq: true, subClass: true } } },
     }),
     prisma.distributionPoolWork.groupBy({ by: ["status"], where: { link: { distributionId: id } }, _count: { _all: true } }),
   ]);
@@ -55,7 +55,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       note: r.note,
       linkId: r.link.id,
       linkSeq: r.link.seq,
-      station: r.link.stationName,
+      subClass: r.link.subClass,
     })),
   });
 }

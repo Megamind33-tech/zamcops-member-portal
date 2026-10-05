@@ -614,31 +614,13 @@ model DistributionLine {
   @@index([linkId])
 }
 
-// A radio or television station (or other broadcaster / venue) that reports
-// music use. The WIPO Connect "Sub Class" of a distribution pool link.
-model BroadcastStation {
-  id        String   @id @default(cuid())
-  name      String
-  kind      String   @default("Radio") // Radio | Television | Live performance | Online | Other
-  code      String   @default("")
-  region    String   @default("")
-  notes     String   @default("")
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  links DistributionPoolLink[]
-
-  @@index([kind, name])
-}
-
 // A reusable distribution pool — WIPO Connect's "Distribution Pool" such as
 // TV-WL-01: the creation class, right type and method its money is shared by.
 model DistributionPool {
   id            String   @id @default(cuid())
   code          String   @unique
   name          String   @default("")
-  kind          String   @default("Television") // the class of use: Radio | Television | Live performance | Online | Other
+  className     String   @default("") // WIPO "Class", free text (RADIO, TELEVISION, CONCERT …)
   method        String   @default("Work List") // Work List | Log Based | RO List | Reserve | Analogy | CRD
   creationClass String   @default("MW")
   rightType     String   @default("Performing") // which shares are paid from this pool
@@ -674,10 +656,8 @@ model DistributionPoolLink {
   distributionId String
   pool           DistributionPool? @relation(fields: [poolId], references: [id], onDelete: SetNull)
   poolId         String?
-  station        BroadcastStation? @relation(fields: [stationId], references: [id], onDelete: SetNull)
-  stationId      String?
-  stationName    String            @default("") // kept so the label survives a deleted station
-  kind           String            @default("")
+  className      String            @default("") // WIPO "Class", free text (RADIO, TELEVISION, CONCERT …)
+  subClass       String            @default("") // WIPO "Sub Class": the station or venue
   periodStart    String            @default("")
   periodEnd      String            @default("")
   amount         Float             @default(0)

@@ -2,8 +2,8 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ArrowLeft, Download, Pencil, Save, X } from "lucide-react";
+import { useParams, useSearchParams } from "next/navigation";
+import { ArrowLeft, Download, RefreshCw, Save } from "lucide-react";
 import { toast } from "sonner";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
@@ -13,6 +13,7 @@ import { HolderPicker } from "@/components/admin/HolderPicker";
 import { WorkPicker } from "@/components/admin/WorkPicker";
 import { PoolLinks } from "@/components/admin/PoolLinks";
 import { PendingWorks } from "@/components/admin/PendingWorks";
+import { PortalPayouts } from "@/components/admin/PortalPayouts";
 import { formatKwacha } from "@/lib/format";
 
 type Row = Record<string, string | number | boolean | null>;
@@ -50,7 +51,7 @@ type Result = {
   rows: Row[];
 };
 
-type Tab = "main" | "pools" | "pending" | "summary" | "analysis" | "statements" | "allocations" | "audit";
+type Tab = "main" | "payouts" | "pending" | "summary" | "analysis" | "statements" | "allocations" | "audit";
 
 const Line = ({ label, value, strong }: { label: string; value: React.ReactNode; strong?: boolean }) => (
   <div className={"flex items-baseline justify-between gap-4 border-b border-[#eceff3] px-4 py-1.5 text-[13px] " + (strong ? "font-bold" : "")}>
@@ -61,7 +62,9 @@ const Line = ({ label, value, strong }: { label: string; value: React.ReactNode;
 
 export default function DistributionDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [tab, setTab] = useState<Tab>("main");
+  const sp = useSearchParams();
+  const first = sp.get("tab");
+  const [tab, setTab] = useState<Tab>(first === "pending" || first === "summary" || first === "analysis" || first === "statements" || first === "allocations" || first === "audit" || first === "payouts" ? (first as Tab) : "main");
   const [view, setView] = useState<"holders" | "works" | "lines">("holders");
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
@@ -70,8 +73,8 @@ export default function DistributionDetailPage() {
   const [err, setErr] = useState("");
   const [tick, setTick] = useState(0);
   const [closing, setClosing] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [meta, setMeta] = useState({ periodLabel: "", code: "", startDate: "", endDate: "", notes: "" });
+  const [meta, setMeta] = useState({ periodLabel: "", code: "", startDate: "", endDate: "", deadline: "", notes: "" });
+  const [metaDirty, setMetaDirty] = useState(false);
   const [unmatched, setUnmatched] = useState(false);
   const [lineEdit, setLineEdit] = useState<{
     id: string;
@@ -112,12 +115,9 @@ export default function DistributionDetailPage() {
   }, [id, activeView, term, page, tick, unmatched, tab]);
 
   const d = data?.distribution;
-  const startEdit = useCallback(() => {
-    if (!d) return;
-    setMeta({ periodLabel: d.periodLabel, code: d.code, startDate: d.startDate, endDate: d.endDate, notes: d.notes });
-    setEditing(true);
-    setTab("main");
-  }, [d]);
+  useEffect(() => {
+    if (d && !metaDirty) setMeta({ periodLabel: d.periodLabel, code: d.code, startDate: d.startDate, endDate: d.endDate, deadline: d.deadline, notes: d.notes });
+  }, [d, metaDirty]);
 
   const saveMeta = async () => {
     const r = await fetch("/api/admin/distributions", {
@@ -128,7 +128,7 @@ export default function DistributionDetailPage() {
     const b = await r.json().catch(() => ({}));
     if (!r.ok) return toast.error(b.error ?? "Could not save.");
     toast.success("Distribution updated.");
-    setEditing(false);
+    setMetaDirty(false);
     setTick((t) => t + 1);
   };
 
@@ -152,6 +152,25 @@ export default function DistributionDetailPage() {
     toast.success("Line updated.");
     setLineEdit(null);
     setTick((t) => t + 1);
+  };
+
+  // WIPO Connect's "Sync with Portal": On shows the run's confirmed payouts to
+  // members (and notifies them); Off hides them again.
+  const setSync = async (on: boolean) => {
+    if (!d || on === (d.status === "Published")) return;
+    if (on && !window.confirm("Turn Sync with Portal on? Members with a payout in this distribution will see it immediately and be notified.")) return;
+    setClosing(true);
+    try {
+      const r = await fetch("/api/admin/distributions", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: on ? "Published" : "Draft" }) });
+      const b = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(b.error ?? "Could not change Sync with Portal.");
+      toast.success(on ? "Synced with the member portal." : "Taken off the member portal.");
+      setTick((t) => t + 1);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not change Sync with Portal.");
+    } finally {
+      setClosing(false);
+    }
   };
 
   const runAction = async (action: "close" | "reopen") => {
@@ -209,12 +228,22 @@ export default function DistributionDetailPage() {
         <ArrowLeft size={13} /> Distributions
       </Link>
       <AdminHeader
-        title={d.periodLabel}
-        subtitle={[d.code && `Code ${d.code}`, range, d.runAt && `Run ${new Date(d.runAt).toLocaleDateString("en-GB", { dateStyle: "medium" })}`, d.imported ? "Imported from WIPO Connect" : "Created in the portal"].filter(Boolean).join(" · ")}
+        title={`${d.periodLabel} (${d.code || "—"})`}
+        subtitle={d.runAt ? `Run Date: ${new Date(d.runAt).toLocaleDateString("en-GB").replace(/\//g, "/")}` : d.imported ? "Imported from WIPO Connect" : ""}
         right={
-          <div className="flex items-center gap-2">
-            <StatusBadge status={d.closedAt ? "Approved" : d.status} />
-            <span className="text-xs font-semibold text-zam-muted">{d.closedAt ? "Done" : d.status === "Published" ? "Published" : "To be Completed"}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={"inline-block rounded-sm px-2 py-0.5 text-[12px] " + (d.closedAt ? "bg-[#d9f2e3] text-[#17683a]" : "bg-[#fff3c4] text-[#7a5b00]")}>{d.closedAt ? "Done" : "To be Completed"}</span>
+            <span className="flex items-center gap-1.5 text-[12px] font-semibold text-zam-muted">
+              Sync with Portal
+              <span className="inline-flex overflow-hidden rounded-sm ring-1 ring-[#bfc5ce]">
+                <button type="button" disabled={closing || d.closedAt != null} onClick={() => setSync(true)} className={"px-3 py-1 text-[12px] " + (d.status === "Published" ? "bg-[#286090] text-white" : "bg-white text-zam-muted hover:bg-[#eef3f8]")}>
+                  On
+                </button>
+                <button type="button" disabled={closing || d.closedAt != null} onClick={() => setSync(false)} className={"px-3 py-1 text-[12px] " + (d.status !== "Published" ? "bg-[#7a8a99] text-white" : "bg-white text-zam-muted hover:bg-[#eef3f8]")}>
+                  Off
+                </button>
+              </span>
+            </span>
             {d.closedAt ? (
               <button onClick={() => runAction("reopen")} disabled={closing} className={btn}>
                 Reopen
@@ -226,16 +255,13 @@ export default function DistributionDetailPage() {
                 </button>
               )
             )}
-            <button onClick={startEdit} className={btn}>
-              <Pencil size={13} /> Edit details
-            </button>
           </div>
         }
       />
 
       <Tabs
         className="mb-3"
-        value={tab}
+        value={tab === "pending" ? "main" : tab}
         onChange={(t) => {
           setTab(t);
           setPage(1);
@@ -243,12 +269,11 @@ export default function DistributionDetailPage() {
         }}
         tabs={[
           { key: "main", label: "Main" },
-          { key: "pools", label: "Pool links" },
-          { key: "pending", label: "Pending works" },
           { key: "summary", label: "Summary" },
           { key: "analysis", label: "Analysis" },
           { key: "statements", label: "Statements", count: s.holders },
           { key: "allocations", label: "Allocations", count: s.lines },
+          { key: "payouts", label: "Portal payouts", count: d.entryCount || undefined },
           { key: "audit", label: "Audit" },
         ]}
       />
@@ -257,64 +282,58 @@ export default function DistributionDetailPage() {
 
       {tab === "main" && (
         <div className="space-y-3">
-          {editing ? (
-            <Panel
-              title="Edit distribution details"
-              right={
-                <button onClick={() => setEditing(false)} aria-label="Cancel" className="text-zam-muted hover:text-zam-ink">
-                  <X size={16} />
+          <Panel
+            title="General Information"
+            collapsible
+            right={
+              <div className="flex items-center gap-1.5">
+                <button type="button" onClick={() => setTick((t) => t + 1)} className="grid h-6 w-6 place-items-center rounded-sm bg-[#286090] text-white hover:bg-[#204d74]" aria-label="Refresh" title="Refresh">
+                  <RefreshCw size={12} />
                 </button>
-              }
-            >
-              <div className="grid gap-3 p-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Name / label</span>
-                  <input value={meta.periodLabel} onChange={(e) => setMeta({ ...meta, periodLabel: e.target.value })} className="field-input h-9 w-full" />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Code</span>
-                  <input value={meta.code} onChange={(e) => setMeta({ ...meta, code: e.target.value })} className="field-input h-9 w-full" />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Start date</span>
-                  <input type="date" value={meta.startDate} onChange={(e) => setMeta({ ...meta, startDate: e.target.value })} className="field-input h-9 w-full" />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold text-zam-muted">End date</span>
-                  <input type="date" value={meta.endDate} onChange={(e) => setMeta({ ...meta, endDate: e.target.value })} className="field-input h-9 w-full" />
-                </label>
-                <label className="block sm:col-span-2">
-                  <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Narrative / notes</span>
-                  <textarea rows={3} value={meta.notes} onChange={(e) => setMeta({ ...meta, notes: e.target.value })} className="field-input w-full" />
-                </label>
-                <div className="sm:col-span-2">
+                <button type="button" onClick={() => setTab("pending")} className="inline-flex h-6 items-center rounded-sm bg-[#286090] px-2 text-[11px] font-semibold text-white hover:bg-[#204d74]">
+                  Pending Works
+                </button>
+              </div>
+            }
+          >
+            <div className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Main Id</span>
+                <input value={d.code} readOnly className="field-input h-8 w-full bg-[#f1f3f6]" />
+              </label>
+              <label className="block lg:col-span-3">
+                <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Name</span>
+                <input value={meta.periodLabel} disabled={!!d.locked} onChange={(e) => { setMeta({ ...meta, periodLabel: e.target.value }); setMetaDirty(true); }} className="field-input h-8 w-full" />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Start Date</span>
+                <input type="date" value={meta.startDate} disabled={!!d.locked} onChange={(e) => { setMeta({ ...meta, startDate: e.target.value }); setMetaDirty(true); }} className="field-input h-8 w-full" />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold text-zam-muted">End Date</span>
+                <input type="date" value={meta.endDate} disabled={!!d.locked} onChange={(e) => { setMeta({ ...meta, endDate: e.target.value }); setMetaDirty(true); }} className="field-input h-8 w-full" />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Deadline</span>
+                <input type="date" value={meta.deadline} disabled={!!d.locked} onChange={(e) => { setMeta({ ...meta, deadline: e.target.value }); setMetaDirty(true); }} className="field-input h-8 w-full" />
+              </label>
+              <label className="block sm:col-span-2 lg:col-span-4">
+                <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Narrative</span>
+                <textarea rows={3} value={meta.notes} disabled={!!d.locked} onChange={(e) => { setMeta({ ...meta, notes: e.target.value }); setMetaDirty(true); }} className="field-input w-full" />
+              </label>
+              {metaDirty && !d.locked && (
+                <div className="sm:col-span-2 lg:col-span-4">
                   <button onClick={saveMeta} className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-zam-orange px-4 text-[13px] font-semibold text-white">
                     <Save size={13} /> Save
                   </button>
                 </div>
-              </div>
-            </Panel>
-          ) : (
-            <Panel title="General information" collapsible>
-              <dl className="grid gap-x-8 gap-y-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
-                <Field label="Main id">{d.code}</Field>
-                <Field label="Name">{d.periodLabel}</Field>
-                <Field label="Start date">{d.startDate}</Field>
-                <Field label="End date">{d.endDate}</Field>
-                <Field label="Deadline">{d.deadline}</Field>
-                <Field label="Status">{d.closedAt ? "Done" : d.status === "Published" ? "Published" : "To be Completed"}</Field>
-                <Field label="Run date">{d.runAt ? new Date(d.runAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "Not run yet"}</Field>
-                <Field label="Closed">{d.closedAt ? new Date(d.closedAt).toLocaleDateString("en-GB", { dateStyle: "medium" }) : ""}</Field>
-                <Field label="Published">{d.publishedAt ? new Date(d.publishedAt).toLocaleDateString("en-GB", { dateStyle: "medium" }) : "Not published"}</Field>
-                <Field label="Source">{d.imported ? "Imported from WIPO Connect" : "Created in the portal"}</Field>
-                <Field label="Member payouts">{d.entryCount ? String(d.entryCount) : ""}</Field>
-                <Field label="Narrative" className="sm:col-span-2 lg:col-span-4">
-                  {d.notes}
-                </Field>
-              </dl>
-            </Panel>
-          )}
-          <Panel title="Totals" collapsible>
+              )}
+            </div>
+          </Panel>
+
+          <PoolLinks distributionId={id} onChanged={() => setTick((t) => t + 1)} />
+
+          <Panel title="Total Amount" collapsible defaultOpen={false}>
             <div className="grid sm:grid-cols-2">
               <div>
                 <Line label="Total allocated" value={formatKwacha(s.amount)} strong />
@@ -328,18 +347,19 @@ export default function DistributionDetailPage() {
               </div>
             </div>
           </Panel>
-          {s.lines === 0 && (
-            <p className="rounded-sm bg-zam-amber/10 px-4 py-2.5 text-sm text-[#9a6a00]">
-              This period has no allocation lines.
-              {d.entryCount > 0 ? ` It has ${d.entryCount} member payouts — manage them from the Distributions list.` : " Import the WIPO Connect export to bring in past allocations."}
-            </p>
-          )}
         </div>
       )}
 
-      {tab === "pools" && <PoolLinks distributionId={id} onChanged={() => setTick((t) => t + 1)} />}
+      {tab === "pending" && (
+        <div>
+          <button type="button" onClick={() => setTab("main")} className="mb-2 inline-flex items-center gap-1 text-xs text-zam-muted hover:text-zam-ink">
+            <ArrowLeft size={13} /> Main
+          </button>
+          <PendingWorks distributionId={id} refresh={tick} />
+        </div>
+      )}
 
-      {tab === "pending" && <PendingWorks distributionId={id} refresh={tick} />}
+      {tab === "payouts" && <PortalPayouts distributionId={id} locked={d.status === "Published" || !!d.closedAt} onChanged={() => setTick((t) => t + 1)} />}
 
       {tab === "summary" && (
         <div className="grid gap-3 lg:grid-cols-3">

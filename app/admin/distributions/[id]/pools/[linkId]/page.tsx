@@ -18,10 +18,9 @@ type Detail = {
     id: string;
     seq: number;
     distribution: { id: string; periodLabel: string; status: string; code: string };
-    pool: { id: string; code: string; name: string; kind: string; method: string; rightType: string; creationClass: string; workMethod: string; roMethod: string; adminFeePct: number } | null;
-    stationId: string | null;
-    stationName: string;
-    kind: string;
+    pool: { id: string; code: string; name: string; className: string; method: string; rightType: string; creationClass: string; workMethod: string; roMethod: string; adminFeePct: number } | null;
+    className: string;
+    subClass: string;
     periodStart: string;
     periodEnd: string;
     amount: number;
@@ -57,8 +56,7 @@ type Results = {
   total: number;
   rows: Record<string, string | number | null>[];
 };
-type Pool = { id: string; code: string; name: string; kind: string; rightType: string; method: string; adminFeePct: number };
-type Station = { id: string; name: string; kind: string };
+type Pool = { id: string; code: string; name: string; className: string; rightType: string; method: string; adminFeePct: number };
 type Method = { id: string; name: string; target: string };
 type WorkSetRow = { id: string; name: string; works: number };
 
@@ -86,11 +84,11 @@ export default function PoolLinkPage() {
   const [tick, setTick] = useState(0);
   const [selected, setSelected] = useState<globalThis.Set<string>>(new globalThis.Set());
   const [weights, setWeights] = useState<Record<string, string>>({});
-  const [form, setForm] = useState({ poolId: "", stationId: "", periodStart: "", periodEnd: "", amount: "", currency: "ZMW", affiliation: "ZAMCOPS", adminFeePct: "0", adminFeeIntl: "0", adminFeeIntlRevenue: "0", adminFeeReserved: "0", reserveType: "", workMethodId: "", roMethodId: "", notes: "" });
+  const [form, setForm] = useState({ poolId: "", className: "", subClass: "", periodStart: "", periodEnd: "", amount: "", currency: "ZMW", affiliation: "ZAMCOPS", adminFeePct: "0", adminFeeIntl: "0", adminFeeIntlRevenue: "0", adminFeeReserved: "0", reserveType: "", workMethodId: "", roMethodId: "", notes: "" });
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState("");
   const [pools, setPools] = useState<Pool[]>([]);
-  const [stations, setStations] = useState<Station[]>([]);
+  const [suggest, setSuggest] = useState<{ classes: string[]; subClasses: string[] }>({ classes: [], subClasses: [] });
   const [methods, setMethods] = useState<Method[]>([]);
   const [sets, setSets] = useState<WorkSetRow[]>([]);
   const [setId, setSetId] = useState("");
@@ -101,15 +99,15 @@ export default function PoolLinkPage() {
   const reload = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
-    Promise.all([fetch("/api/admin/pools?status=all").then((r) => r.json()), fetch("/api/admin/stations?active=1").then((r) => r.json()), fetch("/api/admin/allocation-methods").then((r) => r.json()), fetch("/api/admin/work-sets").then((r) => r.json())])
-      .then(([p, s, m, w]) => {
+    Promise.all([fetch("/api/admin/pools?status=all").then((r) => r.json()), fetch("/api/admin/allocation-methods").then((r) => r.json()), fetch("/api/admin/work-sets").then((r) => r.json()), fetch(`/api/admin/registry/distributions/${id}/links`).then((r) => r.json())])
+      .then(([p, m, w, l]) => {
         setPools(p.pools ?? []);
-        setStations(s.stations ?? []);
         setMethods(m.methods ?? []);
         setSets(w.sets ?? []);
+        setSuggest(l.suggestions ?? { classes: [], subClasses: [] });
       })
-      .catch(() => toast.error("Could not load the pool, station and method lists."));
-  }, []);
+      .catch(() => toast.error("Could not load the pool and method lists."));
+  }, [id]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -133,7 +131,8 @@ export default function PoolLinkPage() {
           const l = b.link;
           setForm({
             poolId: l.pool?.id ?? "",
-            stationId: l.stationId ?? "",
+            className: l.className,
+            subClass: l.subClass,
             periodStart: l.periodStart,
             periodEnd: l.periodEnd,
             amount: String(l.amount),
@@ -186,7 +185,7 @@ export default function PoolLinkPage() {
   const save = async () => {
     setBusy("save");
     try {
-      const b = await call(api, { method: "PATCH", body: JSON.stringify({ ...form, poolId: form.poolId || null, stationId: form.stationId || null, workMethodId: form.workMethodId || null, roMethodId: form.roMethodId || null }) }, "Could not save.");
+      const b = await call(api, { method: "PATCH", body: JSON.stringify({ ...form, poolId: form.poolId || null, workMethodId: form.workMethodId || null, roMethodId: form.roMethodId || null }) }, "Could not save.");
       toast.success(b.needsAllocation ? "Saved. The money settings changed, so run the allocation again." : "Saved.");
       setDirty(false);
       reload();
@@ -296,8 +295,8 @@ export default function PoolLinkPage() {
         <ArrowLeft size={13} /> {L.distribution.periodLabel}
       </Link>
       <AdminHeader
-        title={`133-${L.seq}-DPL · ${L.stationName || "Pool link"}`}
-        subtitle={[L.pool?.code, L.kind, L.pool?.method, L.pool?.rightType && `${L.pool.rightType} right`, [L.periodStart, L.periodEnd].filter(Boolean).join(" → ")].filter(Boolean).join(" · ")}
+        title={`133-${L.seq}-DPL · ${L.subClass || L.pool?.code || "Pool link"}`}
+        subtitle={[L.pool?.code, L.className, L.pool?.method, L.pool?.rightType && `${L.pool.rightType} right`, [L.periodStart, L.periodEnd].filter(Boolean).join(" → ")].filter(Boolean).join(" · ")}
         right={
           <div className="flex items-center gap-2">
             <StatusBadge status={statusTone(L.status)} className="whitespace-nowrap" />
@@ -345,21 +344,28 @@ export default function PoolLinkPage() {
                   <option value="">— none —</option>
                   {pools.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.code} · {p.kind} · {p.rightType}
+                      {p.code} · {p.className || p.method} · {p.rightType}
                     </option>
                   ))}
                 </select>
               </label>
               <label className="block">
-                <Lbl hint="(sub class)">Radio / TV station</Lbl>
-                <select value={form.stationId} onChange={(e) => set("stationId", e.target.value)} className={small + " appearance-none bg-white"}>
-                  <option value="">— none —</option>
-                  {stations.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} ({s.kind})
-                    </option>
+                <Lbl>Class</Lbl>
+                <input value={form.className} onChange={(e) => set("className", e.target.value)} list="link-classes" className={small} placeholder="e.g. RADIO" />
+                <datalist id="link-classes">
+                  {[...new Set(["RADIO", "TELEVISION", "CONCERT", ...suggest.classes])].map((c) => (
+                    <option key={c} value={c} />
                   ))}
-                </select>
+                </datalist>
+              </label>
+              <label className="block">
+                <Lbl>Sub Class</Lbl>
+                <input value={form.subClass} onChange={(e) => set("subClass", e.target.value)} list="link-subclasses" className={small} placeholder="e.g. ZNBC-RADIO" />
+                <datalist id="link-subclasses">
+                  {suggest.subClasses.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
               </label>
               <label className="block">
                 <Lbl>Start date</Lbl>

@@ -8,7 +8,7 @@ import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Pager } from "@/components/admin/ui";
 import { formatKwacha } from "@/lib/format";
-import { CREATION_CLASSES, POOL_RIGHT_TYPES, RESERVE_STATUSES, RESERVE_TYPE_LIST, STATION_KINDS } from "@/lib/poolConst";
+import { CREATION_CLASSES, POOL_RIGHT_TYPES, RESERVE_STATUSES, RESERVE_TYPE_LIST } from "@/lib/poolConst";
 
 type Row = {
   id: string;
@@ -37,7 +37,7 @@ const badge = (s: string) => (s === "Open" ? "Pending" : s === "In Distribution"
 // Reserve Management — money held back by allocations, searched and moved
 // through Open / In Distribution / Prescribed / Closed like WIPO Connect.
 export default function ReservesPage() {
-  const [f, setF] = useState({ distributionId: "", className: "", creationClass: "", rightType: "", reserveType: "", status: "", from: "", to: "" });
+  const [f, setF] = useState({ distributionId: "", creationClass: "", rightType: "", reserveType: "", status: "", from: "", to: "" });
   const [page, setPage] = useState(1);
   const [data, setData] = useState<Result | null>(null);
   const [err, setErr] = useState("");
@@ -98,15 +98,6 @@ export default function ReservesPage() {
                 {d.code ? `${d.code} · ` : ""}
                 {d.periodLabel}
               </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Class</span>
-          <select value={f.className} onChange={(e) => set("className", e.target.value)} className={small + " appearance-none bg-white"}>
-            <option value="">All</option>
-            {STATION_KINDS.map((k) => (
-              <option key={k}>{k}</option>
             ))}
           </select>
         </label>

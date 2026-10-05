@@ -9,13 +9,13 @@ import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, StatusBadge } from "@/components/admin/widgets";
 import { AuditTrail } from "@/components/admin/AuditTrail";
 import { Tabs } from "@/components/admin/ui";
-import { CREATION_CLASSES, POOL_METHODS, POOL_RIGHT_TYPES, RESERVE_TYPE_LIST, STATION_KINDS } from "@/lib/poolConst";
+import { CREATION_CLASSES, POOL_METHODS, POOL_RIGHT_TYPES, RESERVE_TYPE_LIST } from "@/lib/poolConst";
 
 type Method = { id: string; name: string; target: string };
 type Form = {
   code: string;
   name: string;
-  kind: string;
+  className: string;
   subClass: string;
   method: string;
   creationClass: string;
@@ -34,7 +34,7 @@ type Form = {
 const BLANK: Form = {
   code: "",
   name: "",
-  kind: "Television",
+  className: "",
   subClass: "",
   method: "Work List",
   creationClass: "MW",
@@ -95,7 +95,7 @@ export default function PoolPage() {
       setF({
         code: p.code,
         name: p.name,
-        kind: p.kind,
+        className: p.className,
         subClass: p.subClass,
         method: p.method,
         creationClass: p.creationClass,
@@ -275,11 +275,12 @@ export default function PoolPage() {
               </label>
               <label className="block">
                 <Lbl>Class</Lbl>
-                <select value={f.kind} onChange={(e) => set("kind", e.target.value)} className={small + " appearance-none bg-white"}>
-                  {STATION_KINDS.map((m) => (
-                    <option key={m}>{m}</option>
+                <input value={f.className} onChange={(e) => set("className", e.target.value)} list="pool-classes" className={small} placeholder="e.g. RADIO" />
+                <datalist id="pool-classes">
+                  {["RADIO", "TELEVISION", "CONCERT"].map((c) => (
+                    <option key={c} value={c} />
                   ))}
-                </select>
+                </datalist>
               </label>
               <label className="block">
                 <Lbl>Sub class</Lbl>

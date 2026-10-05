@@ -15,7 +15,6 @@ async function load(id: string, linkId: string) {
     include: {
       distribution: { select: { id: true, periodLabel: true, status: true, code: true, closedAt: true } },
       pool: { include: { workMethod: { select: { id: true, name: true } }, roMethod: { select: { id: true, name: true } } } },
-      station: true,
       workMethod: { select: { id: true, name: true } },
       roMethod: { select: { id: true, name: true } },
     },
@@ -73,7 +72,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             id: pool.id,
             code: pool.code,
             name: pool.name,
-            kind: pool.kind,
+            className: pool.className,
             method: pool.method,
             rightType: pool.rightType,
             creationClass: pool.creationClass,
@@ -82,9 +81,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             adminFeePct: pool.adminFeePct,
           }
         : null,
-      stationId: link.stationId,
-      stationName: link.stationName,
-      kind: link.kind,
+      className: link.className,
+      subClass: link.subClass,
       periodStart: link.periodStart,
       periodEnd: link.periodEnd,
       amount: link.amount,
@@ -145,24 +143,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if ("error" in read) return bad(read.error);
   const data: Record<string, string | number | boolean | null> = { ...read.data };
 
-  if (b.stationId !== undefined) {
-    if (b.stationId) {
-      const s = await prisma.broadcastStation.findUnique({ where: { id: String(b.stationId) } });
-      if (!s) return bad("That station does not exist.");
-      data.stationId = s.id;
-      data.stationName = s.name;
-      data.kind = s.kind;
-    } else {
-      data.stationId = null;
-      data.stationName = "";
-    }
-  }
   if (!Object.keys(data).length) return bad("Nothing to update.");
   const moneyChanged = MONEY_FIELDS.some((k) => k in data && data[k] !== (link as unknown as Record<string, unknown>)[k]) || "periodStart" in data || "periodEnd" in data;
   if (moneyChanged && link.status !== "To be Allocated") data.status = "To be Allocated";
 
   await prisma.distributionPoolLink.update({ where: { id: linkId }, data });
-  const label = `133-${link.seq}-DPL ${link.stationName || link.pool?.code || ""}`.trim();
+  const label = `133-${link.seq}-DPL ${link.subClass || link.pool?.code || ""}`.trim();
   await logAudit(session.sub, "distribution.link-updated", {
     targetType: "Distribution",
     targetId: id,
@@ -178,7 +164,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       affiliation: "Paid to",
       periodStart: "Period start",
       periodEnd: "Period end",
-      stationName: "Station",
+      className: "Class",
+      subClass: "Sub class",
       notes: "Narrative",
     }).map((c) => ({ ...c, field: `${c.field} (${label})` })),
   });
@@ -198,8 +185,8 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   await logAudit(session.sub, "distribution.link-removed", {
     targetType: "Distribution",
     targetId: id,
-    summary: `Removed pool link 133-${link.seq}-DPL ${link.stationName}`.trim(),
-    changes: [{ field: "Pool link", from: `133-${link.seq}-DPL · ${[link.pool?.code, link.stationName].filter(Boolean).join(" · ")} — ${link.currency} ${link.amount.toFixed(2)}`, to: "" }],
+    summary: `Removed pool link 133-${link.seq}-DPL ${link.subClass}`.trim(),
+    changes: [{ field: "Pool link", from: `133-${link.seq}-DPL · ${[link.pool?.code, link.className, link.subClass].filter(Boolean).join(" · ")} — ${link.currency} ${link.amount.toFixed(2)}`, to: "" }],
   });
   return json({ ok: true });
 }

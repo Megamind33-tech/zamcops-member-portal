@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     data: {
       code: d.code!,
       name: d.name ?? "",
-      kind: d.kind ?? "Television",
+      className: d.className ?? "",
       subClass: d.subClass ?? "",
       method: d.method ?? "Work List",
       creationClass: d.creationClass || "MW",
