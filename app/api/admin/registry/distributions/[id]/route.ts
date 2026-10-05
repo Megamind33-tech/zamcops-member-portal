@@ -13,6 +13,7 @@ const PAGE_SIZE = 50;
 // (view=lines). Imported WIPO runs carry lines, not the per-member payouts the
 // portal's own periods use, so this is where past runs are checked.
 //   ?q=     holder or work name
+//   ?filter=unmatched  only lines with no right-holder or no registered work
 //   ?page=  1-based
 //   ?format=csv  the current view, all pages, as a download
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -29,6 +30,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   if (!d) return bad("Distribution not found.", 404);
 
   const and: Prisma.DistributionLineWhereInput[] = [{ distributionId: id }];
+  if (url.searchParams.get("filter") === "unmatched") and.push({ OR: [{ rightHolderId: null }, { workId: null }] });
   for (const word of q.split(/\s+/).filter(Boolean)) {
     and.push({
       OR: [
@@ -213,6 +215,35 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!line) return bad("That line is not in this distribution.", 404);
 
   const data: Prisma.DistributionLineUpdateInput = {};
+  const matchChanges: { field: string; from: string; to: string }[] = [];
+  // Match a line to a right-holder / work (or clear the match).
+  if (b.rightHolderId !== undefined) {
+    if (b.rightHolderId) {
+      const h = await prisma.rightHolder.findUnique({ where: { id: String(b.rightHolderId) }, select: { id: true, displayName: true } });
+      if (!h) return bad("That right-holder is not on the register.");
+      if (h.id !== line.rightHolderId) {
+        const prev = line.rightHolderId ? (await prisma.rightHolder.findUnique({ where: { id: line.rightHolderId }, select: { displayName: true } }))?.displayName : "";
+        data.rightHolder = { connect: { id: h.id } };
+        matchChanges.push({ field: "Right-holder", from: prev ?? "", to: h.displayName });
+      }
+    } else if (line.rightHolderId) {
+      data.rightHolder = { disconnect: true };
+      matchChanges.push({ field: "Right-holder", from: "matched", to: "" });
+    }
+  }
+  if (b.workId !== undefined) {
+    if (b.workId) {
+      const w = await prisma.registryWork.findUnique({ where: { id: String(b.workId) }, select: { id: true, title: true } });
+      if (!w) return bad("That work is not on the register.");
+      if (w.id !== line.workId) {
+        data.work = { connect: { id: w.id } };
+        matchChanges.push({ field: "Work", from: line.work?.title ?? "", to: w.title });
+      }
+    } else if (line.workId) {
+      data.work = { disconnect: true };
+      matchChanges.push({ field: "Work", from: line.work?.title ?? "", to: "" });
+    }
+  }
   for (const k of ["amount", "total", "adminFee", "reserved"] as const) {
     if (b[k] === undefined) continue;
     const n = money(b[k]);
@@ -224,7 +255,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   await prisma.distributionLine.update({ where: { id: line.id }, data });
   const who = line.work ? `“${line.work.title}”` : "a line";
-  const changes = diffFields(line as unknown as Record<string, unknown>, data as Record<string, unknown>, { amount: "Amount", total: "Gross", adminFee: "Admin fee", reserved: "Reserved", disputed: "Disputed" }).map((c) => ({ ...c, field: `${c.field} (${who})` }));
+  const changes = [
+    ...diffFields(line as unknown as Record<string, unknown>, data as Record<string, unknown>, { amount: "Amount", total: "Gross", adminFee: "Admin fee", reserved: "Reserved", disputed: "Disputed" }),
+    ...matchChanges,
+  ].map((c) => ({ ...c, field: `${c.field} (${who})` }));
   await logAudit(session.sub, "distribution.line-updated", {
     targetType: "Distribution",
     targetId: id,

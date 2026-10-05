@@ -9,6 +9,8 @@ import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Tabs, Pager, Field } from "@/components/admin/ui";
 import { AuditTrail } from "@/components/admin/AuditTrail";
+import { HolderPicker } from "@/components/admin/HolderPicker";
+import { WorkPicker } from "@/components/admin/WorkPicker";
 import { formatKwacha } from "@/lib/format";
 
 type Row = Record<string, string | number | boolean | null>;
@@ -63,7 +65,18 @@ export default function DistributionDetailPage() {
   const [tick, setTick] = useState(0);
   const [editing, setEditing] = useState(false);
   const [meta, setMeta] = useState({ periodLabel: "", code: "", startDate: "", endDate: "", notes: "" });
-  const [lineEdit, setLineEdit] = useState<{ id: string; amount: string; adminFee: string; reserved: string; disputed: boolean } | null>(null);
+  const [unmatched, setUnmatched] = useState(false);
+  const [lineEdit, setLineEdit] = useState<{
+    id: string;
+    amount: string;
+    adminFee: string;
+    reserved: string;
+    disputed: boolean;
+    holderId: string | null;
+    holderName: string;
+    workId: string | null;
+    workTitle: string;
+  } | null>(null);
 
   // Statements are the per-right-holder view; Allocations lets staff switch view.
   const activeView = tab === "statements" ? "holders" : view;
@@ -79,6 +92,7 @@ export default function DistributionDetailPage() {
   useEffect(() => {
     const ctl = new AbortController();
     const params = new URLSearchParams({ view: activeView, q: term, page: String(page) });
+    if (unmatched && tab === "allocations" && activeView === "lines") params.set("filter", "unmatched");
     setErr("");
     fetch(`/api/admin/registry/distributions/${id}?${params}`, { signal: ctl.signal, cache: "no-store" })
       .then(async (r) => {
@@ -88,7 +102,7 @@ export default function DistributionDetailPage() {
       })
       .catch((e) => e.name !== "AbortError" && setErr(e.message));
     return () => ctl.abort();
-  }, [id, activeView, term, page, tick]);
+  }, [id, activeView, term, page, tick, unmatched, tab]);
 
   const d = data?.distribution;
   const startEdit = useCallback(() => {
@@ -116,7 +130,15 @@ export default function DistributionDetailPage() {
     const r = await fetch(`/api/admin/registry/distributions/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lineId: lineEdit.id, amount: lineEdit.amount, adminFee: lineEdit.adminFee, reserved: lineEdit.reserved, disputed: lineEdit.disputed }),
+      body: JSON.stringify({
+        lineId: lineEdit.id,
+        amount: lineEdit.amount,
+        adminFee: lineEdit.adminFee,
+        reserved: lineEdit.reserved,
+        disputed: lineEdit.disputed,
+        rightHolderId: lineEdit.holderId,
+        workId: lineEdit.workId,
+      }),
     });
     const b = await r.json().catch(() => ({}));
     if (!r.ok) return toast.error(b.error ?? "Could not save the line.");
@@ -150,6 +172,9 @@ export default function DistributionDetailPage() {
 
   const s = data.summary;
   const b = data.breakdown;
+  // The rows on screen belong to the view they were fetched for; while a switch
+  // is in flight they must not be drawn in the new view's columns.
+  const stale = data.view !== activeView;
   const net = Math.max(0, s.amount - s.adminFee);
   const range = [d.startDate, d.endDate].filter(Boolean).join(" → ");
   const reservedSuspicious = s.amount > 0 && Math.abs(s.reserved - s.amount) < 0.01;
@@ -349,6 +374,20 @@ export default function DistributionDetailPage() {
                   {v.label}
                 </button>
               ))}
+            {tab === "allocations" && view === "lines" && (
+              <label className="inline-flex h-8 items-center gap-1.5 rounded-sm border border-[#bfc5ce] bg-white px-2.5 text-[13px] font-semibold text-[#1f4e79]">
+                <input
+                  type="checkbox"
+                  checked={unmatched}
+                  onChange={(e) => {
+                    setUnmatched(e.target.checked);
+                    setPage(1);
+                  }}
+                  className="h-3.5 w-3.5"
+                />
+                Unmatched only{b.unidentified.lines + b.unmatchedWorkLines > 0 ? ` (${(b.unidentified.lines + b.unmatchedWorkLines).toLocaleString()})` : ""}
+              </label>
+            )}
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter: name, IPI, work…" className="field-input ml-auto h-8 w-64" />
             <a href={csvHref} className={btn}>
               <Download size={13} /> Download CSV
@@ -357,7 +396,9 @@ export default function DistributionDetailPage() {
 
           <Panel title={tab === "statements" ? "Local right-holder statements" : activeView === "holders" ? "Allocation by right-holder" : activeView === "works" ? "Allocation by work" : "Every allocation line"}>
             <div className="overflow-x-auto">
-              {activeView === "lines" ? (
+              {stale ? (
+                <p className="px-5 py-8 text-center text-sm text-zam-muted">Loading…</p>
+              ) : activeView === "lines" ? (
                 <table className="w-full min-w-[960px]">
                   <thead>
                     <tr>
@@ -378,8 +419,27 @@ export default function DistributionDetailPage() {
                       const on = lineEdit?.id === rid;
                       return (
                         <tr key={rid}>
-                          <Td>{r.holderId ? <Link className="font-semibold hover:text-zam-orange" href={`/admin/register/${r.holderId}`}>{String(r.holder)}</Link> : String(r.holder)}</Td>
-                          <Td>{r.workId ? <Link className="hover:text-zam-orange" href={`/admin/catalogue/${r.workId}`}>{String(r.work)}</Link> : String(r.work)}</Td>
+                          {on ? (
+                            <>
+                              <Td className="min-w-[200px]">
+                                <HolderPicker
+                                  value={lineEdit.holderId ? { id: lineEdit.holderId, name: lineEdit.holderName } : null}
+                                  onPick={(h) => setLineEdit({ ...lineEdit, holderId: h?.id ?? null, holderName: h?.displayName ?? "" })}
+                                />
+                              </Td>
+                              <Td className="min-w-[200px]">
+                                <WorkPicker
+                                  value={lineEdit.workId ? { id: lineEdit.workId, title: lineEdit.workTitle } : null}
+                                  onPick={(w) => setLineEdit({ ...lineEdit, workId: w?.id ?? null, workTitle: w?.title ?? "" })}
+                                />
+                              </Td>
+                            </>
+                          ) : (
+                            <>
+                              <Td>{r.holderId ? <Link className="font-semibold hover:text-zam-orange" href={`/admin/register/${r.holderId}`}>{String(r.holder)}</Link> : <span className="font-semibold text-[#9a6a00]">Unmatched</span>}</Td>
+                              <Td>{r.workId ? <Link className="hover:text-zam-orange" href={`/admin/catalogue/${r.workId}`}>{String(r.work)}</Link> : <span className="font-semibold text-[#9a6a00]">Unmatched</span>}</Td>
+                            </>
+                          )}
                           <Td className="font-mono text-xs">{String(r.roleCode) || "—"}</Td>
                           <Td className="text-xs">{String(r.rightType) || "—"}</Td>
                           {on ? (
@@ -402,7 +462,20 @@ export default function DistributionDetailPage() {
                               <Td className="text-right tabular-nums">{formatKwacha(Number(r.reserved))}</Td>
                               <Td>{r.disputed ? <span className="text-xs font-semibold text-zam-red">Disputed</span> : "—"}</Td>
                               <Td>
-                                <button onClick={() => setLineEdit({ id: rid, amount: String(r.amount), adminFee: String(r.adminFee), reserved: String(r.reserved), disputed: !!r.disputed })} className="rounded-sm bg-[#e6ebf1] px-2.5 py-1 text-xs font-semibold text-[#1f4e79] hover:bg-[#d6dfe9]">
+                                <button
+                                  onClick={() =>
+                                    setLineEdit({
+                                      id: rid,
+                                      amount: String(r.amount),
+                                      adminFee: String(r.adminFee),
+                                      reserved: String(r.reserved),
+                                      disputed: !!r.disputed,
+                                      holderId: r.holderId ? String(r.holderId) : null,
+                                      holderName: r.holderId ? String(r.holder) : "",
+                                      workId: r.workId ? String(r.workId) : null,
+                                      workTitle: r.workId ? String(r.work) : "",
+                                    })
+                                  } className="rounded-sm bg-[#e6ebf1] px-2.5 py-1 text-xs font-semibold text-[#1f4e79] hover:bg-[#d6dfe9]">
                                   Edit
                                 </button>
                               </Td>
@@ -447,7 +520,7 @@ export default function DistributionDetailPage() {
                   </tbody>
                 </table>
               )}
-              {data.rows.length === 0 && <p className="px-5 py-8 text-center text-sm text-zam-muted">Nothing to show{term ? " for that filter" : ""}.</p>}
+              {!stale && data.rows.length === 0 && <p className="px-5 py-8 text-center text-sm text-zam-muted">Nothing to show{term ? " for that filter" : ""}.</p>}
             </div>
             <Pager page={page} pageSize={data.pageSize} total={data.total} onPage={setPage} className="border-t border-[#eceff3]" />
           </Panel>
