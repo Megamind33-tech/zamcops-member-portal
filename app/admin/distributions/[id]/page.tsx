@@ -12,6 +12,7 @@ import { AuditTrail } from "@/components/admin/AuditTrail";
 import { HolderPicker } from "@/components/admin/HolderPicker";
 import { WorkPicker } from "@/components/admin/WorkPicker";
 import { PoolLinks } from "@/components/admin/PoolLinks";
+import { PendingWorks } from "@/components/admin/PendingWorks";
 import { formatKwacha } from "@/lib/format";
 
 type Row = Record<string, string | number | boolean | null>;
@@ -25,6 +26,10 @@ type Result = {
     startDate: string;
     endDate: string;
     publishedAt: string | null;
+    deadline: string;
+    runAt: string | null;
+    closedAt: string | null;
+    locked: string;
     imported: boolean;
     entryCount: number;
   };
@@ -45,7 +50,7 @@ type Result = {
   rows: Row[];
 };
 
-type Tab = "main" | "pools" | "summary" | "analysis" | "statements" | "allocations" | "audit";
+type Tab = "main" | "pools" | "pending" | "summary" | "analysis" | "statements" | "allocations" | "audit";
 
 const Line = ({ label, value, strong }: { label: string; value: React.ReactNode; strong?: boolean }) => (
   <div className={"flex items-baseline justify-between gap-4 border-b border-[#eceff3] px-4 py-1.5 text-[13px] " + (strong ? "font-bold" : "")}>
@@ -64,6 +69,7 @@ export default function DistributionDetailPage() {
   const [data, setData] = useState<Result | null>(null);
   const [err, setErr] = useState("");
   const [tick, setTick] = useState(0);
+  const [closing, setClosing] = useState(false);
   const [editing, setEditing] = useState(false);
   const [meta, setMeta] = useState({ periodLabel: "", code: "", startDate: "", endDate: "", notes: "" });
   const [unmatched, setUnmatched] = useState(false);
@@ -148,6 +154,22 @@ export default function DistributionDetailPage() {
     setTick((t) => t + 1);
   };
 
+  const runAction = async (action: "close" | "reopen") => {
+    if (action === "close" && !window.confirm("Close this distribution? It becomes Done and its allocations can no longer be changed until you reopen it.")) return;
+    setClosing(true);
+    try {
+      const r = await fetch(`/api/admin/registry/distributions/${id}/actions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }) });
+      const b = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(b.error ?? "That did not work.");
+      toast.success(action === "close" ? "Distribution closed." : "Distribution reopened.");
+      setTick((t) => t + 1);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "That did not work.");
+    } finally {
+      setClosing(false);
+    }
+  };
+
   const csvHref = `/api/admin/registry/distributions/${id}?${new URLSearchParams({ view: activeView, q: term, format: "csv" })}`;
 
   if (err && !data)
@@ -188,10 +210,22 @@ export default function DistributionDetailPage() {
       </Link>
       <AdminHeader
         title={d.periodLabel}
-        subtitle={[d.code && `Code ${d.code}`, range, d.imported ? "Imported from WIPO Connect" : "Created in the portal"].filter(Boolean).join(" · ")}
+        subtitle={[d.code && `Code ${d.code}`, range, d.runAt && `Run ${new Date(d.runAt).toLocaleDateString("en-GB", { dateStyle: "medium" })}`, d.imported ? "Imported from WIPO Connect" : "Created in the portal"].filter(Boolean).join(" · ")}
         right={
           <div className="flex items-center gap-2">
-            <StatusBadge status={d.status} />
+            <StatusBadge status={d.closedAt ? "Approved" : d.status} />
+            <span className="text-xs font-semibold text-zam-muted">{d.closedAt ? "Done" : d.status === "Published" ? "Published" : "To be Completed"}</span>
+            {d.closedAt ? (
+              <button onClick={() => runAction("reopen")} disabled={closing} className={btn}>
+                Reopen
+              </button>
+            ) : (
+              d.status !== "Published" && (
+                <button onClick={() => runAction("close")} disabled={closing} className={btn}>
+                  {closing ? "Closing…" : "Close"}
+                </button>
+              )
+            )}
             <button onClick={startEdit} className={btn}>
               <Pencil size={13} /> Edit details
             </button>
@@ -210,6 +244,7 @@ export default function DistributionDetailPage() {
         tabs={[
           { key: "main", label: "Main" },
           { key: "pools", label: "Pool links" },
+          { key: "pending", label: "Pending works" },
           { key: "summary", label: "Summary" },
           { key: "analysis", label: "Analysis" },
           { key: "statements", label: "Statements", count: s.holders },
@@ -266,7 +301,10 @@ export default function DistributionDetailPage() {
                 <Field label="Name">{d.periodLabel}</Field>
                 <Field label="Start date">{d.startDate}</Field>
                 <Field label="End date">{d.endDate}</Field>
-                <Field label="Status">{d.status}</Field>
+                <Field label="Deadline">{d.deadline}</Field>
+                <Field label="Status">{d.closedAt ? "Done" : d.status === "Published" ? "Published" : "To be Completed"}</Field>
+                <Field label="Run date">{d.runAt ? new Date(d.runAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : "Not run yet"}</Field>
+                <Field label="Closed">{d.closedAt ? new Date(d.closedAt).toLocaleDateString("en-GB", { dateStyle: "medium" }) : ""}</Field>
                 <Field label="Published">{d.publishedAt ? new Date(d.publishedAt).toLocaleDateString("en-GB", { dateStyle: "medium" }) : "Not published"}</Field>
                 <Field label="Source">{d.imported ? "Imported from WIPO Connect" : "Created in the portal"}</Field>
                 <Field label="Member payouts">{d.entryCount ? String(d.entryCount) : ""}</Field>
@@ -300,6 +338,8 @@ export default function DistributionDetailPage() {
       )}
 
       {tab === "pools" && <PoolLinks distributionId={id} onChanged={() => setTick((t) => t + 1)} />}
+
+      {tab === "pending" && <PendingWorks distributionId={id} refresh={tick} />}
 
       {tab === "summary" && (
         <div className="grid gap-3 lg:grid-cols-3">
@@ -357,6 +397,7 @@ export default function DistributionDetailPage() {
 
       {(tab === "statements" || tab === "allocations") && (
         <>
+          {d.locked && tab === "allocations" && <p className="mb-2 rounded-sm bg-zam-amber/10 px-4 py-2 text-sm text-[#9a6a00]">{d.locked} Lines are read-only.</p>}
           <div className="mb-2 flex flex-wrap items-center gap-2">
             {tab === "allocations" &&
               (

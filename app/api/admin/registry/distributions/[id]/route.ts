@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { logAudit, diffFields } from "@/lib/audit";
+import { lockReason } from "@/lib/distLock";
 import type { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
@@ -176,6 +177,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       endDate: d.endDate,
       publishedAt: d.publishedAt,
       createdAt: d.createdAt,
+      deadline: d.deadline,
+      runAt: d.runAt,
+      closedAt: d.closedAt,
+      locked: lockReason(d),
       imported: !!d.wipoId,
       entryCount: d._count.entries,
     },
@@ -211,6 +216,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const b = await req.json().catch(() => null);
   if (!b?.lineId) return bad("Say which line to change.");
 
+  const dist = await prisma.distribution.findUnique({ where: { id }, select: { status: true, closedAt: true } });
+  if (dist) {
+    const locked = lockReason(dist);
+    if (locked) return bad(locked);
+  }
   const line = await prisma.distributionLine.findFirst({ where: { id: b.lineId, distributionId: id }, include: { work: { select: { title: true } } } });
   if (!line) return bad("That line is not in this distribution.", 404);
 

@@ -16,6 +16,9 @@ import {
   CalendarRange,
   Radio,
   Layers,
+  Calculator,
+  ListChecks,
+  PiggyBank,
   Handshake,
   BarChart3,
   LifeBuoy,
@@ -54,6 +57,7 @@ const sections = [
       { href: "/admin/works", label: "Work Declarations", icon: FileText },
       { href: "/admin/songs", label: "Song Submissions", icon: Music2 },
       { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
+      { href: "/admin/work-sets", label: "Work Sets", icon: ListChecks },
     ],
   },
   {
@@ -62,6 +66,8 @@ const sections = [
       { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
       { href: "/admin/pools", label: "Distribution Pools", icon: Layers },
       { href: "/admin/stations", label: "Radio & TV Stations", icon: Radio },
+      { href: "/admin/allocation-methods", label: "Allocation Methods", icon: Calculator },
+      { href: "/admin/reserves", label: "Reserve Management", icon: PiggyBank },
       { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
     ],
   },
@@ -126,7 +132,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const parent = nav.find((n) => !n.exact && n.href !== "/admin" && pathname.startsWith(n.href + "/"));
   const isDetail = !!parent;
   const crumb = parent
-    ? ({ "/admin/members": "Member Detail", "/admin/register": "Right-holder", "/admin/catalogue": "Work", "/admin/groups": "Group", "/admin/distributions": "Distribution" } as Record<string, string>)[parent.href] ?? "Detail"
+    ? ({ "/admin/members": "Member Detail", "/admin/register": "Right-holder", "/admin/catalogue": "Work", "/admin/groups": "Group", "/admin/distributions": "Distribution", "/admin/pools": "Pool", "/admin/work-sets": "Work Set" } as Record<string, string>)[parent.href] ?? "Detail"
     : crumbs[pathname] || "Dashboard";
 
   const doLogout = async () => {

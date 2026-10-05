@@ -3,11 +3,12 @@ import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { logAudit } from "@/lib/audit";
 import { MAX_LIST_LINES, matchWorks, parseWorkList } from "@/lib/poolAllocation";
+import { lockReason } from "@/lib/distLock";
 
 export const runtime = "nodejs";
 
 async function guard(id: string, linkId: string) {
-  const link = await prisma.distributionPoolLink.findFirst({ where: { id: linkId, distributionId: id }, include: { distribution: { select: { status: true } }, pool: { select: { code: true } } } });
+  const link = await prisma.distributionPoolLink.findFirst({ where: { id: linkId, distributionId: id }, include: { distribution: { select: { status: true, closedAt: true } }, pool: { select: { code: true } } } });
   return link;
 }
 
@@ -42,11 +43,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 
   if (b.action === "add") {
-    if (link.distribution.status === "Published") return bad("This distribution is published. Unpublish it before changing works.");
-    if (!Array.isArray(b.items) || b.items.length === 0) return bad("Nothing to add.");
-    if (b.items.length > MAX_LIST_LINES) return bad(`Add at most ${MAX_LIST_LINES.toLocaleString()} works at a time.`);
+    const locked = lockReason(link.distribution);
+    if (locked) return bad(locked);
+    let items: { workId?: string; weight?: number | string }[] = Array.isArray(b.items) ? b.items : [];
+    if (b.workSetId) {
+      const set = await prisma.workSet.findUnique({ where: { id: String(b.workSetId) }, include: { items: { select: { workId: true, weight: true } } } });
+      if (!set) return bad("That work set does not exist.");
+      items = set.items;
+    }
+    if (items.length === 0) return bad("Nothing to add.");
+    if (items.length > 50000) return bad("That is too many works to add at once.");
     const want = new Map<string, number>();
-    for (const it of b.items as { workId?: string; weight?: number | string }[]) {
+    for (const it of items) {
       const w = Number(it.weight ?? 1);
       if (it.workId) want.set(String(it.workId), Number.isFinite(w) && w > 0 ? Math.round(w * 1000) / 1000 : 1);
     }
@@ -63,7 +71,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     for (const workId of reweigh) await prisma.distributionPoolWork.update({ where: { linkId_workId: { linkId, workId } }, data: { weight: want.get(workId)! } });
 
     if (fresh.length || reweigh.length) {
-      if (link.status === "Allocated") await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "To be Allocated" } });
+      if (link.status !== "To be Allocated") await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "To be Allocated" } });
       await logAudit(session.sub, "distribution.link-works-added", {
         targetType: "Distribution",
         targetId: id,
@@ -84,7 +92,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id, linkId } = await params;
   const link = await guard(id, linkId);
   if (!link) return bad("Pool link not found.", 404);
-  if (link.distribution.status === "Published") return bad("This distribution is published. Unpublish it before changing works.");
+  const locked = lockReason(link.distribution);
+  if (locked) return bad(locked);
   const b = await req.json().catch(() => null);
   if (!Array.isArray(b?.items) || b.items.length === 0) return bad("Nothing to update.");
   for (const it of b.items as { workId?: string; weight?: number | string }[]) {
@@ -92,7 +101,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!it.workId || !Number.isFinite(w) || w <= 0) return bad("Every weight must be greater than zero.");
     await prisma.distributionPoolWork.updateMany({ where: { linkId, workId: String(it.workId) }, data: { weight: Math.round(w * 1000) / 1000 } });
   }
-  if (link.status === "Allocated") await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "To be Allocated" } });
+  if (link.status !== "To be Allocated") await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "To be Allocated" } });
   await logAudit(session.sub, "distribution.link-works-weighted", { targetType: "Distribution", targetId: id, summary: `Changed ${b.items.length} work weight${b.items.length === 1 ? "" : "s"} on ${label(link)}` });
   return json({ ok: true });
 }
@@ -104,14 +113,15 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   const { id, linkId } = await params;
   const link = await guard(id, linkId);
   if (!link) return bad("Pool link not found.", 404);
-  if (link.distribution.status === "Published") return bad("This distribution is published. Unpublish it before changing works.");
+  const locked = lockReason(link.distribution);
+  if (locked) return bad(locked);
   const b = await req.json().catch(() => null);
   const before = await prisma.distributionPoolWork.count({ where: { linkId } });
   let removed = 0;
   if (b?.all === true) removed = (await prisma.distributionPoolWork.deleteMany({ where: { linkId } })).count;
   else if (Array.isArray(b?.workIds) && b.workIds.length) removed = (await prisma.distributionPoolWork.deleteMany({ where: { linkId, workId: { in: b.workIds.map(String) } } })).count;
   else return bad("Say which works to remove.");
-  if (removed && link.status === "Allocated") await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "To be Allocated" } });
+  if (removed && link.status !== "To be Allocated") await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "To be Allocated" } });
   if (removed) {
     await logAudit(session.sub, "distribution.link-works-removed", {
       targetType: "Distribution",

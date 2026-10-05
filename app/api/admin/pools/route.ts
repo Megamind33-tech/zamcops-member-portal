@@ -2,50 +2,50 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { logAudit } from "@/lib/audit";
+import { poolJson, readPoolFields } from "@/lib/poolFields";
 
 export const runtime = "nodejs";
 
-// Distribution pools — the reusable "TV-WL-01" style setups a pool link draws on.
-export async function GET() {
+// Distribution pools — the reusable "TV-WL-01" style setups a pool link draws
+// on. ?status=Open|Archived (default Open; "all" for both)
+export async function GET(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
-  const pools = await prisma.distributionPool.findMany({ orderBy: { code: "asc" }, include: { _count: { select: { links: true } } } });
-  return json({
-    pools: pools.map((p) => ({
-      id: p.id,
-      code: p.code,
-      name: p.name,
-      kind: p.kind,
-      method: p.method,
-      creationClass: p.creationClass,
-      rightType: p.rightType,
-      adminFeePct: p.adminFeePct,
-      notes: p.notes,
-      active: p.active,
-      links: p._count.links,
-    })),
+  const status = new URL(req.url).searchParams.get("status") ?? "Open";
+  const pools = await prisma.distributionPool.findMany({
+    where: status === "all" ? {} : { active: status !== "Archived" },
+    orderBy: { code: "asc" },
+    include: { _count: { select: { links: true } }, workMethod: { select: { name: true } }, roMethod: { select: { name: true } } },
   });
+  return json({ pools: pools.map((p) => ({ ...poolJson(p), links: p._count.links, workMethodName: p.workMethod?.name ?? "", roMethodName: p.roMethod?.name ?? "" })) });
 }
 
 export async function POST(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
   const b = await req.json().catch(() => null);
-  const code = String(b?.code ?? "").trim().toUpperCase().slice(0, 40);
-  if (!code) return bad("Give the pool a code, for example TV-WL-01.");
-  if (await prisma.distributionPool.findUnique({ where: { code } })) return bad(`A pool with code ${code} already exists.`, 409);
-  const fee = Number(b?.adminFeePct ?? 0);
-  if (!Number.isFinite(fee) || fee < 0 || fee > 100) return bad("The admin fee must be between 0 and 100%.");
+  if (!b || typeof b !== "object" || !String(b.code ?? "").trim()) return bad("Give the pool a code, for example TV-WL-01.");
+  const read = await readPoolFields(b);
+  if ("error" in read) return bad(read.error, read.error.includes("already exists") ? 409 : 400);
+  const d = read.data;
   const p = await prisma.distributionPool.create({
     data: {
-      code,
-      name: String(b?.name ?? "").trim().slice(0, 200),
-      kind: String(b?.kind ?? "Television").trim().slice(0, 40) || "Television",
-      method: ["Work List", "Log Based"].includes(b?.method) ? b.method : "Work List",
-      creationClass: String(b?.creationClass ?? "MW").trim().slice(0, 10) || "MW",
-      rightType: ["Performing", "Mechanical", "Synchronisation", "Print", "Other"].includes(b?.rightType) ? b.rightType : "Performing",
-      adminFeePct: Math.round(fee * 100) / 100,
-      notes: String(b?.notes ?? "").slice(0, 2000),
+      code: d.code!,
+      name: d.name ?? "",
+      kind: d.kind ?? "Television",
+      subClass: d.subClass ?? "",
+      method: d.method ?? "Work List",
+      creationClass: d.creationClass || "MW",
+      rightType: d.rightType ?? "Performing",
+      adminFeePct: d.adminFeePct ?? 0,
+      workRoles: d.workRoles ?? "[]",
+      workMethodId: d.workMethodId ?? null,
+      roMethodId: d.roMethodId ?? null,
+      reallocateWithinWork: d.reallocateWithinWork ?? true,
+      workShareTolerance: d.workShareTolerance ?? 0,
+      internationalRevenueStream: d.internationalRevenueStream ?? false,
+      reserveType: d.reserveType ?? "",
+      notes: d.notes ?? "",
     },
   });
   await logAudit(session.sub, "pool.created", { targetType: "Pool", targetId: p.id, summary: `Created distribution pool ${p.code}` });

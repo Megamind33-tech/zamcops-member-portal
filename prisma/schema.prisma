@@ -312,14 +312,20 @@ model Distribution {
   createdAt   DateTime  @default(now())
 
   // Set for runs imported from WIPO Connect (their id_distribution).
-  wipoId    String? @unique
-  code      String  @default("")
-  startDate String  @default("")
-  endDate   String  @default("")
+  wipoId    String?   @unique
+  code      String    @default("")
+  startDate String    @default("")
+  endDate   String    @default("")
+  deadline  String    @default("")
+  // The run lifecycle beyond Draft / Published: when its allocations were
+  // last run, and when it was closed (Done). A closed run is read-only.
+  runAt     DateTime?
+  closedAt  DateTime?
 
-  entries DistributionEntry[]
-  lines   DistributionLine[]
-  links   DistributionPoolLink[]
+  entries  DistributionEntry[]
+  lines    DistributionLine[]
+  links    DistributionPoolLink[]
+  reserves Reserve[]
 }
 
 // A member's confirmed payout within a given distribution period.
@@ -549,6 +555,7 @@ model RegistryWork {
   shares    WorkShare[]
   lines     DistributionLine[]
   poolWorks DistributionPoolWork[]
+  setItems  WorkSetItem[]
 
   @@index([title])
   @@index([iswc])
@@ -597,6 +604,9 @@ model DistributionLine {
   // null for lines imported from WIPO Connect.
   link           DistributionPoolLink? @relation(fields: [linkId], references: [id], onDelete: Cascade)
   linkId         String?
+  // Why reserved money is held back: Unidentified | Non-society | Incomplete |
+  // Undistributable | Disputed. Empty when nothing is reserved.
+  reserveType    String                @default("")
 
   @@index([distributionId])
   @@index([rightHolderId])
@@ -629,7 +639,7 @@ model DistributionPool {
   code          String   @unique
   name          String   @default("")
   kind          String   @default("Television") // the class of use: Radio | Television | Live performance | Online | Other
-  method        String   @default("Work List") // Work List | Log Based
+  method        String   @default("Work List") // Work List | Log Based | RO List | Reserve | Analogy | CRD
   creationClass String   @default("MW")
   rightType     String   @default("Performing") // which shares are paid from this pool
   adminFeePct   Float    @default(0)
@@ -637,6 +647,20 @@ model DistributionPool {
   active        Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  // WIPO Connect pool settings. workRoles: JSON list of role codes the pool
+  // pays (empty = every role). The methods are formulas; with none the weight
+  // or share is used as it stands.
+  subClass                   String            @default("")
+  workRoles                  String            @default("[]") @db.Text
+  workMethod                 AllocationMethod? @relation("PoolWorkMethod", fields: [workMethodId], references: [id], onDelete: SetNull)
+  workMethodId               String?
+  roMethod                   AllocationMethod? @relation("PoolRoMethod", fields: [roMethodId], references: [id], onDelete: SetNull)
+  roMethodId                 String?
+  reallocateWithinWork       Boolean           @default(true)
+  workShareTolerance         Float             @default(0)
+  internationalRevenueStream Boolean           @default(false)
+  reserveType                String            @default("")
 
   links DistributionPoolLink[]
 }
@@ -657,14 +681,28 @@ model DistributionPoolLink {
   periodStart    String            @default("")
   periodEnd      String            @default("")
   amount         Float             @default(0)
-  adminFeePct    Float             @default(0) // copied from the pool when the link is made; editable
-  status         String            @default("To be Allocated") // To be Allocated | Allocated
+  adminFeePct    Float             @default(0) // Domestic admin fee %, copied from the pool; editable
+  status         String            @default("To be Allocated") // To be Allocated | Allocating | Allocated | Failed
   allocatedAt    DateTime?
   notes          String            @default("")
   createdAt      DateTime          @default(now())
 
-  works DistributionPoolWork[]
-  lines DistributionLine[]
+  seq                 Int               @default(autoincrement()) // shown as 133-<seq>-DPL
+  currency            String            @default("ZMW")
+  adminFeeIntl        Float             @default(0)
+  adminFeeIntlRevenue Float             @default(0)
+  adminFeeReserved    Float             @default(0)
+  reserveType         String            @default("")
+  affiliation         String            @default("ZAMCOPS") // who is paid: ZAMCOPS (affiliated members) | All
+  workMethod          AllocationMethod? @relation("LinkWorkMethod", fields: [workMethodId], references: [id], onDelete: SetNull)
+  workMethodId        String?
+  roMethod            AllocationMethod? @relation("LinkRoMethod", fields: [roMethodId], references: [id], onDelete: SetNull)
+  roMethodId          String?
+  lastError           String            @default("")
+
+  works    DistributionPoolWork[]
+  lines    DistributionLine[]
+  reserves Reserve[]
 
   @@index([distributionId])
 }
@@ -677,6 +715,10 @@ model DistributionPoolWork {
   work   RegistryWork         @relation(fields: [workId], references: [id], onDelete: Cascade)
   workId String
   weight Float                @default(1)
+  // Set by an allocation run: Fully distributable | Partially distributable |
+  // Not distributable, with the reason in note.
+  status String               @default("")
+  note   String               @default("")
 
   @@unique([linkId, workId])
   @@index([workId])
@@ -715,4 +757,75 @@ model RightHolderGroupMember {
 
   @@index([groupId])
   @@index([rightHolderId])
+}
+
+// A named allocation formula. A Work method turns a work weight (plays) into
+// the weight it earns in the pool; a Right owner method turns a right-holder
+// share into the weight they earn within the work.
+//   Work:        $Weight$   $Work$.shares   $Work$.domestic   $Work$.year
+//   Right owner: $Weight$   $Role$   $Ro$.affiliated   $Work$.shares ...
+model AllocationMethod {
+  id          String   @id @default(cuid())
+  name        String
+  target      String   @default("Work") // Work | Right owner
+  formula     String   @default("$Weight$") @db.Text
+  description String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  poolWork DistributionPool[]     @relation("PoolWorkMethod")
+  poolRo   DistributionPool[]     @relation("PoolRoMethod")
+  linkWork DistributionPoolLink[] @relation("LinkWorkMethod")
+  linkRo   DistributionPoolLink[] @relation("LinkRoMethod")
+
+  @@unique([target, name])
+}
+
+// A reusable, named list of works (WIPO Connect Work Set) that can be added
+// to a pool link in one go.
+model WorkSet {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  description String        @default("")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  items       WorkSetItem[]
+}
+
+model WorkSetItem {
+  id     String       @id @default(cuid())
+  set    WorkSet      @relation(fields: [setId], references: [id], onDelete: Cascade)
+  setId  String
+  work   RegistryWork @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId String
+  weight Float        @default(1)
+
+  @@unique([setId, workId])
+  @@index([workId])
+}
+
+// Money held back from payment in an allocation — WIPO Connect Reserve
+// Management. One row per pool link and reason; staff close it, let it
+// prescribe, or release it into a later distribution.
+model Reserve {
+  id                  String                @id @default(cuid())
+  distribution        Distribution          @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  distributionId      String
+  link                DistributionPoolLink? @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  linkId              String?
+  className           String                @default("")
+  subClass            String                @default("")
+  creationClass       String                @default("")
+  rightType           String                @default("")
+  reserveType         String                @default("") // Unidentified | Non-society | Incomplete | Undistributable | Disputed
+  reservedAt          DateTime              @default(now())
+  closedAt            DateTime?
+  amount              Float                 @default(0)
+  distributableAmount Float                 @default(0)
+  distributedAmount   Float                 @default(0)
+  status              String                @default("Open") // Open | In Distribution | Prescribed | Closed
+  notes               String                @default("")
+
+  @@index([distributionId])
+  @@index([status, reserveType])
 }
