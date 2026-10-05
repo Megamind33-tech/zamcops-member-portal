@@ -14,6 +14,8 @@ import {
   FolderOpen,
   Wallet,
   CalendarRange,
+  Radio,
+  Layers,
   Handshake,
   BarChart3,
   LifeBuoy,
@@ -58,6 +60,8 @@ const sections = [
     title: "Matching & distribution",
     items: [
       { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
+      { href: "/admin/pools", label: "Distribution Pools", icon: Layers },
+      { href: "/admin/stations", label: "Radio & TV Stations", icon: Radio },
       { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
     ],
   },

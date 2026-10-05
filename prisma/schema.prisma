@@ -319,6 +319,7 @@ model Distribution {
 
   entries DistributionEntry[]
   lines   DistributionLine[]
+  links   DistributionPoolLink[]
 }
 
 // A member's confirmed payout within a given distribution period.
@@ -545,8 +546,9 @@ model RegistryWork {
   declarationId     String?  @unique
   createdAt         DateTime @default(now())
 
-  shares WorkShare[]
-  lines  DistributionLine[]
+  shares    WorkShare[]
+  lines     DistributionLine[]
+  poolWorks DistributionPoolWork[]
 
   @@index([title])
   @@index([iswc])
@@ -576,24 +578,107 @@ model WorkShare {
 
 // What one right-holder was allocated on one work in one distribution run.
 model DistributionLine {
-  id             String        @id @default(cuid())
-  distribution   Distribution  @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  id             String                @id @default(cuid())
+  distribution   Distribution          @relation(fields: [distributionId], references: [id], onDelete: Cascade)
   distributionId String
-  work           RegistryWork? @relation(fields: [workId], references: [id], onDelete: SetNull)
+  work           RegistryWork?         @relation(fields: [workId], references: [id], onDelete: SetNull)
   workId         String?
-  rightHolder    RightHolder?  @relation(fields: [rightHolderId], references: [id], onDelete: SetNull)
+  rightHolder    RightHolder?          @relation(fields: [rightHolderId], references: [id], onDelete: SetNull)
   rightHolderId  String?
-  roleCode       String        @default("")
-  rightType      String        @default("")
-  amount         Float         @default(0) // estimated_amount
-  total          Float         @default(0) // sum_amount
-  weight         Float         @default(0)
-  adminFee       Float         @default(0)
-  reserved       Float         @default(0)
-  disputed       Boolean       @default(false)
+  roleCode       String                @default("")
+  rightType      String                @default("")
+  amount         Float                 @default(0) // estimated_amount
+  total          Float                 @default(0) // sum_amount
+  weight         Float                 @default(0)
+  adminFee       Float                 @default(0)
+  reserved       Float                 @default(0)
+  disputed       Boolean               @default(false)
+  // Set when the line was produced by allocating a pool link in the portal;
+  // null for lines imported from WIPO Connect.
+  link           DistributionPoolLink? @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  linkId         String?
 
   @@index([distributionId])
   @@index([rightHolderId])
+  @@index([workId])
+  @@index([linkId])
+}
+
+// A radio or television station (or other broadcaster / venue) that reports
+// music use. The WIPO Connect "Sub Class" of a distribution pool link.
+model BroadcastStation {
+  id        String   @id @default(cuid())
+  name      String
+  kind      String   @default("Radio") // Radio | Television | Live performance | Online | Other
+  code      String   @default("")
+  region    String   @default("")
+  notes     String   @default("")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  links DistributionPoolLink[]
+
+  @@index([kind, name])
+}
+
+// A reusable distribution pool — WIPO Connect's "Distribution Pool" such as
+// TV-WL-01: the creation class, right type and method its money is shared by.
+model DistributionPool {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String   @default("")
+  kind          String   @default("Television") // the class of use: Radio | Television | Live performance | Online | Other
+  method        String   @default("Work List") // Work List | Log Based
+  creationClass String   @default("MW")
+  rightType     String   @default("Performing") // which shares are paid from this pool
+  adminFeePct   Float    @default(0)
+  notes         String   @default("")
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  links DistributionPoolLink[]
+}
+
+// One pool's money in one distribution run for one station and period —
+// WIPO Connect's "Distribution Pool Link" (DPL). The works played are listed on
+// the link; allocating it turns amount + works + shares into DistributionLines.
+model DistributionPoolLink {
+  id             String            @id @default(cuid())
+  distribution   Distribution      @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  distributionId String
+  pool           DistributionPool? @relation(fields: [poolId], references: [id], onDelete: SetNull)
+  poolId         String?
+  station        BroadcastStation? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  stationId      String?
+  stationName    String            @default("") // kept so the label survives a deleted station
+  kind           String            @default("")
+  periodStart    String            @default("")
+  periodEnd      String            @default("")
+  amount         Float             @default(0)
+  adminFeePct    Float             @default(0) // copied from the pool when the link is made; editable
+  status         String            @default("To be Allocated") // To be Allocated | Allocated
+  allocatedAt    DateTime?
+  notes          String            @default("")
+  createdAt      DateTime          @default(now())
+
+  works DistributionPoolWork[]
+  lines DistributionLine[]
+
+  @@index([distributionId])
+}
+
+// A work on a pool link's list, with how much it counts (plays / airings).
+model DistributionPoolWork {
+  id     String               @id @default(cuid())
+  link   DistributionPoolLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  linkId String
+  work   RegistryWork         @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId String
+  weight Float                @default(1)
+
+  @@unique([linkId, workId])
   @@index([workId])
 }
 

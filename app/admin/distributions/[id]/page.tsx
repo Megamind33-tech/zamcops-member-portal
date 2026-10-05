@@ -11,6 +11,7 @@ import { Tabs, Pager, Field } from "@/components/admin/ui";
 import { AuditTrail } from "@/components/admin/AuditTrail";
 import { HolderPicker } from "@/components/admin/HolderPicker";
 import { WorkPicker } from "@/components/admin/WorkPicker";
+import { PoolLinks } from "@/components/admin/PoolLinks";
 import { formatKwacha } from "@/lib/format";
 
 type Row = Record<string, string | number | boolean | null>;
@@ -44,7 +45,7 @@ type Result = {
   rows: Row[];
 };
 
-type Tab = "main" | "summary" | "analysis" | "statements" | "allocations" | "audit";
+type Tab = "main" | "pools" | "summary" | "analysis" | "statements" | "allocations" | "audit";
 
 const Line = ({ label, value, strong }: { label: string; value: React.ReactNode; strong?: boolean }) => (
   <div className={"flex items-baseline justify-between gap-4 border-b border-[#eceff3] px-4 py-1.5 text-[13px] " + (strong ? "font-bold" : "")}>
@@ -208,6 +209,7 @@ export default function DistributionDetailPage() {
         }}
         tabs={[
           { key: "main", label: "Main" },
+          { key: "pools", label: "Pool links" },
           { key: "summary", label: "Summary" },
           { key: "analysis", label: "Analysis" },
           { key: "statements", label: "Statements", count: s.holders },
@@ -296,6 +298,8 @@ export default function DistributionDetailPage() {
           )}
         </div>
       )}
+
+      {tab === "pools" && <PoolLinks distributionId={id} onChanged={() => setTick((t) => t + 1)} />}
 
       {tab === "summary" && (
         <div className="grid gap-3 lg:grid-cols-3">
