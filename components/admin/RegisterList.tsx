@@ -254,7 +254,9 @@ export function RegisterList({ embedded = false, scope }: { embedded?: boolean; 
               {data && data.holders.length === 0 && (
                 <tr>
                   <Td colSpan={9} className="py-10 text-center text-zam-muted">
-                    No right-holders match.
+                    {scope === "affiliated" && !term && !filter
+                      ? "Nobody is currently affiliated with ZAMCOPS on the imported register. Re-run the import so the affiliation records are read."
+                      : "No right-holders match."}
                   </Td>
                 </tr>
               )}
