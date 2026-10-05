@@ -400,7 +400,20 @@ async function main() {
     const matched = holders.filter((h) => h.memberId);
     console.log(`  members in portal ${members.length}; matched ${matched.length} (by ipi ${report.match.ipi}, nrc ${report.match.nrc}, email ${report.match.email}, phone ${report.match.phone}); ambiguous ${report.match.ambiguous}, collisions ${report.match.collisions}`);
     console.log(`  unmatched members ${members.length - matched.length} · right-holders staying as records only ${holders.length - matched.length}`);
-    report.unmatchedMembers = members.filter((m) => !matched.some((h) => h.memberId === m.id)).map((m) => ({ memberNumber: m.memberNumber, fullName: m.fullName }));
+    // Name-only candidates for members the hard keys missed. Reported for staff
+    // to confirm by hand; never linked automatically, since names coincide.
+    const nameKey = (s) => clean(s).toUpperCase().replace(/[^A-Z ]/g, " ").split(/\s+/).filter(Boolean).sort().join(" ");
+    const byName = group(holders.map((h) => ({ k: nameKey(h.displayName), id: h.wipoId, taken: !!h.memberId })), "k");
+    const matchedIds = new Set(matched.map((h) => h.memberId));
+    report.unmatchedMembers = members
+      .filter((m) => !matchedIds.has(m.id))
+      .map((m) => ({
+        memberNumber: m.memberNumber,
+        fullName: m.fullName,
+        candidates: (byName.get(nameKey(m.fullName)) ?? []).filter((c) => !c.taken).map((c) => c.id),
+      }));
+    const withCand = report.unmatchedMembers.filter((u) => u.candidates.length).length;
+    console.log(`  of the unmatched members, ${withCand} have a same-name right-holder to confirm by hand (see report)`);
   } else {
     console.log("  DATABASE_URL not set — member matching skipped");
   }
