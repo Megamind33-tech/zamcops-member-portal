@@ -809,3 +809,51 @@ model Reserve {
   @@index([distributionId])
   @@index([status, reserveType])
 }
+
+// WIPO Connect "Operational" reference data (CMO, Territories, Reference Table
+// = creation classes, Identifiers). Seeded from data/wipo/*.json on first use.
+model RefCmo {
+  id            String @id @default(cuid())
+  code          String @unique
+  acronym       String @default("")
+  name          String @default("")
+  country       String @default("")
+  type          String @default("")
+  creationClass String @default("")
+}
+
+model RefTerritory {
+  id        String @id @default(cuid())
+  tisn      String @unique
+  tisa      String @default("")
+  name      String @default("")
+  type      String @default("")
+  startDate String @default("")
+  endDate   String @default("")
+}
+
+model RefCreationClass {
+  id               String @id @default(cuid())
+  code             String @unique
+  name             String @default("")
+  description      String @default("")
+  shareBase        Int?
+  identifiers      Json   @default("[]")
+  additionalFields Json   @default("[]")
+  roles            Json   @default("[]")
+  domesticRoles    Json   @default("[]")
+  domesticFee      Float?
+  intlRevenueFee   Float?
+  intlFee          Float?
+  reservedFee      Float?
+}
+
+model RefIdentifier {
+  id      String @id @default(cuid())
+  code    String @unique
+  acronym String @default("")
+  name    String @default("")
+  entity  String @default("")
+  type    String @default("")
+  classes Json   @default("[]")
+}

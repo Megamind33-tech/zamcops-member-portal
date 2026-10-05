@@ -32,6 +32,11 @@ import {
   UserRound,
   Library,
   UsersRound,
+  Building2,
+  Globe2,
+  Table2,
+  Fingerprint,
+  BookMarked,
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { useAdminAuth } from "@/lib/adminAuth";
@@ -65,6 +70,16 @@ const sections = [
       { href: "/admin/pools", label: "Distribution Pool", icon: Layers },
       { href: "/admin/allocation-methods", label: "Allocation Method", icon: Calculator },
       { href: "/admin/reserves", label: "Reserve Management", icon: PiggyBank },
+    ],
+  },
+  {
+    title: "Operational",
+    items: [
+      { href: "/admin/reference/cmo", label: "CMO", icon: Building2 },
+      { href: "/admin/reference/territories", label: "Territories", icon: Globe2 },
+      { href: "/admin/reference/reference-table", label: "Reference Table", icon: Table2 },
+      { href: "/admin/reference/identifiers", label: "Identifiers", icon: Fingerprint },
+      { href: "/admin/reference/local-references", label: "Local References", icon: BookMarked },
     ],
   },
   {

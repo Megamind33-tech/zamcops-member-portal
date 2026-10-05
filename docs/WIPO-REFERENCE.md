@@ -2,7 +2,7 @@
 
 Everything below was read from the live WIPO Connect pages (menu JSON, page HTML, grid headers, record windows).
 Nothing here is invented. Where a page is not listed it has not been captured yet. The data files
-(`data/wipo/*`) are exact copies of WIPO's reference grids.
+(`data/wipo/*.json`) are exact copies of WIPO's reference grids.
 
 ## Main menu (`/connect/mvc/common/mainMenu.json`)
 
@@ -61,9 +61,9 @@ Nothing here is invented. Where a page is not listed it has not been captured ye
 - Business Intelligence: Query name (38 queries: WORK Identifier, WORK Status, Distributable status, Distributed, Distributed per Main Id and CC, Entered within a certain period of time, SR without any PC, SWI Reports, Works declared by members, Work Set format for CWR, Creation class, Role, City, RO Identifier, RO Status, Birthday, Deceased, IPBN-IPINN discrepancies, Joined within specific period, Minors/below 18 years of age, Certain age, Distributed Amount, Work Genre, No Works for a specific CC, Number of Works by RO, Lack of IPI Name Number, RO, RO and Distribution Pool, Work, Work and Distribution Pool, Unidentified grouped Title, Unidentified grouped Title and Distribution Pool code, UP list by Distribution and DPL ID, CAPASSO - SWI Format, SONACAM - MW Repertoire format, ZIMURA - Membership Repertoire, ZAMCOPS - List of beneficiaries per society code, UPRS - Disaffiliated members, UPRS - Repertoire report, COPYGHANA - List of works by type and market, ZARRSO - Copyright Detained on T&I, GHAMRO - Distribution Payment Method, Member's contact); Export Format CSV / Json; Search.
 - Audit: Entity Type (Work / RightOwner), Start/End Audit Period, Author of the Change, Affiliation CMO, Main ID, Show only Terminal; Search, Clear.
 
-### Operational (reference data; `data/wipo/*`)
-- CMO: 535 entries (`cmo.psv`): Code · Acronym · Name · Country of Origin · Type · Creation Class.
-- Territories: 250 entries (`territories.psv`): TISN · TISA · Name · Type · Start Date · End Date.
+### Operational (reference data; `data/wipo/*.json`)
+- CMO: 535 entries (`cmo.json`): Code · Acronym · Name · Country of Origin · Type · Creation Class.
+- Territories: 250 entries (`territories.json`): TISN · TISA · Name · Type · Start Date · End Date.
 - Reference Table (creation classes): 21 classes (`creation-classes.json`): Code · Name · Description · Work Share Base · Work Identifier · Work Additional Fields · Domestic Work · Domestic Admin. Fee · International Revenue Admin. Fee · International Admin. Fee · Reserved Admin. Fee. Add Creation Class.
 - Identifiers: 18 entries (`identifiers.json`): Code · Acronym · Name · Creation Classes · Entity · Type. Add Identifier.
 - Local References: AGREEMENT_SOURCE_TYPE "Agreement Source Type".
