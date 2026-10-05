@@ -445,9 +445,20 @@ model RightHolder {
   region         String   @default("")
   nextOfKin      String   @default("")
   spouse         String   @default("")
-  matchedBy      String   @default("") // ipi | nrc | email | phone | "" — how memberId was found
+  matchedBy      String   @default("") // ipi | nrc | email | phone | invite | "" — how memberId was found
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  // Invitation to open a portal account. Staff add an email (or the WIPO
+  // contact email is used); the invite link carries a one-time token whose
+  // SHA-256 is stored here, never the token itself. Signing up through the
+  // link links the new Member to this record. Plain columns and an index only:
+  // a new unique constraint would stop the container's schema push.
+  inviteEmail     String    @default("")
+  inviteTokenHash String    @default("")
+  inviteSentAt    DateTime?
+  inviteExpiresAt DateTime?
+  inviteCount     Int       @default(0)
 
   names     RightHolderName[]
   addresses RightHolderAddress[]
@@ -458,6 +469,7 @@ model RightHolder {
   @@index([displayName])
   @@index([ipiNumber])
   @@index([nrc])
+  @@index([inviteTokenHash])
 }
 
 // A right-holder can be known under several names (legal name, pseudonym, ...),

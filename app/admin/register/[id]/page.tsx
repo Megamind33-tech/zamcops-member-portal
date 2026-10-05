@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Link2 } from "lucide-react";
+import { ArrowLeft, Link2, Send } from "lucide-react";
+import { toast } from "sonner";
 import { Panel, Th, Td } from "@/components/admin/widgets";
 
 type Detail = {
@@ -31,6 +32,7 @@ type Detail = {
     addresses: { id: string; line1: string; line2: string; line3: string; city: string; province: string; postcode: string; country: string; addressType: string }[];
     contacts: { id: string; contactType: string; value: string; email: string; phone: string; contactName: string }[];
   };
+  invite: { email: string; typedEmail: string; sentAt: string | null; expiresAt: string | null; count: number; canSend: boolean };
   shareCount: number;
   shares: {
     id: string;
@@ -55,6 +57,9 @@ export default function RightHolderPage() {
   const { id } = useParams<{ id: string }>();
   const [d, setD] = useState<Detail | null>(null);
   const [err, setErr] = useState("");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     fetch(`/api/admin/register/holders/${id}`)
@@ -62,9 +67,29 @@ export default function RightHolderPage() {
         const b = await r.json();
         if (!r.ok) throw new Error(b.error ?? "Could not load this right-holder.");
         setD(b);
+        setEmail(b.invite.typedEmail || b.invite.email);
       })
       .catch((e) => setErr(e.message));
-  }, [id]);
+  }, [id, tick]);
+
+  const call = async (body: { email?: string; send?: boolean }, ok: string) => {
+    setBusy(true);
+    try {
+      const r = await fetch(`/api/admin/register/holders/${id}/invite`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const b = await r.json();
+      if (!r.ok) throw new Error(b.error ?? "That did not work.");
+      toast.success(ok.replace("{to}", b.sentTo ?? ""));
+      setTick((t) => t + 1);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "That did not work.");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   if (err) return <p className="rounded-xl bg-zam-red/10 px-4 py-3 text-sm text-zam-red">{err}</p>;
   if (!d) return <p className="text-sm text-zam-muted">Loading…</p>;
@@ -96,6 +121,53 @@ export default function RightHolderPage() {
           <span className="rounded-xl bg-zam-canvas px-3 py-2 text-sm text-zam-muted">No portal account</span>
         )}
       </div>
+
+      {!h.member && (
+        <div className="mb-5">
+          <Panel title="Portal invitation">
+            <div className="space-y-3 px-5 py-4">
+              <p className="text-sm text-zam-muted">
+                This person is on the society&apos;s register but has no portal account. Add an email address and send an
+                invitation: signing up through the link creates their account and links it to this record.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@email.com"
+                  className="field-input h-10 w-72"
+                />
+                <button
+                  disabled={busy || email.trim().toLowerCase() === d.invite.typedEmail}
+                  onClick={() => call({ email }, "Email saved.")}
+                  className="h-10 rounded-xl border border-zam-line bg-white px-3.5 text-sm font-semibold text-zam-ink disabled:opacity-40"
+                >
+                  Save email
+                </button>
+                <button
+                  disabled={busy || !d.invite.email || !d.invite.canSend || email.trim().toLowerCase() !== (d.invite.typedEmail || d.invite.email)}
+                  onClick={() => call({ send: true }, "Invitation sent to {to}.")}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-zam-orange px-3.5 text-sm font-semibold text-white disabled:opacity-40"
+                >
+                  <Send size={14} /> {d.invite.sentAt ? "Send again" : "Send invitation"}
+                </button>
+              </div>
+              {d.invite.sentAt && (
+                <p className="text-xs text-zam-muted">
+                  Last sent {new Date(d.invite.sentAt).toLocaleString()} ({d.invite.count} sent in all)
+                  {d.invite.expiresAt && ` · link ${new Date(d.invite.expiresAt) > new Date() ? "expires" : "expired"} ${new Date(d.invite.expiresAt).toLocaleDateString()}`}.
+                  Sending again replaces the earlier link.
+                </p>
+              )}
+              {!d.invite.canSend && (
+                <p className="text-xs text-zam-red">Email sending is not set up on the server yet (RESEND_API_KEY), so invitations cannot be sent.</p>
+              )}
+              {!d.invite.email && <p className="text-xs text-zam-muted">No email is on file — type one above and save it.</p>}
+            </div>
+          </Panel>
+        </div>
+      )}
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Panel title="Identity">

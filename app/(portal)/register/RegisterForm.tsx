@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/zam/Button";
 import { Field, Input, Select } from "@/components/zam/Input";
@@ -16,6 +16,9 @@ const roles: MemberRole[] = [...MEMBER_ROLES];
 export function RegisterForm() {
   const router = useRouter();
   const { register } = useApp();
+  const inviteToken = useSearchParams().get("invite") ?? "";
+  // null = no invitation; otherwise what the link resolved to
+  const [invite, setInvite] = useState<null | { valid: boolean; name?: string; ipiNumber?: string }>(null);
   const [form, setForm] = useState({
     fullName: "",
     stageName: "",
@@ -29,6 +32,22 @@ export function RegisterForm() {
   });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!inviteToken) return;
+    let live = true;
+    fetch(`/api/auth/invite?token=${encodeURIComponent(inviteToken)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!live) return;
+        setInvite(d);
+        if (d.valid) setForm((f) => ({ ...f, fullName: f.fullName || d.name || "", email: f.email || d.email || "", nrcOrPassport: f.nrcOrPassport || d.nrc || "" }));
+      })
+      .catch(() => live && setInvite({ valid: false }));
+    return () => {
+      live = false;
+    };
+  }, [inviteToken]);
+
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -58,6 +77,7 @@ export function RegisterForm() {
         role: form.role,
         membershipType: form.membershipType,
         password: form.password,
+        ...(invite?.valid ? { invite: inviteToken } : {}),
       });
       if (res.ok) router.replace("/verify-email");
       else setError(res.error || "Registration failed.");
@@ -75,6 +95,18 @@ export function RegisterForm() {
         Open to composers, authors and publishers of musical works. What you enter here starts your membership
         application — you will not be asked for it again.
       </p>
+
+      {invite?.valid && (
+        <p className="mt-4 rounded-xl bg-zam-green/10 px-4 py-3 text-sm text-zam-ink">
+          You have been invited by ZAMCOPS{invite.name ? `, ${invite.name}` : ""}. Your account will be linked to the society&apos;s
+          record{invite.ipiNumber ? ` (IPI ${invite.ipiNumber})` : ""}.
+        </p>
+      )}
+      {inviteToken && invite && !invite.valid && (
+        <p className="mt-4 rounded-xl bg-zam-amber/15 px-4 py-3 text-sm text-zam-ink">
+          This invitation link is no longer valid. You can still register below, or ask ZAMCOPS to send a new invitation.
+        </p>
+      )}
 
       <form onSubmit={submit} className="mt-6">
         <div className="grid gap-4 sm:grid-cols-2">
