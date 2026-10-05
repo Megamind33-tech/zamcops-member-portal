@@ -5,7 +5,7 @@ import { applicationDTO } from "@/lib/serialize";
 import { notifyMember } from "@/lib/notify";
 import { logAudit } from "@/lib/audit";
 import { issueMemberDocuments, IssueError, ADMISSION_CLASS } from "@/lib/issueDocuments";
-import { ADMIN_FIELDS } from "@/lib/applicationForms";
+import { ADMIN_FIELDS, FORM_DEFS, type ApplicationFormType } from "@/lib/applicationForms";
 
 export const runtime = "nodejs";
 
@@ -14,34 +14,90 @@ export async function GET(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
 
-  const ownerId = new URL(req.url).searchParams.get("ownerId");
+  const sp = new URL(req.url).searchParams;
+  const ownerId = sp.get("ownerId");
+  const formType = sp.get("formType");
   const applications = await prisma.membershipApplication.findMany({
-    where: ownerId ? { ownerId } : undefined,
+    where: { ...(ownerId ? { ownerId } : {}), ...(formType ? { formType } : {}) },
     orderBy: { updatedAt: "desc" },
+    include: formType ? { owner: { select: { id: true, fullName: true, memberNumber: true } } } : undefined,
   });
-  return json({ applications: applications.map(applicationDTO) });
+  return json({
+    applications: applications.map((a) => ({
+      ...applicationDTO(a),
+      ...("owner" in a && a.owner ? { owner: a.owner } : {}),
+    })),
+  });
 }
 
-// Save the staff-only ("for official use") fields on an application.
+// Save the staff-only ("for official use") fields and/or correct the
+// applicant's answers (`payload`) — staff fix typos, complete the group's
+// member list, and so on. Only keys the form defines are kept.
 export async function PATCH(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
 
   const b = await req.json().catch(() => null);
-  if (!b?.ownerId || typeof b.adminFields !== "object" || b.adminFields === null) {
-    return bad("Invalid request body.");
-  }
-  const allowed = new Set(ADMIN_FIELDS.map((f) => f.key));
-  const adminFields: Record<string, string> = {};
-  for (const [k, v] of Object.entries(b.adminFields as Record<string, unknown>)) {
-    if (allowed.has(k)) adminFields[k] = String(v ?? "");
+  if (!b?.ownerId) return bad("Invalid request body.");
+  const hasAdmin = typeof b.adminFields === "object" && b.adminFields !== null;
+  const hasPayload = typeof b.payload === "object" && b.payload !== null && !Array.isArray(b.payload);
+  if (!hasAdmin && !hasPayload) return bad("Invalid request body.");
+
+  const current = await prisma.membershipApplication.findUnique({ where: { ownerId: b.ownerId } });
+  if (!current) return bad("Application not found.", 404);
+
+  const data: { adminFields?: string; payload?: string } = {};
+
+  if (hasAdmin) {
+    const allowed = new Set(ADMIN_FIELDS.map((f) => f.key));
+    const adminFields: Record<string, string> = {};
+    for (const [k, v] of Object.entries(b.adminFields as Record<string, unknown>)) {
+      if (allowed.has(k)) adminFields[k] = String(v ?? "");
+    }
+    data.adminFields = JSON.stringify(adminFields);
   }
 
-  const application = await prisma.membershipApplication
-    .update({ where: { ownerId: b.ownerId }, data: { adminFields: JSON.stringify(adminFields) } })
-    .catch(() => null);
-  if (!application) return bad("Application not found.", 404);
+  if (hasPayload) {
+    const def = FORM_DEFS[current.formType as ApplicationFormType];
+    if (!def) return bad("Unknown application form.");
+    const incoming = b.payload as Record<string, unknown>;
+    const next: Record<string, unknown> = {};
+    // keep any answer the form has no field for (older drafts) untouched
+    try {
+      Object.assign(next, JSON.parse(current.payload));
+    } catch {
+      /* start clean */
+    }
+    for (const section of def.sections) {
+      for (const f of section.fields ?? []) {
+        if (!(f.key in incoming)) continue;
+        const v = incoming[f.key];
+        next[f.key] = Array.isArray(v) ? v.map((x) => String(x).slice(0, 200)) : String(v ?? "").slice(0, 2000);
+      }
+      if (section.repeat && section.repeat.key in incoming) {
+        const rows = incoming[section.repeat.key];
+        if (!Array.isArray(rows)) return bad(`${section.repeat.label} must be a list.`);
+        if (rows.length > 200) return bad(`${section.repeat.label} is too long.`);
+        next[section.repeat.key] = rows
+          .map((r) => {
+            const out: Record<string, string> = {};
+            for (const c of section.repeat!.columns) out[c.key] = String((r as Record<string, unknown>)?.[c.key] ?? "").trim().slice(0, 300);
+            return out;
+          })
+          .filter((r) => Object.values(r).some(Boolean));
+      }
+    }
+    data.payload = JSON.stringify(next);
+  }
 
+  const application = await prisma.membershipApplication.update({ where: { ownerId: b.ownerId }, data });
+  if (hasPayload) {
+    await logAudit(session.sub, "application.edited", {
+      targetType: "MembershipApplication",
+      targetId: application.id,
+      summary: `Corrected the ${application.formType} application answers`,
+    });
+  }
   return json({ application: applicationDTO(application) });
 }
 

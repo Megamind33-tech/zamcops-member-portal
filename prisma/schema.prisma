@@ -465,6 +465,7 @@ model RightHolder {
   contacts  RightHolderContact[]
   shares    WorkShare[]
   lines     DistributionLine[]
+  groups    RightHolderGroupMember[]
 
   @@index([displayName])
   @@index([ipiNumber])
@@ -590,4 +591,39 @@ model DistributionLine {
   @@index([distributionId])
   @@index([rightHolderId])
   @@index([workId])
+}
+
+// A named collective of right-holders on the register — a band, ensemble,
+// family estate or publishing house with its people. Staff-managed from the
+// admin Groups screen; the members are right-holders from the register (or
+// free-text names for people who are not on it yet).
+model RightHolderGroup {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @default("")
+  kind        String   @default("Group") // Group | Band | Ensemble | Estate | Publisher | Other
+  status      String   @default("Active") // Active | Inactive
+  description String   @default("")
+  notes       String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members RightHolderGroupMember[]
+
+  @@index([name])
+}
+
+model RightHolderGroupMember {
+  id            String           @id @default(cuid())
+  group         RightHolderGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId       String
+  rightHolder   RightHolder?     @relation(fields: [rightHolderId], references: [id], onDelete: SetNull)
+  rightHolderId String?
+  displayName   String           @default("")
+  role          String           @default("") // e.g. Lead, Member, Manager
+  sharePct      Float            @default(0) // optional split inside the group
+  notes         String           @default("")
+
+  @@index([groupId])
+  @@index([rightHolderId])
 }

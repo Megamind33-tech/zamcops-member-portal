@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { createContext, createElement, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { toast } from "sonner";
 import type {
   Member,
@@ -22,6 +22,8 @@ import type {
 // published or not (members themselves only ever see published entries).
 export interface AdminDistribution extends Distribution {
   entries: DistributionEntry[];
+  lineCount?: number; // allocation lines carried by an imported WIPO run
+  lineAmount?: number;
 }
 
 interface Overview {
@@ -62,15 +64,39 @@ async function postJSON(url: string, body: unknown, method = "POST") {
   return { res, data };
 }
 
-// Fetches the admin overview and exposes a review-status mutator.
-export function useAdminData() {
+// A write whose failure the staff member must hear about — a silent failure
+// looks exactly like success until the page is reloaded.
+async function mutate(url: string, body: unknown, method: string, failure: string) {
+  const { res, data } = await postJSON(url, body, method);
+  if (!res.ok) toast.error((data as { error?: string }).error || failure);
+  return res.ok;
+}
+
+// One shared copy of the admin overview for the whole staff console. Every
+// page and the shell read the same state, so moving between pages doesn't
+// download every member, upload and submission again (and twice over), and a
+// change made on one screen shows on all of them.
+function useAdminDataState() {
   const [data, setData] = useState<Overview>(emptyOverview);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const res = await fetch("/api/admin/overview");
-    if (res.ok) setData(await res.json());
-    setLoading(false);
+    try {
+      const res = await fetch("/api/admin/overview", { cache: "no-store" });
+      if (res.status === 401) {
+        window.location.href = "/admin/login";
+        return;
+      }
+      if (!res.ok) throw new Error(`The server answered ${res.status}.`);
+      setData(await res.json());
+      setError("");
+    } catch (e) {
+      // keep whatever we already had on screen; just say the refresh failed
+      setError(e instanceof Error ? e.message : "Could not reach the server.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -107,7 +133,7 @@ export function useAdminData() {
   // Complete a work's distribution key (shares per contributor) and its file
   // number / factor — the office's own boxes on the declaration.
   const updateWorkSplits = useCallback(
-    async (id: string, payload: { ownershipSplits?: unknown; fileNo?: string; factor?: string }) => {
+    async (id: string, payload: Record<string, unknown>) => {
       const { res, data: d } = await postJSON(`/api/admin/works/${id}`, payload, "PATCH");
       if (!res.ok) return { ok: false as const, error: d.error || "Could not save these particulars." };
       await load();
@@ -119,7 +145,7 @@ export function useAdminData() {
   // Permanently delete a submission (admin-only — including registered ones).
   const deleteSubmission = useCallback(
     async (kind: "work" | "single" | "album", id: string) => {
-      await postJSON("/api/admin/review", { kind, id }, "DELETE");
+      await mutate("/api/admin/review", { kind, id }, "DELETE", "Could not delete this submission.");
       await load();
     },
     [load]
@@ -128,7 +154,7 @@ export function useAdminData() {
   // Approve / reject an uploaded file and notify the owner.
   const setFileStatus = useCallback(
     async (id: string, status: string, reason?: string) => {
-      await postJSON("/api/admin/files", { id, status, reason }, "PATCH");
+      await mutate("/api/admin/files", { id, status, reason }, "PATCH", "Could not update this file.");
       await load();
     },
     [load]
@@ -137,7 +163,7 @@ export function useAdminData() {
   // Approve / reject / suspend a member's application and notify them.
   const setMemberStatus = useCallback(
     async (id: string, status: string) => {
-      await postJSON("/api/admin/members", { id, status }, "PATCH");
+      await mutate("/api/admin/members", { id, status }, "PATCH", "Could not update this member.");
       await load();
     },
     [load]
@@ -156,7 +182,7 @@ export function useAdminData() {
 
   const removeDocument = useCallback(
     async (id: string) => {
-      await postJSON("/api/admin/member-documents", { id }, "DELETE");
+      await mutate("/api/admin/member-documents", { id }, "DELETE", "Could not remove this document.");
       await load();
     },
     [load]
@@ -176,7 +202,7 @@ export function useAdminData() {
   // Publishes (or reverts) a distribution — the gate that reveals payouts to members.
   const setDistributionStatus = useCallback(
     async (id: string, status: "Draft" | "Published") => {
-      await postJSON("/api/admin/distributions", { id, status }, "PATCH");
+      await mutate("/api/admin/distributions", { id, status }, "PATCH", "Could not change this distribution.");
       await load();
     },
     [load]
@@ -204,7 +230,7 @@ export function useAdminData() {
   // Replies to / resolves / reopens a support ticket.
   const setTicketStatus = useCallback(
     async (id: string, status: "Open" | "Resolved", reply?: string) => {
-      await postJSON("/api/admin/support", { id, status, reply }, "PATCH");
+      await mutate("/api/admin/support", { id, status, reply }, "PATCH", "Could not update this ticket.");
       await load();
     },
     [load]
@@ -249,7 +275,7 @@ export function useAdminData() {
   // attaching the negotiated fee figures.
   const setLicenseRequestStatus = useCallback(
     async (id: string, status: LicenseRequestStatus, fees?: { proposedFee?: number; facilitationFee?: number }) => {
-      await postJSON("/api/admin/licensing", { id, status, ...fees }, "PATCH");
+      await mutate("/api/admin/licensing", { id, status, ...fees }, "PATCH", "Could not update this enquiry.");
       await load();
     },
     [load]
@@ -258,6 +284,7 @@ export function useAdminData() {
   return {
     ...data,
     loading,
+    error,
     setReviewStatus,
     reissueWorkDocuments,
     updateWorkSplits,
@@ -276,4 +303,18 @@ export function useAdminData() {
     logLicenseEnquiry,
     reload: load,
   };
+}
+
+type AdminData = ReturnType<typeof useAdminDataState>;
+const AdminDataContext = createContext<AdminData | null>(null);
+
+export function AdminDataProvider({ children }: { children: ReactNode }) {
+  const value = useAdminDataState();
+  return createElement(AdminDataContext.Provider, { value }, children);
+}
+
+export function useAdminData(): AdminData {
+  const ctx = useContext(AdminDataContext);
+  if (!ctx) throw new Error("useAdminData must be used inside <AdminDataProvider>.");
+  return ctx;
 }

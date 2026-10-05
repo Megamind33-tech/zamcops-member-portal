@@ -26,6 +26,8 @@ import {
   PenLine,
   ChevronRight,
   UserRound,
+  Library,
+  UsersRound,
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { useAdminAuth } from "@/lib/adminAuth";
@@ -38,6 +40,8 @@ const nav = [
   { href: "/admin/directory", label: "All Members", icon: Contact },
   { href: "/admin/register", label: "Right-holders", icon: BookUser },
   { href: "/admin/works", label: "Work Declarations", icon: FileText },
+  { href: "/admin/catalogue", label: "Registered Works", icon: Library },
+  { href: "/admin/groups", label: "Groups", icon: UsersRound },
   { href: "/admin/songs", label: "Song Submissions", icon: Music2 },
   { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
   { href: "/admin/files", label: "Uploaded Files", icon: FolderOpen },
@@ -63,7 +67,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout, admin } = useAdminAuth();
-  const { members, supportTickets } = useAdminData();
+  const { members, supportTickets, error: dataError, reload } = useAdminData();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -88,8 +92,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const active = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
 
-  const isDetail = pathname.startsWith("/admin/members/") && pathname !== "/admin/members";
-  const crumb = isDetail ? "Member Detail" : crumbs[pathname] || "Dashboard";
+  // Detail pages sit under a list page: show the list as the parent crumb.
+  const parent = nav.find((n) => !n.exact && n.href !== "/admin" && pathname.startsWith(n.href + "/"));
+  const isDetail = !!parent;
+  const crumb = parent
+    ? ({ "/admin/members": "Member Detail", "/admin/register": "Right-holder", "/admin/catalogue": "Work", "/admin/groups": "Group", "/admin/distributions": "Distribution" } as Record<string, string>)[parent.href] ?? "Detail"
+    : crumbs[pathname] || "Dashboard";
 
   const doLogout = async () => {
     await logout();
@@ -199,8 +207,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             {isDetail && (
               <>
                 <ChevronRight size={15} className="text-zam-muted/60" />
-                <Link href="/admin/members" className="font-medium text-zam-muted hover:text-zam-ink">
-                  Members
+                <Link href={parent!.href} className="font-medium text-zam-muted hover:text-zam-ink">
+                  {parent!.label}
                 </Link>
               </>
             )}
@@ -246,7 +254,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">{children}</main>
+        <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
+          {dataError && (
+            <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-zam-red/10 px-4 py-3 text-sm text-zam-red">
+              <span>Couldn&apos;t refresh the console data ({dataError}). What you see may be out of date.</span>
+              <button onClick={() => reload()} className="shrink-0 font-semibold underline">
+                Retry
+              </button>
+            </div>
+          )}
+          {children}
+        </main>
       </div>
     </div>
   );

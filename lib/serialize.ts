@@ -243,6 +243,10 @@ export function distributionDTO(d: any): Distribution {
     notes: d.notes,
     publishedAt: d.publishedAt ? iso(d.publishedAt) : undefined,
     createdAt: iso(d.createdAt),
+    imported: !!d.wipoId,
+    code: d.code || undefined,
+    startDate: d.startDate || undefined,
+    endDate: d.endDate || undefined,
   };
 }
 

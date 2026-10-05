@@ -34,7 +34,31 @@ export async function PATCH(req: Request) {
   if (!session) return bad("Not authorized.", 401);
 
   const b = await req.json().catch(() => null);
-  if (!b?.id || !["Draft", "Published"].includes(b.status)) return bad("Invalid distribution payload.");
+  if (!b?.id) return bad("Invalid distribution payload.");
+
+  // Edit the run's particulars (label, notes, dates) without touching its status.
+  if (b.status === undefined) {
+    const data: { periodLabel?: string; notes?: string; code?: string; startDate?: string; endDate?: string } = {};
+    if (b.periodLabel !== undefined) {
+      const label = String(b.periodLabel).trim();
+      if (!label) return bad("The period needs a label.");
+      data.periodLabel = label.slice(0, 120);
+    }
+    if (b.notes !== undefined) data.notes = String(b.notes).slice(0, 4000);
+    if (b.code !== undefined) data.code = String(b.code).trim().slice(0, 40);
+    if (b.startDate !== undefined) data.startDate = String(b.startDate).trim().slice(0, 20);
+    if (b.endDate !== undefined) data.endDate = String(b.endDate).trim().slice(0, 20);
+    if (Object.keys(data).length === 0) return bad("Nothing to update.");
+    const updated = await prisma.distribution.update({ where: { id: b.id }, data });
+    await logAudit(session.sub, "distribution.updated", {
+      targetType: "Distribution",
+      targetId: updated.id,
+      summary: `Edited distribution “${updated.periodLabel}”`,
+    });
+    return json({ ok: true });
+  }
+
+  if (!["Draft", "Published"].includes(b.status)) return bad("Invalid distribution payload.");
 
   const distribution = await prisma.distribution.update({
     where: { id: b.id },

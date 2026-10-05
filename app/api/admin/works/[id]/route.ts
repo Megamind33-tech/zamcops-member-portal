@@ -25,7 +25,25 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const work = await prisma.workDeclaration.findUnique({ where: { id } });
   if (!work) return bad("Work not found.", 404);
 
-  const data: { ownershipSplits?: string; composers?: string; authors?: string; subArrangers?: string; publisher?: string; fileNo?: string; factor?: string } = {};
+  const data: Record<string, string> = {};
+
+  // Particulars of the declaration — staff correct typos and complete what the
+  // member left out. (Identity evidence and files are not editable here.)
+  const TEXT: [string, number][] = [
+    ["title", 200], ["alternativeTitle", 200], ["language", 60], ["genre", 80], ["duration", 20],
+    ["isrc", 40], ["iswc", 40], ["instruments", 200], ["yearComposed", 10], ["soundCarrier", 80],
+    ["publisher", 200], ["publisherIpi", 40], ["dateCreated", 20], ["workNo", 20],
+  ];
+  for (const [k, max] of TEXT) {
+    if (b[k] === undefined) continue;
+    const v = String(b[k]).trim().slice(0, max);
+    if (k === "title" && !v) return bad("A work needs a title.");
+    data[k] = v;
+  }
+  if (b.workType !== undefined) {
+    if (!["Song", "Instrumental", "Arrangement"].includes(b.workType)) return bad("Unknown work type.");
+    data.workType = b.workType;
+  }
 
   if (b.ownershipSplits !== undefined) {
     if (!Array.isArray(b.ownershipSplits)) return bad("Ownership splits must be a list.");
@@ -43,7 +61,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     data.composers = JSON.stringify(names.composers);
     data.authors = JSON.stringify(names.authors);
     data.subArrangers = JSON.stringify(names.arrangers);
-    data.publisher = names.publisher;
+    if (b.publisher === undefined) data.publisher = names.publisher;
   }
 
   if (b.fileNo !== undefined) data.fileNo = String(b.fileNo).trim().slice(0, 40);
@@ -56,7 +74,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   await logAudit(session.sub, "work.splits-updated", {
     targetType: "Work declaration",
     targetId: id,
-    summary: `Updated ownership shares${data.fileNo !== undefined || data.factor !== undefined ? " and register particulars" : ""} for “${updated.title}”`,
+    summary: `Edited the declaration “${updated.title}”${b.ownershipSplits !== undefined ? " (distribution key)" : ""}`,
   });
 
   return json({ ok: true });
