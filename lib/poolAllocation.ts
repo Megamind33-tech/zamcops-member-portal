@@ -216,6 +216,7 @@ export async function allocateLink(linkId: string): Promise<AllocationResult> {
   } catch (e) {
     const msg = e instanceof Error ? e.message : "The allocation failed.";
     await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "Failed", lastError: msg.slice(0, 500) } });
+    await prisma.issueLog.create({ data: { source: `Allocation ${linkId}`, message: msg.slice(0, 2000) } }).catch(() => {});
     throw e;
   }
 }

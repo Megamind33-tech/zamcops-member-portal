@@ -53,6 +53,7 @@ export async function POST(req: Request) {
   if (!admin || !(await verifyPassword(password, admin.passwordHash))) {
     return bad("Invalid staff credentials.", 401);
   }
+  if (!admin.active) return bad("This account is not active. Ask an administrator to activate it.", 403);
 
   return jsonWithSession(
     { admin: { id: admin.id, email: admin.email, name: admin.name } },

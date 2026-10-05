@@ -37,6 +37,11 @@ import {
   Table2,
   Fingerprint,
   BookMarked,
+  History,
+  SlidersHorizontal,
+  Cable,
+  ListPlus,
+  AlertTriangle,
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { useAdminAuth } from "@/lib/adminAuth";
@@ -83,10 +88,21 @@ const sections = [
     ],
   },
   {
-    title: "Reports and Administration",
+    title: "BI & Reports",
     items: [
-      { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-      { href: "/admin/team", label: "Audit and Accounts", icon: ShieldCheck },
+      { href: "/admin/reports", label: "Business Intelligence", icon: BarChart3 },
+      { href: "/admin/team", label: "Audit", icon: History },
+    ],
+  },
+  {
+    title: "Administration",
+    items: [
+      { href: "/admin/administration/accounts", label: "User Accounts", icon: UserRound },
+      { href: "/admin/administration/security-groups", label: "Security Groups", icon: ShieldCheck },
+      { href: "/admin/administration/parameters", label: "Parameters", icon: SlidersHorizontal },
+      { href: "/admin/administration/technical-settings", label: "Technical Settings", icon: Cable },
+      { href: "/admin/administration/dynamic-fields", label: "Dynamic Fields", icon: ListPlus },
+      { href: "/admin/administration/issue-log", label: "Issue Log", icon: AlertTriangle },
     ],
   },
   {

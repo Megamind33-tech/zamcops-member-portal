@@ -18,11 +18,56 @@ datasource db {
 
 // Staff accounts for the admin dashboard (separate from members).
 model AdminUser {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String       @id @default(cuid())
+  email        String       @unique
   name         String
   passwordHash String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime     @default(now())
+  // WIPO Connect user account fields
+  firstName    String       @default("")
+  language     String       @default("English")
+  accountType  String       @default("Operator") // Operator | Agent
+  active       Boolean      @default(true)
+  tags         String       @default("")
+  matchMin     Float?
+  matchMax     Float?
+  groups       AdminGroup[]
+}
+
+// WIPO Connect Security Group: a named set of permissions given to accounts.
+model AdminGroup {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String      @default("")
+  note        String      @default("")
+  permissions Json        @default("[]")
+  users       AdminUser[]
+}
+
+// WIPO Connect Parameters / Technical Settings, kept as one JSON document each.
+model AdminSetting {
+  key       String   @id
+  value     Json     @default("{}")
+  updatedAt DateTime @updatedAt
+}
+
+// WIPO Connect Dynamic Fields: extra fields staff add to a record kind.
+model DynamicField {
+  id       String  @id @default(cuid())
+  entity   String // Right Owner | Work | Account | License | Distribution Pool | Distribution
+  label    String
+  type     String  @default("Text") // Text | Number | Date | List | Yes/No
+  options  String  @default("") // comma separated, for List
+  required Boolean @default(false)
+  position Int     @default(0)
+}
+
+// WIPO Connect Issue Log: problems the system recorded (failed allocations, imports, syncs).
+model IssueLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  source    String   @default("")
+  message   String   @db.Text
 }
 
 // Who did what on the staff console. Admin identity is denormalised so the
