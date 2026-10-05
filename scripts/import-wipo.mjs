@@ -469,6 +469,13 @@ async function main() {
   if (!prisma) throw new Error("--apply needs DATABASE_URL");
 
   // ── write ────────────────────────────────────────────────────────────────
+  // Once staff have edited works in the portal it is the source of truth for
+  // them, and this run replaces the register wholesale. Refuse rather than lose edits.
+  const edited = await prisma.registryWork.count({ where: { editedAt: { not: null } } });
+  if (edited && !args.includes("--overwrite-edits")) {
+    throw new Error(`${edited} work(s) have been edited in the portal; re-importing would overwrite them. Re-run with --overwrite-edits only if that is what you want.`);
+  }
+
   const kept = new Map((await prisma.registryWork.findMany({ where: { declarationId: { not: null } }, select: { wipoId: true, declarationId: true } })).map((r) => [r.wipoId, r.declarationId]));
 
   // Links staff made by hand, and invitations already sent, live on the

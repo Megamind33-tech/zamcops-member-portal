@@ -8,6 +8,7 @@ import {
   Users,
   Contact,
   BookUser,
+  Library,
   FileText,
   Music2,
   Disc3,
@@ -37,6 +38,7 @@ const nav = [
   { href: "/admin/members", label: "Member Applications", icon: Users },
   { href: "/admin/directory", label: "All Members", icon: Contact },
   { href: "/admin/register", label: "Right-holders", icon: BookUser },
+  { href: "/admin/registry", label: "Works Registry", icon: Library },
   { href: "/admin/works", label: "Work Declarations", icon: FileText },
   { href: "/admin/songs", label: "Song Submissions", icon: Music2 },
   { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
@@ -89,7 +91,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
 
   const isDetail = pathname.startsWith("/admin/members/") && pathname !== "/admin/members";
-  const crumb = isDetail ? "Member Detail" : crumbs[pathname] || "Dashboard";
+  // the section is the longest menu entry that prefixes this path, so nested
+  // pages (a work, a right-holder, a distribution) are named for where they live
+  const section = nav
+    .filter((n) => !n.exact && (pathname === n.href || pathname.startsWith(n.href + "/")))
+    .sort((a, b) => b.href.length - a.href.length)[0];
+  const crumb = isDetail ? "Member Detail" : crumbs[pathname] || section?.label || "Dashboard";
 
   const doLogout = async () => {
     await logout();

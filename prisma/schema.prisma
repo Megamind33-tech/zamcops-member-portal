@@ -523,22 +523,25 @@ model RightHolderContact {
 // WorkDeclaration, which is a member's submission awaiting review; a declaration
 // that has been registered links to its register entry through `declarationId`.
 model RegistryWork {
-  id                String   @id @default(cuid())
-  wipoId            String   @unique
+  id                String    @id @default(cuid())
+  wipoId            String    @unique
   title             String
-  alternativeTitles String   @default("[]") @db.Text // JSON string[]
-  status            String   @default("")
-  registeredAt      String   @default("")
-  domestic          Boolean  @default(false)
-  iswc              String   @default("")
-  isrc              String   @default("")
-  identifiers       String   @default("[]") @db.Text // JSON [{ code, label, value }]
-  genre             String   @default("")
-  dates             String   @default("[]") @db.Text // JSON [{ code, value, territory }]
-  extra             String   @default("{}") @db.Text // JSON of the remaining dynamic fields
-  notes             String   @default("")
-  declarationId     String?  @unique
-  createdAt         DateTime @default(now())
+  alternativeTitles String    @default("[]") @db.Text // JSON string[]
+  status            String    @default("")
+  registeredAt      String    @default("")
+  domestic          Boolean   @default(false)
+  iswc              String    @default("")
+  isrc              String    @default("")
+  identifiers       String    @default("[]") @db.Text // JSON [{ code, label, value }]
+  genre             String    @default("")
+  dates             String    @default("[]") @db.Text // JSON [{ code, value, territory }]
+  extra             String    @default("{}") @db.Text // JSON of the remaining dynamic fields
+  notes             String    @default("")
+  declarationId     String?   @unique
+  // Set when staff edit the work here. The importer refuses to replace the
+  // register while any work carries it, so an edit can never be overwritten.
+  editedAt          DateTime?
+  createdAt         DateTime  @default(now())
 
   shares WorkShare[]
   lines  DistributionLine[]
