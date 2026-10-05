@@ -12,3 +12,6 @@ tmp/
 
 # Python bytecode from the dev-time form scripts
 __pycache__/
+
+# WIPO Connect export files — personal data, never commit
+import-data/

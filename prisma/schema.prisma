@@ -73,6 +73,11 @@ model Member {
 
   notificationPrefs String @default("") // JSON { email, sms, royalty, marketing }
 
+  // Society identifiers carried over from the WIPO Connect register.
+  ipiNumber     String @default("") // IPI name number (CAE)
+  ipiBaseNumber String @default("") // IPI base number
+  wipoId        String @default("") // id_interested_party in WIPO Connect
+
   membershipStatus String   @default("Pending")
   joinedAt         DateTime @default(now())
 
@@ -95,6 +100,7 @@ model Member {
   documents           MemberDocument[]
   supportTickets      SupportTicket[]
   application         MembershipApplication?
+  rightHolder         RightHolder?
 }
 
 // The official ZAMCOPS membership application (Individual / Group / Publisher),
@@ -301,7 +307,14 @@ model Distribution {
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
 
+  // Set for runs imported from WIPO Connect (their id_distribution).
+  wipoId    String? @unique
+  code      String  @default("")
+  startDate String  @default("")
+  endDate   String  @default("")
+
   entries DistributionEntry[]
+  lines   DistributionLine[]
 }
 
 // A member's confirmed payout within a given distribution period.
@@ -401,4 +414,168 @@ model MemberDocument {
   uploadedAt DateTime @default(now())
 
   @@index([ownerId])
+}
+
+// ── WIPO Connect register ───────────────────────────────────────────────────
+// Imported by scripts/import-wipo.mjs. Every row carries the WIPO Connect id it
+// came from, so the import can be re-run without duplicating anything.
+
+// Any right-holder on the register: a member, or a co-writer / publisher / heir
+// who has no portal account. `member` is set when the import matched them to
+// one (by IPI, NRC, email or phone).
+model RightHolder {
+  id             String   @id @default(cuid())
+  wipoId         String   @unique
+  member         Member?  @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  memberId       String?  @unique
+  kind           String   @default("Person") // Person | Legal entity
+  displayName    String
+  firstName      String   @default("")
+  lastName       String   @default("")
+  ipiNumber      String   @default("") // IPI name number (CAE)
+  ipiBaseNumber  String   @default("")
+  identifiers    String   @default("[]") @db.Text // JSON [{ code, label, value }] — every identifier on the WIPO record
+  nrc            String   @default("")
+  sex            String   @default("")
+  birthDate      String   @default("")
+  deathDate      String   @default("")
+  status         String   @default("")
+  isAffiliated   Boolean  @default(false)
+  affiliatedFrom String   @default("")
+  region         String   @default("")
+  nextOfKin      String   @default("")
+  spouse         String   @default("")
+  matchedBy      String   @default("") // ipi | nrc | email | phone | "" — how memberId was found
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  names     RightHolderName[]
+  addresses RightHolderAddress[]
+  contacts  RightHolderContact[]
+  shares    WorkShare[]
+  lines     DistributionLine[]
+
+  @@index([displayName])
+  @@index([ipiNumber])
+  @@index([nrc])
+}
+
+// A right-holder can be known under several names (legal name, pseudonym, ...),
+// each with its own IPI name number.
+model RightHolderName {
+  id            String      @id @default(cuid())
+  wipoNameId    String      @unique
+  rightHolder   RightHolder @relation(fields: [rightHolderId], references: [id], onDelete: Cascade)
+  rightHolderId String
+  name          String
+  firstName     String      @default("")
+  nameType      String      @default("")
+  ipiNameNumber String      @default("")
+
+  shares WorkShare[]
+
+  @@index([rightHolderId])
+}
+
+model RightHolderAddress {
+  id            String      @id @default(cuid())
+  rightHolder   RightHolder @relation(fields: [rightHolderId], references: [id], onDelete: Cascade)
+  rightHolderId String
+  line1         String      @default("")
+  line2         String      @default("")
+  line3         String      @default("")
+  city          String      @default("")
+  province      String      @default("")
+  postcode      String      @default("")
+  country       String      @default("")
+  addressType   String      @default("")
+
+  @@index([rightHolderId])
+}
+
+model RightHolderContact {
+  id            String      @id @default(cuid())
+  rightHolder   RightHolder @relation(fields: [rightHolderId], references: [id], onDelete: Cascade)
+  rightHolderId String
+  contactType   String      @default("")
+  value         String      @default("")
+  email         String      @default("")
+  phone         String      @default("")
+  contactName   String      @default("")
+  department    String      @default("")
+
+  @@index([rightHolderId])
+}
+
+// A work on the society's register — the WIPO Connect works list. Distinct from
+// WorkDeclaration, which is a member's submission awaiting review; a declaration
+// that has been registered links to its register entry through `declarationId`.
+model RegistryWork {
+  id                String   @id @default(cuid())
+  wipoId            String   @unique
+  title             String
+  alternativeTitles String   @default("[]") @db.Text // JSON string[]
+  status            String   @default("")
+  registeredAt      String   @default("")
+  domestic          Boolean  @default(false)
+  iswc              String   @default("")
+  isrc              String   @default("")
+  identifiers       String   @default("[]") @db.Text // JSON [{ code, label, value }]
+  genre             String   @default("")
+  dates             String   @default("[]") @db.Text // JSON [{ code, value, territory }]
+  extra             String   @default("{}") @db.Text // JSON of the remaining dynamic fields
+  notes             String   @default("")
+  declarationId     String?  @unique
+  createdAt         DateTime @default(now())
+
+  shares WorkShare[]
+  lines  DistributionLine[]
+
+  @@index([title])
+  @@index([iswc])
+}
+
+// One right-holder's share of a work, per territory view and right type
+// (performing, mechanical, ...). `share` is stored as WIPO Connect holds it.
+model WorkShare {
+  id               String           @id @default(cuid())
+  work             RegistryWork     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId           String
+  rightHolder      RightHolder?     @relation(fields: [rightHolderId], references: [id], onDelete: SetNull)
+  rightHolderId    String?
+  name             RightHolderName? @relation(fields: [nameId], references: [id], onDelete: SetNull)
+  nameId           String?
+  roleCode         String           @default("")
+  isPublisher      Boolean          @default(false)
+  rightType        String           @default("")
+  share            Float            @default(0)
+  territoryFormula String           @default("")
+  validFrom        String           @default("")
+  validTo          String           @default("")
+
+  @@index([workId])
+  @@index([rightHolderId])
+}
+
+// What one right-holder was allocated on one work in one distribution run.
+model DistributionLine {
+  id             String        @id @default(cuid())
+  distribution   Distribution  @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  distributionId String
+  work           RegistryWork? @relation(fields: [workId], references: [id], onDelete: SetNull)
+  workId         String?
+  rightHolder    RightHolder?  @relation(fields: [rightHolderId], references: [id], onDelete: SetNull)
+  rightHolderId  String?
+  roleCode       String        @default("")
+  rightType      String        @default("")
+  amount         Float         @default(0) // estimated_amount
+  total          Float         @default(0) // sum_amount
+  weight         Float         @default(0)
+  adminFee       Float         @default(0)
+  reserved       Float         @default(0)
+  disputed       Boolean       @default(false)
+
+  @@index([distributionId])
+  @@index([rightHolderId])
+  @@index([workId])
 }
