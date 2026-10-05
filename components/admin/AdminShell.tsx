@@ -34,26 +34,52 @@ import { useAdminAuth } from "@/lib/adminAuth";
 import { useAdminData } from "@/lib/adminClient";
 import { cn } from "@/lib/format";
 
-const nav = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/members", label: "Member Applications", icon: Users },
-  { href: "/admin/directory", label: "All Members", icon: Contact },
-  { href: "/admin/register", label: "Right-holders", icon: BookUser },
-  { href: "/admin/works", label: "Work Declarations", icon: FileText },
-  { href: "/admin/catalogue", label: "Registered Works", icon: Library },
-  { href: "/admin/groups", label: "Groups", icon: UsersRound },
-  { href: "/admin/songs", label: "Song Submissions", icon: Music2 },
-  { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
-  { href: "/admin/files", label: "Uploaded Files", icon: FolderOpen },
-  { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
-  { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
-  { href: "/admin/licensing", label: "Licensing Desk", icon: Handshake },
-  { href: "/admin/support", label: "Support Inbox", icon: LifeBuoy },
-  { href: "/admin/notices", label: "Member notices", icon: Bell },
-  { href: "/admin/signatures", label: "Official Signatures", icon: PenLine },
-  { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-  { href: "/admin/team", label: "Team & Activity", icon: ShieldCheck },
+const sections = [
+  { title: "Overview", items: [{ href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true }] },
+  {
+    title: "Rights owners",
+    items: [
+      { href: "/admin/register", label: "Right-holders", icon: BookUser },
+      { href: "/admin/groups", label: "Groups", icon: UsersRound },
+      { href: "/admin/members", label: "Member Applications", icon: Users },
+      { href: "/admin/directory", label: "All Members", icon: Contact },
+    ],
+  },
+  {
+    title: "Works",
+    items: [
+      { href: "/admin/catalogue", label: "Registered Works", icon: Library },
+      { href: "/admin/works", label: "Work Declarations", icon: FileText },
+      { href: "/admin/songs", label: "Song Submissions", icon: Music2 },
+      { href: "/admin/albums", label: "Album Submissions", icon: Disc3 },
+    ],
+  },
+  {
+    title: "Matching & distribution",
+    items: [
+      { href: "/admin/distributions", label: "Distributions", icon: CalendarRange },
+      { href: "/admin/royalties", label: "Royalty Summary", icon: Wallet },
+    ],
+  },
+  { title: "Licensing", items: [{ href: "/admin/licensing", label: "Licensing Desk", icon: Handshake }] },
+  {
+    title: "Operations",
+    items: [
+      { href: "/admin/files", label: "Uploaded Files", icon: FolderOpen },
+      { href: "/admin/support", label: "Support Inbox", icon: LifeBuoy },
+      { href: "/admin/notices", label: "Member notices", icon: Bell },
+      { href: "/admin/signatures", label: "Official Signatures", icon: PenLine },
+    ],
+  },
+  {
+    title: "Reports & administration",
+    items: [
+      { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+      { href: "/admin/team", label: "Team & Activity", icon: ShieldCheck },
+    ],
+  },
 ];
+const nav: { href: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = sections.flatMap((x) => x.items);
 
 const crumbs: Record<string, string> = Object.fromEntries(nav.map((n) => [n.href, n.label]));
 
@@ -118,12 +144,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar — dark ink rail; off-canvas drawer on mobile */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[264px] shrink-0 flex-col bg-zam-ink transition-transform duration-300 ease-out",
+          "fixed inset-y-0 left-0 z-50 flex w-[250px] shrink-0 flex-col bg-[#1b3f66] transition-transform duration-300 ease-out",
           "lg:sticky lg:top-0 lg:z-auto lg:h-[100dvh] lg:translate-x-0",
           open ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 items-center justify-between px-5">
+        <div className="flex h-14 items-center justify-between px-4">
           <Logo size={26} onDark />
           <button
             onClick={() => setOpen(false)}
@@ -134,42 +160,41 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-2 border-y border-white/10 px-5 py-3">
+        <div className="flex items-center gap-2 border-y border-white/10 px-4 py-2">
           <span className="grid h-7 w-7 place-items-center rounded-lg bg-zam-orange/20 text-zam-orange">
             <ShieldCheck size={16} />
           </span>
           <span className="font-display text-sm font-semibold text-white">Staff Console</span>
         </div>
 
-        <nav className="no-scrollbar flex-1 space-y-1 overflow-y-auto p-3">
-          {nav.map((n) => {
-            const on = active(n.href, n.exact);
-            return (
-              <Link
-                key={n.href}
-                href={n.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
-                  on
-                    ? "bg-zam-orange font-semibold text-white"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                )}
-              >
-                <n.icon size={18} className="shrink-0" />
-                <span className="flex-1 truncate">{n.label}</span>
-                {n.href === "/admin/members" && pendingMembers > 0 && (
-                  <span className="grid h-5 min-w-[20px] place-items-center rounded-full bg-zam-amber px-1.5 text-[11px] font-bold text-white">
-                    {pendingMembers}
-                  </span>
-                )}
-                {n.href === "/admin/support" && openTickets > 0 && (
-                  <span className="grid h-5 min-w-[20px] place-items-center rounded-full bg-zam-amber px-1.5 text-[11px] font-bold text-white">
-                    {openTickets}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+        <nav className="no-scrollbar flex-1 overflow-y-auto px-2 py-2">
+          {sections.map((sec) => (
+            <div key={sec.title} className="mb-2">
+              <p className="px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">{sec.title}</p>
+              {(sec.items as typeof nav).map((n) => {
+                const on = active(n.href, n.exact);
+                return (
+                  <Link
+                    key={n.href}
+                    href={n.href}
+                    className={cn(
+                      "flex items-center gap-2.5 border-l-[3px] px-3 py-1.5 text-[13px] transition",
+                      on ? "border-zam-orange bg-white/10 font-semibold text-white" : "border-transparent text-white/70 hover:bg-white/5 hover:text-white"
+                    )}
+                  >
+                    <n.icon size={16} className="shrink-0" />
+                    <span className="flex-1 truncate">{n.label}</span>
+                    {n.href === "/admin/members" && pendingMembers > 0 && (
+                      <span className="grid h-4 min-w-[18px] place-items-center rounded-sm bg-zam-amber px-1 text-[10px] font-bold text-white">{pendingMembers}</span>
+                    )}
+                    {n.href === "/admin/support" && openTickets > 0 && (
+                      <span className="grid h-4 min-w-[18px] place-items-center rounded-sm bg-zam-amber px-1 text-[10px] font-bold text-white">{openTickets}</span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="space-y-1 border-t border-white/10 p-3">
@@ -191,7 +216,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-zam-line bg-white/90 px-4 backdrop-blur-xl lg:px-6">
+        <header className="sticky top-0 z-30 flex h-11 items-center gap-3 border-b border-[#d9dde3] bg-white px-4 lg:px-5">
           <button
             onClick={() => setOpen(true)}
             className="grid h-10 w-10 place-items-center rounded-xl border border-zam-line text-zam-ink lg:hidden"
@@ -254,7 +279,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
+        <main className="min-w-0 flex-1 overflow-x-hidden p-3 lg:p-4">
           {dataError && (
             <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-zam-red/10 px-4 py-3 text-sm text-zam-red">
               <span>Couldn&apos;t refresh the console data ({dataError}). What you see may be out of date.</span>
@@ -270,7 +295,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Shared page header for admin pages.
+// Shared page header for admin pages: a WIPO-style strip with the page name in
+// small capitals, an optional subtitle, and the page's actions on the right.
 export function AdminHeader({
   title,
   subtitle,
@@ -281,10 +307,10 @@ export function AdminHeader({
   right?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-zam-ink">{title}</h1>
-        {subtitle && <p className="mt-0.5 text-sm text-zam-muted">{subtitle}</p>}
+    <div className="mb-3 flex flex-col gap-2 border-b border-[#d9dde3] pb-2 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="truncate text-[15px] font-bold uppercase tracking-wide text-[#1f4e79]">{title}</h1>
+        {subtitle && <p className="mt-0.5 text-xs text-zam-muted">{subtitle}</p>}
       </div>
       {right && <div className="shrink-0">{right}</div>}
     </div>

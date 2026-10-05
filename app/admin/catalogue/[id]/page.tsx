@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { HolderPicker } from "@/components/admin/HolderPicker";
+import { Tabs, Field } from "@/components/admin/ui";
+import { AuditTrail } from "@/components/admin/AuditTrail";
 import { formatKwacha } from "@/lib/format";
 
 type Share = {
@@ -40,6 +42,7 @@ type Detail = {
     dates: { code: string; value: string; territory: string }[];
     extra: Record<string, string>;
     notes: string;
+    createdAt: string;
   };
   declaration: { id: string; title: string; status: string } | null;
   shares: Share[];
@@ -68,6 +71,7 @@ export default function WorkDetailPage() {
   const [shares, setShares] = useState<Share[]>([]);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [tab, setTab] = useState<"main" | "detail" | "history" | "audit">("main");
 
   const load = useCallback(async () => {
     try {
@@ -196,8 +200,22 @@ export default function WorkDetailPage() {
         right={d.work.status ? <StatusBadge status={d.work.status === "ACTIVE" ? "Active" : d.work.status} /> : undefined}
       />
 
-      <div className="space-y-6">
-        <Panel title="Work details">
+      <Tabs
+        className="mb-3"
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { key: "main", label: "Main" },
+          { key: "detail", label: "Detail" },
+          { key: "history", label: "Distribution History", count: d.distributions.length },
+          { key: "audit", label: "Audit" },
+        ]}
+      />
+
+      <div className="space-y-3">
+        {tab === "main" && (
+        <>
+        <Panel title="Main information" collapsible>
           <div className="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3">
             <label className="block sm:col-span-2">
               <Label>Title</Label>
@@ -378,7 +396,11 @@ export default function WorkDetailPage() {
           </div>
         </Panel>
 
-        <Panel title="Distribution history">
+        </>
+        )}
+
+        {tab === "history" && (
+        <Panel title="List of distributions">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px]">
               <thead className="bg-zam-canvas">
@@ -422,8 +444,34 @@ export default function WorkDetailPage() {
           </div>
         </Panel>
 
-        {(d.work.dates.length > 0 || Object.keys(d.work.extra).length > 0) && (
-          <Panel title="Imported register fields (read-only)">
+        )}
+
+        {tab === "audit" && (
+          <Panel title="Changes to this work">
+            <AuditTrail targetType="Register work" targetId={id} />
+          </Panel>
+        )}
+
+        {tab === "detail" && (
+          <>
+          <Panel title="General information">
+            <dl className="grid gap-x-8 gap-y-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+              <Field label="WIPO id">{d.work.wipoId.startsWith("local_") ? "Added in the portal" : d.work.wipoId}</Field>
+              <Field label="Status">{d.work.status}</Field>
+              <Field label="Registered">{d.work.registeredAt}</Field>
+              <Field label="Origin">{d.work.domestic ? "Domestic" : "International"}</Field>
+              <Field label="Member declaration">
+                {d.declaration ? (
+                  <Link href={`/admin/works`} className="text-zam-orange hover:underline">
+                    {d.declaration.title} ({d.declaration.status})
+                  </Link>
+                ) : null}
+              </Field>
+              <Field label="Created in the portal">{new Date(d.work.createdAt).toLocaleDateString("en-GB", { dateStyle: "medium" })}</Field>
+            </dl>
+          </Panel>
+          {(d.work.dates.length > 0 || Object.keys(d.work.extra).length > 0) && (
+          <Panel title="Additional information (imported from WIPO Connect)">
             <dl className="grid gap-x-8 gap-y-1 p-5 sm:grid-cols-2">
               {d.work.dates.map((x, i) => (
                 <div key={`d${i}`} className="flex justify-between gap-4 border-b border-zam-line/60 py-2 text-sm">
@@ -439,6 +487,8 @@ export default function WorkDetailPage() {
               ))}
             </dl>
           </Panel>
+          )}
+          </>
         )}
 
         <div>
@@ -449,7 +499,7 @@ export default function WorkDetailPage() {
       </div>
 
       {/* sticky save bar */}
-      <div className={`fixed inset-x-0 bottom-0 z-30 border-t border-zam-line bg-white/95 px-4 py-3 backdrop-blur transition-transform lg:left-[264px] ${dirty ? "translate-y-0" : "translate-y-full"}`}>
+      <div className={`fixed inset-x-0 bottom-0 z-30 border-t border-zam-line bg-white/95 px-4 py-3 backdrop-blur transition-transform lg:left-[250px] ${dirty ? "translate-y-0" : "translate-y-full"}`}>
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
           <span className="text-sm text-zam-muted">{overs.length ? <span className="font-semibold text-zam-red">{overs[0][0]} shares are over 100%</span> : "You have unsaved changes."}</span>
           <div className="flex gap-2">

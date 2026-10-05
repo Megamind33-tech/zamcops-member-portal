@@ -3,9 +3,12 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Link2, Send } from "lucide-react";
+import { ArrowLeft, Link2, Pencil, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Panel, Th, Td } from "@/components/admin/widgets";
+import { Tabs } from "@/components/admin/ui";
+import { AuditTrail } from "@/components/admin/AuditTrail";
+import { HolderEditForm } from "@/components/admin/HolderEditForm";
 
 type Detail = {
   holder: {
@@ -13,6 +16,8 @@ type Detail = {
     wipoId: string;
     kind: string;
     displayName: string;
+    firstName: string;
+    lastName: string;
     ipiNumber: string;
     ipiBaseNumber: string;
     identifiers: { code: string; label: string; value: string }[];
@@ -71,6 +76,8 @@ export default function RightHolderPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [tick, setTick] = useState(0);
+  const [tab, setTab] = useState<"main" | "works" | "audit">("main");
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     fetch(`/api/admin/register/holders/${id}`)
@@ -163,6 +170,16 @@ export default function RightHolderPage() {
             {h.isAffiliated && ` · affiliated${h.affiliatedFrom ? ` since ${h.affiliatedFrom}` : ""}`}
           </p>
         </div>
+        <div className="flex flex-wrap items-center gap-3">
+        <button
+          onClick={() => {
+            setTab("main");
+            setEditing(true);
+          }}
+          className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-white px-3 text-[13px] font-semibold text-[#1f4e79] ring-1 ring-[#bfc5ce] hover:bg-[#eef3f8]"
+        >
+          <Pencil size={13} /> Edit
+        </button>
         {h.member ? (
           <div className="flex items-center gap-3">
             <Link
@@ -183,11 +200,40 @@ export default function RightHolderPage() {
             </button>
           </div>
         ) : (
-          <span className="rounded-xl bg-zam-canvas px-3 py-2 text-sm text-zam-muted">No portal account</span>
+          <span className="rounded-sm bg-zam-canvas px-3 py-1.5 text-sm text-zam-muted">No portal account</span>
         )}
+        </div>
       </div>
 
-      {!h.member && (
+      <Tabs
+        className="mb-3"
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { key: "main", label: "Main" },
+          { key: "works", label: "Works", count: d.shareCount },
+          { key: "audit", label: "Audit" },
+        ]}
+      />
+
+      {editing && tab === "main" && (
+        <HolderEditForm
+          holder={{ ...h, firstName: h.firstName ?? "", lastName: h.lastName ?? "" }}
+          onCancel={() => setEditing(false)}
+          onSaved={() => {
+            setEditing(false);
+            setTick((t) => t + 1);
+          }}
+        />
+      )}
+
+      {tab === "audit" && (
+        <Panel title="Changes to this right-holder">
+          <AuditTrail targetType="Right-holder" targetId={id} />
+        </Panel>
+      )}
+
+      {!editing && tab === "main" && !h.member && (
         <div className="mb-5">
           <Panel title="Link to a portal member">
             <div className="space-y-3 px-5 py-4">
@@ -302,8 +348,9 @@ export default function RightHolderPage() {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Panel title="Identity">
+      {!editing && tab === "main" && (
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Panel title="Identity" collapsible>
           <dl className="px-5 py-2">
             <Row k="IPI name number" v={h.ipiNumber} />
             <Row k="IPI base number" v={h.ipiBaseNumber} />
@@ -360,8 +407,10 @@ export default function RightHolderPage() {
           )}
         </div>
       </div>
+      )}
 
-      <div className="mt-5">
+      {tab === "works" && (
+      <div>
         <Panel
           title={`Works (${d.shareCount.toLocaleString()} shares)`}
           right={
@@ -388,7 +437,11 @@ export default function RightHolderPage() {
               <tbody className="divide-y divide-zam-line">
                 {d.shares.map((s) => (
                   <tr key={s.id}>
-                    <Td className="font-medium">{s.work.title}</Td>
+                    <Td className="font-medium">
+                      <Link href={`/admin/catalogue/${s.work.id}`} className="hover:text-zam-orange">
+                        {s.work.title}
+                      </Link>
+                    </Td>
                     <Td className="font-mono text-xs">{s.work.iswc || "—"}</Td>
                     <Td>
                       {s.roleCode}
@@ -416,6 +469,7 @@ export default function RightHolderPage() {
           )}
         </Panel>
       </div>
+      )}
     </div>
   );
 }

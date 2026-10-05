@@ -36,9 +36,13 @@ model AuditLog {
   targetType String   @default("") // Member | Work | Single | Album | File | Distribution | ...
   targetId   String   @default("")
   summary    String   @default("")
+  // JSON [{ field, from, to }] — what a save actually changed, shown on a
+  // record Audit tab. Empty for actions that do not edit fields.
+  changes    String   @default("") @db.Text
   createdAt  DateTime @default(now())
 
   @@index([createdAt])
+  @@index([targetType, targetId])
 }
 
 // Members of the society — composers, authors and publishers (ZAMCOPS' mandate).

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
-import { logAudit } from "@/lib/audit";
+import { logAudit, diffFields } from "@/lib/audit";
 import { GROUP_KINDS } from "../route";
 
 export const runtime = "nodejs";
@@ -103,6 +103,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
   if (Object.keys(data).length === 0 && members === null) return bad("Nothing to update.");
 
+  const before = members !== null ? await prisma.rightHolderGroupMember.findMany({ where: { groupId: id }, select: { id: true } }) : [];
   await prisma.$transaction(async (tx) => {
     if (Object.keys(data).length) await tx.rightHolderGroup.update({ where: { id }, data });
     if (members !== null) {
@@ -110,10 +111,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       await tx.rightHolderGroupMember.createMany({ data: members.map((m) => ({ ...m, groupId: id })) });
     }
   });
+  const changes = diffFields(existing as unknown as Record<string, unknown>, data, { name: "Name", kind: "Type", status: "Status", code: "Code", description: "Description", notes: "Internal notes" });
+  if (members !== null) changes.push({ field: "Members", from: `${before.length} member${before.length === 1 ? "" : "s"}`, to: `${members.length} member${members.length === 1 ? "" : "s"}` });
   await logAudit(session.sub, "group.updated", {
     targetType: "Group",
     targetId: id,
     summary: `Edited group “${data.name ?? existing.name}”${members !== null ? ` (${members.length} members)` : ""}`,
+    changes,
   });
   return json({ ok: true });
 }

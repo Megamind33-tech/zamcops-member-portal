@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
-import { logAudit } from "@/lib/audit";
+import { logAudit, diffFields } from "@/lib/audit";
 import type { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
@@ -52,6 +52,33 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     prisma.distributionLine.groupBy({ by: ["rightHolderId"], where: { distributionId: id } }).then((r) => r.length),
     prisma.distributionLine.groupBy({ by: ["workId"], where: { distributionId: id } }).then((r) => r.length),
   ]);
+
+  // Summary / Analysis tabs: what the run paid, to whom and what is held back.
+  const [byHolder, byWork, disputedSum] = await Promise.all([
+    prisma.distributionLine.groupBy({ by: ["rightHolderId"], where: { distributionId: id }, _sum: { amount: true, adminFee: true, reserved: true }, _count: { _all: true } }),
+    prisma.distributionLine.groupBy({ by: ["workId"], where: { distributionId: id }, _sum: { amount: true }, _count: { _all: true } }),
+    prisma.distributionLine.aggregate({ where: { distributionId: id, disputed: true }, _sum: { amount: true } }),
+  ]);
+  const holderRows = await prisma.rightHolder.findMany({
+    where: { id: { in: byHolder.map((g) => g.rightHolderId).filter((x): x is string => !!x) } },
+    select: { id: true, isAffiliated: true },
+  });
+  const affiliated = new Set(holderRows.filter((h) => h.isAffiliated).map((h) => h.id));
+  const workRows = await prisma.registryWork.findMany({
+    where: { id: { in: byWork.map((g) => g.workId).filter((x): x is string => !!x) } },
+    select: { id: true, domestic: true },
+  });
+  const domesticWork = new Map(workRows.map((w) => [w.id, w.domestic]));
+  const sum = (xs: number[]) => Math.round(xs.reduce((a, b) => a + b, 0) * 100) / 100;
+  const breakdown = {
+    affiliated: { holders: byHolder.filter((g) => g.rightHolderId && affiliated.has(g.rightHolderId)).length, amount: sum(byHolder.filter((g) => g.rightHolderId && affiliated.has(g.rightHolderId)).map((g) => g._sum.amount ?? 0)) },
+    other: { holders: byHolder.filter((g) => g.rightHolderId && !affiliated.has(g.rightHolderId)).length, amount: sum(byHolder.filter((g) => g.rightHolderId && !affiliated.has(g.rightHolderId)).map((g) => g._sum.amount ?? 0)) },
+    unidentified: { lines: byHolder.filter((g) => !g.rightHolderId).reduce((a, g) => a + g._count._all, 0), amount: sum(byHolder.filter((g) => !g.rightHolderId).map((g) => g._sum.amount ?? 0)) },
+    domesticWorks: byWork.filter((g) => g.workId && domesticWork.get(g.workId)).length,
+    internationalWorks: byWork.filter((g) => g.workId && domesticWork.get(g.workId) === false).length,
+    unmatchedWorkLines: byWork.filter((g) => !g.workId).reduce((a, g) => a + g._count._all, 0),
+    disputedAmount: disputedSum._sum.amount ?? 0,
+  };
 
   type Row = Record<string, string | number | boolean | null>;
   let rows: Row[] = [];
@@ -160,6 +187,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       reserved: totals._sum.reserved ?? 0,
       disputed,
     },
+    breakdown,
     view,
     page,
     pageSize: PAGE_SIZE,
@@ -195,10 +223,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (Object.keys(data).length === 0) return bad("Nothing to update.");
 
   await prisma.distributionLine.update({ where: { id: line.id }, data });
+  const who = line.work ? `“${line.work.title}”` : "a line";
+  const changes = diffFields(line as unknown as Record<string, unknown>, data as Record<string, unknown>, { amount: "Amount", total: "Gross", adminFee: "Admin fee", reserved: "Reserved", disputed: "Disputed" }).map((c) => ({ ...c, field: `${c.field} (${who})` }));
   await logAudit(session.sub, "distribution.line-updated", {
     targetType: "Distribution",
     targetId: id,
     summary: `Corrected an allocation line${line.work ? ` for “${line.work.title}”` : ""}`,
+    changes,
   });
   return json({ ok: true });
 }

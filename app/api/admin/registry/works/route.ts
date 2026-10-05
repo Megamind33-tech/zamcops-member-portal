@@ -12,7 +12,11 @@ const PAGE_SIZE = 50;
 //   ?q=       title, alternative title, ISWC, ISRC or WIPO id
 //   ?status=  exact register status
 //   ?filter=  nosplits (no shares recorded) | domestic | noiswc
+//   ?holder=  a right-holder name on any share
+//   ?genre=   genre contains
+//   ?from= ?to=  registration date range (YYYY-MM-DD)
 //   ?page=    1-based
+//   ?format=csv  the whole filtered result (up to 20,000 works) as a download
 export async function GET(req: Request) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
@@ -22,6 +26,11 @@ export async function GET(req: Request) {
   const status = (url.searchParams.get("status") ?? "").trim();
   const filter = url.searchParams.get("filter") ?? "";
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
+  const holder = (url.searchParams.get("holder") ?? "").trim().slice(0, 80);
+  const genre = (url.searchParams.get("genre") ?? "").trim().slice(0, 80);
+  const from = (url.searchParams.get("from") ?? "").slice(0, 10);
+  const to = (url.searchParams.get("to") ?? "").slice(0, 10);
+  const csv = url.searchParams.get("format") === "csv";
 
   const and: Prisma.RegistryWorkWhereInput[] = [];
   if (q) {
@@ -38,10 +47,45 @@ export async function GET(req: Request) {
     }
   }
   if (status) and.push({ status });
+  if (genre) and.push({ genre: { contains: genre, mode: "insensitive" } });
+  if (from) and.push({ registeredAt: { gte: from } });
+  if (to) and.push({ registeredAt: { lte: to } });
+  for (const word of holder.split(/s+/).filter(Boolean)) {
+    and.push({ shares: { some: { OR: [{ rightHolder: { displayName: { contains: word, mode: "insensitive" } } }, { name: { name: { contains: word, mode: "insensitive" } } }] } } });
+  }
   if (filter === "nosplits") and.push({ shares: { none: {} } });
   if (filter === "domestic") and.push({ domestic: true });
   if (filter === "noiswc") and.push({ iswc: "" });
   const where: Prisma.RegistryWorkWhereInput = and.length ? { AND: and } : {};
+
+  if (csv) {
+    const rows = await prisma.registryWork.findMany({
+      where,
+      orderBy: { title: "asc" },
+      take: 20000,
+      include: { shares: { include: { rightHolder: { select: { displayName: true } }, name: { select: { name: true } } } } },
+    });
+    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const head = ["Main Id", "Title", "Status", "Genre", "ISWC", "ISRC", "Registered", "Domestic", "Right-holders"];
+    const body = rows.map((w) =>
+      [
+        w.wipoId.startsWith("local_") ? "" : w.wipoId,
+        w.title,
+        w.status,
+        w.genre,
+        w.iswc,
+        w.isrc,
+        w.registeredAt,
+        w.domestic ? "Yes" : "No",
+        [...new Set(w.shares.map((s) => s.rightHolder?.displayName || s.name?.name || "").filter(Boolean))].join("; "),
+      ]
+        .map(esc)
+        .join(","),
+    );
+    return new Response([head.join(","), ...body].join("\n"), {
+      headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="registered-works.csv"', "Cache-Control": "no-store" },
+    });
+  }
 
   const [total, works, statuses, all] = await Promise.all([
     prisma.registryWork.count({ where }),
@@ -53,7 +97,7 @@ export async function GET(req: Request) {
       include: {
         _count: { select: { shares: true } },
         shares: {
-          take: 3,
+          take: 8,
           orderBy: { share: "desc" },
           include: { rightHolder: { select: { displayName: true } }, name: { select: { name: true } } },
         },
@@ -68,7 +112,9 @@ export async function GET(req: Request) {
     pageSize: PAGE_SIZE,
     total,
     stats: { all, statuses: statuses.map((s) => ({ status: s.status, count: s._count._all })) },
-    works: works.map((w) => ({
+    works: works.map((w) => {
+      const names = [...new Set(w.shares.map((s) => s.rightHolder?.displayName || s.name?.name || "Unknown"))];
+      return {
       id: w.id,
       wipoId: w.wipoId,
       title: w.title,
@@ -79,8 +125,10 @@ export async function GET(req: Request) {
       domestic: w.domestic,
       registeredAt: w.registeredAt,
       shareCount: w._count.shares,
-      holders: w.shares.map((s) => s.rightHolder?.displayName || s.name?.name || "Unknown"),
-    })),
+      holders: names.slice(0, 3),
+      moreHolders: names.length > 3 || w._count.shares > 8,
+      };
+    }),
   });
 }
 

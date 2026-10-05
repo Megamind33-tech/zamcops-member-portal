@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
-import { logAudit } from "@/lib/audit";
+import { logAudit, diffFields } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -186,6 +186,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   if (Object.keys(data).length === 0 && shares === null) return bad("Nothing to update.");
 
+  const shareKey = (s: { rightHolderId: string | null; roleCode: string; isPublisher: boolean; rightType: string; share: number; territoryFormula: string; validFrom: string; validTo: string }) =>
+    [s.rightHolderId ?? "", s.roleCode, s.isPublisher ? 1 : 0, s.rightType, s.share, s.territoryFormula, s.validFrom, s.validTo].join("|");
+  const beforeShares =
+    shares !== null
+      ? (await prisma.workShare.findMany({ where: { workId: id }, select: { rightHolderId: true, roleCode: true, isPublisher: true, rightType: true, share: true, territoryFormula: true, validFrom: true, validTo: true } })).map(shareKey).sort().join("|")
+      : "";
   await prisma.$transaction(async (tx) => {
     if (Object.keys(data).length) await tx.registryWork.update({ where: { id }, data });
     if (shares !== null) {
@@ -206,10 +212,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
   });
 
+  const changes = diffFields(
+    { ...existing, alternativeTitles: parse<string[]>(existing.alternativeTitles, []) },
+    { ...data, alternativeTitles: b.alternativeTitles !== undefined ? parse<string[]>(data.alternativeTitles as string, []) : undefined },
+    { title: "Title", alternativeTitles: "Alternative titles", status: "Status", registeredAt: "Registration date", domestic: "Domestic work", iswc: "ISWC", isrc: "ISRC", genre: "Genre", notes: "Notes", identifiers: "Identifiers" },
+  );
+  if (shares !== null && beforeShares !== shares.map(shareKey).sort().join("|")) changes.push({ field: "Shares", from: "", to: `${shares.length} share${shares.length === 1 ? "" : "s"} saved` });
   await logAudit(session.sub, "registry-work.updated", {
     targetType: "Register work",
     targetId: id,
     summary: `Edited “${(data.title as string) ?? existing.title}”${shares !== null ? ` (${shares.length} shares)` : ""}`,
+    changes,
   });
   return json({ ok: true });
 }

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/format";
-import { Check, Eye, X } from "lucide-react";
+import { Check, ChevronDown, Eye, X } from "lucide-react";
 
 export function AdminStat({
   icon,
@@ -34,18 +34,30 @@ export function Panel({
   title,
   children,
   right,
+  collapsible = false,
+  defaultOpen = true,
 }: {
   title: string;
   children: React.ReactNode;
   right?: React.ReactNode;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <section className="card overflow-hidden">
-      <div className="flex items-center justify-between border-b border-zam-line px-5 py-3.5">
-        <h2 className="text-sm font-bold text-zam-ink">{title}</h2>
+      <div className="flex items-center justify-between gap-3 border-b border-[#d9dde3] bg-[#f5f6f8] px-3 py-1.5">
+        {collapsible ? (
+          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex items-center gap-1.5 text-[13px] font-bold text-[#1f4e79]">
+            <ChevronDown size={14} className={cn("transition-transform", !open && "-rotate-90")} />
+            {title}
+          </button>
+        ) : (
+          <h2 className="text-[13px] font-bold text-[#1f4e79]">{title}</h2>
+        )}
         {right}
       </div>
-      {children}
+      {open && children}
     </section>
   );
 }
@@ -116,7 +128,7 @@ export function StatusBadge({ status, className }: { status: string; className?:
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1",
+        "inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 text-[11px] font-semibold ring-1",
         badgeMap[status] ?? "bg-zam-canvas text-zam-muted ring-zam-line",
         className
       )}

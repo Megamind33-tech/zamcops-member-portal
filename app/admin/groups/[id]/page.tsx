@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { HolderPicker } from "@/components/admin/HolderPicker";
+import { Tabs } from "@/components/admin/ui";
+import { AuditTrail } from "@/components/admin/AuditTrail";
 
 type Member = {
   id: string;
@@ -32,6 +34,7 @@ export default function GroupDetailPage() {
   const [err, setErr] = useState("");
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [tab, setTab] = useState<"main" | "audit">("main");
 
   const load = useCallback(async () => {
     try {
@@ -133,8 +136,25 @@ export default function GroupDetailPage() {
       </Link>
       <AdminHeader title={group.name || "Unnamed group"} subtitle={`${group.kind} · ${members.length} member${members.length === 1 ? "" : "s"}`} right={<StatusBadge status={group.status} />} />
 
-      <div className="space-y-6">
-        <Panel title="Group details">
+      <Tabs
+        className="mb-3"
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { key: "main", label: "Main" },
+          { key: "audit", label: "Audit" },
+        ]}
+      />
+
+      {tab === "audit" && (
+        <Panel title="Changes to this group">
+          <AuditTrail targetType="Group" targetId={id} />
+        </Panel>
+      )}
+
+      {tab === "main" && (
+      <div className="space-y-3">
+        <Panel title="Group details" collapsible>
           <div className="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4">
             <label className="block sm:col-span-2">
               <span className="mb-1.5 block text-xs font-semibold text-zam-muted">Name</span>
@@ -225,8 +245,9 @@ export default function GroupDetailPage() {
           <Trash2 size={15} /> Delete group
         </button>
       </div>
+      )}
 
-      <div className={`fixed inset-x-0 bottom-0 z-30 border-t border-zam-line bg-white/95 px-4 py-3 backdrop-blur transition-transform lg:left-[264px] ${dirty ? "translate-y-0" : "translate-y-full"}`}>
+      <div className={`fixed inset-x-0 bottom-0 z-30 border-t border-zam-line bg-white/95 px-4 py-3 backdrop-blur transition-transform lg:left-[250px] ${dirty ? "translate-y-0" : "translate-y-full"}`}>
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
           <span className="text-sm text-zam-muted">You have unsaved changes.</span>
           <div className="flex gap-2">
