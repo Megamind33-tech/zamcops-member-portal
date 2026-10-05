@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { AdminAuthProvider, useAdminAuth } from "@/lib/adminAuth";
+import { AdminDataProvider } from "@/lib/adminClient";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -26,7 +27,11 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <AdminShell>{children}</AdminShell>;
+  return (
+    <AdminDataProvider>
+      <AdminShell>{children}</AdminShell>
+    </AdminDataProvider>
+  );
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

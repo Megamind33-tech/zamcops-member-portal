@@ -14,7 +14,7 @@
 // not admits a new, unverified one, so the member-facing lookup/upload flow in
 // components/zam/SplitsEditor.tsx is not reused.
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Plus, Trash2, CheckCircle2, AlertTriangle, Download, Save } from "lucide-react";
 import { Field, Input, Select } from "@/components/zam/Input";
 import { Progress } from "@/components/zam/Misc";
@@ -33,9 +33,28 @@ export function WorkPreviewModal({
   work: WorkDeclaration;
   ownerName: string;
   onClose: () => void;
-  onSave: (payload: { ownershipSplits: OwnershipSplit[]; fileNo: string; factor: string }) => Promise<{ ok: boolean; error?: string }>;
+  onSave: (payload: Record<string, unknown>) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [splits, setSplits] = useState<OwnershipSplit[]>(work.ownershipSplits);
+  const [fields, setFields] = useState({
+    title: work.title ?? "",
+    alternativeTitle: work.alternativeTitle ?? "",
+    workType: work.workType ?? "Song",
+    genre: work.genre ?? "",
+    language: work.language ?? "",
+    duration: work.duration ?? "",
+    yearComposed: work.yearComposed ?? "",
+    isrc: work.isrc ?? "",
+    iswc: work.iswc ?? "",
+    soundCarrier: work.soundCarrier ?? "",
+    instruments: work.instruments ?? "",
+    publisher: work.publisher ?? "",
+    publisherIpi: work.publisherIpi ?? "",
+  });
+  const setField = (k: keyof typeof fields, v: string) => {
+    setFields((f) => ({ ...f, [k]: v }));
+    setDirty(true);
+  };
   const [fileNo, setFileNo] = useState(work.fileNo ?? "");
   const [factor, setFactor] = useState(work.factor ?? "");
   const [busy, setBusy] = useState(false);
@@ -48,6 +67,12 @@ export function WorkPreviewModal({
   const ok100 = (n: number) => Math.abs(n - 100) < 0.51;
 
   const mark = () => setDirty(true);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   const update = (i: number, patch: Partial<OwnershipSplit>) => {
     setSplits((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
@@ -64,10 +89,11 @@ export function WorkPreviewModal({
 
   const save = async () => {
     setError("");
+    if (!fields.title.trim()) return setError("The work needs a title.");
     if (splits.some((s) => !s.party.trim())) return setError("Every creator needs a name.");
     if (!valid) return setError("Both the performance and recording columns must total 100% before saving.");
     setBusy(true);
-    const res = await onSave({ ownershipSplits: splits, fileNo, factor });
+    const res = await onSave({ ...fields, ownershipSplits: splits, fileNo, factor });
     setBusy(false);
     if (!res.ok) return setError(res.error || "Could not save.");
     setDirty(false);
@@ -75,7 +101,7 @@ export function WorkPreviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zam-ink/50 p-4 py-8 backdrop-blur-sm">
-      <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
+      <div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl">
         <div className="flex items-start justify-between gap-4 border-b border-zam-line px-6 py-4">
           <div className="min-w-0">
             <p className="truncate font-display text-base font-bold text-zam-ink">{work.title}</p>
@@ -92,13 +118,50 @@ export function WorkPreviewModal({
         </div>
 
         <div className="max-h-[70vh] space-y-5 overflow-y-auto px-6 py-5">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
-            <Detail label="Duration" value={work.duration || "—"} />
-            <Detail label="Language" value={work.language || "—"} />
-            <Detail label="Year composed" value={work.yearComposed || "—"} />
-            <Detail label="ISRC" value={work.isrc || "—"} />
-            <Detail label="ISWC" value={work.iswc || "—"} />
-            <Detail label="Sound carrier" value={work.soundCarrier || "—"} />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="Title" className="sm:col-span-2">
+              <Input value={fields.title} onChange={(e) => setField("title", e.target.value)} />
+            </Field>
+            <Field label="Alternative title">
+              <Input value={fields.alternativeTitle} onChange={(e) => setField("alternativeTitle", e.target.value)} />
+            </Field>
+            <Field label="Type">
+              <Select value={fields.workType} onChange={(e) => setField("workType", e.target.value)}>
+                {["Song", "Instrumental", "Arrangement"].map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="Genre">
+              <Input value={fields.genre} onChange={(e) => setField("genre", e.target.value)} />
+            </Field>
+            <Field label="Language">
+              <Input value={fields.language} onChange={(e) => setField("language", e.target.value)} />
+            </Field>
+            <Field label="Duration">
+              <Input value={fields.duration} onChange={(e) => setField("duration", e.target.value)} placeholder="mm:ss" />
+            </Field>
+            <Field label="Year composed">
+              <Input value={fields.yearComposed} onChange={(e) => setField("yearComposed", e.target.value)} />
+            </Field>
+            <Field label="ISRC">
+              <Input value={fields.isrc} onChange={(e) => setField("isrc", e.target.value)} />
+            </Field>
+            <Field label="ISWC">
+              <Input value={fields.iswc} onChange={(e) => setField("iswc", e.target.value)} />
+            </Field>
+            <Field label="Sound carrier">
+              <Input value={fields.soundCarrier} onChange={(e) => setField("soundCarrier", e.target.value)} />
+            </Field>
+            <Field label="Instruments">
+              <Input value={fields.instruments} onChange={(e) => setField("instruments", e.target.value)} />
+            </Field>
+            <Field label="Publisher">
+              <Input value={fields.publisher} onChange={(e) => setField("publisher", e.target.value)} />
+            </Field>
+            <Field label="Publisher IPI">
+              <Input value={fields.publisherIpi} onChange={(e) => setField("publisherIpi", e.target.value)} />
+            </Field>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -220,15 +283,6 @@ export function WorkPreviewModal({
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Detail({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0">
-      <p className="text-[11px] uppercase tracking-wide text-zam-muted">{label}</p>
-      <p className="truncate font-medium text-zam-ink">{value}</p>
     </div>
   );
 }

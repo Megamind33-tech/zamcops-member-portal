@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { CalendarRange, Plus, Send, Users, Wallet } from "lucide-react";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { AdminStat, Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
@@ -19,7 +20,8 @@ export default function AdminDistributionsPage() {
 
   const selected = distributions.find((d) => d.id === selectedId) ?? null;
   const published = distributions.filter((d) => d.status === "Published");
-  const totalPaidOut = published.reduce((s, d) => s + d.entries.reduce((a, e) => a + e.amount, 0), 0);
+  const totalOf = (d: (typeof distributions)[number]) => d.entries.reduce((a, e) => a + e.amount, 0) + (d.lineAmount ?? 0);
+  const totalPaidOut = published.reduce((s, d) => s + totalOf(d), 0);
 
   const submitNew = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,18 +131,32 @@ export default function AdminDistributionsPage() {
               </thead>
               <tbody className="divide-y divide-zam-line">
                 {distributions.map((d) => {
-                  const total = d.entries.reduce((s, e) => s + e.amount, 0);
+                  const total = totalOf(d);
                   return (
                     <tr key={d.id} className="hover:bg-zam-canvas">
-                      <Td className="font-semibold text-zam-ink">{d.periodLabel}</Td>
+                      <Td className="font-semibold text-zam-ink">
+                        <Link href={`/admin/distributions/${d.id}`} className="hover:text-zam-orange hover:underline">
+                          {d.periodLabel}
+                        </Link>
+                        {d.imported && <span className="ml-2 rounded bg-zam-canvas px-1.5 py-0.5 text-[10px] font-semibold text-zam-muted">WIPO</span>}
+                      </Td>
                       <Td>
                         <StatusBadge status={d.status} />
                       </Td>
-                      <Td>{d.entries.length}</Td>
+                      <Td>
+                        {d.entries.length}
+                        {!!d.lineCount && <span className="block text-[11px] text-zam-muted">{d.lineCount.toLocaleString()} allocation lines</span>}
+                      </Td>
                       <Td className="text-zam-orange">{formatKwacha(total)}</Td>
                       <Td className="text-zam-muted">{d.publishedAt ? formatDate(d.publishedAt) : "—"}</Td>
                       <Td>
                         <div className="flex justify-end gap-2">
+                          <Link
+                            href={`/admin/distributions/${d.id}`}
+                            className="rounded-lg bg-zam-orange/12 px-2.5 py-1.5 text-xs font-semibold text-zam-orange transition hover:bg-zam-orange/20"
+                          >
+                            Open
+                          </Link>
                           <button
                             onClick={() => setSelectedId(selectedId === d.id ? null : d.id)}
                             className="rounded-lg bg-zam-canvas px-2.5 py-1.5 text-xs font-semibold text-zam-ink transition hover:bg-zam-canvas hover:text-zam-ink"

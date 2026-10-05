@@ -322,6 +322,10 @@ export interface Distribution {
   notes?: string;
   publishedAt?: string;
   createdAt: string;
+  imported?: boolean; // came from the WIPO Connect import (carries allocation lines)
+  code?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface DistributionEntry {
