@@ -1,0 +1,20 @@
+[
+  { "code": "DDEX_R", "acronym": "DDEX_R", "name": "DDEX Right Owner Identifier", "entity": "Right Owner", "type": "Shared" },
+  { "code": "DDEX_W", "acronym": "DDEX_W", "name": "DDEX Work Identifier", "entity": "Work", "type": "Shared" },
+  { "code": "DOI", "acronym": "DOI", "name": "Standard Digital Object Identifier", "entity": "Work", "type": "Shared" },
+  { "code": "EIDR", "acronym": "EIDR", "name": "Entertainment IDentifier Registry", "entity": "Work", "type": "Shared" },
+  { "code": "IPBN", "acronym": "IPBN", "name": "IP Base Number", "entity": "Right Owner", "type": "Shared" },
+  { "code": "IPN", "acronym": "IPN", "name": "International Performer Number", "entity": "Right Owner", "type": "Shared" },
+  { "code": "ISAN", "acronym": "ISAN", "name": "International Standard Audiovisual Number", "entity": "Work", "type": "Shared" },
+  { "code": "ISBN", "acronym": "ISBN", "name": "International Standard Book Number", "entity": "Work", "type": "Shared" },
+  { "code": "ISNI", "acronym": "ISNI", "name": "International Standard Name Identifier", "entity": "Right Owner", "type": "Shared" },
+  { "code": "ISRC", "acronym": "ISRC", "name": "International Sound Recording Code", "entity": "Work", "type": "Shared" },
+  { "code": "ISSN", "acronym": "ISSN", "name": "International Standard Serial Number", "entity": "Work", "type": "Shared" },
+  { "code": "ISWC", "acronym": "ISWC", "name": "ISWC", "entity": "Work", "type": "Shared" },
+  { "code": "LAN", "acronym": "Language Code", "name": "CISAC Language Code", "entity": "Work", "type": "Shared" },
+  { "code": "SOC", "acronym": "CISAC Society Code", "name": "CISAC Society Code", "entity": "Work", "type": "Shared" },
+  { "code": "TISA", "acronym": "TIS Alpha 2", "name": "CISAC Territory Information System Code - Alphanumeric", "entity": "Work", "type": "Shared" },
+  { "code": "TISN", "acronym": "TIS Numeric", "name": "CISAC Territory Information System Code - Numeric", "entity": "Work", "type": "Shared" },
+  { "code": "WIPOCOS", "acronym": "WIPOCOS", "name": "WIPOCOS ID", "entity": "Right Owner", "type": "Local" },
+  { "code": "WIPOCOS_ID", "acronym": "WIPOCOS_ID", "name": "WIPOCOS WORK ID", "entity": "Work", "type": "Local" }
+]

@@ -1,0 +1,212 @@
+[
+  {
+    "code": "AC",
+    "name": "Architectural work",
+    "description": "A work such as a building, including its related concepts, plans and models",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Legitimate source"],
+    "roles": ["AT", "EB", "EJ", "EP", "VA"],
+    "domesticRoles": []
+  },
+  {
+    "code": "AD",
+    "name": "Documentary audiovisual work",
+    "description": "An audio visual work based on a documentary.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AG", "AS", "CD", "CG", "CM", "CP", "CT", "DD", "DS", "DW", "ET", "FD", "MS", "PD", "PW", "RE", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "AF",
+    "name": "Fiction audio-visual work",
+    "description": "An audio visual work based on a fiction.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AG", "AS", "CD", "CG", "CM", "CP", "CT", "DD", "DS", "DW", "ET", "FD", "MS", "PD", "PW", "RE", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "AM",
+    "name": "Music Videos",
+    "description": "AV Music videos",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AG", "AS", "CD", "CG", "CM", "CP", "CT", "DD", "DS", "DW", "ET", "FD", "MS", "PD", "PW", "RE", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "AV",
+    "name": "Audio-visual work",
+    "description": "A work that consists of a series of related images which are intrinsically intended to be shown by the use of machines or devices such as projectors, viewers or electronic equipment, together with accompanying music, dialogue and/or sound effects, if any...",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AC", "AG", "AS", "CD", "CG", "CM", "CP", "CT", "DD", "DS", "DW", "ET", "FD", "MS", "PD", "PW", "RE", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "AVP",
+    "name": "Audiovisual Production",
+    "description": "Audiovisual work on recorded medium",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AC", "FD", "PC"],
+    "domesticRoles": []
+  },
+  {
+    "code": "CW",
+    "name": "Choreographic work",
+    "description": "A work comprising of a combination of movements and/or gestures and/or postures and/or mime, with or without music",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AR", "C", "CA", "CD", "CG", "MS", "PD", "SR"],
+    "domesticRoles": []
+  },
+  {
+    "code": "DM",
+    "name": "Dramatico-musical work",
+    "description": "A work composed of a combination of sounds with lyrics and/or text to be performed by instruments and the human voice to be performed in a dramatic context.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["A", "AD", "AM", "AQ", "AR", "C", "CA", "CD", "CG", "E", "EM", "ES", "PA", "SA", "SE", "SR", "ST", "TR"],
+    "domesticRoles": []
+  },
+  {
+    "code": "DW",
+    "name": "Dramatic work",
+    "description": "A written or spoken work composed of a combination of words, containing connected actions and discourses of one or usually more persons, in a dramatic context.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL"],
+    "roles": ["CD", "CG", "EB", "EJ", "EP", "MS", "PD", "PW", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "IS",
+    "name": "Information system",
+    "description": "A computer-based system with the defining characteristic that it provides information to users. Information systems include data processing applications, office automation applications, expert system application, databases.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AP", "DA"],
+    "domesticRoles": []
+  },
+  {
+    "code": "LF",
+    "name": "Literary fiction work",
+    "description": "A litterary work, based on a fiction",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Publication local language"],
+    "roles": ["AG", "DW", "EB", "EJ", "EP", "JO", "PH", "PR", "PW", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "LN",
+    "name": "Literary non-fiction work",
+    "description": "A litterary work, not based on a fiction",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Publication local language"],
+    "roles": ["AG", "DW", "EB", "EJ", "EP", "JO", "PH", "PR", "PW", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "LS",
+    "name": "Lyric Sheet",
+    "description": "A simple, clean document that clearly states all your important information and your lyrics so your song can be considered.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Sheet Music", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Publication local language"],
+    "roles": ["A", "AD", "AM", "AQ", "AR", "C", "CA", "E", "EB", "EM", "ES", "PA", "PU", "SA", "SE", "SR", "TR", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "LW",
+    "name": "Literary work",
+    "description": "A written or spoken work composed of a combination of words, not intended for a dramatic context.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Publication local language"],
+    "roles": ["AG", "DW", "EB", "EJ", "EP", "JO", "PH", "PR", "PW", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "MM",
+    "name": "Multimedia work",
+    "description": "The combined use of digitalized information representing text, sound and still or video images or the media so used. The term can refer to any interactive system and any data storage medium.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": ["AG", "DW", "MD"],
+    "domesticRoles": []
+  },
+  {
+    "code": "MW",
+    "name": "Musical work",
+    "description": "A work composed of a combination of sounds with or without lyrics to be performed by instruments and/or the human voice, not intended for a dramatic context.",
+    "shareBase": 100,
+    "identifiers": ["ISWC"],
+    "additionalFields": ["Language", "Duration", "Genre", "Instrument", "Territory"],
+    "roles": ["A", "AD", "AM", "AQ", "AR", "C", "CA", "E", "EM", "ES", "PA", "SA", "SE", "SR", "ST", "TR"],
+    "domesticRoles": ["A", "AD", "AQ", "AR", "C", "CA", "E", "ES", "PA", "SA", "SE", "SR", "TR"]
+  },
+  {
+    "code": "PH",
+    "name": "Photographic work",
+    "description": "A still image produced on surfaces sensitive to light or other radiation",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Legitimate source", "Publication local language"],
+    "roles": ["AG", "CP", "CT", "DA", "DG", "DW", "EB", "EJ", "EP", "PH", "PR", "VA"],
+    "domesticRoles": []
+  },
+  {
+    "code": "RW",
+    "name": "Radiophonic works",
+    "description": "Radiophonic works",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": [],
+    "roles": [],
+    "domesticRoles": []
+  },
+  {
+    "code": "SM",
+    "name": "Sheet Music",
+    "description": "A handwritten or printed form of musical notation that uses musical symbols to indicate the pitches, rhythms, or chords of a song or instrumental musical piece.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Sheet Music", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Publication local language"],
+    "roles": ["A", "AD", "AM", "AQ", "AR", "C", "CA", "E", "EB", "EM", "ES", "PA", "PU", "SA", "SE", "SR", "TR", "WP"],
+    "domesticRoles": []
+  },
+  {
+    "code": "SR",
+    "name": "Sound Recording",
+    "description": "Sound Recording",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Support", "Label", "Language", "Performer", "Duration", "Producer", "Composer", "Genre", "Territory of Publication", "Instrument", "Version", "Territory", "Movement", "Mastered Date", "Conductor", "SR Type", "Version Type", "Medley", "Pot Pourri", "Instrumental", "Background", "Bonus Resource", "Computer Generated", "Contains Sample", "Version Type User Defined", "SR Type User Defined", "Genre User Defined"],
+    "roles": ["IN", "PC", "RC", "ST"],
+    "domesticRoles": []
+  },
+  {
+    "code": "WA",
+    "name": "Work of art",
+    "description": "A graphic or visual art work, including painting, sculpture, etc.",
+    "shareBase": null,
+    "identifiers": [],
+    "additionalFields": ["Publication year", "Publication title", "Creation (copyright) year", "Publication country", "Publication language", "Text version", "Re-issue", "Publication year of the first edition", "Number of pages", "Number of characters", "Number of works in the publication", "Reprint", "Collection", "Local print run", "All territories (except local print run)", "Electronic book", "Audio book", "URL", "Legitimate source", "Publication local language"],
+    "roles": ["AG", "AT", "CD", "CP", "CT", "DA", "DG", "DW", "EB", "EJ", "EP", "FA", "PD", "PH", "VA"],
+    "domesticRoles": []
+  }
+]
