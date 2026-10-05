@@ -15,6 +15,7 @@
     "backfill:r2": "node scripts/backfill-r2.mjs",
     "check:forms": "node scripts/check-form-templates.mjs",
     "backfill:album-works": "node scripts/backfill-album-works.mjs",
+    "import:wipo": "node scripts/import-wipo.mjs",
     "map:forms": "python3 scripts/map-form-slots.py",
     "render:forms": "node scripts/render-sample-forms.mjs tmp/forms",
     "check:prefill": "node scripts/check-prefill.mjs",
