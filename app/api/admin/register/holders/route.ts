@@ -58,6 +58,25 @@ export async function GET(req: Request) {
       ],
     });
   }
+  // WIPO Connect Rights Owners search form
+  const sp = url.searchParams;
+  const ci = (v: string) => ({ contains: v, mode: "insensitive" as const });
+  const idQ = (sp.get("identifier") ?? "").trim().slice(0, 60);
+  if (idQ) {
+    if (sp.get("onlyMainId")) and.push({ wipoId: { in: [idQ, idQ] } });
+    else and.push({ OR: [{ wipoId: { contains: idQ } }, { ipiNumber: idQ }, { ipiBaseNumber: idQ }, { nrc: ci(idQ) }, { identifiers: { contains: idQ, mode: "insensitive" } }] });
+  }
+  const lastName = (sp.get("lastName") ?? "").trim().slice(0, 80);
+  if (lastName) and.push({ OR: [{ displayName: ci(lastName) }, { lastName: ci(lastName) }, { names: { some: { name: ci(lastName) } } }] });
+  const firstName = (sp.get("firstName") ?? "").trim().slice(0, 80);
+  if (firstName) and.push({ OR: [{ firstName: ci(firstName) }, { names: { some: { firstName: ci(firstName) } } }] });
+  if (sp.get("type") === "N") and.push({ kind: "Person" });
+  if (sp.get("type") === "L") and.push({ kind: { not: "Person" } });
+  const cmo = sp.get("cmoOfAffiliation");
+  if (cmo === "133") and.push({ isAffiliated: true });
+  else if (cmo === "ALL_BUT_CURRENT_CMO") and.push({ isAffiliated: false });
+  if (sp.get("statusCode")) and.push({ status: { equals: sp.get("statusCode")!, mode: "insensitive" } });
+  if ((sp.get("dateBirth") ?? "").trim()) and.push({ birthDate: { startsWith: sp.get("dateBirth")!.trim().slice(0, 10) } });
   const scope = url.searchParams.get("scope");
   if (scope === "affiliated") and.push({ isAffiliated: true });
   if (scope === "other") and.push({ isAffiliated: false });
@@ -79,6 +98,7 @@ export async function GET(req: Request) {
       include: {
         member: { select: { id: true, memberNumber: true } },
         contacts: { select: { email: true, value: true } },
+        names: { select: { name: true, firstName: true, ipiNameNumber: true, nameType: true } },
         _count: { select: { shares: true } },
       },
     }),
@@ -105,6 +125,9 @@ export async function GET(req: Request) {
       ipiNumber: h.ipiNumber,
       ipiBaseNumber: h.ipiBaseNumber,
       wipocosId: parseIdents(h.identifiers).find((i) => i.code === "WIPOCOS")?.value ?? "",
+      identifiers: parseIdents(h.identifiers).map((i) => ({ code: i.code, value: i.value })),
+      names: h.names.map((n) => ({ name: [n.firstName, n.name].filter(Boolean).join(" "), ipi: n.ipiNameNumber })),
+      birthDate: h.birthDate,
       nrc: h.nrc,
       status: h.status,
       isAffiliated: h.isAffiliated,
