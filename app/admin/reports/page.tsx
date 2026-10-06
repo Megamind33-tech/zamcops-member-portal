@@ -1,127 +1,175 @@
 "use client";
 
-import React from "react";
-import { Download, PieChart, BarChart3 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Download, Search } from "lucide-react";
+import { toast } from "sonner";
 import { AdminHeader } from "@/components/admin/AdminShell";
-import { Panel } from "@/components/admin/widgets";
-import { useAdminData } from "@/lib/adminClient";
-import { formatKwacha } from "@/lib/format";
-import { downloadMembers, downloadRepertoire, downloadDistributions } from "@/lib/export";
+import { Panel, Th, Td } from "@/components/admin/widgets";
+import { CREATION_CLASSES } from "@/lib/poolConst";
+import type { BiParam } from "@/lib/biCatalogue";
 
-export default function AdminReportsPage() {
-  const { works, singles, albums, members, royalty, distributions } = useAdminData();
+type Query = { name: string; params: BiParam[]; available: boolean; why: string };
+type Result = { columns: string[]; rows: (string | number)[][] };
 
-  const reviewBreakdown = (items: { status: string }[]) => {
-    const b = { Approved: 0, Pending: 0, Rejected: 0, "Under Review": 0 } as Record<string, number>;
-    items.forEach((i) => (b[i.status] = (b[i.status] ?? 0) + 1));
-    return b;
+const small = "field-input h-8 w-full";
+
+// WIPO Connect BI & Reports > Business Intelligence
+export default function BusinessIntelligencePage() {
+  const [queries, setQueries] = useState<Query[]>([]);
+  const [name, setName] = useState("");
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [result, setResult] = useState<Result | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/bi", { cache: "no-store" })
+      .then(async (r) => {
+        const b = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(b.error ?? `Could not load (${r.status}).`);
+        setQueries(b.queries);
+      })
+      .catch((e) => setErr(e.message));
+  }, []);
+
+  const q = queries.find((x) => x.name === name);
+
+  const run = async (format: "json" | "csv") => {
+    if (!q) return;
+    setBusy(true);
+    setErr("");
+    try {
+      const r = await fetch("/api/admin/bi", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q.name, params: values, format }) });
+      if (!r.ok) {
+        const b = await r.json().catch(() => ({}));
+        throw new Error(b.error ?? "The query failed.");
+      }
+      if (format === "csv") {
+        const blob = await r.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${q.name.replace(/[^A-Za-z0-9]+/g, "-")}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } else setResult(await r.json());
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "The query failed.");
+      if (format === "json") setResult(null);
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const works$ = reviewBreakdown(works);
-  const songs$ = reviewBreakdown(singles);
-  const albums$ = reviewBreakdown(albums);
-  const totalEstimated = royalty.reduce((s, r) => s + r.totalEstimated, 0);
-
-  const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
-  const labelFor = (id: string) => {
-    const m = members.find((x) => x.id === id);
-    return { name: m?.fullName ?? "Unknown", number: m?.memberNumber ?? "" };
+  const download = () => {
+    if (!result) return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(result.rows.map((r) => Object.fromEntries(result.columns.map((c, i) => [c, r[i]]))), null, 2)], { type: "application/json" }));
+    a.download = `${q?.name.replace(/[^A-Za-z0-9]+/g, "-") ?? "report"}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast.success("Saved.");
   };
 
-  const entryCount = distributions.reduce((s, d) => s + d.entries.length, 0);
-  const year = new Date().getFullYear();
-
-  const reports = [
-    {
-      title: "Membership Register",
-      desc: `${members.length} members — full contact and status columns`,
-      ref: `RPT-MEM-${year}`,
-      run: () => downloadMembers(members, "csv"),
-    },
-    {
-      title: "Repertoire Report",
-      desc: `${works.length} works · ${singles.length} singles · ${albums.length} albums`,
-      ref: `RPT-REP-${year}`,
-      run: () => downloadRepertoire(works, singles, albums, nameFor),
-    },
-    {
-      title: "Royalty Distribution Report",
-      desc: `${entryCount} payout entries across ${distributions.length} periods · ${formatKwacha(totalEstimated)} estimated activity`,
-      ref: `RPT-ROY-${year}`,
-      run: () => downloadDistributions(distributions, labelFor),
-    },
-  ];
+  const input = (p: BiParam) => {
+    const v = values[p.code] ?? "";
+    const set = (x: string) => setValues((s) => ({ ...s, [p.code]: x }));
+    if (p.type === "DATE") return <input type="date" value={v} onChange={(e) => set(e.target.value)} className={small} />;
+    if (p.type === "INTEGER") return <input inputMode="numeric" value={v} onChange={(e) => set(e.target.value)} className={small} />;
+    if (p.type === "MULTISELECT")
+      return (
+        <select multiple value={v ? v.split(",") : []} onChange={(e) => set([...e.target.selectedOptions].map((o) => o.value).join(","))} className="field-input h-24 w-full">
+          {CREATION_CLASSES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </select>
+      );
+    if (p.type === "CMO" || /cmo/i.test(p.code))
+      return (
+        <select value={v} onChange={(e) => set(e.target.value)} className={small + " appearance-none bg-white"}>
+          <option value=""></option>
+          <option value="ALL">ALL</option>
+          <option value="133">ZAMCOPS</option>
+        </select>
+      );
+    return <input value={v} onChange={(e) => set(e.target.value)} className={small} />;
+  };
 
   return (
     <div>
-      <AdminHeader title="Reports" subtitle="Generate and download operational reports" />
-
-      <div className="mb-6 grid gap-4 lg:grid-cols-3">
-        <Breakdown title="Work declarations" data={works$} icon={<PieChart size={16} />} />
-        <Breakdown title="Song submissions" data={songs$} icon={<BarChart3 size={16} />} />
-        <Breakdown title="Album submissions" data={albums$} icon={<PieChart size={16} />} />
-      </div>
-
-      <Panel title="Downloadable reports">
-        <div className="divide-y divide-zam-line">
-          {reports.map((r) => (
-            <div key={r.ref} className="flex items-center justify-between px-5 py-4">
-              <div>
-                <p className="text-sm font-semibold text-zam-ink">{r.title}</p>
-                <p className="text-xs text-zam-muted">
-                  {r.desc} · <span className="font-mono">{r.ref}</span>
-                </p>
-              </div>
-              <button
-                onClick={r.run}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-zam-orange px-3 py-2 text-xs font-semibold text-white shadow-fab hover:bg-zam-orange-dark"
-              >
-                <Download size={14} /> CSV
-              </button>
-            </div>
-          ))}
-        </div>
-      </Panel>
-    </div>
-  );
-}
-
-function Breakdown({
-  title,
-  data,
-  icon,
-}: {
-  title: string;
-  data: Record<string, number>;
-  icon: React.ReactNode;
-}) {
-  const total = Object.values(data).reduce((a, b) => a + b, 0) || 1;
-  const colors: Record<string, string> = {
-    Approved: "bg-emerald-400",
-    Pending: "bg-zam-amber",
-    "Under Review": "bg-zam-blue-soft",
-    Rejected: "bg-red-400",
-  };
-  return (
-    <div className="card p-5">
-      <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-zam-ink">
-        {icon} {title}
-      </h3>
-      <div className="mb-3 flex h-2.5 overflow-hidden rounded-full bg-zam-canvas">
-        {Object.entries(data).map(([k, v]) =>
-          v > 0 ? <span key={k} className={colors[k]} style={{ width: `${(v / total) * 100}%` }} /> : null
-        )}
-      </div>
-      <div className="space-y-1.5">
-        {Object.entries(data).map(([k, v]) => (
-          <div key={k} className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1.5 text-zam-muted">
-              <span className={"h-2 w-2 rounded-full " + (colors[k] ?? "bg-zam-muted")} /> {k}
-            </span>
-            <span className="font-semibold text-zam-ink">{v}</span>
-          </div>
+      <AdminHeader title="Business Intelligence" subtitle="Reports and queries over the register and the distributions" />
+      <div className="card mb-3 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="block sm:col-span-2">
+          <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Query</span>
+          <select
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              setValues({});
+              setResult(null);
+              setErr("");
+            }}
+            className={small + " appearance-none bg-white"}
+          >
+            <option value=""></option>
+            {queries.map((x) => (
+              <option key={x.name} value={x.name}>
+                {x.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        {q?.params.map((p) => (
+          <label key={p.code} className="block">
+            <span className="mb-1 block text-[11px] font-semibold text-zam-muted">{p.label}</span>
+            {input(p)}
+          </label>
         ))}
+        {q && !q.available && <p className="text-[13px] text-zam-muted sm:col-span-4">{q.why}</p>}
+        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-4 lg:justify-end">
+          <button type="button" disabled={!q?.available || busy} onClick={() => run("json")} className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-[#286090] px-3 text-[13px] font-semibold text-white hover:bg-[#204d76] disabled:opacity-50">
+            <Search size={13} /> Search
+          </button>
+          <button type="button" disabled={!q?.available || busy} onClick={() => run("csv")} className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-white px-3 text-[13px] font-semibold text-[#1f4e79] ring-1 ring-[#bfc5ce] hover:bg-[#eef3f8] disabled:opacity-50">
+            <Download size={13} /> CSV
+          </button>
+          <button type="button" disabled={!result || busy} onClick={download} className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-white px-3 text-[13px] font-semibold text-[#1f4e79] ring-1 ring-[#bfc5ce] hover:bg-[#eef3f8] disabled:opacity-50">
+            <Download size={13} /> Json
+          </button>
+        </div>
       </div>
+      {err && <p className="mb-3 rounded-sm bg-zam-red/10 px-4 py-2 text-sm text-zam-red">{err}</p>}
+      {result && (
+        <Panel title={`${q?.name ?? "Result"} — ${result.rows.length.toLocaleString()} row${result.rows.length === 1 ? "" : "s"}`}>
+          <div className="max-h-[70vh] overflow-auto">
+            <table className="w-full min-w-[600px]">
+              <thead>
+                <tr>
+                  {result.columns.map((c) => (
+                    <Th key={c}>{c}</Th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {result.rows.length === 0 && (
+                  <tr>
+                    <Td colSpan={result.columns.length} className="py-6 text-center text-zam-muted">
+                      No data available in table
+                    </Td>
+                  </tr>
+                )}
+                {result.rows.slice(0, 1000).map((r, i) => (
+                  <tr key={i}>
+                    {r.map((v, j) => (
+                      <Td key={j}>{v}</Td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {result.rows.length > 1000 && <p className="border-t border-[#eceff3] px-3 py-2 text-[12px] text-zam-muted">Showing the first 1,000 rows. Download the CSV for all of them.</p>}
+        </Panel>
+      )}
     </div>
   );
 }

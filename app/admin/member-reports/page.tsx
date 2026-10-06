@@ -1,0 +1,127 @@
+"use client";
+
+import React from "react";
+import { Download, PieChart, BarChart3 } from "lucide-react";
+import { AdminHeader } from "@/components/admin/AdminShell";
+import { Panel } from "@/components/admin/widgets";
+import { useAdminData } from "@/lib/adminClient";
+import { formatKwacha } from "@/lib/format";
+import { downloadMembers, downloadRepertoire, downloadDistributions } from "@/lib/export";
+
+export default function MemberReportsPage() {
+  const { works, singles, albums, members, royalty, distributions } = useAdminData();
+
+  const reviewBreakdown = (items: { status: string }[]) => {
+    const b = { Approved: 0, Pending: 0, Rejected: 0, "Under Review": 0 } as Record<string, number>;
+    items.forEach((i) => (b[i.status] = (b[i.status] ?? 0) + 1));
+    return b;
+  };
+
+  const works$ = reviewBreakdown(works);
+  const songs$ = reviewBreakdown(singles);
+  const albums$ = reviewBreakdown(albums);
+  const totalEstimated = royalty.reduce((s, r) => s + r.totalEstimated, 0);
+
+  const nameFor = (id: string) => members.find((m) => m.id === id)?.fullName ?? "Unknown";
+  const labelFor = (id: string) => {
+    const m = members.find((x) => x.id === id);
+    return { name: m?.fullName ?? "Unknown", number: m?.memberNumber ?? "" };
+  };
+
+  const entryCount = distributions.reduce((s, d) => s + d.entries.length, 0);
+  const year = new Date().getFullYear();
+
+  const reports = [
+    {
+      title: "Membership Register",
+      desc: `${members.length} members — full contact and status columns`,
+      ref: `RPT-MEM-${year}`,
+      run: () => downloadMembers(members, "csv"),
+    },
+    {
+      title: "Repertoire Report",
+      desc: `${works.length} works · ${singles.length} singles · ${albums.length} albums`,
+      ref: `RPT-REP-${year}`,
+      run: () => downloadRepertoire(works, singles, albums, nameFor),
+    },
+    {
+      title: "Royalty Distribution Report",
+      desc: `${entryCount} payout entries across ${distributions.length} periods · ${formatKwacha(totalEstimated)} estimated activity`,
+      ref: `RPT-ROY-${year}`,
+      run: () => downloadDistributions(distributions, labelFor),
+    },
+  ];
+
+  return (
+    <div>
+      <AdminHeader title="Reports" subtitle="Generate and download operational reports" />
+
+      <div className="mb-6 grid gap-4 lg:grid-cols-3">
+        <Breakdown title="Work declarations" data={works$} icon={<PieChart size={16} />} />
+        <Breakdown title="Song submissions" data={songs$} icon={<BarChart3 size={16} />} />
+        <Breakdown title="Album submissions" data={albums$} icon={<PieChart size={16} />} />
+      </div>
+
+      <Panel title="Downloadable reports">
+        <div className="divide-y divide-zam-line">
+          {reports.map((r) => (
+            <div key={r.ref} className="flex items-center justify-between px-5 py-4">
+              <div>
+                <p className="text-sm font-semibold text-zam-ink">{r.title}</p>
+                <p className="text-xs text-zam-muted">
+                  {r.desc} · <span className="font-mono">{r.ref}</span>
+                </p>
+              </div>
+              <button
+                onClick={r.run}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-zam-orange px-3 py-2 text-xs font-semibold text-white shadow-fab hover:bg-zam-orange-dark"
+              >
+                <Download size={14} /> CSV
+              </button>
+            </div>
+          ))}
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+function Breakdown({
+  title,
+  data,
+  icon,
+}: {
+  title: string;
+  data: Record<string, number>;
+  icon: React.ReactNode;
+}) {
+  const total = Object.values(data).reduce((a, b) => a + b, 0) || 1;
+  const colors: Record<string, string> = {
+    Approved: "bg-emerald-400",
+    Pending: "bg-zam-amber",
+    "Under Review": "bg-zam-blue-soft",
+    Rejected: "bg-red-400",
+  };
+  return (
+    <div className="card p-5">
+      <h3 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-zam-ink">
+        {icon} {title}
+      </h3>
+      <div className="mb-3 flex h-2.5 overflow-hidden rounded-full bg-zam-canvas">
+        {Object.entries(data).map(([k, v]) =>
+          v > 0 ? <span key={k} className={colors[k]} style={{ width: `${(v / total) * 100}%` }} /> : null
+        )}
+      </div>
+      <div className="space-y-1.5">
+        {Object.entries(data).map(([k, v]) => (
+          <div key={k} className="flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 text-zam-muted">
+              <span className={"h-2 w-2 rounded-full " + (colors[k] ?? "bg-zam-muted")} /> {k}
+            </span>
+            <span className="font-semibold text-zam-ink">{v}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

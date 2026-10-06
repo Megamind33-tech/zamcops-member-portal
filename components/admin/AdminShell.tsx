@@ -143,6 +143,7 @@ const sections = [
       { href: "/admin/support", label: "Support Inbox", icon: LifeBuoy },
       { href: "/admin/notices", label: "Member notices", icon: Bell },
       { href: "/admin/signatures", label: "Official Signatures", icon: PenLine },
+      { href: "/admin/member-reports", label: "Member reports", icon: BarChart3 },
     ],
   },
 ];

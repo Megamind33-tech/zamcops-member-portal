@@ -10,6 +10,21 @@ import { CoverArt } from "@/components/media/CoverArt";
 import { Illustration } from "@/components/media/Illustration";
 import { formatDate } from "@/lib/format";
 
+// WIPO Connect's home page: one tile per area, then one per creation class group.
+const HOME_TILES = [
+  { href: "/admin/register", label: "Rights Owners" },
+  { href: "/admin/agreements", label: "Agreements and Mandates" },
+  { href: "/admin/distributions", label: "Matching and Distribution" },
+  { href: "/admin/catalogue", label: "All Creation Classes" },
+  { href: "/admin/catalogue?cc=MW", label: "Musical Works" },
+  { href: "/admin/catalogue?cc=AV", label: "AV Works" },
+  { href: "/admin/catalogue?cc=AVP", label: "AV Productions" },
+  { href: "/admin/catalogue?cc=SR", label: "Sound Recordings" },
+  { href: "/admin/catalogue?cc=LW,LF,LN,DW,SM", label: "Textual Works and Publications" },
+  { href: "/admin/catalogue?cc=DM", label: "Theatrical and Dance" },
+  { href: "/admin/catalogue?cc=WA,PH", label: "Visual Arts" },
+];
+
 export default function AdminDashboard() {
   const { members, works, singles, albums, uploads } = useAdminData();
 
@@ -28,7 +43,17 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <AdminHeader title="Staff Dashboard" subtitle="Overview of member activity and review queues" />
+      <AdminHeader title="Home page" subtitle="Staff console" />
+
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {HOME_TILES.map((t) => (
+          <Link key={t.href} href={t.href} className="card flex h-20 items-center justify-center px-3 text-center text-[14px] font-semibold text-[#1f4e79] transition-colors hover:bg-[#eef3f8]">
+            {t.label}
+          </Link>
+        ))}
+      </div>
+
+      <h2 className="mb-2 text-[13px] font-bold text-[#1f4e79]">Member portal activity</h2>
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
         <AdminStat icon={<Users size={18} />} label="Members" value={members.length} />
