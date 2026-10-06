@@ -91,7 +91,7 @@ const sections = [
     title: "BI & Reports",
     items: [
       { href: "/admin/reports", label: "Business Intelligence", icon: BarChart3 },
-      { href: "/admin/team", label: "Audit", icon: History },
+      { href: "/admin/audit", label: "Audit", icon: History },
     ],
   },
   {
