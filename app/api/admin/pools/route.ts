@@ -17,7 +17,19 @@ export async function GET(req: Request) {
     orderBy: { code: "asc" },
     include: { _count: { select: { links: true } }, workMethod: { select: { name: true } }, roMethod: { select: { name: true } } },
   });
-  return json({ pools: pools.map((p) => ({ ...poolJson(p), links: p._count.links, workMethodName: p.workMethod?.name ?? "", roMethodName: p.roMethod?.name ?? "" })) });
+  const [sources, methods] = await Promise.all([prisma.logSource.findMany({ select: { id: true, name: true } }), prisma.logAllocationMethod.findMany({ select: { id: true, name: true } })]);
+  const sName = new Map(sources.map((x) => [x.id, x.name]));
+  const mName = new Map(methods.map((x) => [x.id, x.name]));
+  return json({
+    pools: pools.map((p) => ({
+      ...poolJson(p),
+      links: p._count.links,
+      workMethodName: p.workMethod?.name ?? "",
+      roMethodName: p.roMethod?.name ?? "",
+      logSourceName: (p.logSourceId && sName.get(p.logSourceId)) || "",
+      logMethodName: (p.logMethodId && mName.get(p.logMethodId)) || "",
+    })),
+  });
 }
 
 export async function POST(req: Request) {
@@ -41,6 +53,8 @@ export async function POST(req: Request) {
       workRoles: d.workRoles ?? "[]",
       workMethodId: d.workMethodId ?? null,
       roMethodId: d.roMethodId ?? null,
+      logSourceId: d.logSourceId ?? null,
+      logMethodId: d.logMethodId ?? null,
       reallocateWithinWork: d.reallocateWithinWork ?? true,
       workShareTolerance: d.workShareTolerance ?? 0,
       internationalRevenueStream: d.internationalRevenueStream ?? false,

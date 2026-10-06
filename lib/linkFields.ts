@@ -20,6 +20,8 @@ export type LinkData = {
   poolId?: string | null;
   workMethodId?: string | null;
   roMethodId?: string | null;
+  logSourceId?: string | null;
+  logMethodId?: string | null;
 };
 
 const pct = (v: unknown): number | null => {
@@ -77,6 +79,15 @@ export async function readLinkFields(b: Record<string, unknown>): Promise<{ data
     if (b[k]) {
       const m = await prisma.allocationMethod.findUnique({ where: { id: String(b[k]) }, select: { target: true } });
       if (!m || m.target !== target) return { error: `That is not a ${target.toLowerCase()} allocation method.` };
+      (data as Record<string, string | null>)[k] = String(b[k]);
+    } else (data as Record<string, string | null>)[k] = null;
+  }
+  // Log Based pools: this link's own Log Source / Log Allocation Method (empty = the pool's)
+  for (const k of ["logSourceId", "logMethodId"] as const) {
+    if (b[k] === undefined) continue;
+    if (b[k]) {
+      const found = k === "logSourceId" ? await prisma.logSource.findUnique({ where: { id: String(b[k]) }, select: { id: true } }) : await prisma.logAllocationMethod.findUnique({ where: { id: String(b[k]) }, select: { id: true } });
+      if (!found) return { error: k === "logSourceId" ? "That log source does not exist." : "That log allocation method does not exist." };
       (data as Record<string, string | null>)[k] = String(b[k]);
     } else (data as Record<string, string | null>)[k] = null;
   }

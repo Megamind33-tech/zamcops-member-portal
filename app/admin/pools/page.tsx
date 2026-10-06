@@ -18,6 +18,8 @@ type Pool = {
   adminFeePct: number;
   workMethodName: string;
   roMethodName: string;
+  logSourceName: string;
+  logMethodName: string;
   active: boolean;
   links: number;
 };
@@ -73,22 +75,18 @@ export default function PoolsPage() {
             <thead>
               <tr>
                 <Th>Code</Th>
-                <Th>Class</Th>
-                <Th>Sub class</Th>
-                <Th>Creation class</Th>
+                <Th>Creation Class</Th>
                 <Th>RT</Th>
-                <Th>Distribution method</Th>
-                <Th>Work allocation</Th>
-                <Th>RO allocation</Th>
-                <Th className="text-right">Admin fee</Th>
-                <Th className="text-right">Links</Th>
+                <Th>Distribution Method</Th>
+                <Th>Log Allocation Method</Th>
+                <Th>Log Source</Th>
                 <Th>Status</Th>
               </tr>
             </thead>
             <tbody>
               {!rows && !err && (
                 <tr>
-                  <Td colSpan={11} className="py-6 text-center text-zam-muted">
+                  <Td colSpan={7} className="py-6 text-center text-zam-muted">
                     Loading…
                   </Td>
                 </tr>
@@ -101,23 +99,17 @@ export default function PoolsPage() {
                     </Link>
                     {p.name && <span className="ml-2 font-sans font-normal text-zam-muted">{p.name}</span>}
                   </Td>
-                  <Td>{p.className || "—"}</Td>
-                  <Td>{p.subClass || "—"}</Td>
                   <Td>{p.creationClass}</Td>
                   <Td>{p.rightType === "Performing" ? "PR" : p.rightType === "Mechanical" ? "MR" : p.rightType}</Td>
                   <Td>{p.method}</Td>
-                  <Td className="text-xs">{p.workMethodName || "—"}</Td>
-                  <Td className="text-xs">{p.roMethodName || "—"}</Td>
-                  <Td className="text-right tabular-nums">{p.adminFeePct}%</Td>
-                  <Td className="text-right tabular-nums">{p.links}</Td>
-                  <Td>
-                    <StatusBadge status={p.active ? "Active" : "Paused"} />
-                  </Td>
+                  <Td className="text-xs">{p.logMethodName}</Td>
+                  <Td className="text-xs">{p.logSourceName}</Td>
+                  <Td>{p.active ? "Open" : "Archived"}</Td>
                 </tr>
               ))}
               {rows && shown.length === 0 && (
                 <tr>
-                  <Td colSpan={11} className="py-8 text-center text-zam-muted">
+                  <Td colSpan={7} className="py-8 text-center text-zam-muted">
                     No pools here. A pool such as TV-WL-01 says which class of use and which right a block of money pays.
                   </Td>
                 </tr>

@@ -79,6 +79,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             workMethod: pool.workMethod?.name ?? "",
             roMethod: pool.roMethod?.name ?? "",
             adminFeePct: pool.adminFeePct,
+            logSourceId: pool.logSourceId,
+            logMethodId: pool.logMethodId,
           }
         : null,
       className: link.className,
@@ -95,6 +97,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       affiliation: link.affiliation,
       workMethodId: link.workMethodId,
       roMethodId: link.roMethodId,
+      logSourceId: link.logSourceId,
+      logMethodId: link.logMethodId,
       status: link.status,
       lastError: link.lastError,
       allocatedAt: link.allocatedAt,
@@ -124,7 +128,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   });
 }
 
-const MONEY_FIELDS = ["amount", "adminFeePct", "adminFeeIntl", "adminFeeIntlRevenue", "adminFeeReserved", "reserveType", "affiliation", "poolId", "workMethodId", "roMethodId", "currency"] as const;
+const MONEY_FIELDS = ["amount", "adminFeePct", "adminFeeIntl", "adminFeeIntlRevenue", "adminFeeReserved", "reserveType", "affiliation", "poolId", "workMethodId", "roMethodId", "logMethodId", "currency"] as const;
 
 // Edit the link. Changing anything that affects the money leaves it "To be
 // Allocated" until it is run again.

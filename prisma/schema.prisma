@@ -688,6 +688,9 @@ model DistributionPool {
   workShareTolerance         Float             @default(0)
   internationalRevenueStream Boolean           @default(false)
   reserveType                String            @default("")
+  // Log Based pools: how the usage log is matched (Log Source) and weighed (Log Allocation Method)
+  logSourceId                String?
+  logMethodId                String?
 
   links DistributionPoolLink[]
 }
@@ -723,6 +726,8 @@ model DistributionPoolLink {
   workMethodId        String?
   roMethod            AllocationMethod? @relation("LinkRoMethod", fields: [roMethodId], references: [id], onDelete: SetNull)
   roMethodId          String?
+  logSourceId         String?
+  logMethodId         String?
   lastError           String            @default("")
 
   works    DistributionPoolWork[]
@@ -1008,4 +1013,39 @@ model UsageLog {
 
   @@index([distributionId])
   @@index([linkId])
+}
+
+// One grouped line of a usage log: every row with the same title / creators /
+// identifier collapses to one group, which is matched to a work.
+model UsageLogGroup {
+  id         String   @id @default(cuid())
+  usageLogId String
+  key        String
+  title      String   @default("")
+  creators   String   @default("")
+  identifier String   @default("")
+  rowsCount  Int      @default(1)
+  amount     Float    @default(0) // total of the Allocation column (plays / frequency)
+  splits     Json     @default("{}") // Split column totals, e.g. per station
+  workId     String?
+  score      Float?
+  status     String   @default("To be matched") // To be matched | Possible match | Matched | Not matched | Ignored
+  candidates Json     @default("[]") // [{ workId, title, score }]
+  matchedBy  String   @default("") // auto | history | staff
+  updatedAt  DateTime @updatedAt
+
+  @@unique([usageLogId, key])
+  @@index([status])
+  @@index([workId])
+}
+
+// Matches staff confirmed, reused the next time the same title and creators turn up.
+model UsageMatchHistory {
+  id        String   @id @default(cuid())
+  sourceId  String
+  key       String
+  workId    String
+  createdAt DateTime @default(now())
+
+  @@unique([sourceId, key])
 }

@@ -24,6 +24,8 @@ type Form = {
   workRoles: string[];
   workMethodId: string;
   roMethodId: string;
+  logSourceId: string;
+  logMethodId: string;
   reallocateWithinWork: boolean;
   workShareTolerance: string;
   internationalRevenueStream: boolean;
@@ -43,6 +45,8 @@ const BLANK: Form = {
   workRoles: [],
   workMethodId: "",
   roMethodId: "",
+  logSourceId: "",
+  logMethodId: "",
   reallocateWithinWork: true,
   workShareTolerance: "0",
   internationalRevenueStream: false,
@@ -61,7 +65,7 @@ const small = "field-input h-8 w-full";
 
 const METHOD_HELP: Record<string, string> = {
   "Work List": "Shares the amount across a list of works (the works played). Fully supported.",
-  "Log Based": "Shares the amount by usage logs sent by the broadcaster. Recorded on the pool; log matching is not in the portal yet.",
+  "Log Based": "Shares the amount by the usage logs sent by the broadcaster: import a log on the pool link, match its lines to works in Pending Matches, then run the allocation.",
   "RO List": "Pays a fixed list of right-holders directly. Recorded on the pool.",
   Reserve: "Pays out of reserved money held from earlier runs. Recorded on the pool.",
   Analogy: "Shares by analogy with the results of another pool. Recorded on the pool.",
@@ -78,6 +82,8 @@ export default function PoolPage() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [methods, setMethods] = useState<Method[]>([]);
+  const [logSources, setLogSources] = useState<{ id: string; name: string }[]>([]);
+  const [logMethods, setLogMethods] = useState<{ id: string; name: string }[]>([]);
   const [knownRoles, setKnownRoles] = useState<string[]>([]);
   const [links, setLinks] = useState(0);
   const [tab, setTab] = useState<"main" | "audit">("main");
@@ -87,6 +93,12 @@ export default function PoolPage() {
     try {
       const m = await fetch("/api/admin/allocation-methods", { cache: "no-store" }).then((r) => r.json());
       setMethods(m.methods ?? []);
+      const [ls, lm] = await Promise.all([
+        fetch("/api/admin/matching-settings/sources", { cache: "no-store" }).then((r) => (r.ok ? r.json() : { rows: [] })),
+        fetch("/api/admin/matching-settings/allocation-methods", { cache: "no-store" }).then((r) => (r.ok ? r.json() : { rows: [] })),
+      ]);
+      setLogSources(ls.rows ?? []);
+      setLogMethods(lm.rows ?? []);
       if (isNew) return;
       const r = await fetch(`/api/admin/pools/${id}`, { cache: "no-store" });
       const b = await r.json().catch(() => ({}));
@@ -104,6 +116,8 @@ export default function PoolPage() {
         workRoles: p.workRoles,
         workMethodId: p.workMethodId ?? "",
         roMethodId: p.roMethodId ?? "",
+        logSourceId: p.logSourceId ?? "",
+        logMethodId: p.logMethodId ?? "",
         reallocateWithinWork: p.reallocateWithinWork,
         workShareTolerance: String(p.workShareTolerance),
         internationalRevenueStream: p.internationalRevenueStream,
@@ -137,7 +151,7 @@ export default function PoolPage() {
     setDirty(true);
   };
 
-  const body = () => ({ ...f, workMethodId: f.workMethodId || null, roMethodId: f.roMethodId || null });
+  const body = () => ({ ...f, workMethodId: f.workMethodId || null, roMethodId: f.roMethodId || null, logSourceId: f.logSourceId || null, logMethodId: f.logMethodId || null });
 
   const save = async () => {
     if (!f.code.trim()) return toast.error("Give the pool a code.");
@@ -314,6 +328,32 @@ export default function PoolPage() {
                   ))}
                 </select>
               </label>
+              {f.method === "Log Based" && (
+                <>
+                  <label className="block sm:col-span-2">
+                    <Lbl hint="(how log lines are read and matched — Matching Settings)">Log Source</Lbl>
+                    <select value={f.logSourceId} onChange={(e) => set("logSourceId", e.target.value)} className={small + " appearance-none bg-white"}>
+                      <option value=""></option>
+                      {logSources.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block sm:col-span-2">
+                    <Lbl hint="(formula over the log's Allocation column)">Log Allocation Method</Lbl>
+                    <select value={f.logMethodId} onChange={(e) => set("logMethodId", e.target.value)} className={small + " appearance-none bg-white"}>
+                      <option value=""></option>
+                      {logMethods.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
               <p className="text-xs text-zam-muted sm:col-span-4">
                 Create methods under <Link href="/admin/allocation-methods" className="text-zam-orange underline">Allocation Methods</Link>.
               </p>

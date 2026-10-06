@@ -9,6 +9,7 @@ import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Pager, Field, Tabs } from "@/components/admin/ui";
 import { BulkWorkAdd } from "@/components/admin/BulkWorkAdd";
+import { SourceTab } from "@/components/admin/UsageLogSource";
 import { formatKwacha } from "@/lib/format";
 import { RESERVE_TYPE_LIST } from "@/lib/poolConst";
 
@@ -18,7 +19,7 @@ type Detail = {
     id: string;
     seq: number;
     distribution: { id: string; periodLabel: string; status: string; code: string };
-    pool: { id: string; code: string; name: string; className: string; method: string; rightType: string; creationClass: string; workMethod: string; roMethod: string; adminFeePct: number } | null;
+    pool: { id: string; code: string; name: string; className: string; method: string; rightType: string; creationClass: string; workMethod: string; roMethod: string; adminFeePct: number; logSourceId: string | null; logMethodId: string | null } | null;
     className: string;
     subClass: string;
     periodStart: string;
@@ -33,6 +34,8 @@ type Detail = {
     affiliation: string;
     workMethodId: string | null;
     roMethodId: string | null;
+    logSourceId: string | null;
+    logMethodId: string | null;
     status: string;
     lastError: string;
     allocatedAt: string | null;
@@ -75,7 +78,7 @@ export default function PoolLinkPage() {
   const { id, linkId } = useParams<{ id: string; linkId: string }>();
   const router = useRouter();
   const api = `/api/admin/registry/distributions/${id}/links/${linkId}`;
-  const [tab, setTab] = useState<"main" | "works" | "results">("main");
+  const [tab, setTab] = useState<"main" | "source" | "works" | "results">("main");
   const [d, setD] = useState<Detail | null>(null);
   const [err, setErr] = useState("");
   const [q, setQ] = useState("");
@@ -319,10 +322,13 @@ export default function PoolLinkPage() {
         onChange={setTab}
         tabs={[
           { key: "main", label: "Main" },
+          ...(L.pool?.method === "Log Based" ? [{ key: "source" as const, label: "Source" }] : []),
           { key: "works", label: "Covered Works", count: d.stats.works },
           { key: "results", label: "Results" },
         ]}
       />
+
+      {tab === "source" && L.pool && <SourceTab linkId={L.id} distributionId={L.distribution.id} link={L} locked={!!locked} onChange={reload} />}
 
       {tab === "main" && (
         <div className="space-y-3">

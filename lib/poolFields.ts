@@ -14,6 +14,8 @@ export type PoolData = {
   workRoles?: string;
   workMethodId?: string | null;
   roMethodId?: string | null;
+  logSourceId?: string | null;
+  logMethodId?: string | null;
   reallocateWithinWork?: boolean;
   workShareTolerance?: number;
   internationalRevenueStream?: boolean;
@@ -64,6 +66,19 @@ export async function readPoolFields(b: Record<string, unknown>, existingCode?: 
       data[k] = String(b[k]);
     } else data[k] = null;
   }
+  // Log Based pools: the Log Source and Log Allocation Method from Matching Settings
+  if (b.logSourceId !== undefined) {
+    if (b.logSourceId) {
+      if (!(await prisma.logSource.findUnique({ where: { id: String(b.logSourceId) }, select: { id: true } }))) return { error: "That log source does not exist." };
+      data.logSourceId = String(b.logSourceId);
+    } else data.logSourceId = null;
+  }
+  if (b.logMethodId !== undefined) {
+    if (b.logMethodId) {
+      if (!(await prisma.logAllocationMethod.findUnique({ where: { id: String(b.logMethodId) }, select: { id: true } }))) return { error: "That log allocation method does not exist." };
+      data.logMethodId = String(b.logMethodId);
+    } else data.logMethodId = null;
+  }
   if (b.reserveType !== undefined) {
     const r = String(b.reserveType);
     if (r && !(RESERVE_TYPES as readonly string[]).includes(r)) return { error: "Unknown reserve type." };
@@ -85,6 +100,8 @@ export const POOL_LABELS: Record<string, string> = {
   workRoles: "Work roles",
   workMethodId: "Work allocation method",
   roMethodId: "Right owner allocation method",
+  logSourceId: "Log Source",
+  logMethodId: "Log Allocation Method",
   reallocateWithinWork: "Reallocate within the work",
   workShareTolerance: "Work share tolerance",
   internationalRevenueStream: "International revenue stream",
@@ -106,6 +123,8 @@ export const poolJson = (p: {
   workRoles: string;
   workMethodId: string | null;
   roMethodId: string | null;
+  logSourceId: string | null;
+  logMethodId: string | null;
   reallocateWithinWork: boolean;
   workShareTolerance: number;
   internationalRevenueStream: boolean;

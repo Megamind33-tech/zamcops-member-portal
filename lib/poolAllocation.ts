@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { compileFormula } from "@/lib/formula";
 import { lockReason } from "@/lib/distLock";
+import { syncLogWorks } from "@/lib/logMatching";
 
 // ──────────────────────────────────────────────────────────────────────────
 // Distribution pool links: reading a list of works, and sharing a pool's money
@@ -194,20 +195,20 @@ type Line = { workId: string; rightHolderId: string | null; roleCode: string; we
 // largest line, so the lines add up to the link's amount exactly. Re-running
 // replaces what the link produced before.
 export async function allocateLink(linkId: string): Promise<AllocationResult> {
-  const link = await prisma.distributionPoolLink.findUnique({
-    where: { id: linkId },
-    include: {
-      pool: { include: { workMethod: true, roMethod: true } },
-      workMethod: true,
-      roMethod: true,
-      works: { select: { workId: true, weight: true } },
-      distribution: { select: { id: true, status: true, closedAt: true } },
-    },
-  });
+  let link = await loadLink(linkId);
   if (!link) throw new Error("Pool link not found.");
   const locked = lockReason(link.distribution);
   if (locked) throw new Error(locked);
   if (!(link.amount > 0)) throw new Error("Give the pool link an amount to share out first.");
+
+  // Log Based pools: the works and their weights come from the matched usage log lines.
+  if (link.pool?.method === "Log Based") {
+    const methodId = link.logMethodId ?? link.pool.logMethodId;
+    const method = methodId ? await prisma.logAllocationMethod.findUnique({ where: { id: methodId }, select: { formula: true } }) : null;
+    await syncLogWorks(linkId, method?.formula ?? null);
+    link = await loadLink(linkId);
+    if (!link) throw new Error("Pool link not found.");
+  }
   if (link.works.length === 0) throw new Error("Add works to this pool link first.");
 
   await prisma.distributionPoolLink.update({ where: { id: linkId }, data: { status: "Allocating", lastError: "" } });
