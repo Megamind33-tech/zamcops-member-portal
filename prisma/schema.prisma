@@ -587,6 +587,7 @@ model RegistryWork {
   status            String   @default("")
   registeredAt      String   @default("")
   domestic          Boolean  @default(false)
+  creationClass     String   @default("") // WIPO Creation Class code (MW, SR, AV …)
   iswc              String   @default("")
   isrc              String   @default("")
   identifiers       String   @default("[]") @db.Text // JSON [{ code, label, value }]

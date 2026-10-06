@@ -31,6 +31,8 @@ export async function GET(req: Request) {
   const from = (url.searchParams.get("from") ?? "").slice(0, 10);
   const to = (url.searchParams.get("to") ?? "").slice(0, 10);
   const csv = url.searchParams.get("format") === "csv";
+  const cc = (url.searchParams.get("cc") ?? "").toUpperCase().split(",").map((c) => c.trim()).filter(Boolean).slice(0, 12);
+  const repertoire = url.searchParams.get("repertoire") ?? "";
 
   const and: Prisma.RegistryWorkWhereInput[] = [];
   if (q) {
@@ -47,10 +49,13 @@ export async function GET(req: Request) {
     }
   }
   if (status) and.push({ status });
+  if (cc.length) and.push({ creationClass: { in: cc } });
+  if (repertoire === "domestic") and.push({ domestic: true });
+  if (repertoire === "foreign") and.push({ domestic: false });
   if (genre) and.push({ genre: { contains: genre, mode: "insensitive" } });
   if (from) and.push({ registeredAt: { gte: from } });
   if (to) and.push({ registeredAt: { lte: to } });
-  for (const word of holder.split(/s+/).filter(Boolean)) {
+  for (const word of holder.split(/\s+/).filter(Boolean)) {
     and.push({ shares: { some: { OR: [{ rightHolder: { displayName: { contains: word, mode: "insensitive" } } }, { name: { name: { contains: word, mode: "insensitive" } } }] } } });
   }
   if (filter === "nosplits") and.push({ shares: { none: {} } });
@@ -107,6 +112,19 @@ export async function GET(req: Request) {
     prisma.registryWork.count(),
   ]);
 
+  // Distributable Status: how much of the performing right is held by identified right owners
+  const identified = await prisma.workShare.groupBy({
+    by: ["workId", "rightType"],
+    where: { workId: { in: works.map((w) => w.id) }, rightHolderId: { not: null } },
+    _sum: { share: true },
+  });
+  const idSum = new Map<string, number>();
+  for (const g of identified) if (g.rightType.trim().toLowerCase() === "performing") idSum.set(g.workId, g._sum.share ?? 0);
+  const distributable = (id: string) => {
+    const v = idSum.get(id) ?? 0;
+    return v >= 99.99 ? "Fully Distributable" : v > 0 ? "Partially Distributable" : "Not Distributable";
+  };
+
   return json({
     page,
     pageSize: PAGE_SIZE,
@@ -124,6 +142,8 @@ export async function GET(req: Request) {
       isrc: w.isrc,
       domestic: w.domestic,
       registeredAt: w.registeredAt,
+      creationClass: w.creationClass,
+      distributable: distributable(w.id),
       shareCount: w._count.shares,
       holders: names.slice(0, 3),
       moreHolders: names.length > 3 || w._count.shares > 8,

@@ -2,12 +2,13 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Download, Plus, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { AdminHeader } from "@/components/admin/AdminShell";
 import { Panel, Th, Td, StatusBadge } from "@/components/admin/widgets";
 import { Pager } from "@/components/admin/ui";
+import { CREATION_CLASSES } from "@/lib/poolConst";
 
 type Row = {
   id: string;
@@ -18,6 +19,8 @@ type Row = {
   iswc: string;
   isrc: string;
   domestic: boolean;
+  creationClass: string;
+  distributable: string;
   registeredAt: string;
   shareCount: number;
   holders: string[];
@@ -40,6 +43,10 @@ const FILTERS = [
 
 export default function CataloguePage() {
   const router = useRouter();
+  const urlCc = useSearchParams().get("cc") ?? "";
+  useEffect(() => {
+    setPage(1);
+  }, [urlCc]);
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
   const [filter, setFilter] = useState("");
@@ -50,12 +57,13 @@ export default function CataloguePage() {
   const [tick, setTick] = useState(0);
   const [adding, setAdding] = useState(false);
   const [showAdv, setShowAdv] = useState(false);
-  const [adv, setAdv] = useState({ holder: "", genre: "", from: "", to: "" });
+  const [adv, setAdv] = useState({ holder: "", genre: "", from: "", to: "", cc: "", repertoire: "" });
   const [advTerm, setAdvTerm] = useState(adv);
   const [newTitle, setNewTitle] = useState("");
 
   useEffect(() => {
-    const initial = new URLSearchParams(window.location.search).get("q");
+    const sp = new URLSearchParams(window.location.search);
+    const initial = sp.get("q");
     if (initial) setQ(initial);
   }, []);
 
@@ -76,11 +84,11 @@ export default function CataloguePage() {
   }, [adv]);
 
   const queryString = (extra: Record<string, string> = {}) =>
-    new URLSearchParams({ q: term, filter, status, holder: advTerm.holder, genre: advTerm.genre, from: advTerm.from, to: advTerm.to, ...extra }).toString();
+    new URLSearchParams({ q: term, filter, status, holder: advTerm.holder, genre: advTerm.genre, from: advTerm.from, to: advTerm.to, cc: advTerm.cc || urlCc, repertoire: advTerm.repertoire, ...extra }).toString();
 
   useEffect(() => {
     const ctl = new AbortController();
-    const params = new URLSearchParams({ q: term, filter, status, holder: advTerm.holder, genre: advTerm.genre, from: advTerm.from, to: advTerm.to, page: String(page) });
+    const params = new URLSearchParams({ q: term, filter, status, holder: advTerm.holder, genre: advTerm.genre, from: advTerm.from, to: advTerm.to, cc: advTerm.cc || urlCc, repertoire: advTerm.repertoire, page: String(page) });
     setErr("");
     fetch(`/api/admin/registry/works?${params}`, { signal: ctl.signal })
       .then(async (r) => {
@@ -90,7 +98,7 @@ export default function CataloguePage() {
       })
       .catch((e) => e.name !== "AbortError" && setErr(e.message));
     return () => ctl.abort();
-  }, [term, filter, status, advTerm, page, tick]);
+  }, [term, filter, status, advTerm, page, tick, urlCc]);
 
   const create = useCallback(
     async (e: React.FormEvent) => {
@@ -162,8 +170,8 @@ export default function CataloguePage() {
         <div className="card mb-3 grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-4">
           {(
             [
-              ["holder", "Right-holder name"],
-              ["genre", "Genre"],
+              ["holder", "Right Owners Name(s)"],
+              ["genre", "Genre in WIPOCOS"],
             ] as const
           ).map(([k, label]) => (
             <label key={k} className="block">
@@ -172,12 +180,29 @@ export default function CataloguePage() {
             </label>
           ))}
           <label className="block">
-            <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Registered from</span>
+            <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Registration From</span>
             <input type="date" value={adv.from} onChange={(e) => setAdv({ ...adv, from: e.target.value })} className="field-input h-8 w-full" />
           </label>
           <label className="block">
-            <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Registered to</span>
+            <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Registration To</span>
             <input type="date" value={adv.to} onChange={(e) => setAdv({ ...adv, to: e.target.value })} className="field-input h-8 w-full" />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Creation Class</span>
+            <select value={adv.cc} onChange={(e) => setAdv({ ...adv, cc: e.target.value })} className="field-input h-8 w-full appearance-none bg-white">
+              <option value=""></option>
+              {CREATION_CLASSES.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-semibold text-zam-muted">Domestic Repertoire</span>
+            <select value={adv.repertoire} onChange={(e) => setAdv({ ...adv, repertoire: e.target.value })} className="field-input h-8 w-full appearance-none bg-white">
+              <option value=""></option>
+              <option value="domestic">Domestic</option>
+              <option value="foreign">Foreign</option>
+            </select>
           </label>
         </div>
       )}
@@ -238,14 +263,14 @@ export default function CataloguePage() {
             <thead>
               <tr className="border-b border-zam-line bg-zam-canvas/60">
                 <Th>Main Id</Th>
+                <Th>Int. Id</Th>
                 <Th>Title</Th>
-                <Th>Right-holders</Th>
-                <Th>ISWC</Th>
-                <Th>ISRC</Th>
-                <Th>Genre</Th>
-                <Th>Registered</Th>
+                <Th>Rights Owners</Th>
+                <Th>Creation Class</Th>
+                <Th>Repertoire</Th>
+                <Th>Distributable Status</Th>
+                <Th>Date</Th>
                 <Th>Status</Th>
-                <Th className="text-right">Shares</Th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zam-line">
@@ -259,21 +284,21 @@ export default function CataloguePage() {
               {data?.works.map((w) => (
                 <tr key={w.id}>
                   <Td className="whitespace-nowrap font-mono text-xs text-zam-muted">{w.wipoId.startsWith("local_") ? "—" : `133-${w.wipoId}-W`}</Td>
+                  <Td className="font-mono text-[11px] leading-tight">
+                    {w.iswc && <div>ISWC: {w.iswc}</div>}
+                    {w.isrc && <div>ISRC: {w.isrc}</div>}
+                  </Td>
                   <Td>
-                    <Link href={`/admin/catalogue/${w.id}`} className="font-semibold text-zam-ink hover:text-zam-orange">
+                    <Link href={`/admin/catalogue/${w.id}`} className="font-semibold text-[#286090] hover:underline">
                       {w.title}
                     </Link>
-                    {w.domestic && <span className="ml-2 text-[11px] text-zam-muted">Domestic</span>}
                   </Td>
-                  <Td className="max-w-[260px] truncate text-xs text-zam-muted" >
-                    {w.holders.length ? w.holders.join(", ") + (w.moreHolders ? " …" : "") : "—"}
-                  </Td>
-                  <Td className="font-mono text-xs">{w.iswc || "—"}</Td>
-                  <Td className="font-mono text-xs">{w.isrc || "—"}</Td>
-                  <Td className="text-xs">{w.genre || "—"}</Td>
-                  <Td className="whitespace-nowrap text-xs text-zam-muted">{w.registeredAt || "—"}</Td>
+                  <Td className="max-w-[260px] truncate text-xs text-zam-muted">{w.holders.length ? w.holders.join(", ") + (w.moreHolders ? " …" : "") : ""}</Td>
+                  <Td>{w.creationClass}</Td>
+                  <Td>{w.domestic ? "Domestic" : "Foreign"}</Td>
+                  <Td className="text-xs">{w.distributable}</Td>
+                  <Td className="whitespace-nowrap text-xs">{w.registeredAt}</Td>
                   <Td>{w.status ? <StatusBadge status={w.status === "ACTIVE" ? "Active" : w.status} /> : "—"}</Td>
-                  <Td className="text-right tabular-nums">{w.shareCount}</Td>
                 </tr>
               ))}
               {data && data.works.length === 0 && (

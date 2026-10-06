@@ -218,6 +218,8 @@ function build(dir) {
   const widentsByWork = group(opt(dir, "work_identifiers"), "fk_work");
   const wdatesByWork = group(opt(dir, "work_dates"), "fk_work");
   const wdynByWork = group(opt(dir, "work_dynamic"), "fk_work");
+  // WIPO creation class code per work (the export carries fk_creation_class when it has one)
+  const ccCode = new Map(opt(dir, "creation_class").map((c) => [c.id_creation_class, clean(c.code)]));
   const registry = [];
   for (const w of works) {
     const id = w.id_work;
@@ -236,6 +238,7 @@ function build(dir) {
       status: clean(w.status),
       registeredAt: clean(w.registration_date).slice(0, 10),
       domestic: truthy(w.domestic_work),
+      creationClass: ccCode.get(w.fk_creation_class) ?? "",
       iswc: ids.find((i) => /iswc/i.test(`${i.code} ${i.label}`))?.value ?? "",
       isrc: ids.find((i) => /isrc/i.test(`${i.code} ${i.label}`))?.value ?? "",
       identifiers: JSON.stringify(ids),

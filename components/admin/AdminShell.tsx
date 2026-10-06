@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -42,6 +42,13 @@ import {
   Settings2,
   GitCompare,
   History,
+  Music,
+  Film,
+  Clapperboard,
+  Disc,
+  BookText,
+  Drama,
+  Palette,
   SlidersHorizontal,
   Cable,
   ListPlus,
@@ -68,6 +75,13 @@ const sections = [
     title: "Works",
     items: [
       { href: "/admin/catalogue", label: "Browse all Creation Classes", icon: Library },
+      { href: "/admin/catalogue?cc=MW", label: "Musical Works", icon: Music },
+      { href: "/admin/catalogue?cc=AV", label: "AV Works", icon: Film },
+      { href: "/admin/catalogue?cc=AVP", label: "AV Productions", icon: Clapperboard },
+      { href: "/admin/catalogue?cc=SR", label: "Sound Recordings", icon: Disc },
+      { href: "/admin/catalogue?cc=LW,LF,LN,DW,SM", label: "Textual Works and Publications", icon: BookText },
+      { href: "/admin/catalogue?cc=DM", label: "Theatrical and Dance", icon: Drama },
+      { href: "/admin/catalogue?cc=WA,PH", label: "Visual Arts", icon: Palette },
       { href: "/admin/works", label: "Pending", icon: FileText },
       { href: "/admin/work-sets", label: "Set", icon: ListChecks },
     ],
@@ -134,7 +148,11 @@ const sections = [
 ];
 const nav: { href: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = sections.flatMap((x) => x.items);
 
-const crumbs: Record<string, string> = Object.fromEntries(nav.map((n) => [n.href, n.label]));
+const crumbs: Record<string, string> = {};
+for (const n of nav) {
+  const path = n.href.split("?")[0];
+  if (!(path in crumbs)) crumbs[path] = n.label;
+}
 
 function initials(name?: string): string {
   if (!name) return "ZS";
@@ -144,6 +162,7 @@ function initials(name?: string): string {
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const search = useSearchParams();
   const router = useRouter();
   const { logout, admin } = useAdminAuth();
   const { members, supportTickets, error: dataError, reload } = useAdminData();
@@ -168,8 +187,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const active = (href: string, exact?: boolean) =>
-    exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
+  // Menu items can carry a creation-class filter (?cc=MW): they are on only when that filter is the one in use.
+  const active = (href: string, exact?: boolean) => {
+    const [path, query] = href.split("?");
+    const cc = search.get("cc") ?? "";
+    if (query) return pathname === path && cc === new URLSearchParams(query).get("cc");
+    if (exact) return pathname === path;
+    if (path === "/admin/catalogue" && pathname === path && cc) return false;
+    return pathname === path || pathname.startsWith(path + "/");
+  };
 
   // Detail pages sit under a list page: show the list as the parent crumb.
   const parent = nav.find((n) => !n.exact && n.href !== "/admin" && pathname.startsWith(n.href + "/"));

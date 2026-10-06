@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { AdminAuthProvider, useAdminAuth } from "@/lib/adminAuth";
@@ -29,7 +29,9 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 
   return (
     <AdminDataProvider>
-      <AdminShell>{children}</AdminShell>
+      <Suspense fallback={null}>
+        <AdminShell>{children}</AdminShell>
+      </Suspense>
     </AdminDataProvider>
   );
 }
