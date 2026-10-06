@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { logAudit } from "@/lib/audit";
+import { hasPermission } from "@/lib/permissions";
 import { ensureReference, REF_KINDS, type RefKind } from "@/lib/reference";
 
 export const runtime = "nodejs";
@@ -20,6 +21,7 @@ const list = (v: unknown) => (Array.isArray(v) ? v.map((x) => String(x).trim()).
 export async function GET(req: Request, ctx: Ctx) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
+  if (!(await hasPermission(session.sub, "REFERENCE_ACCESS"))) return bad("You do not have the Reference (Access) permission.", 403);
   const { kind } = await ctx.params;
   if (!REF_KINDS.includes(kind as RefKind)) return bad("Unknown reference table.", 404);
   await ensureReference();
@@ -51,6 +53,7 @@ export async function GET(req: Request, ctx: Ctx) {
 export async function POST(req: Request, ctx: Ctx) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
+  if (!(await hasPermission(session.sub, "REFERENCE_MGMT"))) return bad("You do not have the Reference (Management) permission.", 403);
   const { kind } = await ctx.params;
   const b = await req.json().catch(() => null);
   if (!b) return bad("Invalid request.");

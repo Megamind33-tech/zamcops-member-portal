@@ -75,3 +75,27 @@ Nothing here is invented. Where a page is not listed it has not been captured ye
 - Technical Settings: Base URL, Username, Password, Formula; Test, Save.
 - Dynamic Fields: add buttons for Right Owner, Work, Account, License, Distribution Pool, Distribution.
 - Issue Log: Delete All.
+
+## Captured later (Oct 2026)
+
+- **Security Groups**: 44 permissions with codes (`data/wipo/permissions.json`) and WIPO's 3 groups (`data/wipo/security-groups.json`).
+- **Parameters**: 15 sections / 50 fields (`lib/parameters.ts`).
+- **Technical Settings**: four connections (Shared, IPI, ISWC, Open IPN: Base URL, Username, Password, Test, Save) and the Work Validation formula. Keys are never copied.
+- **Right types per creation class** for Agreements (`data/wipo/right-types-by-cc.json`).
+- **Agreements**: types General / Implied / Specific Exclude / Specific Include; WIPO holds none for ZAMCOPS.
+- **Matching Settings** (`data/wipo/matching-settings.json`): 5 log formats, 5 log sources (weights, thresholds, pre-matching), 5 log allocation methods.
+- **Usage Log**: 11 imports in WIPO (statuses IMPORT_ERROR, MATCH_COMPLETED).
+- **BI**: the parameters of all 38 queries (`lib/biCatalogue.ts`).
+- **Licensing** (Agent, Licensee, License, Tariff Type, Collection Request): WIPO holds no records for ZAMCOPS and Tariff Type has no usable Usage Type configured; not built yet.
+
+## What the portal does and does not do yet
+
+Built to WIPO's structure: Operational (CMO, Territories, Reference Table, Identifiers, Local References), Administration (User Accounts, Security Groups, Parameters, Technical Settings, Dynamic Fields, Issue Log), Audit, Agreements and Mandates, Matching Settings, Usage Log (xlsx import, fuzzy matching, Pending Matches, log based allocation), Distribution Pool list, Business Intelligence (26 of 38 queries), Works and Rights Owners lists (fields the register holds), Home tiles, per-creation-class Works menu.
+
+Not built, or only partly:
+- Licensing and Invoicing pages.
+- Agreements: Pending view, Documents.
+- Broadcast Monitoring; Rights Owner Set; Import/Export pages; Work Set import.
+- Rights Owners / Works search filters on data the register does not hold (Creation Class(es) of an RO, Country of Birth, Citizenship, Affiliation Role, Tags, Catalogue Number, Label, Country of Production, Search Shared).
+- Parameters stored but not yet applied by the allocation engine: Reserve UP amount, Reserve to Incomplete RO / Undistributable Works / NS RO / DP RO, Close distribution (Days), Number of digits.
+- Permissions are enforced on the Administration, Agreements, Matching, Pending Matches, Reference and BI endpoints only.

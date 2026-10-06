@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, bad } from "@/lib/server";
 import { logAudit } from "@/lib/audit";
+import { hasPermission } from "@/lib/permissions";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,7 @@ const list = (v: unknown) => (Array.isArray(v) ? v.map((x) => String(x).trim()).
 export async function PATCH(req: Request, ctx: Ctx) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
+  if (!(await hasPermission(session.sub, "REFERENCE_MGMT"))) return bad("You do not have the Reference (Management) permission.", 403);
   const { kind, id } = await ctx.params;
   const b = await req.json().catch(() => null);
   if (!b) return bad("Invalid request.");
@@ -63,6 +65,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
 export async function DELETE(_req: Request, ctx: Ctx) {
   const session = await requireAdmin();
   if (!session) return bad("Not authorized.", 401);
+  if (!(await hasPermission(session.sub, "REFERENCE_MGMT"))) return bad("You do not have the Reference (Management) permission.", 403);
   const { kind, id } = await ctx.params;
   if (kind === "creation-classes") {
     const cur = await prisma.refCreationClass.findUnique({ where: { id } });
