@@ -948,3 +948,64 @@ model AgreementWork {
   @@unique([agreementId, workId, excluded])
   @@index([workId])
 }
+
+// WIPO Connect Matching Settings: how a usage log file is read (Log Format),
+// how its lines are matched to works (Log Source) and how a matched line
+// is weighed in a log based pool (Log Allocation Method).
+model LogFormat {
+  id                  String  @id @default(cuid())
+  name                String  @unique
+  fileFormat          String  @default("XLSX")
+  creationClass       String  @default("MW")
+  targetCreationClass String  @default("MW")
+  headerLines         Int     @default(1)
+  footerLines         Int     @default(0)
+  sheetNumber         Int     @default(1)
+  manageComponent     Boolean @default(false)
+  fields              Json    @default("[]") // [{ column, columnType: Matching|Allocation|Split, targetField, fieldType: String|Integer, targetCode }]
+}
+
+model LogSource {
+  id                  String  @id @default(cuid())
+  name                String  @unique
+  formatId            String
+  minThreshold        Float   @default(80)
+  maxThreshold        Float   @default(100)
+  precision           String  @default("0.1")
+  roles               Json    @default("[]")
+  distrStatus         String  @default("")
+  creatorsByPerformer Boolean @default(false)
+  similarity          Float?
+  numberOfWorks       Int?
+  historyEntries      Int     @default(0)
+  weights             Json    @default("[]") // [{ column, weight, similarity, method, priority }]
+}
+
+model LogAllocationMethod {
+  id       String @id @default(cuid())
+  name     String @unique
+  formatId String
+  formula  String @default("")
+}
+
+// WIPO Connect Usage Log: one uploaded log file for a distribution pool link.
+model UsageLog {
+  id             String    @id @default(cuid())
+  importCode     String    @default("")
+  filename       String    @default("")
+  uploadedAt     DateTime  @default(now())
+  startedAt      DateTime?
+  endedAt        DateTime?
+  insertedItems  Int       @default(0)
+  groupedItems   Int       @default(0)
+  processedItems Int       @default(0)
+  errorNumbers   Int       @default(0)
+  distributionId String?
+  linkId         String?
+  sourceId       String?
+  status         String    @default("IMPORTED")
+  priority       Int       @default(0)
+
+  @@index([distributionId])
+  @@index([linkId])
+}

@@ -38,6 +38,8 @@ import {
   Fingerprint,
   BookMarked,
   FileSignature,
+  FileSpreadsheet,
+  Settings2,
   History,
   SlidersHorizontal,
   Cable,
@@ -76,6 +78,8 @@ const sections = [
   {
     title: "Matching and Distribution",
     items: [
+      { href: "/admin/usage-log", label: "Usage Log", icon: FileSpreadsheet },
+      { href: "/admin/matching-settings", label: "Matching Settings", icon: Settings2 },
       { href: "/admin/distributions", label: "Distribution", icon: CalendarRange },
       { href: "/admin/pools", label: "Distribution Pool", icon: Layers },
       { href: "/admin/allocation-methods", label: "Allocation Method", icon: Calculator },

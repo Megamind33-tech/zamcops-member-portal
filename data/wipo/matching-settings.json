@@ -1,0 +1,49 @@
+{
+  "formats": [
+    { "name": "stdlogs", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1, "fields": [] },
+    { "name": "typical log format", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1,
+      "fields": [
+        { "column": "ARTIST", "columnType": "Matching", "targetField": "CREATOR", "fieldType": "String", "targetCode": "" },
+        { "column": "FREQUENCY", "columnType": "Allocation", "targetField": "", "fieldType": "Integer", "targetCode": "" },
+        { "column": "SOURCE", "columnType": "Split", "targetField": "", "fieldType": "String", "targetCode": "" },
+        { "column": "TITLE", "columnType": "Matching", "targetField": "TITLE", "fieldType": "String", "targetCode": "TITLE" }
+      ] },
+    { "name": "Standard Log", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1,
+      "fields": [
+        { "column": "ARTIST", "columnType": "Matching", "targetField": "CREATOR", "fieldType": "String", "targetCode": "" },
+        { "column": "FREQUENCY", "columnType": "Allocation", "targetField": "", "fieldType": "Integer", "targetCode": "" },
+        { "column": "TITLE", "columnType": "Matching", "targetField": "TITLE", "fieldType": "String", "targetCode": "" }
+      ] },
+    { "name": "ACRLOGS", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1,
+      "fields": [
+        { "column": "ARTIST", "columnType": "Matching", "targetField": "CREATOR", "fieldType": "String", "targetCode": "" },
+        { "column": "PLAYS", "columnType": "Allocation", "targetField": "", "fieldType": "Integer", "targetCode": "" },
+        { "column": "STATION", "columnType": "Split", "targetField": "", "fieldType": "String", "targetCode": "" },
+        { "column": "TITLE", "columnType": "Matching", "targetField": "TITLE", "fieldType": "String", "targetCode": "" }
+      ] },
+    { "name": "ISRC", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1,
+      "fields": [
+        { "column": "IDENTIFIER", "columnType": "Matching", "targetField": "IDENTIFIER", "fieldType": "String", "targetCode": "ISRC" },
+        { "column": "PLAYS", "columnType": "Allocation", "targetField": "", "fieldType": "Integer", "targetCode": "" },
+        { "column": "STATION", "columnType": "Split", "targetField": "", "fieldType": "String", "targetCode": "" }
+      ] }
+  ],
+  "sources": [
+    { "name": "stdlogs", "format": "stdlogs", "minThreshold": 60, "maxThreshold": 90, "precision": "0.1", "roles": ["A","AD","AR","C","CA","E","SA","SE","SR","TR"], "distrStatus": "", "creatorsByPerformer": true, "similarity": 80, "numberOfWorks": 20, "historyEntries": 0, "weights": [] },
+    { "name": "Typical log format", "format": "typical log format", "minThreshold": 80, "maxThreshold": 100, "precision": "0.1", "roles": ["A","AD","AR","C","CA","E","SA","SE","SR"], "distrStatus": "", "creatorsByPerformer": true, "similarity": null, "numberOfWorks": null, "historyEntries": 3,
+      "weights": [ { "column": "TITLE", "weight": 13, "similarity": 100, "method": "Exact", "priority": 1 }, { "column": "ARTIST", "weight": 14, "similarity": 100, "method": "", "priority": null } ] },
+    { "name": "Standard Log", "format": "Standard Log", "minThreshold": 40, "maxThreshold": 80, "precision": "0.000001", "roles": ["A","AD","AR","C","CA","E","EM","ES","SA","SE","SR"], "distrStatus": "Fully Distributable", "creatorsByPerformer": true, "similarity": 60, "numberOfWorks": 20, "historyEntries": 5,
+      "weights": [ { "column": "TITLE", "weight": 9, "similarity": null, "method": "Fuzzy", "priority": null }, { "column": "ARTIST", "weight": 10, "similarity": null, "method": "", "priority": null } ] },
+    { "name": "ACRLOGS", "format": "ACRLOGS", "minThreshold": 80, "maxThreshold": 100, "precision": "0.1", "roles": [], "distrStatus": "Fully Distributable", "creatorsByPerformer": true, "similarity": null, "numberOfWorks": null, "historyEntries": 51,
+      "weights": [ { "column": "TITLE", "weight": 28, "similarity": 50, "method": "Exact", "priority": 1 }, { "column": "ARTIST", "weight": 29, "similarity": 70, "method": "", "priority": null } ] },
+    { "name": "ISRC", "format": "ISRC", "minThreshold": 80, "maxThreshold": 100, "precision": "", "roles": [], "distrStatus": "", "creatorsByPerformer": true, "similarity": null, "numberOfWorks": null, "historyEntries": 0,
+      "weights": [ { "column": "IDENTIFIER", "weight": 19, "similarity": 80, "method": "Exact", "priority": 1 } ] }
+  ],
+  "allocationMethods": [
+    { "name": "stdlogs", "format": "stdlogs", "formula": "$FREQUENCY$" },
+    { "name": "typical log format", "format": "typical log format", "formula": "$FREQUENCY$" },
+    { "name": "standard log", "format": "Standard Log", "formula": "$FREQUENCY$" },
+    { "name": "ACRLOGS", "format": "ACRLOGS", "formula": "$PLAYS$" },
+    { "name": "ISRC", "format": "ISRC", "formula": "$PLAYS$" }
+  ]
+}
