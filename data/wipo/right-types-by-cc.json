@@ -1,0 +1,5 @@
+{
+  "AC": ["PCT"], "AD": ["PCT"], "AF": ["PCT"], "AM": ["PCT"], "AV": ["POI"], "AVP": ["POI"], "CW": ["PCT"],
+  "DM": ["PER", "MEC"], "DW": ["PCT"], "IS": [], "LF": ["PCT"], "LN": ["PCT"], "LS": ["PCT"], "LW": ["PCT"],
+  "MM": ["PER", "MEC"], "MW": ["PER", "MEC"], "PH": ["PCT"], "RW": ["PCT"], "SM": ["PCT"], "SR": ["POI"], "WA": ["PCT"]
+}

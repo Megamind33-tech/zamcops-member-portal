@@ -902,3 +902,49 @@ model RefIdentifier {
   type    String @default("")
   classes Json   @default("[]")
 }
+
+// WIPO Connect Agreements and Mandates: who assigned which rights to whom.
+// Assignor and assignee are right holders (plain ids so the register is not
+// touched); seq is the number shown in the default code.
+model Agreement {
+  id              String          @id @default(cuid())
+  seq             Int             @default(autoincrement())
+  code            String          @default("")
+  type            String          @default("General") // General | Implied | Specific Exclude | Specific Include
+  creationClass   String          @default("")
+  assignorId      String?
+  assignorName    String          @default("")
+  assigneeId      String?
+  assigneeName    String          @default("")
+  signatureDate   String          @default("")
+  sourceType      String          @default("") // Assignee | Assignor | External Source | Sister CMO
+  sourceDetail    String          @default("")
+  startDate       String          @default("")
+  endDate         String          @default("")
+  effectiveStart  String          @default("")
+  effectiveEnd    String          @default("")
+  rightTypes      Json            @default("[]")
+  territory       String          @default("")
+  shareValue      Float?
+  workAssociation String          @default("") // Include Set | Include Work
+  status          String          @default("Valid") // Valid | Duplicate Claim | In Dispute | Deleted | Cycle
+  comments        Json            @default("[]")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  works           AgreementWork[]
+
+  @@index([assignorId])
+  @@index([assigneeId])
+  @@index([status])
+}
+
+model AgreementWork {
+  id          String    @id @default(cuid())
+  agreement   Agreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  agreementId String
+  workId      String
+  excluded    Boolean   @default(false)
+
+  @@unique([agreementId, workId, excluded])
+  @@index([workId])
+}

@@ -37,6 +37,7 @@ import {
   Table2,
   Fingerprint,
   BookMarked,
+  FileSignature,
   History,
   SlidersHorizontal,
   Cable,
@@ -67,6 +68,10 @@ const sections = [
       { href: "/admin/works", label: "Pending", icon: FileText },
       { href: "/admin/work-sets", label: "Set", icon: ListChecks },
     ],
+  },
+  {
+    title: "Agreements and Mandates",
+    items: [{ href: "/admin/agreements", label: "Browse", icon: FileSignature }],
   },
   {
     title: "Matching and Distribution",
