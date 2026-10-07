@@ -141,6 +141,13 @@ export default function CataloguePage() {
             >
               <Download size={13} /> Export CSV
             </a>
+            <a
+              href={`/api/admin/registry/works?${queryString({ format: "csv", all: "1" })}`}
+              title="Every work that matches, not just the first 20,000, with alternative titles"
+              className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-white px-3 text-[13px] font-semibold text-[#1f4e79] ring-1 ring-[#bfc5ce] hover:bg-[#eef3f8]"
+            >
+              <Download size={13} /> Export all
+            </a>
             <button
               onClick={() => setAdding((v) => !v)}
               className="inline-flex h-8 items-center gap-1.5 rounded-sm bg-zam-orange px-3 text-[13px] font-semibold text-white"

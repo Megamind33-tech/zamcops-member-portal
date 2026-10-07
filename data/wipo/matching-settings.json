@@ -1,6 +1,12 @@
 {
   "formats": [
-    { "name": "stdlogs", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1, "fields": [] },
+    { "name": "stdlogs", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1,
+      "fields": [
+        { "column": "ARTIST", "columnType": "Matching", "targetField": "CREATOR", "fieldType": "String", "targetCode": "" },
+        { "column": "FREQUENCY", "columnType": "Allocation", "targetField": "", "fieldType": "Integer", "targetCode": "" },
+        { "column": "STATION", "columnType": "Split", "targetField": "", "fieldType": "String", "targetCode": "" },
+        { "column": "TITLE", "columnType": "Matching", "targetField": "TITLE", "fieldType": "String", "targetCode": "" }
+      ] },
     { "name": "typical log format", "fileFormat": "XLSX", "creationClass": "MW", "targetCreationClass": "MW", "headerLines": 1, "footerLines": 0, "sheetNumber": 1,
       "fields": [
         { "column": "ARTIST", "columnType": "Matching", "targetField": "CREATOR", "fieldType": "String", "targetCode": "" },

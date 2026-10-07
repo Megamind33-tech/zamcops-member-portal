@@ -64,32 +64,52 @@ export async function GET(req: Request) {
   const where: Prisma.RegistryWorkWhereInput = and.length ? { AND: and } : {};
 
   if (csv) {
-    const rows = await prisma.registryWork.findMany({
-      where,
-      orderBy: { title: "asc" },
-      take: 20000,
-      include: { shares: { include: { rightHolder: { select: { displayName: true } }, name: { select: { name: true } } } } },
-    });
+    // ?all=1 streams the whole filtered register (any size) in batches; otherwise the first 20,000, by title.
+    const everything = url.searchParams.get("all") === "1";
     const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const head = ["Main Id", "Title", "Status", "Genre", "ISWC", "ISRC", "Registered", "Domestic", "Right-holders"];
-    const body = rows.map((w) =>
-      [
+    const head = ["Main Id", "Title", "Alternative titles", "Status", "Creation Class", "Genre", "ISWC", "ISRC", "Registered", "Domestic", "Right-holders"];
+    const line = (w: {
+      wipoId: string; title: string; alternativeTitles: string; status: string; creationClass: string; genre: string; iswc: string; isrc: string; registeredAt: string; domestic: boolean;
+      shares: { rightHolder: { displayName: string } | null; name: { name: string } | null }[];
+    }) => {
+      let alts: string[] = [];
+      try { alts = JSON.parse(w.alternativeTitles || "[]"); } catch { /* none */ }
+      return [
         w.wipoId.startsWith("local_") ? "" : w.wipoId,
         w.title,
+        alts.join("; "),
         w.status,
+        w.creationClass,
         w.genre,
         w.iswc,
         w.isrc,
         w.registeredAt,
         w.domestic ? "Yes" : "No",
         [...new Set(w.shares.map((s) => s.rightHolder?.displayName || s.name?.name || "").filter(Boolean))].join("; "),
-      ]
-        .map(esc)
-        .join(","),
-    );
-    return new Response([head.join(","), ...body].join("\n"), {
-      headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="registered-works.csv"', "Cache-Control": "no-store" },
+      ].map(esc).join(",");
+    };
+    const include = { shares: { select: { rightHolder: { select: { displayName: true } }, name: { select: { name: true } } } } } as const;
+    const headers = { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="registered-works.csv"', "Cache-Control": "no-store" };
+
+    if (!everything) {
+      const rows = await prisma.registryWork.findMany({ where, orderBy: { title: "asc" }, take: 20000, include });
+      return new Response(["\uFEFF" + head.join(","), ...rows.map(line)].join("\n"), { headers });
+    }
+    const enc = new TextEncoder();
+    const stream = new ReadableStream<Uint8Array>({
+      async start(c) {
+        c.enqueue(enc.encode("\uFEFF" + head.join(",") + "\n"));
+        let cursor: string | undefined;
+        for (;;) {
+          const batch = await prisma.registryWork.findMany({ where, orderBy: { id: "asc" }, take: 2000, ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}), include });
+          if (batch.length === 0) break;
+          c.enqueue(enc.encode(batch.map(line).join("\n") + "\n"));
+          cursor = batch[batch.length - 1].id;
+        }
+        c.close();
+      },
     });
+    return new Response(stream, { headers });
   }
 
   const [total, works, statuses, all] = await Promise.all([
